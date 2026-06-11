@@ -1,0 +1,26 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T[LocalizationKeys.ApiEndpointsScreen.Title].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div>
+            <h2>@T[LocalizationKeys.ApiEndpointsScreen.Title]</h2>
+            <p>@T[LocalizationKeys.ApiEndpointsScreen.Subtitle]</p>
+        </div>
+    </header>
+
+    <div id="api-endpoints-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/app/pages/api-endpoints.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.ApiEndpoints.init();
+        });
+    </script>
+}
+

@@ -8,17 +8,14 @@ public sealed class ResourceConfiguration : IEntityTypeConfiguration<Resource>
 {
     public void Configure(EntityTypeBuilder<Resource> builder)
     {
-        builder.ToTable("Resources");
-        builder.HasQueryFilter(entry => !entry.IsDeleted);
+        builder.ToTable("LocalizationResources");
+        builder.HasKey(r => r.Id);
 
-        builder.Property(entry => entry.Key).HasMaxLength(200).IsRequired();
-        builder.Property(entry => entry.Culture).HasMaxLength(15).IsRequired();
-        builder.Property(entry => entry.Value).IsRequired();
+        builder.Property(r => r.Key).IsRequired().HasMaxLength(200);
+        builder.Property(r => r.Culture).IsRequired().HasMaxLength(10);
+        builder.Property(r => r.Value).IsRequired();
 
-        // A localization key can only have a single value per culture.
-        builder.HasIndex(entry => new { entry.Key, entry.Culture })
-            .IsUnique()
-            .HasDatabaseName("IX_LocalizationEntries_Key_Culture");
+        builder.HasIndex(r => new { r.Culture, r.Key }).IsUnique();
+        builder.HasIndex(r => r.Key);
     }
 }
-

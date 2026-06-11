@@ -1,0 +1,33 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T[LocalizationKeys.UserAccessScreen.Title].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div>
+            <h2>@T[LocalizationKeys.UserAccessScreen.Title]</h2>
+            <p>@T[LocalizationKeys.UserAccessScreen.Subtitle]</p>
+        </div>
+    </header>
+
+    <div class="user-access">
+        <div class="user-access__list">
+            <div id="user-access-users"></div>
+        </div>
+        <div class="user-access__detail">
+            <div id="user-access-detail"></div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/app/pages/user-access.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.UserAccess.init();
+        });
+    </script>
+}
+

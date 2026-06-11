@@ -1,11 +1,8 @@
-using Energy.Application.Common.Exceptions;
 using Energy.Application.Identity.Services;
 using Energy.Domain.Identity;
 using Energy.Infrastructure.Persistence;
 using Energy.Localization;
 using Energy.Shared.Identity.Permissions;
-using Energy.Shared.Models.V1.Common.Responses;
-using Energy.Shared.Models.V1.Identity.Requests;
 using Energy.Shared.Models.V1.Identity.Responses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
@@ -14,209 +11,108 @@ namespace Energy.Infrastructure.Identity.Services;
 
 public sealed class PermissionService : IPermissionService
 {
-    private const string AdminRoleName = "Admin";
-
-    // Default permission catalog used by SeedDefaultPermissionsAsync.
-    // Aggregates all endpoint-specific permission codes via PermissionCatalog.
-    private static readonly IReadOnlyList<PermissionDescriptor> DefaultPermissions = PermissionCatalog.All;
-
-    private readonly AppDbContext _dbContext;
+    private readonly AppDbContext _db;
     private readonly IStringLocalizer<SharedResource> _localizer;
 
-    public PermissionService(AppDbContext dbContext, IStringLocalizer<SharedResource> localizer)
+    public PermissionService(AppDbContext db, IStringLocalizer<SharedResource> localizer)
     {
-        _dbContext = dbContext;
+        _db = db;
         _localizer = localizer;
     }
 
-    public async Task<IReadOnlyList<PermissionResponse>> GetPermissionsAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<PermissionResponse>> GetAllAsync(CancellationToken ct = default)
     {
-        return await _dbContext.Permissions
-            .AsNoTracking()
-            .OrderBy(p => p.Code)
-            .Select(p => new PermissionResponse { Id = p.Id, Code = p.Code, Name = p.Name })
-            .ToListAsync(cancellationToken);
+        var rows = await _db.Permissions.AsNoTracking().ToListAsync(ct);
+        var roleCounts = await _db.RolePermissions.AsNoTracking()
+            .GroupBy(rp => rp.PermissionCode)
+            .Select(g => new { Code = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.Code, x => x.Count, ct);
+
+        var menuCounts = await _db.Menus.AsNoTracking()
+            .Where(m => m.RequiredPermissionCode != null)
+            .GroupBy(m => m.RequiredPermissionCode!)
+            .Select(g => new { Code = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.Code, x => x.Count, ct);
+
+        var endpointCounts = await _db.ApiEndpoints.AsNoTracking()
+            .Where(e => e.RequiredPermissionCode != null)
+            .GroupBy(e => e.RequiredPermissionCode!)
+            .Select(g => new { Code = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.Code, x => x.Count, ct);
+
+        return rows.OrderBy(r => r.Module).ThenBy(r => r.Action)
+            .Select(r => Map(r, roleCounts, menuCounts, endpointCounts))
+            .ToList();
     }
 
-    public async Task<PermissionResponse> GetPermissionByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<PermissionResponse?> GetByCodeAsync(string code, CancellationToken ct = default)
     {
-        var permission = await _dbContext.Permissions
-            .AsNoTracking()
-            .Where(p => p.Id == id)
-            .Select(p => new PermissionResponse { Id = p.Id, Code = p.Code, Name = p.Name })
-            .FirstOrDefaultAsync(cancellationToken);
-
-        return permission ?? throw new NotFoundException(string.Format(
-            _localizer.GetText(LocalizationKeys.Messages.PermissionNotFound, "Permission '{0}' was not found."),
-            id));
+        var row = await _db.Permissions.AsNoTracking().FirstOrDefaultAsync(p => p.Code == code, ct);
+        if (row is null) return null;
+        var roleCount = await _db.RolePermissions.AsNoTracking().CountAsync(rp => rp.PermissionCode == code, ct);
+        var menuCount = await _db.Menus.AsNoTracking().CountAsync(m => m.RequiredPermissionCode == code, ct);
+        var endpointCount = await _db.ApiEndpoints.AsNoTracking().CountAsync(e => e.RequiredPermissionCode == code, ct);
+        return Map(row,
+            new Dictionary<string, int> { [code] = roleCount },
+            new Dictionary<string, int> { [code] = menuCount },
+            new Dictionary<string, int> { [code] = endpointCount });
     }
 
-    public async Task<PermissionResponse> CreatePermissionAsync(CreatePermissionRequest request, CancellationToken cancellationToken = default)
+    public async Task<int> SyncCatalogAsync(CancellationToken ct = default)
     {
-        var code = Normalize(request.Code);
-        if (await _dbContext.Permissions.AnyAsync(p => p.Code == code, cancellationToken))
+        var existing = await _db.Permissions.ToDictionaryAsync(p => p.Code, ct);
+        var added = 0;
+
+        foreach (var descriptor in PermissionCatalog.All)
         {
-            throw new ConflictException(string.Format(
-                _localizer.GetText(LocalizationKeys.Messages.PermissionAlreadyExists, "Permission '{0}' already exists."),
-                code));
+            if (existing.TryGetValue(descriptor.Code, out var row))
+            {
+                row.Module = descriptor.Module;
+                row.Action = descriptor.Action;
+                row.DisplayNameKey = descriptor.DisplayNameKey;
+                row.DescriptionKey = descriptor.DescriptionKey;
+            }
+            else
+            {
+                _db.Permissions.Add(new Permission
+                {
+                    Code = descriptor.Code,
+                    Module = descriptor.Module,
+                    Action = descriptor.Action,
+                    DisplayNameKey = descriptor.DisplayNameKey,
+                    DescriptionKey = descriptor.DescriptionKey
+                });
+                added += 1;
+            }
         }
 
-        var permission = new Permission
+        await _db.SaveChangesAsync(ct);
+        return added;
+    }
+
+    private PermissionResponse Map(Permission p,
+        IReadOnlyDictionary<string, int> roles,
+        IReadOnlyDictionary<string, int> menus,
+        IReadOnlyDictionary<string, int> endpoints)
+    {
+        var displayName = _localizer[p.DisplayNameKey].Value;
+        if (string.IsNullOrEmpty(displayName) || displayName == p.DisplayNameKey)
         {
-            Id = Guid.NewGuid(),
-            Code = code,
-            Name = request.Name.Trim(),
-            CreatedAt = DateTime.UtcNow
+            displayName = $"{p.Module} {p.Action}";
+        }
+        var description = p.DescriptionKey is null ? null : _localizer[p.DescriptionKey].Value;
+        if (description == p.DescriptionKey) description = null;
+
+        return new PermissionResponse
+        {
+            Code = p.Code,
+            Module = p.Module,
+            Action = p.Action,
+            DisplayName = displayName,
+            Description = description,
+            RoleCount = roles.GetValueOrDefault(p.Code),
+            MenuCount = menus.GetValueOrDefault(p.Code),
+            EndpointCount = endpoints.GetValueOrDefault(p.Code)
         };
-
-        _dbContext.Permissions.Add(permission);
-
-        // Keep Admin role as super-user: every newly created permission is linked automatically.
-        var adminRole = await _dbContext.Roles
-            .FirstOrDefaultAsync(r => r.NormalizedName == AdminRoleName.ToUpperInvariant(), cancellationToken);
-
-        if (adminRole is not null)
-        {
-            var adminHasPermission = await _dbContext.RolePermissions
-                .AnyAsync(rp => rp.RoleId == adminRole.Id && rp.PermissionId == permission.Id, cancellationToken);
-
-            if (!adminHasPermission)
-            {
-                _dbContext.RolePermissions.Add(new RolePermission
-                {
-                    RoleId = adminRole.Id,
-                    PermissionId = permission.Id
-                });
-            }
-        }
-
-        await _dbContext.SaveChangesAsync(cancellationToken);
-
-        return new PermissionResponse { Id = permission.Id, Code = permission.Code, Name = permission.Name };
-    }
-
-    public async Task<PermissionResponse> UpdatePermissionAsync(Guid id, UpdatePermissionRequest request, CancellationToken cancellationToken = default)
-    {
-        var permission = await _dbContext.Permissions.FirstOrDefaultAsync(p => p.Id == id, cancellationToken)
-                         ?? throw new NotFoundException(string.Format(
-                             _localizer.GetText(LocalizationKeys.Messages.PermissionNotFound, "Permission '{0}' was not found."),
-                             id));
-
-        var code = Normalize(request.Code);
-        if (await _dbContext.Permissions.AnyAsync(p => p.Id != id && p.Code == code, cancellationToken))
-        {
-            throw new ConflictException(string.Format(
-                _localizer.GetText(LocalizationKeys.Messages.PermissionAlreadyExists, "Permission '{0}' already exists."),
-                code));
-        }
-
-        permission.Code = code;
-        permission.Name = request.Name.Trim();
-        permission.UpdatedAt = DateTime.UtcNow;
-
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return new PermissionResponse { Id = permission.Id, Code = permission.Code, Name = permission.Name };
-    }
-
-    public async Task DeletePermissionAsync(Guid id, CancellationToken cancellationToken = default)
-    {
-        var permission = await _dbContext.Permissions.FirstOrDefaultAsync(p => p.Id == id, cancellationToken)
-                         ?? throw new NotFoundException(string.Format(
-                             _localizer.GetText(LocalizationKeys.Messages.PermissionNotFound, "Permission '{0}' was not found."),
-                             id));
-
-        _dbContext.Permissions.Remove(permission);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-    }
-
-    public async Task<SeedResultResponse> SeedDefaultPermissionsAsync(CancellationToken cancellationToken = default)
-    {
-        var added = 0;
-        var updated = 0;
-
-        foreach (var (code, nameKey, fallbackName) in DefaultPermissions)
-        {
-            var localizedName = _localizer.GetText(nameKey, fallbackName);
-            var existing = await _dbContext.Permissions.FirstOrDefaultAsync(p => p.Code == code, cancellationToken);
-            if (existing is null)
-            {
-                _dbContext.Permissions.Add(new Permission
-                {
-                    Id = Guid.NewGuid(),
-                    Code = code,
-                    Name = localizedName,
-                    CreatedAt = DateTime.UtcNow
-                });
-                added++;
-            }
-            else if (existing.Name != localizedName)
-            {
-                existing.Name = localizedName;
-                existing.UpdatedAt = DateTime.UtcNow;
-                updated++;
-            }
-        }
-
-        await _dbContext.SaveChangesAsync(cancellationToken);
-
-        var total = await _dbContext.Permissions.AsNoTracking().CountAsync(cancellationToken);
-        return new SeedResultResponse { Added = added, Updated = updated, Total = total };
-    }
-
-    private static string Normalize(string value) => value.Trim().ToUpperInvariant();
-
-    public async Task<SeedResultResponse> SeedPermissionCodesAsync(IEnumerable<string> codes, CancellationToken cancellationToken = default)
-    {
-        ArgumentNullException.ThrowIfNull(codes);
-
-        var distinct = codes
-            .Where(static c => !string.IsNullOrWhiteSpace(c))
-            .Select(static c => c.Trim())
-            .Distinct(StringComparer.Ordinal)
-            .ToArray();
-
-        if (distinct.Length == 0)
-        {
-            var totalEmpty = await _dbContext.Permissions.AsNoTracking().CountAsync(cancellationToken);
-            return new SeedResultResponse { Added = 0, Updated = 0, Total = totalEmpty };
-        }
-
-        var existingCodes = await _dbContext.Permissions
-            .Where(p => distinct.Contains(p.Code))
-            .Select(p => p.Code)
-            .ToListAsync(cancellationToken);
-
-        var existingSet = new HashSet<string>(existingCodes, StringComparer.Ordinal);
-
-        var added = 0;
-        foreach (var code in distinct)
-        {
-            if (existingSet.Contains(code))
-            {
-                continue;
-            }
-
-            var nameKey = PermissionCatalog.BuildNameKey(code);
-            var fallback = PermissionCatalog.BuildFallbackName(code);
-            var localizedName = _localizer.GetText(nameKey, fallback);
-
-            _dbContext.Permissions.Add(new Permission
-            {
-                Id = Guid.NewGuid(),
-                Code = code,
-                Name = localizedName,
-                CreatedAt = DateTime.UtcNow
-            });
-            added++;
-        }
-
-        if (added > 0)
-        {
-            await _dbContext.SaveChangesAsync(cancellationToken);
-        }
-
-        var total = await _dbContext.Permissions.AsNoTracking().CountAsync(cancellationToken);
-        return new SeedResultResponse { Added = added, Updated = 0, Total = total };
     }
 }
-

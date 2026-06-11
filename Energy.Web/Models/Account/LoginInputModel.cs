@@ -1,16 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Energy.Web.Models.Account;
 
-/// <summary>
-/// Posted by the DevExtreme login form.
-/// </summary>
 public sealed class LoginInputModel
 {
-    public string UserNameOrEmail { get; set; } = string.Empty;
-
-    public string Password { get; set; } = string.Empty;
-
-    public bool RememberMe { get; set; }
-
+    [Required] public string UserNameOrEmail { get; set; } = string.Empty;
+    [Required] public string Password { get; set; } = string.Empty;
     public string? ReturnUrl { get; set; }
 }
-

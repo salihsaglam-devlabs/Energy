@@ -1,5 +1,7 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.6.11822.322 stable
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energy.Api", "Energy.Api\Energy.Api.csproj", "{7C05822A-96AA-40A0-8CCD-916271960920}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energy.Domain", "Energy.Domain\Energy.Domain.csproj", "{63CA7265-E944-4450-83FB-2B02843730EB}"
@@ -32,6 +34,7 @@ Global
 		{7C05822A-96AA-40A0-8CCD-916271960920}.Debug|x86.Build.0 = Debug|Any CPU
 		{7C05822A-96AA-40A0-8CCD-916271960920}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C05822A-96AA-40A0-8CCD-916271960920}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C05822A-96AA-40A0-8CCD-916271960920}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{7C05822A-96AA-40A0-8CCD-916271960920}.Release|x64.ActiveCfg = Release|Any CPU
 		{7C05822A-96AA-40A0-8CCD-916271960920}.Release|x64.Build.0 = Release|Any CPU
 		{7C05822A-96AA-40A0-8CCD-916271960920}.Release|x86.ActiveCfg = Release|Any CPU
@@ -80,6 +83,7 @@ Global
 		{367B75E8-7FEA-448B-AA34-0C4A5DE29467}.Debug|x86.Build.0 = Debug|Any CPU
 		{367B75E8-7FEA-448B-AA34-0C4A5DE29467}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{367B75E8-7FEA-448B-AA34-0C4A5DE29467}.Release|Any CPU.Build.0 = Release|Any CPU
+		{367B75E8-7FEA-448B-AA34-0C4A5DE29467}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{367B75E8-7FEA-448B-AA34-0C4A5DE29467}.Release|x64.ActiveCfg = Release|Any CPU
 		{367B75E8-7FEA-448B-AA34-0C4A5DE29467}.Release|x64.Build.0 = Release|Any CPU
 		{367B75E8-7FEA-448B-AA34-0C4A5DE29467}.Release|x86.ActiveCfg = Release|Any CPU
@@ -111,5 +115,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2C7DB5BF-0A77-4D92-9D00-626D5DDA88A5}
 	EndGlobalSection
 EndGlobal

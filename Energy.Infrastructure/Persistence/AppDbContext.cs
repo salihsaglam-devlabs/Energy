@@ -2,6 +2,7 @@ using Energy.Domain.Identity;
 using Energy.Domain.Localization;
 using Energy.Domain.Logger;
 using Energy.Domain.System;
+using Energy.Domain.Chat;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence;
@@ -16,14 +17,13 @@ public class AppDbContext : DbContext
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<UserRole> UserRoles => Set<UserRole>();
     public DbSet<Permission> Permissions => Set<Permission>();
-    public DbSet<Menu> Menus => Set<Menu>();
-    public DbSet<AccessRule> AccessRules => Set<AccessRule>();
-    public DbSet<MenuPermission> MenuPermissions => Set<MenuPermission>();
-    public DbSet<AccessRulePermission> AccessRulePermissions => Set<AccessRulePermission>();
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
-    public DbSet<RoleMenu> RoleMenus => Set<RoleMenu>();
-    public DbSet<Log> Logs => Set<Log>();
+    public DbSet<UserPermission> UserPermissions => Set<UserPermission>();
+    public DbSet<Menu> Menus => Set<Menu>();
+    public DbSet<ApiEndpoint> ApiEndpoints => Set<ApiEndpoint>();
     public DbSet<Resource> Resources => Set<Resource>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -50,6 +50,35 @@
     <div class="energy-toolbar__spacer"></div>
 
     <div class="energy-toolbar__actions">
+        <div class="energy-toolbar__conn" id="energy-conn" tabindex="0" role="button"
+             aria-label="@T[LocalizationKeys.ChatScreen.ConnectionStatus]"
+             data-label-status="@T[LocalizationKeys.ChatScreen.ConnectionStatus]"
+             data-label-online="@T[LocalizationKeys.ChatScreen.OnlineUsers]"
+             data-status-connected="@T[LocalizationKeys.ChatScreen.Connected]"
+             data-status-connecting="@T[LocalizationKeys.ChatScreen.Connecting]"
+             data-status-reconnecting="@T[LocalizationKeys.ChatScreen.Reconnecting]"
+             data-status-disconnected="@T[LocalizationKeys.ChatScreen.Disconnected]">
+            <i class="fas fa-wifi"></i>
+            <span class="energy-toolbar__conn-dot" id="energy-conn-dot"></span>
+            <div class="energy-toolbar__conn-panel" id="energy-conn-panel" hidden>
+                <div class="energy-toolbar__notify-header" id="energy-conn-title">@T[LocalizationKeys.ChatScreen.ConnectionStatus]</div>
+                <div class="energy-toolbar__conn-body" id="energy-conn-body"></div>
+            </div>
+        </div>
+
+        <div class="energy-toolbar__notify" id="energy-notify" tabindex="0" role="button"
+             aria-label="@T[LocalizationKeys.ChatScreen.Notifications]"
+             data-chat-url="@Url.Action("Index", "Chat")"
+             data-empty-text="@T[LocalizationKeys.ChatScreen.NoNotifications]"
+             data-title-text="@T[LocalizationKeys.ChatScreen.Notifications]">
+            <i class="fas fa-bell"></i>
+            <span class="energy-toolbar__notify-badge" id="energy-notify-badge" hidden>0</span>
+            <div class="energy-toolbar__notify-panel" id="energy-notify-panel" hidden>
+                <div class="energy-toolbar__notify-header">@T[LocalizationKeys.ChatScreen.Notifications]</div>
+                <ul class="energy-toolbar__notify-list" id="energy-notify-list"></ul>
+            </div>
+        </div>
+
         <div class="energy-toolbar__lang">
             <a href="@trUrl" class="energy-toolbar__lang-btn @(isTr ? "is-active" : "")"
                aria-label="@T[LocalizationKeys.Common.Turkish]">TR</a>

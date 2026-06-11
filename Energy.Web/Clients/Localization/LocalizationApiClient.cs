@@ -7,36 +7,14 @@ namespace Energy.Web.Clients.Localization;
 
 public sealed class LocalizationApiClient : ApiClientBase, ILocalizationApiClient
 {
-    public LocalizationApiClient(HttpClient httpClient) : base(httpClient)
-    {
-    }
+    public LocalizationApiClient(HttpClient httpClient) : base(httpClient) { }
 
-    public Task<BaseResponse<IReadOnlyList<LocalizationEntryResponse>>> GetAllAsync(
-        CancellationToken cancellationToken = default)
-        => GetAsync<BaseResponse<IReadOnlyList<LocalizationEntryResponse>>>(
-            ApiRoutes.Localization.Base, cancellationToken);
+    public Task<BaseResponse<IReadOnlyList<LocalizationEntryResponse>>> GetAllAsync(CancellationToken ct = default)
+        => GetAsync<BaseResponse<IReadOnlyList<LocalizationEntryResponse>>>(ApiRoutes.Localization.Base, ct);
 
-    public Task<BaseResponse<LocalizationEntryResponse>> GetByKeyAsync(
-        string key,
-        CancellationToken cancellationToken = default)
-        => GetAsync<BaseResponse<LocalizationEntryResponse>>(
-            ApiRoutes.Localization.ByKey(key), cancellationToken);
+    public Task<BaseResponse<LocalizationEntryResponse>> UpsertAsync(UpsertLocalizationEntryRequest request, CancellationToken ct = default)
+        => PostAsync<UpsertLocalizationEntryRequest, BaseResponse<LocalizationEntryResponse>>(ApiRoutes.Localization.Base, request, ct);
 
-    public Task<BaseResponse<LocalizationEntryResponse>> UpsertAsync(
-        UpsertLocalizationEntryRequest request,
-        CancellationToken cancellationToken = default)
-        => PostAsync<UpsertLocalizationEntryRequest, BaseResponse<LocalizationEntryResponse>>(
-            ApiRoutes.Localization.Base, request, cancellationToken);
-
-    public Task<BaseResponse<string>> DeleteAsync(
-        string key,
-        CancellationToken cancellationToken = default)
-        => DeleteAsync<BaseResponse<string>>(
-            ApiRoutes.Localization.ByKey(key), cancellationToken);
-
-    public Task<BaseResponse<SeedResultResponse>> ImportFromResxAsync(
-        CancellationToken cancellationToken = default)
-        => PostAsync<BaseResponse<SeedResultResponse>>(
-            ApiRoutes.Localization.ImportFromResx, cancellationToken);
+    public Task<BaseResponse<bool>> DeleteAsync(string key, CancellationToken ct = default)
+        => DeleteAsync<BaseResponse<bool>>(ApiRoutes.Localization.ByKey(key), ct);
 }
-

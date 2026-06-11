@@ -3,7 +3,6 @@
     var L = function () { return window.AppL10n.menus; };
     var LG = function () { return window.AppL10n.grid; };
     var LN = function () { return window.AppL10n.notifications; };
-    var R = function () { return window.AppResponsive; };
     var gridInstance, lookupItems = [], permissionsLookup = [];
 
     function exportGrid(e, fileName) {
@@ -49,7 +48,6 @@
             }
         });
 
-        var g = R().getGridOptions();
         gridInstance = $("#menus-grid").dxDataGrid({
             dataSource: store,
             remoteOperations: { paging: true, sorting: true },
@@ -64,16 +62,16 @@
             hoverStateEnabled: true,
             allowColumnResizing: true,
             columnResizingMode: "widget",
-            columnAutoWidth: g.columnAutoWidth,
-            columnHidingEnabled: g.columnHidingEnabled,
-            wordWrapEnabled: g.wordWrapEnabled,
+            columnAutoWidth: true,
+            columnHidingEnabled: false,
+            wordWrapEnabled: false,
             width: "100%",
-            height: g.height,
-            scrolling: g.scrolling,
+            height: "75vh",
+            scrolling: { mode: "standard", useNative: true, showScrollbar: "onScroll", columnRenderingMode: "standard" },
             repaintChangesOnly: true,
             paging: { pageSize: 20 },
-            pager: R().getPagerOptions(),
-            searchPanel: R().getSearchPanelOptions(LG().search),
+            pager: { visible: true, allowedPageSizes: [10, 20, 50], showPageSizeSelector: true, showInfo: true, showNavigationButtons: true, displayMode: "full" },
+            searchPanel: { visible: true, placeholder: LG().search, width: 240 },
             sorting: { mode: "multiple" },
             columnChooser: { enabled: true, mode: "select", height: 320, search: { enabled: true } },
             loadPanel: { enabled: true, text: LG().loading },
@@ -124,10 +122,19 @@
     }
     function showFormPopup(opts) {
         var formData = opts.data;
-        var popup = $("<div>").appendTo("body").dxPopup(R().getPopupOptions({
-            title: opts.title, width: 640, height: 520, showCloseButton: true,
+        var popup = $("<div>").appendTo("body").dxPopup({
+            title: opts.title,
+            width: 640,
+            height: "auto",
+            maxWidth: "min(92vw, 960px)",
+            maxHeight: "min(88vh, 820px)",
+            dragEnabled: true,
+            resizeEnabled: true,
+            hideOnOutsideClick: true,
+            showCloseButton: true,
+            wrapperAttr: { class: "energy-popup" },
             contentTemplate: function (host) {
-                $("<div>").appendTo(host).dxForm(R().getFormOptions({
+                $("<div>").appendTo(host).dxForm({
                     formData: formData, labelLocation: "top", colCount: 2,
                     items: [
                         { dataField: "name", label: { text: L().name }, validationRules: [{ type: "required" }] },
@@ -156,7 +163,7 @@
                         { dataField: "parentId", label: { text: L().parent }, editorType: "dxSelectBox",
                           editorOptions: { items: lookupItems, valueExpr: "id", displayExpr: "name", searchEnabled: true, showClearButton: true } }
                     ]
-                }));
+                });
             },
             toolbarItems: [
                 { widget: "dxButton", location: "after", toolbar: "bottom",
@@ -169,7 +176,7 @@
                   options: { text: LG().cancel, onClick: function () { popup.hide(); } }}
             ],
             onHidden: function () { popup.dispose(); $(popup.element()).remove(); }
-        })).dxPopup("instance");
+        }).dxPopup("instance");
         popup.show();
     }
 
@@ -188,12 +195,20 @@
                 var selectedIds = selectedResp.selected || [];
                 var formData = { permissionIds: selectedIds.slice() };
 
-                var popup = $("<div>").appendTo("body").dxPopup(R().getPopupOptions({
+                var popup = $("<div>").appendTo("body").dxPopup({
                     title: window.AppL10n.roles.permissionsTitle + " - " + row.name,
-                    width: 560, height: 520, showCloseButton: true,
+                    width: 560,
+                    height: "auto",
+                    maxWidth: "min(92vw, 960px)",
+                    maxHeight: "min(88vh, 820px)",
+                    dragEnabled: true,
+                    resizeEnabled: true,
+                    hideOnOutsideClick: true,
+                    showCloseButton: true,
+                    wrapperAttr: { class: "energy-popup" },
                     contentTemplate: function (host) {
-                        $("<div>").appendTo(host).dxForm(R().getFormOptions({
-                            formData: formData,
+                        $("<div>").appendTo(host).dxForm({
+                            formData: formData, labelLocation: "top", colCount: 1,
                             items: [{
                                 dataField: "permissionIds", label: { text: window.AppL10n.permissions.title },
                                 editorType: "dxTagBox",
@@ -208,7 +223,7 @@
                                     searchEnabled: true
                                 }
                             }]
-                        }));
+                        });
                     },
                     toolbarItems: [
                         { widget: "dxButton", location: "after", toolbar: "bottom",
@@ -221,7 +236,7 @@
                           options: { text: LG().cancel, onClick: function () { popup.hide(); } }}
                     ],
                     onHidden: function () { popup.dispose(); $(popup.element()).remove(); }
-                })).dxPopup("instance");
+                }).dxPopup("instance");
 
                 popup.show();
             })

@@ -6,22 +6,7 @@ namespace Energy.Web.Clients.Localization;
 
 public interface ILocalizationApiClient
 {
-    Task<BaseResponse<IReadOnlyList<LocalizationEntryResponse>>> GetAllAsync(
-        CancellationToken cancellationToken = default);
-
-    Task<BaseResponse<LocalizationEntryResponse>> GetByKeyAsync(
-        string key,
-        CancellationToken cancellationToken = default);
-
-    Task<BaseResponse<LocalizationEntryResponse>> UpsertAsync(
-        UpsertLocalizationEntryRequest request,
-        CancellationToken cancellationToken = default);
-
-    Task<BaseResponse<string>> DeleteAsync(
-        string key,
-        CancellationToken cancellationToken = default);
-
-    Task<BaseResponse<SeedResultResponse>> ImportFromResxAsync(
-        CancellationToken cancellationToken = default);
+    Task<BaseResponse<IReadOnlyList<LocalizationEntryResponse>>> GetAllAsync(CancellationToken ct = default);
+    Task<BaseResponse<LocalizationEntryResponse>> UpsertAsync(UpsertLocalizationEntryRequest request, CancellationToken ct = default);
+    Task<BaseResponse<bool>> DeleteAsync(string key, CancellationToken ct = default);
 }
-

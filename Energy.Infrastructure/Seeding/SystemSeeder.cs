@@ -1,720 +1,546 @@
 using Energy.Application.Identity.Services;
 using Energy.Application.Localization.Services;
-using Energy.Application.System.Services;
 using Energy.Domain.Identity;
 using Energy.Domain.System;
+using Energy.Infrastructure.Identity.Services;
 using Energy.Infrastructure.Persistence;
+using Energy.Infrastructure.System.Services;
 using Energy.Localization;
+using Energy.Shared.Identity;
 using Energy.Shared.Identity.Permissions;
-using Energy.Shared.Models.V1.Identity.Requests;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace Energy.Infrastructure.Seeding;
 
 /// <summary>
-/// Single entry point that brings the database to a fully usable state for
-/// system administration: default permissions, default menu tree, the Admin
-/// role/user with all permissions and menus linked, and the localization
-/// overrides imported from the embedded .resx files.
-///
-/// Every step is idempotent so the seeder can safely run on every startup.
+/// Idempotent startup seeder. Brings the database to a fully usable state:
+/// permission catalog, SuperAdmin + admin user, baseline menu tree, API
+/// endpoint catalog with default permission mapping, localization import,
+/// and a curated catalog of sample roles + demo users covering the common
+/// usage patterns the new architecture supports. Every step is safe to re-run.
 /// </summary>
 public sealed class SystemSeeder
 {
-    private sealed record SeedRoleDefinition(
-        string NameKey,
-        string DescriptionKey,
+    /// <summary>
+    /// Reference catalog of user archetypes. Each entry maps a role to the
+    /// exact set of permission codes it owns and the demo user that wears it.
+    /// Admins can copy these as templates from the Roles screen.
+    /// </summary>
+    private sealed record SampleRole(
+        string RoleName,
+        string RoleDescription,
         IReadOnlyList<string> PermissionCodes,
-        IReadOnlyList<string> MenuUrls,
-        SeedUserDefinition User);
+        SampleUser? DemoUser);
 
-    private sealed record SeedUserDefinition(
-        string FirstNameKey,
-        string LastNameKey,
+    private sealed record SampleUser(
         string UserName,
         string Email,
+        string FirstName,
+        string LastName,
         string Password);
 
     /// <summary>
-    /// One centralized access rule per real API endpoint (scope = API). Each rule
-    /// is linked to the exact permission its controller action already enforces via
-    /// <c>[Authorize(Policy = ...)]</c>, so enabling the rule mirrors the existing
-    /// policy and never changes the effective authorization for any principal.
-    /// This turns the Access Rules screen into a complete, self-documenting map of
-    /// the API surface and how every endpoint relates to a permission.
+    /// Built-in role templates. SuperAdmin is handled separately because it
+    /// bypasses permission checks; it does not appear here.
     /// </summary>
-    private sealed record SeedAccessRuleDefinition(
-        string NameKey,
-        string Path,
-        string HttpMethod,
-        string DescriptionKey,
-        string PermissionCode);
-
-    private const string ApiBase = "/api/v1";
-
-    private static readonly SeedAccessRuleDefinition[] DefaultAccessRuleDefinitions =
+    private static readonly IReadOnlyList<SampleRole> SampleRoles =
     [
-        // Home
-        new(LocalizationKeys.AccessRulesSeed.Home.GetDashboardName, $"{ApiBase}/home/dashboard", "GET", LocalizationKeys.AccessRulesSeed.Home.GetDashboardDescription, HomePermissions.GetDashboard),
-
-        // Users
-        new(LocalizationKeys.AccessRulesSeed.User.GetUsersName, $"{ApiBase}/users", "GET", LocalizationKeys.AccessRulesSeed.User.GetUsersDescription, UserPermissions.GetUsers),
-        new(LocalizationKeys.AccessRulesSeed.User.GetUserName, $"{ApiBase}/users/{{id}}", "GET", LocalizationKeys.AccessRulesSeed.User.GetUserDescription, UserPermissions.GetUser),
-        new(LocalizationKeys.AccessRulesSeed.User.CreateUserName, $"{ApiBase}/users", "POST", LocalizationKeys.AccessRulesSeed.User.CreateUserDescription, UserPermissions.CreateUser),
-        new(LocalizationKeys.AccessRulesSeed.User.UpdateUserName, $"{ApiBase}/users/{{id}}", "PUT", LocalizationKeys.AccessRulesSeed.User.UpdateUserDescription, UserPermissions.UpdateUser),
-        new(LocalizationKeys.AccessRulesSeed.User.SetRolesName, $"{ApiBase}/users/{{id}}/roles", "PUT", LocalizationKeys.AccessRulesSeed.User.SetRolesDescription, UserPermissions.SetRoles),
-        new(LocalizationKeys.AccessRulesSeed.User.UpdatePasswordName, $"{ApiBase}/users/{{id}}/password", "PUT", LocalizationKeys.AccessRulesSeed.User.UpdatePasswordDescription, UserPermissions.UpdatePassword),
-        new(LocalizationKeys.AccessRulesSeed.User.DeleteUserName, $"{ApiBase}/users/{{id}}", "DELETE", LocalizationKeys.AccessRulesSeed.User.DeleteUserDescription, UserPermissions.DeleteUser),
-        new(LocalizationKeys.AccessRulesSeed.User.GetAdminPermissionHealthName, $"{ApiBase}/users/admin-permissions/health", "GET", LocalizationKeys.AccessRulesSeed.User.GetAdminPermissionHealthDescription, UserPermissions.GetAdminPermissionHealth),
-
-        // Permissions
-        new(LocalizationKeys.AccessRulesSeed.Permission.GetPermissionsName, $"{ApiBase}/permissions", "GET", LocalizationKeys.AccessRulesSeed.Permission.GetPermissionsDescription, PermissionPermissions.GetPermissions),
-        new(LocalizationKeys.AccessRulesSeed.Permission.GetPermissionName, $"{ApiBase}/permissions/{{id}}", "GET", LocalizationKeys.AccessRulesSeed.Permission.GetPermissionDescription, PermissionPermissions.GetPermission),
-        new(LocalizationKeys.AccessRulesSeed.Permission.CreatePermissionName, $"{ApiBase}/permissions", "POST", LocalizationKeys.AccessRulesSeed.Permission.CreatePermissionDescription, PermissionPermissions.CreatePermission),
-        new(LocalizationKeys.AccessRulesSeed.Permission.UpdatePermissionName, $"{ApiBase}/permissions/{{id}}", "PUT", LocalizationKeys.AccessRulesSeed.Permission.UpdatePermissionDescription, PermissionPermissions.UpdatePermission),
-        new(LocalizationKeys.AccessRulesSeed.Permission.DeletePermissionName, $"{ApiBase}/permissions/{{id}}", "DELETE", LocalizationKeys.AccessRulesSeed.Permission.DeletePermissionDescription, PermissionPermissions.DeletePermission),
-
-        // Roles
-        new(LocalizationKeys.AccessRulesSeed.Role.GetRolesName, $"{ApiBase}/roles", "GET", LocalizationKeys.AccessRulesSeed.Role.GetRolesDescription, RolePermissions.GetRoles),
-        new(LocalizationKeys.AccessRulesSeed.Role.GetRoleName, $"{ApiBase}/roles/{{id}}", "GET", LocalizationKeys.AccessRulesSeed.Role.GetRoleDescription, RolePermissions.GetRole),
-        new(LocalizationKeys.AccessRulesSeed.Role.CreateRoleName, $"{ApiBase}/roles", "POST", LocalizationKeys.AccessRulesSeed.Role.CreateRoleDescription, RolePermissions.CreateRole),
-        new(LocalizationKeys.AccessRulesSeed.Role.UpdateRoleName, $"{ApiBase}/roles/{{id}}", "PUT", LocalizationKeys.AccessRulesSeed.Role.UpdateRoleDescription, RolePermissions.UpdateRole),
-        new(LocalizationKeys.AccessRulesSeed.Role.DeleteRoleName, $"{ApiBase}/roles/{{id}}", "DELETE", LocalizationKeys.AccessRulesSeed.Role.DeleteRoleDescription, RolePermissions.DeleteRole),
-        new(LocalizationKeys.AccessRulesSeed.Role.GetRolePermissionsName, $"{ApiBase}/roles/{{id}}/permissions", "GET", LocalizationKeys.AccessRulesSeed.Role.GetRolePermissionsDescription, RolePermissions.GetRolePermissions),
-        new(LocalizationKeys.AccessRulesSeed.Role.SetRolePermissionsName, $"{ApiBase}/roles/{{id}}/permissions", "PUT", LocalizationKeys.AccessRulesSeed.Role.SetRolePermissionsDescription, RolePermissions.SetRolePermissions),
-        new(LocalizationKeys.AccessRulesSeed.Role.GetRoleMenusName, $"{ApiBase}/roles/{{id}}/menus", "GET", LocalizationKeys.AccessRulesSeed.Role.GetRoleMenusDescription, RolePermissions.GetRoleMenus),
-        new(LocalizationKeys.AccessRulesSeed.Role.SetRoleMenusName, $"{ApiBase}/roles/{{id}}/menus", "PUT", LocalizationKeys.AccessRulesSeed.Role.SetRoleMenusDescription, RolePermissions.SetRoleMenus),
-
-        // Menus
-        new(LocalizationKeys.AccessRulesSeed.Menu.GetMenusName, $"{ApiBase}/menus", "GET", LocalizationKeys.AccessRulesSeed.Menu.GetMenusDescription, MenuPermissions.GetMenus),
-        new(LocalizationKeys.AccessRulesSeed.Menu.GetMenuTreeName, $"{ApiBase}/menus/tree", "GET", LocalizationKeys.AccessRulesSeed.Menu.GetMenuTreeDescription, MenuPermissions.GetMenuTree),
-        new(LocalizationKeys.AccessRulesSeed.Menu.GetMenuName, $"{ApiBase}/menus/{{id}}", "GET", LocalizationKeys.AccessRulesSeed.Menu.GetMenuDescription, MenuPermissions.GetMenu),
-        new(LocalizationKeys.AccessRulesSeed.Menu.CreateMenuName, $"{ApiBase}/menus", "POST", LocalizationKeys.AccessRulesSeed.Menu.CreateMenuDescription, MenuPermissions.CreateMenu),
-        new(LocalizationKeys.AccessRulesSeed.Menu.UpdateMenuName, $"{ApiBase}/menus/{{id}}", "PUT", LocalizationKeys.AccessRulesSeed.Menu.UpdateMenuDescription, MenuPermissions.UpdateMenu),
-        new(LocalizationKeys.AccessRulesSeed.Menu.DeleteMenuName, $"{ApiBase}/menus/{{id}}", "DELETE", LocalizationKeys.AccessRulesSeed.Menu.DeleteMenuDescription, MenuPermissions.DeleteMenu),
-        new(LocalizationKeys.AccessRulesSeed.Menu.GetMenuPermissionsName, $"{ApiBase}/menus/{{id}}/permissions", "GET", LocalizationKeys.AccessRulesSeed.Menu.GetMenuPermissionsDescription, MenuPermissions.GetMenuPermissions),
-        new(LocalizationKeys.AccessRulesSeed.Menu.SetMenuPermissionsName, $"{ApiBase}/menus/{{id}}/permissions", "PUT", LocalizationKeys.AccessRulesSeed.Menu.SetMenuPermissionsDescription, MenuPermissions.SetMenuPermissions),
-
-        // Localization
-        new(LocalizationKeys.AccessRulesSeed.Localization.GetAllName, $"{ApiBase}/localization", "GET", LocalizationKeys.AccessRulesSeed.Localization.GetAllDescription, LocalizationPermissions.GetAll),
-        new(LocalizationKeys.AccessRulesSeed.Localization.GetByKeyName, $"{ApiBase}/localization/{{key}}", "GET", LocalizationKeys.AccessRulesSeed.Localization.GetByKeyDescription, LocalizationPermissions.GetByKey),
-        new(LocalizationKeys.AccessRulesSeed.Localization.UpsertName, $"{ApiBase}/localization", "POST", LocalizationKeys.AccessRulesSeed.Localization.UpsertDescription, LocalizationPermissions.Upsert),
-        new(LocalizationKeys.AccessRulesSeed.Localization.DeleteName, $"{ApiBase}/localization/{{key}}", "DELETE", LocalizationKeys.AccessRulesSeed.Localization.DeleteDescription, LocalizationPermissions.Delete),
-
-        // Access Rules
-        new(LocalizationKeys.AccessRulesSeed.AccessRule.GetAccessRulesName, $"{ApiBase}/access-rules", "GET", LocalizationKeys.AccessRulesSeed.AccessRule.GetAccessRulesDescription, AccessRulePermissions.GetAccessRules),
-        new(LocalizationKeys.AccessRulesSeed.AccessRule.GetAccessRuleName, $"{ApiBase}/access-rules/{{id}}", "GET", LocalizationKeys.AccessRulesSeed.AccessRule.GetAccessRuleDescription, AccessRulePermissions.GetAccessRule),
-        new(LocalizationKeys.AccessRulesSeed.AccessRule.CreateAccessRuleName, $"{ApiBase}/access-rules", "POST", LocalizationKeys.AccessRulesSeed.AccessRule.CreateAccessRuleDescription, AccessRulePermissions.CreateAccessRule),
-        new(LocalizationKeys.AccessRulesSeed.AccessRule.UpdateAccessRuleName, $"{ApiBase}/access-rules/{{id}}", "PUT", LocalizationKeys.AccessRulesSeed.AccessRule.UpdateAccessRuleDescription, AccessRulePermissions.UpdateAccessRule),
-        new(LocalizationKeys.AccessRulesSeed.AccessRule.DeleteAccessRuleName, $"{ApiBase}/access-rules/{{id}}", "DELETE", LocalizationKeys.AccessRulesSeed.AccessRule.DeleteAccessRuleDescription, AccessRulePermissions.DeleteAccessRule),
-        new(LocalizationKeys.AccessRulesSeed.AccessRule.GetAccessRulePermissionsName, $"{ApiBase}/access-rules/{{id}}/permissions", "GET", LocalizationKeys.AccessRulesSeed.AccessRule.GetAccessRulePermissionsDescription, AccessRulePermissions.GetAccessRulePermissions),
-        new(LocalizationKeys.AccessRulesSeed.AccessRule.SetAccessRulePermissionsName, $"{ApiBase}/access-rules/{{id}}/permissions", "PUT", LocalizationKeys.AccessRulesSeed.AccessRule.SetAccessRulePermissionsDescription, AccessRulePermissions.SetAccessRulePermissions),
-        new(LocalizationKeys.AccessRulesSeed.AccessRule.GetRequiredPermissionsName, $"{ApiBase}/access-rules/required-permissions", "GET", LocalizationKeys.AccessRulesSeed.AccessRule.GetRequiredPermissionsDescription, AccessRulePermissions.GetRequiredPermissions),
-    ];
-
-    /// <summary>
-    /// Maps each leaf menu URL to the primary "view/list" permission it represents.
-    /// Used to populate the MenuPermissions table so the per-menu permission screen
-    /// is meaningful. Every seeded role linked to one of these menus already owns the
-    /// mapped permission, so navigation visibility is unchanged. The "/system" parent
-    /// is intentionally left unmapped so it stays visible as a pure container.
-    /// </summary>
-    private static readonly (string MenuUrl, string PermissionCode)[] DefaultMenuPermissionMap =
-    [
-        ("/dashboard", HomePermissions.GetDashboard),
-        ("/system/users", UserPermissions.GetUsers),
-        ("/system/roles", RolePermissions.GetRoles),
-        ("/system/permissions", PermissionPermissions.GetPermissions),
-        ("/system/menus", MenuPermissions.GetMenus),
-        ("/system/localization", LocalizationPermissions.GetAll),
-        ("/system/access-rules", AccessRulePermissions.GetAccessRules),
-    ];
-
-    private static readonly SeedRoleDefinition[] DefaultRoleDefinitions =
-    [
+        // ---------------- IT / Platform administration ----------------
+        // Permission-based full administrator: owns EVERY catalog permission.
+        // Distinct from SuperAdmin (which bypasses checks and is system-locked);
+        // SystemAdmin is fully manageable from the Roles screen yet covers every
+        // module — so the catalog has no orphaned permission left unassigned.
         new(
-            NameKey: LocalizationKeys.Roles.OperationsManagerDisplayName,
-            DescriptionKey: LocalizationKeys.Roles.OperationsManagerDescription,
+            RoleName: "SystemAdmin",
+            RoleDescription: LocalizationKeys.RoleSeed.SystemAdminDescription,
+            PermissionCodes: [.. PermissionCatalog.All.Select(p => p.Code)],
+            DemoUser: new SampleUser("system.admin", "system.admin@energy.local", "Selin", "Aydın", "SysAdmin123!")),
+
+        // ---------------- Operational management (no security ops) ----------------
+        new(
+            RoleName: "OperationsManager",
+            RoleDescription: LocalizationKeys.RoleSeed.OperationsManagerDescription,
             PermissionCodes:
             [
-                // Home
-                HomePermissions.GetDashboard,
-                // Users
-                UserPermissions.GetUsers,
-                UserPermissions.GetUser,
-                UserPermissions.CreateUser,
-                UserPermissions.UpdateUser,
-                UserPermissions.SetRoles,
-                UserPermissions.DeleteUser,
-                // Permissions
-                PermissionPermissions.GetPermissions,
-                PermissionPermissions.GetPermission,
-                PermissionPermissions.CreatePermission,
-                PermissionPermissions.UpdatePermission,
-                PermissionPermissions.DeletePermission,
-                // Roles
-                RolePermissions.GetRoles,
-                RolePermissions.GetRole,
-                RolePermissions.CreateRole,
-                RolePermissions.UpdateRole,
-                RolePermissions.DeleteRole,
-                RolePermissions.GetRolePermissions,
-                RolePermissions.SetRolePermissions,
-                RolePermissions.GetRoleMenus,
-                RolePermissions.SetRoleMenus,
-                // Menus
-                MenuPermissions.GetMenus,
-                MenuPermissions.GetMenuTree,
-                MenuPermissions.GetMenu,
-                MenuPermissions.CreateMenu,
-                MenuPermissions.UpdateMenu,
-                MenuPermissions.DeleteMenu,
-                MenuPermissions.GetMenuPermissions,
-                MenuPermissions.SetMenuPermissions,
-                // Access Rules
-                AccessRulePermissions.GetAccessRules,
-                AccessRulePermissions.GetAccessRule,
-                AccessRulePermissions.CreateAccessRule,
-                AccessRulePermissions.UpdateAccessRule,
-                AccessRulePermissions.DeleteAccessRule,
-                AccessRulePermissions.GetAccessRulePermissions,
-                AccessRulePermissions.SetAccessRulePermissions,
-                AccessRulePermissions.GetRequiredPermissions,
+                PermissionCatalog.DashboardRead,
+                PermissionCatalog.UserReadAll, PermissionCatalog.UserRead,
+                PermissionCatalog.UserCreate, PermissionCatalog.UserUpdate,
+                PermissionCatalog.RoleReadAll, PermissionCatalog.RoleRead,
+                PermissionCatalog.MenuReadAll, PermissionCatalog.MenuRead,
+                PermissionCatalog.MenuCreate, PermissionCatalog.MenuUpdate, PermissionCatalog.MenuDelete,
+                PermissionCatalog.LogReadAll, PermissionCatalog.LogRead,
             ],
-            MenuUrls: ["/dashboard", "/profile", "/system/users", "/system/roles", "/system/permissions", "/system/menus", "/system/access-rules"],
-            User: new SeedUserDefinition(
-                FirstNameKey: LocalizationKeys.Users.OperationsManagerFirstName,
-                LastNameKey: LocalizationKeys.Users.OperationsManagerLastName,
-                UserName: "ops.manager",
-                Email: "ops.manager@energy.local",
-                Password: "Manager123!")),
+            DemoUser: new SampleUser("ops.manager", "ops.manager@energy.local", "Mert", "Yıldız", "OpsMgr123!")),
+
+        // ---------------- Security / compliance ----------------
         new(
-            NameKey: LocalizationKeys.Roles.LocalizationEditorDisplayName,
-            DescriptionKey: LocalizationKeys.Roles.LocalizationEditorDescription,
+            RoleName: "SecurityAuditor",
+            RoleDescription: LocalizationKeys.RoleSeed.SecurityAuditorDescription,
             PermissionCodes:
             [
-                HomePermissions.GetDashboard,
-                LocalizationPermissions.GetAll,
-                LocalizationPermissions.GetByKey,
-                LocalizationPermissions.Upsert,
-                LocalizationPermissions.Delete,
-                // Menu tree read is required so the navigation drawer can be
-                // populated for any signed-in user, regardless of the rest of
-                // their permission footprint.
-                MenuPermissions.GetMenuTree,
-                RolePermissions.GetRoleMenus,
+                PermissionCatalog.DashboardRead,
+                PermissionCatalog.UserReadAll, PermissionCatalog.UserRead,
+                PermissionCatalog.RoleReadAll, PermissionCatalog.RoleRead,
+                PermissionCatalog.PermissionReadAll, PermissionCatalog.PermissionRead,
+                PermissionCatalog.ApiAccessReadAll, PermissionCatalog.ApiAccessRead,
+                PermissionCatalog.MenuReadAll, PermissionCatalog.MenuRead,
+                PermissionCatalog.LogReadAll, PermissionCatalog.LogRead,
             ],
-            MenuUrls: ["/dashboard", "/profile", "/system/localization"],
-            User: new SeedUserDefinition(
-                FirstNameKey: LocalizationKeys.Users.LocalizationEditorFirstName,
-                LastNameKey: LocalizationKeys.Users.LocalizationEditorLastName,
-                UserName: "localization.editor",
-                Email: "localization.editor@energy.local",
-                Password: "Editor123!")),
+            DemoUser: new SampleUser("security.auditor", "security.auditor@energy.local", "Deniz", "Kaya", "Auditor123!")),
+
+        // ---------------- Translation / content ----------------
         new(
-            NameKey: LocalizationKeys.Roles.ReadOnlyDisplayName,
-            DescriptionKey: LocalizationKeys.Roles.ReadOnlyDescription,
+            RoleName: "LocalizationEditor",
+            RoleDescription: LocalizationKeys.RoleSeed.LocalizationEditorDescription,
             PermissionCodes:
             [
-                HomePermissions.GetDashboard,
-                UserPermissions.GetUsers,
-                UserPermissions.GetUser,
-                PermissionPermissions.GetPermissions,
-                PermissionPermissions.GetPermission,
-                RolePermissions.GetRoles,
-                RolePermissions.GetRole,
-                RolePermissions.GetRolePermissions,
-                RolePermissions.GetRoleMenus,
-                MenuPermissions.GetMenus,
-                MenuPermissions.GetMenuTree,
-                MenuPermissions.GetMenu,
-                MenuPermissions.GetMenuPermissions,
-                AccessRulePermissions.GetAccessRules,
-                AccessRulePermissions.GetAccessRule,
-                AccessRulePermissions.GetAccessRulePermissions,
-                AccessRulePermissions.GetRequiredPermissions,
+                PermissionCatalog.DashboardRead,
+                PermissionCatalog.LocalizationReadAll, PermissionCatalog.LocalizationRead,
+                PermissionCatalog.LocalizationCreate, PermissionCatalog.LocalizationUpdate, PermissionCatalog.LocalizationDelete,
             ],
-            MenuUrls: ["/dashboard", "/profile"],
-            User: new SeedUserDefinition(
-                FirstNameKey: LocalizationKeys.Users.ReadOnlyFirstName,
-                LastNameKey: LocalizationKeys.Users.ReadOnlyLastName,
-                UserName: "readonly.user",
-                Email: "readonly.user@energy.local",
-                Password: "Viewer123!"))
+            DemoUser: new SampleUser("localization.editor", "localization.editor@energy.local", "Elif", "Demir", "Editor123!")),
+
+        // ---------------- Reporting / view-only ----------------
+        new(
+            RoleName: "ReadOnlyViewer",
+            RoleDescription: LocalizationKeys.RoleSeed.ReadOnlyViewerDescription,
+            PermissionCodes:
+            [
+                PermissionCatalog.DashboardRead,
+                PermissionCatalog.UserReadAll, PermissionCatalog.UserRead,
+                PermissionCatalog.RoleReadAll, PermissionCatalog.RoleRead,
+                PermissionCatalog.PermissionReadAll, PermissionCatalog.PermissionRead,
+                PermissionCatalog.MenuReadAll, PermissionCatalog.MenuRead,
+                PermissionCatalog.ApiAccessReadAll, PermissionCatalog.ApiAccessRead,
+                PermissionCatalog.LocalizationReadAll, PermissionCatalog.LocalizationRead,
+                PermissionCatalog.LogReadAll, PermissionCatalog.LogRead,
+            ],
+            DemoUser: new SampleUser("readonly.viewer", "readonly.viewer@energy.local", "Ayşe", "Çelik", "Viewer123!")),
+
+        // ---------------- Minimum baseline employee ----------------
+        new(
+            RoleName: "BasicUser",
+            RoleDescription: LocalizationKeys.RoleSeed.BasicUserDescription,
+            PermissionCodes:
+            [
+                PermissionCatalog.DashboardRead,
+            ],
+            DemoUser: new SampleUser("basic.user", "basic.user@energy.local", "Ahmet", "Şahin", "Basic123!")),
     ];
 
-    private readonly AppDbContext _dbContext;
-    private readonly IPermissionService _permissionService;
-    private readonly IMenuService _menuService;
-    private readonly IUserService _userService;
-    private readonly ILocalizationService _localizationService;
-    private readonly IHostEnvironment _environment;
+    private readonly AppDbContext _db;
+    private readonly IPermissionService _permissions;
+    private readonly IPermissionResolver _permissionResolver;
+    private readonly ApiEndpointSyncService _endpointSync;
+    private readonly ILocalizationService _localization;
+    private readonly PasswordHashingService _passwords;
     private readonly ILogger<SystemSeeder> _logger;
-    private readonly IStringLocalizer<SharedResource> _localizer;
 
     public SystemSeeder(
-        AppDbContext dbContext,
-        IPermissionService permissionService,
-        IMenuService menuService,
-        IUserService userService,
-        ILocalizationService localizationService,
-        IHostEnvironment environment,
-        ILogger<SystemSeeder> logger,
-        IStringLocalizer<SharedResource> localizer)
+        AppDbContext db,
+        IPermissionService permissions,
+        IPermissionResolver permissionResolver,
+        ApiEndpointSyncService endpointSync,
+        ILocalizationService localization,
+        PasswordHashingService passwords,
+        ILogger<SystemSeeder> logger)
     {
-        _dbContext = dbContext;
-        _permissionService = permissionService;
-        _menuService = menuService;
-        _userService = userService;
-        _localizationService = localizationService;
-        _environment = environment;
+        _db = db;
+        _permissions = permissions;
+        _permissionResolver = permissionResolver;
+        _endpointSync = endpointSync;
+        _localization = localization;
+        _passwords = passwords;
         _logger = logger;
-        _localizer = localizer;
     }
 
-    public async Task SeedAsync(CancellationToken cancellationToken = default)
-        => await SeedAsync(additionalPermissionCodes: null, cancellationToken);
-
-    public async Task SeedAsync(
-        IReadOnlyCollection<string>? additionalPermissionCodes,
-        CancellationToken cancellationToken = default)
+    public async Task SeedAsync(CancellationToken ct = default)
     {
-        _logger.LogInformation("System seeding started ({Environment}).", _environment.EnvironmentName);
-
-        // 1) Permission catalog — required by both role assignment and JWT claims.
-        var permissionResult = await _permissionService.SeedDefaultPermissionsAsync(cancellationToken);
-        _logger.LogInformation("Permissions: {Added} added, {Updated} updated, total {Total}.",
-            permissionResult.Added, permissionResult.Updated, permissionResult.Total);
-
-        // 1.1) Auto-discovered permissions from [Authorize(Policy=...)] attributes.
-        if (additionalPermissionCodes is { Count: > 0 })
+        if (_db.Database.IsSqlServer())
         {
-            var discoveredResult = await _permissionService.SeedPermissionCodesAsync(additionalPermissionCodes, cancellationToken);
-            _logger.LogInformation(
-                "Discovered permissions: {Added} added from {Scanned} policy code(s), total {Total}.",
-                discoveredResult.Added, additionalPermissionCodes.Count, discoveredResult.Total);
+            // SQL Server deployments have no migration history; build the full
+            // schema from the current model in one shot. No-op if it already exists.
+            _logger.LogInformation("Seeding: ensuring SQL Server schema (EnsureCreated)");
+            await _db.Database.EnsureCreatedAsync(ct);
+        }
+        else
+        {
+            // PostgreSQL: migration-free top-ups that add columns/tables introduced
+            // after the initial schema to pre-existing databases. Each is idempotent.
+            _logger.LogInformation("Seeding: audit log schema (request/response columns)");
+            await EnsureAuditSchemaAsync(ct);
+
+            _logger.LogInformation("Seeding: direct user-permission table");
+            await EnsureUserPermissionSchemaAsync(ct);
+
+            _logger.LogInformation("Seeding: profile-image columns");
+            await EnsureProfileImageSchemaAsync(ct);
+
+            _logger.LogInformation("Seeding: chat message table");
+            await EnsureChatSchemaAsync(ct);
         }
 
-        // 2) Menu tree — depends on no other seed; cleans up legacy nodes too.
-        var menuResult = await _menuService.SeedDefaultMenusAsync(cancellationToken);
-        _logger.LogInformation("Menus: {Added} added, {Updated} updated, total {Total}.",
-            menuResult.Added, menuResult.Updated, menuResult.Total);
+        _logger.LogInformation("Seeding: permission catalog");
+        var permissionsAdded = await _permissions.SyncCatalogAsync(ct);
+        _logger.LogInformation("Seeding: {Added} permission(s) added to catalog", permissionsAdded);
 
-        // 3) Admin user + Admin role + all permissions linked to Admin.
-        var adminResult = await _userService.SeedAdminAsync(cancellationToken);
+        _logger.LogInformation("Seeding: SuperAdmin role + admin user");
+        await EnsureSuperAdminAsync(ct);
+
+        _logger.LogInformation("Seeding: baseline menu tree");
+        await EnsureBaselineMenusAsync(ct);
+
+        _logger.LogInformation("Seeding: API endpoint discovery + default permission mapping");
+        await _endpointSync.SyncAsync(ct);
+
+        _logger.LogInformation("Seeding: sample role templates + demo users");
+        await EnsureSampleRolesAndUsersAsync(ct);
+
+        _logger.LogInformation("Seeding: default permission grants for every role");
+        await EnsureDefaultPermissionsForAllRolesAsync(ct);
+
+        _logger.LogInformation("Seeding: localization resources (resx → DB)");
+        var localizationResult = await _localization.ImportFromResxAsync(ct);
         _logger.LogInformation(
-            "Admin: user '{Email}' (created={UserCreated}), role (created={RoleCreated}).",
-            adminResult.Email, adminResult.UserCreated, adminResult.RoleCreated);
-
-        // 4) Link every menu to the Admin role so the navigation is fully visible.
-        await EnsureAllMenusLinkedToRoleAsync(adminResult.RoleId, cancellationToken);
-
-        // 4.1) Seed additional user archetypes and role/menu/permission links.
-        var identityCatalogResult = await SeedDefaultIdentityCatalogAsync(cancellationToken);
-        _logger.LogInformation(
-            "Identity catalog: {RolesAdded} role(s), {UsersAdded} user(s), {PermissionLinksAdded} permission link(s), {PermissionLinksRemoved} removed, {MenuLinksAdded} menu link(s), {MenuLinksRemoved} removed.",
-            identityCatalogResult.RolesAdded,
-            identityCatalogResult.UsersAdded,
-            identityCatalogResult.PermissionLinksAdded,
-            identityCatalogResult.PermissionLinksRemoved,
-            identityCatalogResult.MenuLinksAdded,
-            identityCatalogResult.MenuLinksRemoved);
-
-        // 4.2) Centralized access rules (scope=API) mirroring every endpoint's policy,
-        //      each linked to the permission it already enforces.
-        var accessRuleResult = await SeedDefaultAccessRulesAsync(cancellationToken);
-        _logger.LogInformation(
-            "Access rules: {RulesAdded} added, {RulesExisting} existing, {PermissionLinksAdded} permission link(s) added.",
-            accessRuleResult.RulesAdded, accessRuleResult.RulesExisting, accessRuleResult.PermissionLinksAdded);
-
-        // 4.3) Menu → permission links so the per-menu permission catalog is populated.
-        var menuPermissionLinks = await SeedDefaultMenuPermissionsAsync(cancellationToken);
-        _logger.LogInformation("Menu permissions: {Added} link(s) added.", menuPermissionLinks);
-
-        // 5) Mirror the .resx fallback values into the LocalizationEntries table
-        //    so the DB-first localizer has a complete snapshot to serve from.
-        var localizationResult = await _localizationService.ImportFromResxAsync(cancellationToken);
-        _logger.LogInformation(
-            "Localization import: {Added} added, {Updated} updated, total {Total}.",
+            "Localization: {Added} added, {Updated} updated, {Total} total entries.",
             localizationResult.Added, localizationResult.Updated, localizationResult.Total);
-
-        _logger.LogInformation("System seeding completed.");
     }
 
-    private sealed record IdentityCatalogSeedResult(
-        int RolesAdded,
-        int UsersAdded,
-        int PermissionLinksAdded,
-        int PermissionLinksRemoved,
-        int MenuLinksAdded,
-        int MenuLinksRemoved);
-
-    private async Task<IdentityCatalogSeedResult> SeedDefaultIdentityCatalogAsync(CancellationToken cancellationToken)
+    /// <summary>
+    /// Idempotently adds the request/response audit columns. The project has no
+    /// migration history, so this guarantees existing databases gain the new
+    /// columns before any audit insert runs. Safe and no-op on fresh databases.
+    /// </summary>
+    private async Task EnsureAuditSchemaAsync(CancellationToken ct)
     {
-        var rolesAdded = 0;
-        var usersAdded = 0;
-        var permissionLinksAdded = 0;
-        var permissionLinksRemoved = 0;
-        var menuLinksAdded = 0;
-        var menuLinksRemoved = 0;
-
-        var permissionsByCode = await _dbContext.Permissions
-            .AsNoTracking()
-            .ToDictionaryAsync(item => item.Code, item => item.Id, StringComparer.OrdinalIgnoreCase, cancellationToken);
-
-        var menusByUrl = await _dbContext.Menus
-            .AsNoTracking()
-            .ToDictionaryAsync(item => item.Url, item => item.Id, StringComparer.OrdinalIgnoreCase, cancellationToken);
-
-        foreach (var definition in DefaultRoleDefinitions)
+        const string sql = """
+            ALTER TABLE "AuditLogs" ADD COLUMN IF NOT EXISTS "QueryString" character varying(2000);
+            ALTER TABLE "AuditLogs" ADD COLUMN IF NOT EXISTS "Source" character varying(10);
+            ALTER TABLE "AuditLogs" ADD COLUMN IF NOT EXISTS "RequestBody" text;
+            ALTER TABLE "AuditLogs" ADD COLUMN IF NOT EXISTS "ResponseBody" text;
+            """;
+        try
         {
-            var role = await EnsureRoleAsync(definition, cancellationToken);
-            if (role.Created)
-            {
-                rolesAdded += 1;
-            }
-
-            var desiredPermissionIds = definition.PermissionCodes
-                .Where(code => permissionsByCode.ContainsKey(code))
-                .Select(code => permissionsByCode[code])
-                .Distinct()
-                .ToArray();
-
-            var desiredMenuIds = definition.MenuUrls
-                .Where(url => menusByUrl.ContainsKey(url))
-                .Select(url => menusByUrl[url])
-                .Distinct()
-                .ToArray();
-
-            var (addedPermissions, removedPermissions) = await SyncRolePermissionsAsync(role.RoleId, desiredPermissionIds, cancellationToken);
-            var (addedMenus, removedMenus) = await SyncRoleMenusAsync(role.RoleId, desiredMenuIds, cancellationToken);
-
-            permissionLinksAdded += addedPermissions;
-            permissionLinksRemoved += removedPermissions;
-            menuLinksAdded += addedMenus;
-            menuLinksRemoved += removedMenus;
-
-            var createdUser = await EnsureUserForRoleAsync(definition.User, role.RoleId, cancellationToken);
-            if (createdUser)
-            {
-                usersAdded += 1;
-            }
+            await _db.Database.ExecuteSqlRawAsync(sql, ct);
         }
-
-        return new IdentityCatalogSeedResult(
-            RolesAdded: rolesAdded,
-            UsersAdded: usersAdded,
-            PermissionLinksAdded: permissionLinksAdded,
-            PermissionLinksRemoved: permissionLinksRemoved,
-            MenuLinksAdded: menuLinksAdded,
-            MenuLinksRemoved: menuLinksRemoved);
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Could not ensure AuditLogs request/response columns; they may already exist or the table is not yet created.");
+        }
     }
 
-    private async Task<(Guid RoleId, bool Created)> EnsureRoleAsync(SeedRoleDefinition definition, CancellationToken cancellationToken)
+    /// <summary>
+    /// Idempotently creates the <c>UserPermissions</c> table that backs direct,
+    /// per-user permission grants (managed from the User Access screen). Mirrors
+    /// the migration-free approach used for the audit columns.
+    /// </summary>
+    private async Task EnsureUserPermissionSchemaAsync(CancellationToken ct)
     {
-        var displayName = _localizer.GetText(definition.NameKey, definition.NameKey);
-        var description = _localizer.GetText(definition.DescriptionKey, definition.DescriptionKey);
+        const string sql = """
+            CREATE TABLE IF NOT EXISTS "UserPermissions" (
+                "UserId" uuid NOT NULL,
+                "PermissionCode" character varying(150) NOT NULL,
+                CONSTRAINT "PK_UserPermissions" PRIMARY KEY ("UserId", "PermissionCode"),
+                CONSTRAINT "FK_UserPermissions_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE,
+                CONSTRAINT "FK_UserPermissions_Permissions_PermissionCode" FOREIGN KEY ("PermissionCode") REFERENCES "Permissions" ("Code") ON DELETE RESTRICT
+            );
+            CREATE INDEX IF NOT EXISTS "IX_UserPermissions_PermissionCode" ON "UserPermissions" ("PermissionCode");
+            """;
+        try
+        {
+            await _db.Database.ExecuteSqlRawAsync(sql, ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Could not ensure the UserPermissions table; it may already exist or a referenced table is not yet created.");
+        }
+    }
 
-        var normalizedName = displayName.Trim().ToUpperInvariant();
-        var role = await _dbContext.Roles.FirstOrDefaultAsync(item => item.NormalizedName == normalizedName, cancellationToken);
+    /// <summary>
+    /// Idempotently adds the binary profile-image columns to <c>Users</c>.
+    /// Safe and no-op when they already exist (migration-free convention).
+    /// </summary>
+    private async Task EnsureProfileImageSchemaAsync(CancellationToken ct)
+    {
+        const string sql = """
+            ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "ProfileImage" bytea;
+            ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "ProfileImageContentType" character varying(100);
+            """;
+        try
+        {
+            await _db.Database.ExecuteSqlRawAsync(sql, ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Could not ensure the Users profile-image columns; they may already exist.");
+        }
+    }
 
+    /// <summary>
+    /// Idempotently creates the <c>ChatMessages</c> table backing the direct
+    /// messaging feature. Mirrors the migration-free DDL approach.
+    /// </summary>
+    private async Task EnsureChatSchemaAsync(CancellationToken ct)
+    {
+        const string sql = """
+            CREATE TABLE IF NOT EXISTS "ChatMessages" (
+                "Id" uuid NOT NULL,
+                "SenderId" uuid NOT NULL,
+                "RecipientId" uuid NOT NULL,
+                "Text" character varying(4000) NOT NULL,
+                "IsRead" boolean NOT NULL DEFAULT FALSE,
+                "ReadAt" timestamp with time zone,
+                "CreatedAt" timestamp with time zone NOT NULL,
+                "CreatedBy" uuid,
+                "UpdatedAt" timestamp with time zone,
+                "UpdatedBy" uuid,
+                "IsDeleted" boolean NOT NULL DEFAULT FALSE,
+                "DeletedAt" timestamp with time zone,
+                "DeletedBy" uuid,
+                CONSTRAINT "PK_ChatMessages" PRIMARY KEY ("Id"),
+                CONSTRAINT "FK_ChatMessages_Users_SenderId" FOREIGN KEY ("SenderId") REFERENCES "Users" ("Id") ON DELETE CASCADE,
+                CONSTRAINT "FK_ChatMessages_Users_RecipientId" FOREIGN KEY ("RecipientId") REFERENCES "Users" ("Id") ON DELETE CASCADE
+            );
+            CREATE INDEX IF NOT EXISTS "IX_ChatMessages_SenderId_RecipientId" ON "ChatMessages" ("SenderId", "RecipientId");
+            CREATE INDEX IF NOT EXISTS "IX_ChatMessages_RecipientId_IsRead" ON "ChatMessages" ("RecipientId", "IsRead");
+            """;
+        try
+        {
+            await _db.Database.ExecuteSqlRawAsync(sql, ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Could not ensure the ChatMessages table; it may already exist or a referenced table is not yet created.");
+        }
+    }
+
+    private async Task EnsureSuperAdminAsync(CancellationToken ct)
+    {
+        var role = await _db.Roles.FirstOrDefaultAsync(r => r.Name == SystemRoles.SuperAdmin, ct);
         if (role is null)
         {
             role = new Role
             {
                 Id = Guid.NewGuid(),
-                Name = displayName.Trim(),
-                NormalizedName = normalizedName,
-                Description = description,
-                ConcurrencyStamp = Guid.NewGuid().ToString("N")
+                Name = SystemRoles.SuperAdmin,
+                Description = LocalizationKeys.RoleSeed.SuperAdminDescription,
+                IsSystem = true
             };
-
-            _dbContext.Roles.Add(role);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-            return (role.Id, true);
+            _db.Roles.Add(role);
+            await _db.SaveChangesAsync(ct);
         }
 
-        var changed = false;
-
-        if (!string.Equals(role.Description, description, StringComparison.Ordinal))
+        const string adminEmail = "admin@energy.local";
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == adminEmail, ct);
+        if (user is null)
         {
-            role.Description = description;
-            changed = true;
-        }
-
-        if (!string.Equals(role.Name, displayName, StringComparison.Ordinal))
-        {
-            role.Name = displayName;
-            changed = true;
-        }
-
-        if (changed)
-        {
-            role.ConcurrencyStamp = Guid.NewGuid().ToString("N");
-            await _dbContext.SaveChangesAsync(cancellationToken);
-        }
-
-        return (role.Id, false);
-    }
-
-    private async Task<(int Added, int Removed)> SyncRolePermissionsAsync(
-        Guid roleId,
-        IReadOnlyCollection<Guid> desiredPermissionIds,
-        CancellationToken cancellationToken)
-    {
-        var existingLinks = await _dbContext.RolePermissions
-            .Where(item => item.RoleId == roleId)
-            .ToListAsync(cancellationToken);
-
-        var existingIds = existingLinks.Select(item => item.PermissionId).ToHashSet();
-        var desiredIds = desiredPermissionIds.ToHashSet();
-
-        var toRemove = existingLinks.Where(item => !desiredIds.Contains(item.PermissionId)).ToList();
-        var toAdd = desiredIds.Where(id => !existingIds.Contains(id))
-            .Select(permissionId => new RolePermission { RoleId = roleId, PermissionId = permissionId })
-            .ToList();
-
-        if (toRemove.Count > 0)
-        {
-            _dbContext.RolePermissions.RemoveRange(toRemove);
-        }
-
-        if (toAdd.Count > 0)
-        {
-            await _dbContext.RolePermissions.AddRangeAsync(toAdd, cancellationToken);
-        }
-
-        if (toRemove.Count > 0 || toAdd.Count > 0)
-        {
-            await _dbContext.SaveChangesAsync(cancellationToken);
-        }
-
-        return (toAdd.Count, toRemove.Count);
-    }
-
-    private async Task<(int Added, int Removed)> SyncRoleMenusAsync(
-        Guid roleId,
-        IReadOnlyCollection<Guid> desiredMenuIds,
-        CancellationToken cancellationToken)
-    {
-        var existingLinks = await _dbContext.RoleMenus
-            .Where(item => item.RoleId == roleId)
-            .ToListAsync(cancellationToken);
-
-        var existingIds = existingLinks.Select(item => item.MenuId).ToHashSet();
-        var desiredIds = desiredMenuIds.ToHashSet();
-
-        var toRemove = existingLinks.Where(item => !desiredIds.Contains(item.MenuId)).ToList();
-        var toAdd = desiredIds.Where(id => !existingIds.Contains(id))
-            .Select(menuId => new RoleMenu { RoleId = roleId, MenuId = menuId })
-            .ToList();
-
-        if (toRemove.Count > 0)
-        {
-            _dbContext.RoleMenus.RemoveRange(toRemove);
-        }
-
-        if (toAdd.Count > 0)
-        {
-            await _dbContext.RoleMenus.AddRangeAsync(toAdd, cancellationToken);
-        }
-
-        if (toRemove.Count > 0 || toAdd.Count > 0)
-        {
-            await _dbContext.SaveChangesAsync(cancellationToken);
-        }
-
-        return (toAdd.Count, toRemove.Count);
-    }
-
-    private async Task<bool> EnsureUserForRoleAsync(SeedUserDefinition definition, Guid roleId, CancellationToken cancellationToken)
-    {
-        var normalizedEmail = definition.Email.Trim().ToUpperInvariant();
-        var existingUser = await _dbContext.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(item => item.NormalizedEmail == normalizedEmail, cancellationToken);
-
-        if (existingUser is null)
-        {
-            await _userService.CreateUserAsync(
-                new CreateUserRequest
-                {
-                    FirstName = _localizer.GetText(definition.FirstNameKey, definition.FirstNameKey),
-                    LastName = _localizer.GetText(definition.LastNameKey, definition.LastNameKey),
-                    UserName = definition.UserName,
-                    Email = definition.Email,
-                    Password = definition.Password,
-                    IsActive = true,
-                    EmailConfirmed = true,
-                    PhoneNumberConfirmed = false,
-                    TwoFactorEnabled = false,
-                    LockoutEnabled = false,
-                    RoleIds = [roleId]
-                },
-                cancellationToken);
-
-            return true;
-        }
-
-        var hasRole = await _dbContext.UserRoles.AnyAsync(
-            item => item.UserId == existingUser.Id && item.RoleId == roleId,
-            cancellationToken);
-
-        if (!hasRole)
-        {
-            _dbContext.UserRoles.Add(new UserRole { UserId = existingUser.Id, RoleId = roleId });
-            await _dbContext.SaveChangesAsync(cancellationToken);
-        }
-
-        return false;
-    }
-
-    private sealed record AccessRuleSeedResult(int RulesAdded, int RulesExisting, int PermissionLinksAdded);
-
-    private async Task<AccessRuleSeedResult> SeedDefaultAccessRulesAsync(CancellationToken cancellationToken)
-    {
-        var rulesAdded = 0;
-        var rulesExisting = 0;
-        var permissionLinksAdded = 0;
-
-        var permissionsByCode = await _dbContext.Permissions
-            .AsNoTracking()
-            .ToDictionaryAsync(item => item.Code, item => item.Id, StringComparer.OrdinalIgnoreCase, cancellationToken);
-
-        foreach (var definition in DefaultAccessRuleDefinitions)
-        {
-            const string scope = "API";
-            var path = definition.Path.Trim();
-            var method = definition.HttpMethod.Trim().ToUpperInvariant();
-            var name = _localizer.GetText(definition.NameKey, definition.NameKey);
-            var description = _localizer.GetText(definition.DescriptionKey, definition.DescriptionKey);
-
-            var rule = await _dbContext.AccessRules.FirstOrDefaultAsync(
-                item => item.Scope == scope && item.Path == path && item.HttpMethod == method,
-                cancellationToken);
-
-            if (rule is null)
+            user = new User
             {
-                rule = new AccessRule
+                Id = Guid.NewGuid(),
+                UserName = "admin",
+                Email = adminEmail,
+                FirstName = "System",
+                LastName = "Administrator",
+                PasswordHash = _passwords.Hash("Admin123!"),
+                IsActive = true,
+                SecurityStamp = Guid.NewGuid()
+            };
+            _db.Users.Add(user);
+            await _db.SaveChangesAsync(ct);
+        }
+
+        if (!await _db.UserRoles.AnyAsync(ur => ur.UserId == user.Id && ur.RoleId == role.Id, ct))
+        {
+            _db.UserRoles.Add(new UserRole { UserId = user.Id, RoleId = role.Id });
+            await _db.SaveChangesAsync(ct);
+        }
+    }
+
+    private async Task EnsureBaselineMenusAsync(CancellationToken ct)
+    {
+        // Idempotent per-node upsert keyed by NameKey. Newly introduced screens
+        // (e.g. Profile) are added on a later run without wiping admin edits or
+        // re-ordering an existing tree.
+        var system = await EnsureMenuAsync(LocalizationKeys.Menus.System, null, null, "preferences", 10, null, ct);
+
+        // Per-user pages every authenticated user reaches (permissions are part
+        // of the DefaultGrants set so the menu is always visible).
+        await EnsureMenuAsync(LocalizationKeys.Menus.Dashboard, null, "/dashboard", "home", 1, PermissionCatalog.DashboardRead, ct);
+        await EnsureMenuAsync(LocalizationKeys.Menus.Profile, null, "/profile", "user", 2, PermissionCatalog.ProfileRead, ct);
+        await EnsureMenuAsync(LocalizationKeys.Menus.Chat, null, "/chat", "message", 3, PermissionCatalog.ChatUse, ct);
+
+        // System administration submenu — mirrors the reference project's
+        // hierarchy (one entry per admin screen), each gated by the same
+        // permission code the page/endpoint require.
+        await EnsureMenuAsync(LocalizationKeys.Menus.Users, system.Id, "/users", "group", 11, PermissionCatalog.UserReadAll, ct);
+        await EnsureMenuAsync(LocalizationKeys.Menus.UserAccess, system.Id, "/user-access", "card", 12, PermissionCatalog.UserUpdate, ct);
+        await EnsureMenuAsync(LocalizationKeys.Menus.Roles, system.Id, "/roles", "accountbox", 13, PermissionCatalog.RoleReadAll, ct);
+        await EnsureMenuAsync(LocalizationKeys.Menus.Permissions, system.Id, "/permissions", "key", 14, PermissionCatalog.PermissionReadAll, ct);
+        await EnsureMenuAsync(LocalizationKeys.Menus.Menus_, system.Id, "/menus", "menu", 15, PermissionCatalog.MenuReadAll, ct);
+        await EnsureMenuAsync(LocalizationKeys.Menus.ApiEndpoints, system.Id, "/api-endpoints", "globe", 16, PermissionCatalog.ApiAccessReadAll, ct);
+        await EnsureMenuAsync(LocalizationKeys.Menus.Localization, system.Id, "/localization", "globe", 17, PermissionCatalog.LocalizationReadAll, ct);
+        await EnsureMenuAsync(LocalizationKeys.Menus.Logs, system.Id, "/logs", "clock", 18, PermissionCatalog.LogReadAll, ct);
+    }
+
+    private async Task<Menu> EnsureMenuAsync(
+        string nameKey, Guid? parentId, string? url, string? icon, int order, string? requiredPermission, CancellationToken ct)
+    {
+        var menu = await _db.Menus.FirstOrDefaultAsync(m => m.NameKey == nameKey, ct);
+        if (menu is not null)
+        {
+            // Converge the baseline structure (hierarchy, link, icon, order and
+            // permission) to the current definition so existing databases adopt
+            // the up-to-date menu tree without losing the node's identity/key.
+            var changed =
+                menu.ParentId != parentId ||
+                menu.Url != url ||
+                menu.Icon != icon ||
+                menu.DisplayOrder != order ||
+                menu.RequiredPermissionCode != requiredPermission ||
+                !menu.IsActive ||
+                !menu.IsVisible;
+
+            if (changed)
+            {
+                menu.ParentId = parentId;
+                menu.Url = url;
+                menu.Icon = icon;
+                menu.DisplayOrder = order;
+                menu.RequiredPermissionCode = requiredPermission;
+                menu.IsActive = true;
+                menu.IsVisible = true;
+                await _db.SaveChangesAsync(ct);
+            }
+            return menu;
+        }
+
+        menu = new Menu
+        {
+            Id = Guid.NewGuid(),
+            ParentId = parentId,
+            NameKey = nameKey,
+            Url = url,
+            Icon = icon,
+            DisplayOrder = order,
+            RequiredPermissionCode = requiredPermission
+        };
+        _db.Menus.Add(menu);
+        await _db.SaveChangesAsync(ct);
+        return menu;
+    }
+
+    /// <summary>
+    /// Grants the <see cref="PermissionCatalog.DefaultGrants"/> floor (dashboard
+    /// + self-service profile) to every role except SuperAdmin (which bypasses
+    /// permission checks). Guarantees that any user holding any role can always
+    /// reach the dashboard and their own profile without explicit assignment.
+    /// </summary>
+    private async Task EnsureDefaultPermissionsForAllRolesAsync(CancellationToken ct)
+    {
+        var roles = await _db.Roles
+            .Where(r => r.Name != SystemRoles.SuperAdmin)
+            .ToListAsync(ct);
+
+        var added = 0;
+        foreach (var role in roles)
+        {
+            var existing = (await _db.RolePermissions
+                    .Where(rp => rp.RoleId == role.Id)
+                    .Select(rp => rp.PermissionCode)
+                    .ToListAsync(ct))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            var changed = false;
+            foreach (var code in PermissionCatalog.DefaultGrants)
+            {
+                if (existing.Contains(code)) continue;
+                _db.RolePermissions.Add(new RolePermission { RoleId = role.Id, PermissionCode = code });
+                added += 1;
+                changed = true;
+            }
+
+            if (changed)
+            {
+                await _db.SaveChangesAsync(ct);
+                await _permissionResolver.InvalidateRoleAsync(role.Id, ct);
+            }
+        }
+
+        _logger.LogInformation("Default grants: {Added} default permission link(s) ensured across {Roles} role(s).", added, roles.Count);
+    }
+
+    private async Task EnsureSampleRolesAndUsersAsync(CancellationToken ct)
+    {
+        var rolesAdded = 0;
+        var usersAdded = 0;
+        var permissionLinks = 0;
+
+        foreach (var sample in SampleRoles)
+        {
+            var role = await _db.Roles.FirstOrDefaultAsync(r => r.Name == sample.RoleName, ct);
+            if (role is null)
+            {
+                role = new Role
                 {
                     Id = Guid.NewGuid(),
-                    Name = name,
-                    Scope = scope,
-                    Path = path,
-                    HttpMethod = method,
-                    Description = description,
-                    IsEnabled = true,
-                    CreatedAt = DateTime.UtcNow
+                    Name = sample.RoleName,
+                    Description = sample.RoleDescription,
+                    IsSystem = false
                 };
-
-                _dbContext.AccessRules.Add(rule);
-                await _dbContext.SaveChangesAsync(cancellationToken);
-                rulesAdded += 1;
-            }
-            else
-            {
-                rulesExisting += 1;
+                _db.Roles.Add(role);
+                await _db.SaveChangesAsync(ct);
+                rolesAdded += 1;
             }
 
-            // Link the rule to the exact permission its controller action enforces.
-            // Add-only (non-destructive) so manual permission tweaks are preserved.
-            if (permissionsByCode.TryGetValue(definition.PermissionCode, out var permissionId))
-            {
-                var linkExists = await _dbContext.AccessRulePermissions.AnyAsync(
-                    link => link.AccessRuleId == rule.Id && link.PermissionId == permissionId,
-                    cancellationToken);
+            // Sync the permission set additively — never remove permissions an admin may have added.
+            var existing = await _db.RolePermissions
+                .Where(rp => rp.RoleId == role.Id)
+                .Select(rp => rp.PermissionCode)
+                .ToListAsync(ct);
+            var existingSet = existing.ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-                if (!linkExists)
+            foreach (var code in sample.PermissionCodes.Distinct(StringComparer.OrdinalIgnoreCase))
+            {
+                if (existingSet.Contains(code)) continue;
+                _db.RolePermissions.Add(new RolePermission { RoleId = role.Id, PermissionCode = code });
+                permissionLinks += 1;
+            }
+            if (permissionLinks > 0) await _db.SaveChangesAsync(ct);
+
+            // Provision the demo user once and bind it to the role.
+            if (sample.DemoUser is { } demo)
+            {
+                var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == demo.Email, ct);
+                if (user is null)
                 {
-                    _dbContext.AccessRulePermissions.Add(new AccessRulePermission
+                    user = new User
                     {
-                        AccessRuleId = rule.Id,
-                        PermissionId = permissionId
-                    });
-                    await _dbContext.SaveChangesAsync(cancellationToken);
-                    permissionLinksAdded += 1;
+                        Id = Guid.NewGuid(),
+                        UserName = demo.UserName,
+                        Email = demo.Email,
+                        FirstName = demo.FirstName,
+                        LastName = demo.LastName,
+                        PasswordHash = _passwords.Hash(demo.Password),
+                        IsActive = true,
+                        SecurityStamp = Guid.NewGuid()
+                    };
+                    _db.Users.Add(user);
+                    await _db.SaveChangesAsync(ct);
+                    usersAdded += 1;
+                }
+
+                if (!await _db.UserRoles.AnyAsync(ur => ur.UserId == user.Id && ur.RoleId == role.Id, ct))
+                {
+                    _db.UserRoles.Add(new UserRole { UserId = user.Id, RoleId = role.Id });
+                    await _db.SaveChangesAsync(ct);
+                    _permissionResolver.InvalidateUser(user.Id);
                 }
             }
         }
 
-        return new AccessRuleSeedResult(rulesAdded, rulesExisting, permissionLinksAdded);
-    }
-
-    private async Task<int> SeedDefaultMenuPermissionsAsync(CancellationToken cancellationToken)
-    {
-        var added = 0;
-
-        var permissionsByCode = await _dbContext.Permissions
-            .AsNoTracking()
-            .ToDictionaryAsync(item => item.Code, item => item.Id, StringComparer.OrdinalIgnoreCase, cancellationToken);
-
-        var menusByUrl = await _dbContext.Menus
-            .AsNoTracking()
-            .ToDictionaryAsync(item => item.Url, item => item.Id, StringComparer.OrdinalIgnoreCase, cancellationToken);
-
-        foreach (var (menuUrl, permissionCode) in DefaultMenuPermissionMap)
-        {
-            if (!menusByUrl.TryGetValue(menuUrl, out var menuId) ||
-                !permissionsByCode.TryGetValue(permissionCode, out var permissionId))
-            {
-                continue;
-            }
-
-            var linkExists = await _dbContext.MenuPermissions.AnyAsync(
-                link => link.MenuId == menuId && link.PermissionId == permissionId,
-                cancellationToken);
-
-            if (!linkExists)
-            {
-                _dbContext.MenuPermissions.Add(new MenuPermission
-                {
-                    MenuId = menuId,
-                    PermissionId = permissionId
-                });
-                await _dbContext.SaveChangesAsync(cancellationToken);
-                added += 1;
-            }
-        }
-
-        return added;
-    }
-
-    /// <summary>
-    /// Ensures that every menu currently in the database is reachable by the
-    /// supplied role. Used so the freshly-seeded Admin role automatically owns
-    /// the entire menu tree without manual configuration.
-    /// </summary>
-    private async Task EnsureAllMenusLinkedToRoleAsync(Guid roleId, CancellationToken cancellationToken)
-    {
-        var menuIds = await _dbContext.Menus
-            .Select(menu => menu.Id)
-            .ToListAsync(cancellationToken);
-
-        if (menuIds.Count == 0)
-        {
-            return;
-        }
-
-        var existingLinks = await _dbContext.RoleMenus
-            .Where(link => link.RoleId == roleId)
-            .Select(link => link.MenuId)
-            .ToListAsync(cancellationToken);
-
-        var missingIds = menuIds.Except(existingLinks).ToList();
-        if (missingIds.Count == 0)
-        {
-            return;
-        }
-
-        await _dbContext.RoleMenus.AddRangeAsync(
-            missingIds.Select(menuId => new RoleMenu { RoleId = roleId, MenuId = menuId }),
-            cancellationToken);
-
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        _logger.LogInformation("Linked {Count} menu(s) to the Admin role.", missingIds.Count);
+        _logger.LogInformation(
+            "Sample catalog: {Roles} role(s) added, {Users} demo user(s) added, {Links} permission link(s) added.",
+            rolesAdded, usersAdded, permissionLinks);
     }
 }
-

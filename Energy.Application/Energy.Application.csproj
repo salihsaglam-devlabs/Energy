@@ -12,9 +12,5 @@
       <ProjectReference Include="..\Energy.Localization\Energy.Localization.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
-      <PackageReference Include="MediatR" Version="14.1.0" />
-    </ItemGroup>
 
 </Project>

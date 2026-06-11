@@ -1,12 +1,14 @@
 using Energy.Application.Common.Exceptions;
 using Energy.Application.Identity.Services;
 using Energy.Domain.Identity;
-using Energy.Domain.System;
 using Energy.Infrastructure.Persistence;
 using Energy.Localization;
+using Energy.Shared.Identity;
+using Energy.Shared.Identity.Permissions;
+using Energy.Shared.Models.V1.Common.Requests;
+using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Identity.Requests;
 using Energy.Shared.Models.V1.Identity.Responses;
-using Energy.Shared.Models.V1.System.Responses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 
@@ -14,227 +16,163 @@ namespace Energy.Infrastructure.Identity.Services;
 
 public sealed class RoleService : IRoleService
 {
-    private readonly AppDbContext _dbContext;
+    private readonly AppDbContext _db;
+    private readonly IPermissionResolver _permissions;
     private readonly IStringLocalizer<SharedResource> _localizer;
 
-    public RoleService(AppDbContext dbContext, IStringLocalizer<SharedResource> localizer)
+    public RoleService(AppDbContext db, IPermissionResolver permissions, IStringLocalizer<SharedResource> localizer)
     {
-        _dbContext = dbContext;
+        _db = db;
+        _permissions = permissions;
         _localizer = localizer;
     }
 
-    public async Task<IReadOnlyList<RoleSummaryResponse>> GetRolesAsync(CancellationToken cancellationToken = default)
+    public async Task<PaginatedResponse<RoleSummaryResponse>> GetAllAsync(PaginatedRequest request, CancellationToken ct = default)
     {
-        return await _dbContext.Roles
-            .AsNoTracking()
-            .OrderBy(role => role.Name)
-            .Select(role => new RoleSummaryResponse
-            {
-                Id = role.Id,
-                Name = role.Name,
-                Description = role.Description
-            })
-            .ToListAsync(cancellationToken);
-    }
-
-    public async Task<RoleDetailResponse> GetRoleByIdAsync(Guid id, CancellationToken cancellationToken = default)
-    {
-        var role = await _dbContext.Roles
-            .AsNoTracking()
-            .Where(item => item.Id == id)
-            .Select(item => new RoleDetailResponse
-            {
-                Id = item.Id,
-                Name = item.Name,
-                NormalizedName = item.NormalizedName,
-                Description = item.Description,
-                AssignedUserCount = _dbContext.UserRoles.Count(userRole => userRole.RoleId == item.Id)
-            })
-            .FirstOrDefaultAsync(cancellationToken);
-
-        return role ?? throw new NotFoundException(string.Format(
-            _localizer.GetText(LocalizationKeys.Messages.RoleNotFound, "Role '{0}' was not found."),
-            id));
-    }
-
-    public async Task<RoleDetailResponse> CreateRoleAsync(CreateRoleRequest request, CancellationToken cancellationToken = default)
-    {
-        var normalizedName = Normalize(request.Name);
-        var exists = await _dbContext.Roles.AnyAsync(role => role.NormalizedName == normalizedName, cancellationToken);
-        if (exists)
+        var query = _db.Roles.AsNoTracking();
+        if (!string.IsNullOrWhiteSpace(request.Search))
         {
-            throw new ConflictException(string.Format(
-                _localizer.GetText(LocalizationKeys.Messages.RoleAlreadyExists, "Role '{0}' already exists."),
-                request.Name));
+            var term = request.Search.Trim().ToLower();
+            query = query.Where(r => r.Name.ToLower().Contains(term));
         }
+        var total = await query.CountAsync(ct);
+        var rows = await query
+            .OrderBy(r => r.Name)
+            .Skip((request.PageNumber - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .Select(r => new
+            {
+                r.Id,
+                r.Name,
+                r.Description,
+                r.IsSystem,
+                PermissionCount = _db.RolePermissions.Count(rp => rp.RoleId == r.Id),
+                UserCount = _db.UserRoles.Count(ur => ur.RoleId == r.Id)
+            })
+            .ToListAsync(ct);
+
+        var page = rows.Select(r => new RoleSummaryResponse
+        {
+            Id = r.Id,
+            Name = r.Name,
+            Description = LocalizeDescription(r.Description),
+            IsSystem = r.IsSystem,
+            PermissionCount = r.PermissionCount,
+            UserCount = r.UserCount
+        }).ToList();
+
+        return PaginatedResponse<RoleSummaryResponse>.Create(page, request.PageNumber, request.PageSize, total);
+    }
+
+    public async Task<RoleDetailResponse?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    {
+        var role = await _db.Roles.AsNoTracking().FirstOrDefaultAsync(r => r.Id == id, ct);
+        if (role is null) return null;
+
+        var codes = await _db.RolePermissions.AsNoTracking()
+            .Where(rp => rp.RoleId == id)
+            .Select(rp => rp.PermissionCode)
+            .OrderBy(c => c)
+            .ToListAsync(ct);
+
+        var users = await _db.UserRoles.AsNoTracking()
+            .Where(ur => ur.RoleId == id)
+            .Join(_db.Users.AsNoTracking(), ur => ur.UserId, u => u.Id, (_, u) => u)
+            .Select(u => new UserSummaryResponse
+            {
+                Id = u.Id, UserName = u.UserName, Email = u.Email,
+                FullName = (u.FirstName + " " + u.LastName).Trim(),
+                IsActive = u.IsActive, LastLoginAt = u.LastLoginAt
+            })
+            .ToListAsync(ct);
+
+        return new RoleDetailResponse
+        {
+            Id = role.Id, Name = role.Name, Description = LocalizeDescription(role.Description), IsSystem = role.IsSystem,
+            PermissionCodes = codes, Users = users
+        };
+    }
+
+    public async Task<RoleDetailResponse> CreateAsync(CreateRoleRequest request, CancellationToken ct = default)
+    {
+        var name = request.Name.Trim();
+        if (await _db.Roles.AnyAsync(r => r.Name == name, ct))
+            throw new ConflictException(LocalizationKeys.Messages.RoleAlreadyExists, name);
 
         var role = new Role
         {
             Id = Guid.NewGuid(),
-            Name = request.Name.Trim(),
-            NormalizedName = normalizedName,
-            Description = request.Description.Trim(),
-            ConcurrencyStamp = Guid.NewGuid().ToString("N")
+            Name = name,
+            Description = request.Description,
+            IsSystem = false
         };
-
-        _dbContext.Roles.Add(role);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-
-        return await GetRoleByIdAsync(role.Id, cancellationToken);
+        _db.Roles.Add(role);
+        await _db.SaveChangesAsync(ct);
+        return (await GetByIdAsync(role.Id, ct))!;
     }
 
-    public async Task<RoleDetailResponse> UpdateRoleAsync(Guid id, UpdateRoleRequest request, CancellationToken cancellationToken = default)
+    public async Task<RoleDetailResponse> UpdateAsync(Guid id, UpdateRoleRequest request, CancellationToken ct = default)
     {
-        var role = await _dbContext.Roles.FirstOrDefaultAsync(item => item.Id == id, cancellationToken)
-                   ?? throw new NotFoundException(string.Format(
-                       _localizer.GetText(LocalizationKeys.Messages.RoleNotFound, "Role '{0}' was not found."),
-                       id));
+        var role = await _db.Roles.FirstOrDefaultAsync(r => r.Id == id, ct)
+                   ?? throw new NotFoundException(LocalizationKeys.Messages.RoleNotFound, id);
 
-        var normalizedName = Normalize(request.Name);
-        var exists = await _dbContext.Roles.AnyAsync(
-            item => item.Id != id && item.NormalizedName == normalizedName,
-            cancellationToken);
+        if (role.IsSystem && !string.Equals(role.Name, request.Name.Trim(), StringComparison.Ordinal))
+            throw new ConflictException(LocalizationKeys.Messages.SystemRoleCannotBeRenamed);
 
-        if (exists)
-        {
-            throw new ConflictException(string.Format(
-                _localizer.GetText(LocalizationKeys.Messages.RoleAlreadyExists, "Role '{0}' already exists."),
-                request.Name));
-        }
+        var name = request.Name.Trim();
+        if (!string.Equals(role.Name, name, StringComparison.OrdinalIgnoreCase) &&
+            await _db.Roles.AnyAsync(r => r.Name == name && r.Id != id, ct))
+            throw new ConflictException(LocalizationKeys.Messages.RoleAlreadyExists, name);
 
-        role.Name = request.Name.Trim();
-        role.NormalizedName = normalizedName;
-        role.Description = request.Description.Trim();
-        role.ConcurrencyStamp = Guid.NewGuid().ToString("N");
-
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return await GetRoleByIdAsync(role.Id, cancellationToken);
+        role.Name = name;
+        role.Description = request.Description;
+        await _db.SaveChangesAsync(ct);
+        return (await GetByIdAsync(id, ct))!;
     }
 
-    public async Task DeleteRoleAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteAsync(Guid id, CancellationToken ct = default)
     {
-        var role = await _dbContext.Roles.FirstOrDefaultAsync(item => item.Id == id, cancellationToken)
-                   ?? throw new NotFoundException(string.Format(
-                       _localizer.GetText(LocalizationKeys.Messages.RoleNotFound, "Role '{0}' was not found."),
-                       id));
+        var role = await _db.Roles.FirstOrDefaultAsync(r => r.Id == id, ct);
+        if (role is null) return false;
+        if (role.IsSystem) throw new ConflictException(LocalizationKeys.Messages.SystemRoleCannotBeDeleted);
 
-        _dbContext.Roles.Remove(role);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        _db.Roles.Remove(role);
+        await _db.SaveChangesAsync(ct);
+        await _permissions.InvalidateRoleAsync(id, ct);
+        return true;
     }
 
-    private static string Normalize(string value) => value.Trim().ToUpperInvariant();
-
-    public async Task<IReadOnlyList<PermissionResponse>> GetRolePermissionsAsync(Guid roleId, CancellationToken cancellationToken = default)
+    public async Task<RoleDetailResponse> SetPermissionsAsync(Guid id, SetRolePermissionsRequest request, CancellationToken ct = default)
     {
-        await EnsureRoleExistsAsync(roleId, cancellationToken);
+        var role = await _db.Roles.FirstOrDefaultAsync(r => r.Id == id, ct)
+                   ?? throw new NotFoundException(LocalizationKeys.Messages.RoleNotFound, id);
 
-        return await _dbContext.RolePermissions
-            .AsNoTracking()
-            .Where(rp => rp.RoleId == roleId)
-            .Join(_dbContext.Permissions.AsNoTracking(),
-                rp => rp.PermissionId,
-                p => p.Id,
-                (rp, p) => new PermissionResponse { Id = p.Id, Code = p.Code, Name = p.Name })
-            .OrderBy(p => p.Code)
-            .ToListAsync(cancellationToken);
+        if (string.Equals(role.Name, SystemRoles.SuperAdmin, StringComparison.OrdinalIgnoreCase))
+            throw new ConflictException(LocalizationKeys.Messages.SuperAdminPermissionsAutoManaged);
+
+        var desired = request.PermissionCodes
+            .Where(code => PermissionCatalog.AllCodes.Contains(code))
+            .Distinct()
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var existing = await _db.RolePermissions.Where(rp => rp.RoleId == id).ToListAsync(ct);
+        var current = existing.Select(rp => rp.PermissionCode).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var rp in existing.Where(rp => !desired.Contains(rp.PermissionCode))) _db.RolePermissions.Remove(rp);
+        foreach (var code in desired.Where(c => !current.Contains(c)))
+            _db.RolePermissions.Add(new RolePermission { RoleId = id, PermissionCode = code });
+
+        await _db.SaveChangesAsync(ct);
+        await _permissions.InvalidateRoleAsync(id, ct);
+
+        return (await GetByIdAsync(id, ct))!;
     }
 
-    public async Task<IReadOnlyList<PermissionResponse>> SetRolePermissionsAsync(Guid roleId, IReadOnlyCollection<Guid> permissionIds, CancellationToken cancellationToken = default)
-    {
-        await EnsureRoleExistsAsync(roleId, cancellationToken);
-
-        var distinctIds = permissionIds?.Distinct().ToArray() ?? Array.Empty<Guid>();
-        if (distinctIds.Length > 0)
-        {
-            var existingCount = await _dbContext.Permissions.AsNoTracking().CountAsync(p => distinctIds.Contains(p.Id), cancellationToken);
-            if (existingCount != distinctIds.Length)
-            {
-                throw new NotFoundException(_localizer.GetText(
-                    LocalizationKeys.Messages.PermissionsNotFound,
-                    "One or more permissions were not found."));
-            }
-        }
-
-        var existingLinks = await _dbContext.RolePermissions
-            .Where(rp => rp.RoleId == roleId)
-            .ToListAsync(cancellationToken);
-
-        var toRemove = existingLinks.Where(rp => !distinctIds.Contains(rp.PermissionId)).ToList();
-        var existingIds = existingLinks.Select(rp => rp.PermissionId).ToHashSet();
-        var toAdd = distinctIds.Where(id => !existingIds.Contains(id))
-            .Select(id => new RolePermission { RoleId = roleId, PermissionId = id });
-
-        if (toRemove.Count > 0) _dbContext.RolePermissions.RemoveRange(toRemove);
-        await _dbContext.RolePermissions.AddRangeAsync(toAdd, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-
-        return await GetRolePermissionsAsync(roleId, cancellationToken);
-    }
-
-    public async Task<IReadOnlyList<MenuResponse>> GetRoleMenusAsync(Guid roleId, CancellationToken cancellationToken = default)
-    {
-        await EnsureRoleExistsAsync(roleId, cancellationToken);
-
-        return await _dbContext.RoleMenus
-            .AsNoTracking()
-            .Where(rm => rm.RoleId == roleId)
-            .Join(_dbContext.Menus.AsNoTracking(),
-                rm => rm.MenuId,
-                m => m.Id,
-                (rm, m) => new MenuResponse
-                {
-                    Id = m.Id,
-                    Name = m.Name,
-                    Url = m.Url,
-                    Icon = m.Icon,
-                    Order = m.Order,
-                    ParentId = m.ParentId
-                })
-            .OrderBy(m => m.Order)
-            .ThenBy(m => m.Name)
-            .ToListAsync(cancellationToken);
-    }
-
-    public async Task<IReadOnlyList<MenuResponse>> SetRoleMenusAsync(Guid roleId, IReadOnlyCollection<Guid> menuIds, CancellationToken cancellationToken = default)
-    {
-        await EnsureRoleExistsAsync(roleId, cancellationToken);
-
-        var distinctIds = menuIds?.Distinct().ToArray() ?? Array.Empty<Guid>();
-        if (distinctIds.Length > 0)
-        {
-            var existingCount = await _dbContext.Menus.AsNoTracking().CountAsync(m => distinctIds.Contains(m.Id), cancellationToken);
-            if (existingCount != distinctIds.Length)
-            {
-                throw new NotFoundException(_localizer.GetText(
-                    LocalizationKeys.Messages.MenusNotFound,
-                    "One or more menus were not found."));
-            }
-        }
-
-        var existingLinks = await _dbContext.RoleMenus
-            .Where(rm => rm.RoleId == roleId)
-            .ToListAsync(cancellationToken);
-
-        var toRemove = existingLinks.Where(rm => !distinctIds.Contains(rm.MenuId)).ToList();
-        var existingIds = existingLinks.Select(rm => rm.MenuId).ToHashSet();
-        var toAdd = distinctIds.Where(id => !existingIds.Contains(id))
-            .Select(id => new RoleMenu { RoleId = roleId, MenuId = id });
-
-        if (toRemove.Count > 0) _dbContext.RoleMenus.RemoveRange(toRemove);
-        await _dbContext.RoleMenus.AddRangeAsync(toAdd, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-
-        return await GetRoleMenusAsync(roleId, cancellationToken);
-    }
-
-    private async Task EnsureRoleExistsAsync(Guid roleId, CancellationToken cancellationToken)
-    {
-        var exists = await _dbContext.Roles.AsNoTracking().AnyAsync(r => r.Id == roleId, cancellationToken);
-        if (!exists)
-        {
-            throw new NotFoundException(string.Format(
-                _localizer.GetText(LocalizationKeys.Messages.RoleNotFound, "Role '{0}' was not found."),
-                roleId));
-        }
-    }
+    /// <summary>
+    /// Seeded roles store a localization KEY in <c>Description</c>; user-created
+    /// roles store free text. Resolve the key when present, otherwise return the
+    /// text unchanged.
+    /// </summary>
+    private string? LocalizeDescription(string? value)
+        => string.IsNullOrWhiteSpace(value) ? value : _localizer.GetText(value, value);
 }

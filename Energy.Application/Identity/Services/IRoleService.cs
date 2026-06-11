@@ -1,26 +1,16 @@
+using Energy.Shared.Models.V1.Common.Requests;
+using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Identity.Requests;
 using Energy.Shared.Models.V1.Identity.Responses;
-using Energy.Shared.Models.V1.System.Responses;
 
 namespace Energy.Application.Identity.Services;
 
 public interface IRoleService
 {
-    Task<IReadOnlyList<RoleSummaryResponse>> GetRolesAsync(CancellationToken cancellationToken = default);
-
-    Task<RoleDetailResponse> GetRoleByIdAsync(Guid id, CancellationToken cancellationToken = default);
-
-    Task<RoleDetailResponse> CreateRoleAsync(CreateRoleRequest request, CancellationToken cancellationToken = default);
-
-    Task<RoleDetailResponse> UpdateRoleAsync(Guid id, UpdateRoleRequest request, CancellationToken cancellationToken = default);
-
-    Task DeleteRoleAsync(Guid id, CancellationToken cancellationToken = default);
-
-    Task<IReadOnlyList<PermissionResponse>> GetRolePermissionsAsync(Guid roleId, CancellationToken cancellationToken = default);
-
-    Task<IReadOnlyList<PermissionResponse>> SetRolePermissionsAsync(Guid roleId, IReadOnlyCollection<Guid> permissionIds, CancellationToken cancellationToken = default);
-
-    Task<IReadOnlyList<MenuResponse>> GetRoleMenusAsync(Guid roleId, CancellationToken cancellationToken = default);
-
-    Task<IReadOnlyList<MenuResponse>> SetRoleMenusAsync(Guid roleId, IReadOnlyCollection<Guid> menuIds, CancellationToken cancellationToken = default);
+    Task<PaginatedResponse<RoleSummaryResponse>> GetAllAsync(PaginatedRequest request, CancellationToken cancellationToken = default);
+    Task<RoleDetailResponse?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<RoleDetailResponse> CreateAsync(CreateRoleRequest request, CancellationToken cancellationToken = default);
+    Task<RoleDetailResponse> UpdateAsync(Guid id, UpdateRoleRequest request, CancellationToken cancellationToken = default);
+    Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<RoleDetailResponse> SetPermissionsAsync(Guid id, SetRolePermissionsRequest request, CancellationToken cancellationToken = default);
 }

@@ -9,9 +9,14 @@ public sealed class PermissionConfiguration : IEntityTypeConfiguration<Permissio
     public void Configure(EntityTypeBuilder<Permission> builder)
     {
         builder.ToTable("Permissions");
-        builder.HasQueryFilter(permission => !permission.IsDeleted);
-        builder.HasIndex(permission => permission.Code).IsUnique();
-        builder.Property(permission => permission.Code).HasMaxLength(100).IsRequired();
-        builder.Property(permission => permission.Name).HasMaxLength(200).IsRequired();
+        builder.HasKey(p => p.Code);
+
+        builder.Property(p => p.Code).HasMaxLength(150);
+        builder.Property(p => p.Module).IsRequired().HasMaxLength(50);
+        builder.Property(p => p.Action).IsRequired().HasMaxLength(50);
+        builder.Property(p => p.DisplayNameKey).IsRequired().HasMaxLength(200);
+        builder.Property(p => p.DescriptionKey).HasMaxLength(200);
+
+        builder.HasIndex(p => p.Module);
     }
 }

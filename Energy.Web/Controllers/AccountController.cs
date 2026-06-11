@@ -1,166 +1,66 @@
-using Energy.Localization;
-using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Identity.Requests;
-using Energy.Shared.Models.V1.Identity.Responses;
 using Energy.Web.Clients.Identity;
-using Energy.Web.Clients.Infrastructure.Authentication;
-using Energy.Web.Common;
 using Energy.Web.Models.Account;
 using Energy.Web.Services.Authentication;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 
 namespace Energy.Web.Controllers;
 
 [AllowAnonymous]
 public sealed class AccountController : Controller
 {
-    private readonly IAuthApiClient _authApiClient;
-    private readonly IAuthCookieFactory _cookieFactory;
-    private readonly IStringLocalizer<SharedResource> _localizer;
-    private readonly ILogger<AccountController> _logger;
+    private readonly IAuthApiClient _auth;
+    private readonly IAuthCookieFactory _cookies;
+    private readonly IWebHostEnvironment _env;
 
-    public AccountController(
-        IAuthApiClient authApiClient,
-        IAuthCookieFactory cookieFactory,
-        IStringLocalizer<SharedResource> localizer,
-        ILogger<AccountController> logger)
+    public AccountController(IAuthApiClient auth, IAuthCookieFactory cookies, IWebHostEnvironment env)
     {
-        _authApiClient = authApiClient;
-        _cookieFactory = cookieFactory;
-        _localizer = localizer;
-        _logger = logger;
+        _auth = auth;
+        _cookies = cookies;
+        _env = env;
     }
+
+    private LoginViewModel BuildLoginModel(string? returnUrl) => new()
+    {
+        ReturnUrl = returnUrl,
+        // Only expose the seeded quick-login presets while developing.
+        DevAccounts = _env.IsDevelopment() ? DevLoginAccounts.All : Array.Empty<DevAccount>()
+    };
 
     [HttpGet("/account/login")]
     public IActionResult Login(string? returnUrl = null)
-    {
-        if (User.Identity?.IsAuthenticated == true)
-        {
-            return Redirect(Url.GetLocalReturnUrl(returnUrl, "/"));
-        }
-
-        ViewData["Title"] = _localizer.GetText(LocalizationKeys.Auth.SignInTitle);
-
-        return View(new LoginViewModel
-        {
-            ReturnUrl = Url.IsLocalUrl(returnUrl) ? returnUrl : null
-        });
-    }
+        => View(BuildLoginModel(returnUrl));
 
     [HttpPost("/account/login")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(
-        [FromForm] LoginInputModel input,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> Login(LoginInputModel input, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(input.UserNameOrEmail) || string.IsNullOrWhiteSpace(input.Password))
+        if (!ModelState.IsValid) return View(BuildLoginModel(input.ReturnUrl));
+
+        var response = await _auth.LoginAsync(new LoginRequest
         {
-            return Json(new
-            {
-                ok = false,
-                message = _localizer.GetText(LocalizationKeys.Auth.InvalidCredentials)
-            });
+            UserNameOrEmail = input.UserNameOrEmail,
+            Password = input.Password
+        }, ct);
+
+        if (!response.IsSuccess || response.Data is null)
+        {
+            ModelState.AddModelError(string.Empty, response.Message);
+            return View(BuildLoginModel(input.ReturnUrl));
         }
 
-        BaseResponse<AuthTokenResponse> envelope;
-        try
-        {
-            envelope = await _authApiClient.LoginAsync(
-                new LoginRequest
-                {
-                    UserNameOrEmail = input.UserNameOrEmail,
-                    Password = input.Password
-                },
-                cancellationToken);
-        }
-        catch (HttpRequestException ex)
-        {
-            _logger.LogError(ex, "Login request to API failed for user '{UserNameOrEmail}'.", input.UserNameOrEmail);
-            return Json(new
-            {
-                ok = false,
-                message = _localizer.GetText(LocalizationKeys.Notifications.NetworkError)
-            });
-        }
-        catch (InvalidOperationException ex)
-        {
-            _logger.LogError(ex, "Login response could not be processed for user '{UserNameOrEmail}'.", input.UserNameOrEmail);
-            return Json(new
-            {
-                ok = false,
-                message = _localizer.GetText(LocalizationKeys.Notifications.GenericError)
-            });
-        }
-
-        if (!envelope.IsSuccess || envelope.Data is null || string.IsNullOrEmpty(envelope.Data.AccessToken))
-        {
-            return Json(new
-            {
-                ok = false,
-                message = _localizer.GetText(LocalizationKeys.Auth.InvalidCredentials)
-            });
-        }
-
-        var token = envelope.Data;
-        var principal = await _cookieFactory.CreatePrincipalAsync(token, cancellationToken);
-
-        var properties = new AuthenticationProperties
-        {
-            IsPersistent = input.RememberMe,
-            ExpiresUtc = token.ExpiresAt.ToUniversalTime(),
-            AllowRefresh = false
-        };
-
-        properties.StoreTokens(new[]
-        {
-            new AuthenticationToken { Name = ApiAuthTokens.AccessToken, Value = token.AccessToken },
-            new AuthenticationToken { Name = ApiAuthTokens.ExpiresAt, Value = token.ExpiresAt.ToUniversalTime().ToString("o") }
-        });
-
-        await HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            principal,
-            properties);
-
-        var redirectUrl = Url.GetLocalReturnUrl(input.ReturnUrl, "/");
-
-        return Json(new
-        {
-            ok = true,
-            redirect = redirectUrl
-        });
+        await _cookies.SignInAsync(HttpContext, response.Data);
+        return Redirect(string.IsNullOrEmpty(input.ReturnUrl) ? "/" : input.ReturnUrl);
     }
 
-    [HttpPost("/account/logout")]
-    [ValidateAntiForgeryToken]
+    [HttpGet("/account/logout"), HttpPost("/account/logout")]
     public async Task<IActionResult> Logout()
     {
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        await _cookies.SignOutAsync(HttpContext);
         return Redirect("/account/login");
     }
 
     [HttpGet("/account/access-denied")]
-    public IActionResult AccessDenied(string? path = null, string? permission = null)
-    {
-        ViewData["Title"] = _localizer.GetText(LocalizationKeys.Auth.AccessDeniedTitle);
-
-        var sanitizedPath = string.IsNullOrWhiteSpace(path) || !path.StartsWith('/')
-            ? "/"
-            : path;
-
-        var permissionHint = string.IsNullOrWhiteSpace(permission)
-            ? string.Empty
-            : permission.Trim();
-
-        return View(new AccessDeniedViewModel
-        {
-            RequestedPath = sanitizedPath,
-            RequestedPermission = permissionHint
-        });
-    }
+    public IActionResult AccessDenied() => View(new AccessDeniedViewModel());
 }
-

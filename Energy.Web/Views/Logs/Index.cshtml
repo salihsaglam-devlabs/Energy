@@ -1,0 +1,25 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T[LocalizationKeys.LogsScreen.Title].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div>
+            <h2>@T[LocalizationKeys.LogsScreen.Title]</h2>
+            <p>@T[LocalizationKeys.LogsScreen.Subtitle]</p>
+        </div>
+    </header>
+
+    <div id="logs-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/app/pages/logs.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.Logs.init();
+        });
+    </script>
+}

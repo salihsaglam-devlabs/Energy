@@ -1,35 +1,21 @@
 using Asp.Versioning;
-using Energy.Application.Home.Queries.GetHomeDashboard;
-using Energy.Shared.Identity.Permissions;
+using Energy.Application.Home.Services;
+using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Home.Requests;
-using Energy.Shared.Versioning;
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
+using Energy.Shared.Models.V1.Home.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Energy.Api.Controllers;
 
 [ApiController]
-[ApiVersion(ApiVersions.V1)]
+[ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/home")]
-[Authorize]
 public sealed class HomeController : ControllerBase
 {
-    private readonly ISender _sender;
-
-    public HomeController(ISender sender)
-    {
-        _sender = sender;
-    }
+    private readonly IHomeService _home;
+    public HomeController(IHomeService home) { _home = home; }
 
     [HttpGet("dashboard")]
-    [Authorize(Policy = HomePermissions.GetDashboard)]
-    public async Task<IActionResult> GetDashboard(
-        [FromQuery] GetHomeDashboardRequest request,
-        CancellationToken cancellationToken)
-    {
-        var query = new GetHomeDashboardQuery(request.IncludeQuickLinks, request.QuickLinkCount);
-        var response = await _sender.Send(query, cancellationToken);
-        return Ok(response);
-    }
+    public async Task<ActionResult<BaseResponse<HomeDashboardResponse>>> GetDashboard([FromQuery] GetHomeDashboardRequest request, CancellationToken ct)
+        => Ok(BaseResponse<HomeDashboardResponse>.Success(await _home.GetDashboardAsync(request, ct)));
 }

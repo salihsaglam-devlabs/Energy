@@ -4,7 +4,6 @@
     var L = function () { return window.AppL10n.users; };
     var LG = function () { return window.AppL10n.grid; };
     var LN = function () { return window.AppL10n.notifications; };
-    var R = function () { return window.AppResponsive; };
 
     var gridInstance, rolesLookup = [];
 
@@ -33,6 +32,34 @@
     }
 
     function buildGrid() {
+        var auth = window.AppAuth || { can: function () { return true; } };
+        var canCreate = auth.can("User.Create");
+        var canUpdate = auth.can("User.Update");
+        var canDelete = auth.can("User.Delete");
+
+        var rowButtons = [];
+        if (canUpdate) {
+            rowButtons.push({ hint: LG().edit, icon: "edit", onClick: function (e) { openEdit(e.row.data.id); } });
+            rowButtons.push({ hint: L().manageRoles, icon: "group", onClick: function (e) { openRoles(e.row.data); } });
+            rowButtons.push({ hint: L().changePassword, icon: "key", onClick: function (e) { openPassword(e.row.data); } });
+        }
+        if (canDelete) {
+            rowButtons.push({ hint: LG().delete, icon: "trash", onClick: function (e) { confirmDelete(e.row.data); } });
+        }
+
+        var toolbarItems = [];
+        if (canCreate) {
+            toolbarItems.push({ location: "after", widget: "dxButton", locateInMenu: "auto",
+                options: { icon: "add", text: LG().add, type: "default", stylingMode: "contained", onClick: openCreate } });
+        }
+        toolbarItems.push(
+            { location: "after", widget: "dxButton", locateInMenu: "auto",
+              options: { icon: "refresh", hint: LG().refresh, stylingMode: "text", onClick: function () { gridInstance.refresh(); } } },
+            { name: "columnChooserButton", location: "after", locateInMenu: "auto" },
+            { name: "exportButton", location: "after", locateInMenu: "auto" },
+            { name: "searchPanel", location: "after" }
+        );
+
         var store = new DevExpress.data.CustomStore({
             key: "id",
             load: function (loadOptions) {
@@ -46,7 +73,6 @@
             }
         });
 
-        var g = R().getGridOptions();
         gridInstance = $("#users-grid").dxDataGrid({
             dataSource: store,
             remoteOperations: { paging: true, sorting: true, filtering: false },
@@ -61,16 +87,16 @@
             hoverStateEnabled: true,
             allowColumnResizing: true,
             columnResizingMode: "widget",
-            columnAutoWidth: g.columnAutoWidth,
-            columnHidingEnabled: g.columnHidingEnabled,
-            wordWrapEnabled: g.wordWrapEnabled,
+            columnAutoWidth: true,
+            columnHidingEnabled: false,
+            wordWrapEnabled: false,
             width: "100%",
-            height: g.height,
-            scrolling: g.scrolling,
+            height: "75vh",
+            scrolling: { mode: "standard", useNative: true, showScrollbar: "onScroll", columnRenderingMode: "standard" },
             repaintChangesOnly: true,
             paging: { pageSize: 20 },
-            pager: R().getPagerOptions(),
-            searchPanel: R().getSearchPanelOptions(LG().search),
+            pager: { visible: true, allowedPageSizes: [10, 20, 50], showPageSizeSelector: true, showInfo: true, showNavigationButtons: true, displayMode: "full" },
+            searchPanel: { visible: true, placeholder: LG().search, width: 240 },
             sorting: { mode: "multiple" },
             columnChooser: { enabled: true, mode: "select", height: 320, search: { enabled: true } },
             loadPanel: { enabled: true, text: LG().loading },
@@ -85,23 +111,11 @@
                 { dataField: "isActive", caption: L().isActive, dataType: "boolean", width: 90, alignment: "center" },
                 {
                     type: "buttons", width: 150, caption: LG().actions, fixed: true, fixedPosition: "right",
-                    buttons: [
-                        { hint: LG().edit, icon: "edit", onClick: function (e) { openEdit(e.row.data.id); } },
-                        { hint: L().manageRoles, icon: "group", onClick: function (e) { openRoles(e.row.data); } },
-                        { hint: L().changePassword, icon: "key", onClick: function (e) { openPassword(e.row.data); } },
-                        { hint: LG().delete, icon: "trash", onClick: function (e) { confirmDelete(e.row.data); } }
-                    ]
+                    visible: rowButtons.length > 0,
+                    buttons: rowButtons
                 }
             ],
-            toolbar: { items: [
-                { location: "after", widget: "dxButton", locateInMenu: "auto",
-                  options: { icon: "add", text: LG().add, type: "default", stylingMode: "contained", onClick: openCreate } },
-                { location: "after", widget: "dxButton", locateInMenu: "auto",
-                  options: { icon: "refresh", hint: LG().refresh, stylingMode: "text", onClick: function () { gridInstance.refresh(); } } },
-                { name: "columnChooserButton", location: "after", locateInMenu: "auto" },
-                { name: "exportButton", location: "after", locateInMenu: "auto" },
-                { name: "searchPanel", location: "after" }
-            ] }
+            toolbar: { items: toolbarItems }
         }).dxDataGrid("instance");
     }
 
@@ -145,12 +159,22 @@
                 var selectedIds = (resp.data.roles || []).map(function (r) { return r.id; });
                 var formData = { roleIds: selectedIds };
 
-                var popup = $("<div>").appendTo("body").dxPopup(R().getPopupOptions({
+                var popup = $("<div>").appendTo("body").dxPopup({
                     title: L().rolesTitle + " — " + row.userName,
-                    width: 480, height: 420, showCloseButton: true,
+                    width: 480,
+                    height: "auto",
+                    maxWidth: "min(92vw, 960px)",
+                    maxHeight: "min(88vh, 820px)",
+                    dragEnabled: true,
+                    resizeEnabled: true,
+                    hideOnOutsideClick: true,
+                    showCloseButton: true,
+                    wrapperAttr: { class: "energy-popup" },
                     contentTemplate: function (host) {
-                        $("<div>").appendTo(host).dxForm(R().getFormOptions({
+                        $("<div>").appendTo(host).dxForm({
                             formData: formData,
+                            labelLocation: "top",
+                            colCount: 1,
                             items: [{
                                 dataField: "roleIds",
                                 label: { text: L().roles },
@@ -161,7 +185,7 @@
                                     searchEnabled: true
                                 }
                             }]
-                        }));
+                        });
                     },
                     toolbarItems: [
                         { widget: "dxButton", location: "after", toolbar: "bottom",
@@ -176,7 +200,7 @@
                           options: { text: LG().cancel, onClick: function () { popup.hide(); } }}
                     ],
                     onHidden: function () { popup.dispose(); $(popup.element()).remove(); }
-                })).dxPopup("instance");
+                }).dxPopup("instance");
                 popup.show();
             })
             .catch(window.AppNotify.fromHttpError);
@@ -184,18 +208,28 @@
 
     function openPassword(row) {
         var formData = { newPassword: "" };
-        var popup = $("<div>").appendTo("body").dxPopup(R().getPopupOptions({
+        var popup = $("<div>").appendTo("body").dxPopup({
             title: L().passwordTitle + " — " + row.userName,
-            width: 420, height: 280, showCloseButton: true,
+            width: 420,
+            height: "auto",
+            maxWidth: "min(92vw, 960px)",
+            maxHeight: "min(88vh, 820px)",
+            dragEnabled: true,
+            resizeEnabled: true,
+            hideOnOutsideClick: true,
+            showCloseButton: true,
+            wrapperAttr: { class: "energy-popup" },
             contentTemplate: function (host) {
-                $("<div>").appendTo(host).dxForm(R().getFormOptions({
+                $("<div>").appendTo(host).dxForm({
                     formData: formData,
+                    labelLocation: "top",
+                    colCount: 1,
                     items: [{
                         dataField: "newPassword", label: { text: L().password },
                         editorOptions: { mode: "password", stylingMode: "outlined" },
                         validationRules: [{ type: "required", message: window.AppL10n.auth.fieldRequired }]
                     }]
-                }));
+                });
             },
             toolbarItems: [
                 { widget: "dxButton", location: "after", toolbar: "bottom",
@@ -209,7 +243,7 @@
                   options: { text: LG().cancel, onClick: function () { popup.hide(); } }}
             ],
             onHidden: function () { popup.dispose(); $(popup.element()).remove(); }
-        })).dxPopup("instance");
+        }).dxPopup("instance");
         popup.show();
     }
 
@@ -249,10 +283,19 @@
             });
         }
 
-        var popup = $("<div>").appendTo("body").dxPopup(R().getPopupOptions({
-            title: opts.title, width: 720, height: 520, showCloseButton: true,
+        var popup = $("<div>").appendTo("body").dxPopup({
+            title: opts.title,
+            width: 720,
+            height: "auto",
+            maxWidth: "min(92vw, 960px)",
+            maxHeight: "min(88vh, 820px)",
+            dragEnabled: true,
+            resizeEnabled: true,
+            hideOnOutsideClick: true,
+            showCloseButton: true,
+            wrapperAttr: { class: "energy-popup" },
             contentTemplate: function (host) {
-                $("<div>").appendTo(host).dxForm(R().getFormOptions({ formData: formData, labelLocation: "top", items: items }));
+                $("<div>").appendTo(host).dxForm({ formData: formData, labelLocation: "top", colCount: 2, items: items });
             },
             toolbarItems: [
                 { widget: "dxButton", location: "after", toolbar: "bottom",
@@ -265,7 +308,7 @@
                   options: { text: LG().cancel, onClick: function () { popup.hide(); } }}
             ],
             onHidden: function () { popup.dispose(); $(popup.element()).remove(); }
-        })).dxPopup("instance");
+        }).dxPopup("instance");
         popup.show();
     }
 

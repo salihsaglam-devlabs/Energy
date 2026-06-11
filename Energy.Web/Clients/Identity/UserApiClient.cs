@@ -8,57 +8,39 @@ namespace Energy.Web.Clients.Identity;
 
 public sealed class UserApiClient : ApiClientBase, IUserApiClient
 {
-    public UserApiClient(HttpClient httpClient) : base(httpClient)
-    {
-    }
+    public UserApiClient(HttpClient httpClient) : base(httpClient) { }
 
-    public Task<BaseResponse<PaginatedResponse<UserSummaryResponse>>> GetUsersAsync(PaginatedRequest? request = null, CancellationToken cancellationToken = default)
-        => GetAsync<BaseResponse<PaginatedResponse<UserSummaryResponse>>>(ApiQueryString.Append(ApiRoutes.Users.Base, request), cancellationToken);
+    public Task<BaseResponse<PaginatedResponse<UserSummaryResponse>>> GetAllAsync(PaginatedRequest request, CancellationToken ct = default)
+        => GetAsync<BaseResponse<PaginatedResponse<UserSummaryResponse>>>(
+            $"{ApiRoutes.Users.Base}?pageNumber={request.PageNumber}&pageSize={request.PageSize}&search={Uri.EscapeDataString(request.Search ?? string.Empty)}", ct);
 
-    public Task<BaseResponse<UserDetailResponse>> GetUserAsync(Guid id, CancellationToken cancellationToken = default)
-        => GetAsync<BaseResponse<UserDetailResponse>>(ApiRoutes.Users.ById(id), cancellationToken);
+    public Task<BaseResponse<UserDetailResponse>> GetByIdAsync(Guid id, CancellationToken ct = default)
+        => GetAsync<BaseResponse<UserDetailResponse>>(ApiRoutes.Users.ById(id), ct);
 
-    public Task<BaseResponse<UserDetailResponse>> CreateUserAsync(CreateUserRequest request, CancellationToken cancellationToken = default)
-        => PostAsync<CreateUserRequest, BaseResponse<UserDetailResponse>>(ApiRoutes.Users.Base, request, cancellationToken);
+    public Task<BaseResponse<UserDetailResponse>> CreateAsync(CreateUserRequest request, CancellationToken ct = default)
+        => PostAsync<CreateUserRequest, BaseResponse<UserDetailResponse>>(ApiRoutes.Users.Base, request, ct);
 
-    public Task<BaseResponse<UserDetailResponse>> UpdateUserAsync(Guid id, UpdateUserRequest request, CancellationToken cancellationToken = default)
-        => PutAsync<UpdateUserRequest, BaseResponse<UserDetailResponse>>(ApiRoutes.Users.ById(id), request, cancellationToken);
+    public Task<BaseResponse<UserDetailResponse>> UpdateAsync(Guid id, UpdateUserRequest request, CancellationToken ct = default)
+        => PutAsync<UpdateUserRequest, BaseResponse<UserDetailResponse>>(ApiRoutes.Users.ById(id), request, ct);
 
-    public Task<BaseResponse<UserDetailResponse>> SetRolesAsync(Guid id, SetUserRolesRequest request, CancellationToken cancellationToken = default)
-        => PutAsync<SetUserRolesRequest, BaseResponse<UserDetailResponse>>(ApiRoutes.Users.Roles(id), request, cancellationToken);
+    public Task<BaseResponse<bool>> DeleteAsync(Guid id, CancellationToken ct = default)
+        => DeleteAsync<BaseResponse<bool>>(ApiRoutes.Users.ById(id), ct);
 
-    public Task<BaseResponse<Guid>> UpdatePasswordAsync(Guid id, UpdateUserPasswordRequest request, CancellationToken cancellationToken = default)
-        => PutAsync<UpdateUserPasswordRequest, BaseResponse<Guid>>(ApiRoutes.Users.Password(id), request, cancellationToken);
+    public Task<BaseResponse<bool>> ChangePasswordAsync(Guid id, ChangePasswordRequest request, CancellationToken ct = default)
+        => PutAsync<ChangePasswordRequest, BaseResponse<bool>>(ApiRoutes.Users.Password(id), request, ct);
 
-    public Task<BaseResponse<Guid>> DeleteUserAsync(Guid id, CancellationToken cancellationToken = default)
-        => DeleteAsync<BaseResponse<Guid>>(ApiRoutes.Users.ById(id), cancellationToken);
+    public Task<BaseResponse<UserAccessResponse>> GetAccessAsync(Guid id, CancellationToken ct = default)
+        => GetAsync<BaseResponse<UserAccessResponse>>(ApiRoutes.Users.Access(id), ct);
 
-    public Task<BaseResponse<SeedAdminResponse>> SeedAdminAsync(CancellationToken cancellationToken = default)
-        => PostAsync<BaseResponse<SeedAdminResponse>>(ApiRoutes.Users.SeedAdmin, cancellationToken);
+    public Task<BaseResponse<UserAccessResponse>> SetAccessAsync(Guid id, SetUserAccessRequest request, CancellationToken ct = default)
+        => PutAsync<SetUserAccessRequest, BaseResponse<UserAccessResponse>>(ApiRoutes.Users.Access(id), request, ct);
 
-    public Task<BaseResponse<UserDetailResponse>> GetCurrentUserAsync(CancellationToken cancellationToken = default)
-        => GetAsync<BaseResponse<UserDetailResponse>>(ApiRoutes.Users.Me, cancellationToken);
+    public Task<(byte[] Content, string ContentType, int StatusCode)> GetProfileImageAsync(Guid id, CancellationToken ct = default)
+        => GetRawAsync(ApiRoutes.Users.ProfileImage(id), ct);
 
-    public async Task<(byte[] Content, string ContentType)?> GetProfileImageAsync(Guid id, CancellationToken cancellationToken = default)
-    {
-        var (content, contentType, statusCode) = await GetRawAsync(ApiRoutes.Users.ProfileImage(id), cancellationToken);
-        if (statusCode == 404 || content.Length == 0)
-        {
-            return null;
-        }
+    public Task<BaseResponse<bool>> SetProfileImageAsync(Guid id, SetProfileImageRequest request, CancellationToken ct = default)
+        => PutAsync<SetProfileImageRequest, BaseResponse<bool>>(ApiRoutes.Users.ProfileImage(id), request, ct);
 
-        return (content, contentType);
-    }
-
-    public Task<BaseResponse<UserDetailResponse>> UpdateProfileImageAsync(Guid id, UpdateProfileImageRequest request, CancellationToken cancellationToken = default)
-        => PutAsync<UpdateProfileImageRequest, BaseResponse<UserDetailResponse>>(ApiRoutes.Users.ProfileImage(id), request, cancellationToken);
-
-    public Task<BaseResponse<UserDetailResponse>> RemoveProfileImageAsync(Guid id, CancellationToken cancellationToken = default)
-        => DeleteAsync<BaseResponse<UserDetailResponse>>(ApiRoutes.Users.ProfileImage(id), cancellationToken);
-
-    public Task<BaseResponse<UserDetailResponse>> UpdateMyProfileImageAsync(UpdateProfileImageRequest request, CancellationToken cancellationToken = default)
-        => PutAsync<UpdateProfileImageRequest, BaseResponse<UserDetailResponse>>(ApiRoutes.Users.MyProfileImage, request, cancellationToken);
-
-    public Task<BaseResponse<UserDetailResponse>> RemoveMyProfileImageAsync(CancellationToken cancellationToken = default)
-        => DeleteAsync<BaseResponse<UserDetailResponse>>(ApiRoutes.Users.MyProfileImage, cancellationToken);
+    public Task<BaseResponse<bool>> RemoveProfileImageAsync(Guid id, CancellationToken ct = default)
+        => DeleteAsync<BaseResponse<bool>>(ApiRoutes.Users.ProfileImage(id), ct);
 }

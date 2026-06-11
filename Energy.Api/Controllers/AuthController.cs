@@ -1,45 +1,35 @@
 using Asp.Versioning;
-using Energy.Application.Identity.Auth.Commands.Login;
-using Energy.Application.Identity.Auth.Queries.ValidateCredentials;
+using Energy.Application.Identity.Services;
+using Energy.Localization;
+using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Identity.Requests;
-using Energy.Shared.Versioning;
-using MediatR;
+using Energy.Shared.Models.V1.Identity.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace Energy.Api.Controllers;
 
 [ApiController]
-[ApiVersion(ApiVersions.V1)]
+[ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/auth")]
-[AllowAnonymous]
 public sealed class AuthController : ControllerBase
 {
-    private readonly ISender _sender;
-
-    public AuthController(ISender sender)
+    private readonly IUserService _users;
+    private readonly IStringLocalizer<SharedResource> _localizer;
+    public AuthController(IUserService users, IStringLocalizer<SharedResource> localizer)
     {
-        _sender = sender;
+        _users = users;
+        _localizer = localizer;
     }
 
-    /// <summary>
-    /// Issues a JWT bearer access token for the supplied credentials.
-    /// </summary>
     [HttpPost("login")]
-    public async Task<IActionResult> Login(
-        [FromBody] LoginRequest request,
-        CancellationToken cancellationToken)
+    [AllowAnonymous]
+    public async Task<ActionResult<BaseResponse<AuthTokenResponse>>> Login(LoginRequest request, CancellationToken ct)
     {
-        var response = await _sender.Send(new LoginCommand(request), cancellationToken);
-        return Ok(response);
-    }
-
-    [HttpPost("validate-credentials")]
-    public async Task<IActionResult> ValidateCredentials(
-        [FromBody] ValidateCredentialsRequest request,
-        CancellationToken cancellationToken)
-    {
-        var response = await _sender.Send(new ValidateCredentialsQuery(request), cancellationToken);
-        return Ok(response);
+        var token = await _users.LoginAsync(request, ct);
+        return token is null
+            ? Unauthorized(BaseResponse<AuthTokenResponse>.Failure(_localizer[LocalizationKeys.Messages.InvalidCredentials].Value))
+            : Ok(BaseResponse<AuthTokenResponse>.Success(token));
     }
 }

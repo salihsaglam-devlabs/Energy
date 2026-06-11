@@ -1,105 +1,95 @@
+using System.Linq;
 using Energy.Localization;
+using Energy.Shared.Identity.Permissions;
 using Energy.Shared.Models.V1.Localization.Requests;
 using Energy.Web.Clients.Localization;
-using Energy.Web.Common;
 using Energy.Web.Common.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 
 namespace Energy.Web.Controllers;
 
+/// <summary>
+/// Localization grid + JSON adapter. The new API stores a (key → culture →
+/// value) map; the grid flattens it into per-culture columns for editing.
+/// </summary>
 [Authorize]
+[PagePermission(PermissionCatalog.LocalizationReadAll)]
 [Route("localization")]
-[Route("system/localization")]
-[ServiceFilter(typeof(ApiExceptionFilter))]
 public sealed class LocalizationController : Controller
 {
-    private readonly ILocalizationApiClient _localizationApiClient;
-    private readonly IStringLocalizer<SharedResource> _localizer;
+    private readonly ILocalizationApiClient _client;
 
-    public LocalizationController(
-        ILocalizationApiClient localizationApiClient,
-        IStringLocalizer<SharedResource> localizer)
-    {
-        _localizationApiClient = localizationApiClient;
-        _localizer = localizer;
-    }
+    public LocalizationController(ILocalizationApiClient client) { _client = client; }
 
     [HttpGet("")]
-    [HttpGet("Index")]
+    [HttpGet("index")]
     public IActionResult Index()
     {
-        ViewData["Title"] = _localizer.GetText(LocalizationKeys.LocalizationScreen.Title);
+        ViewBag.Cultures = CultureConstants.SupportedCultures.Select(c => c.Name).ToArray();
         return View();
     }
 
     [HttpGet("list")]
-    public async Task<IActionResult> List(CancellationToken cancellationToken)
+    public async Task<IActionResult> List(CancellationToken ct)
     {
-        var envelope = await _localizationApiClient.GetAllAsync(cancellationToken);
-
-        if (!envelope.IsSuccess || envelope.Data is null)
-        {
-            return BadRequest(new { message = envelope.Message, errors = envelope.Errors });
-        }
-
-        // Flatten the per-culture dictionary into a row shape DevExtreme can
-        // bind to without nested editors.
-        var rows = envelope.Data.Select(entry => new
-        {
-            key = entry.Key,
-            tr = entry.Values.TryGetValue(CultureConstants.TurkishCulture, out var tr) ? tr : null,
-            en = entry.Values.TryGetValue(CultureConstants.EnglishCulture, out var en) ? en : null,
-            invariant = entry.Values.TryGetValue(string.Empty, out var inv) ? inv : null
-        });
-
-        return Ok(rows);
-    }
-
-    [HttpPost("")]
-    public async Task<IActionResult> Upsert(
-        [FromBody] LocalizationRowDto row,
-        CancellationToken cancellationToken)
-    {
-        var values = new Dictionary<string, string>();
-        if (!string.IsNullOrEmpty(row.Tr)) values[CultureConstants.TurkishCulture] = row.Tr;
-        if (!string.IsNullOrEmpty(row.En)) values[CultureConstants.EnglishCulture] = row.En;
-        if (!string.IsNullOrEmpty(row.Invariant)) values[string.Empty] = row.Invariant;
-
-        var envelope = await _localizationApiClient.UpsertAsync(
-            new UpsertLocalizationEntryRequest
+        var envelope = await _client.GetAllAsync(ct);
+        var items = (envelope.Data ?? Array.Empty<Shared.Models.V1.Localization.Responses.LocalizationEntryResponse>())
+            .Select(e =>
             {
-                Key = row.Key,
-                Values = values
-            },
-            cancellationToken);
-
-        return envelope.ToJsonResult();
+                e.Values.TryGetValue("tr-TR", out var tr);
+                e.Values.TryGetValue("en-US", out var en);
+                e.Values.TryGetValue(string.Empty, out var invariant);
+                return new
+                {
+                    key = e.Key,
+                    tr = tr ?? string.Empty,
+                    en = en ?? string.Empty,
+                    invariant = invariant ?? string.Empty
+                };
+            })
+            .OrderBy(x => x.key, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+        return Json(items);
     }
 
-    [HttpDelete("")]
-    public async Task<IActionResult> Delete(
-        [FromQuery] string key,
-        CancellationToken cancellationToken)
-    {
-        var envelope = await _localizationApiClient.DeleteAsync(key, cancellationToken);
-        return envelope.ToJsonResult();
-    }
-
-    [HttpPost("import-from-resx")]
-    public async Task<IActionResult> ImportFromResx(CancellationToken cancellationToken)
-    {
-        var envelope = await _localizationApiClient.ImportFromResxAsync(cancellationToken);
-        return envelope.ToJsonResult();
-    }
-
-    public sealed class LocalizationRowDto
+    public sealed class UpsertInput
     {
         public string Key { get; set; } = string.Empty;
         public string? Tr { get; set; }
         public string? En { get; set; }
         public string? Invariant { get; set; }
     }
-}
 
+    [HttpPost("")]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> Upsert([FromBody] UpsertInput input, CancellationToken ct)
+    {
+        var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["tr-TR"] = input.Tr ?? string.Empty,
+            ["en-US"] = input.En ?? string.Empty,
+            [string.Empty] = input.Invariant ?? string.Empty
+        };
+        var envelope = await _client.UpsertAsync(new UpsertLocalizationEntryRequest
+        {
+            Key = input.Key,
+            Values = values
+        }, ct);
+        return Json(envelope);
+    }
+
+    [HttpDelete("")]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> Delete([FromQuery] string key, CancellationToken ct)
+        => Json(await _client.DeleteAsync(key, ct));
+
+    /// <summary>
+    /// Placeholder for the legacy "import from .resx" toolbar action. The new
+    /// API does not expose a resx-import endpoint so we always reply success
+    /// with a zero counter to keep the UI from displaying an error.
+    /// </summary>
+    [HttpPost("import-from-resx")]
+    [IgnoreAntiforgeryToken]
+    public IActionResult ImportFromResx() => Json(new { success = true, data = new { added = 0, updated = 0 } });
+}

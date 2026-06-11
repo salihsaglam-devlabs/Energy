@@ -2,10 +2,7 @@ namespace Energy.Web.Models.Dashboard;
 
 public sealed class DashboardMetricViewModel
 {
-    public required string LabelKey { get; init; }
-
-    public required string DescriptionKey { get; init; }
-
-    public required string Value { get; init; }
+    public string LabelKey { get; init; } = string.Empty;
+    public string DescriptionKey { get; init; } = string.Empty;
+    public string Value { get; init; } = string.Empty;
 }
-

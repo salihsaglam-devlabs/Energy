@@ -3,7 +3,6 @@
     var L = function () { return window.AppL10n.localization; };
     var LG = function () { return window.AppL10n.grid; };
     var LN = function () { return window.AppL10n.notifications; };
-    var R = function () { return window.AppResponsive; };
     var gridInstance;
 
     function exportGrid(e, fileName) {
@@ -48,7 +47,6 @@
             remove: function (key) { return window.AppHttp.del("/localization?key=" + encodeURIComponent(key)); }
         });
 
-        var g = R().getGridOptions();
         gridInstance = $("#localization-grid").dxDataGrid({
             dataSource: store,
             showBorders: true,
@@ -62,16 +60,16 @@
             hoverStateEnabled: true,
             allowColumnResizing: true,
             columnResizingMode: "widget",
-            columnAutoWidth: g.columnAutoWidth,
-            columnHidingEnabled: g.columnHidingEnabled,
-            wordWrapEnabled: g.wordWrapEnabled,
+            columnAutoWidth: true,
+            columnHidingEnabled: false,
+            wordWrapEnabled: false,
             width: "100%",
-            height: g.height,
-            scrolling: g.scrolling,
+            height: "75vh",
+            scrolling: { mode: "standard", useNative: true, showScrollbar: "onScroll", columnRenderingMode: "standard" },
             repaintChangesOnly: true,
             paging: { pageSize: 20 },
-            pager: R().getPagerOptions(),
-            searchPanel: R().getSearchPanelOptions(LG().search),
+            pager: { visible: true, allowedPageSizes: [10, 20, 50], showPageSizeSelector: true, showInfo: true, showNavigationButtons: true, displayMode: "full" },
+            searchPanel: { visible: true, placeholder: LG().search, width: 240 },
             sorting: { mode: "multiple" },
             columnChooser: { enabled: true, mode: "select", height: 320, search: { enabled: true } },
             loadPanel: { enabled: true, text: LG().loading },
@@ -81,8 +79,14 @@
             editing: {
                 mode: "popup", allowAdding: true, allowUpdating: true, allowDeleting: true,
                 useIcons: true,
-                popup: R().getPopupOptions({ title: L().editTitle, showTitle: true, width: 640, height: 460 }),
-                form: { labelLocation: "top", items: [
+                popup: {
+                    title: L().editTitle, showTitle: true,
+                    width: 640, height: "auto",
+                    maxWidth: "min(92vw, 960px)", maxHeight: "min(88vh, 820px)",
+                    dragEnabled: true, resizeEnabled: true, hideOnOutsideClick: true,
+                    showCloseButton: true, wrapperAttr: { class: "energy-popup" }
+                },
+                form: { labelLocation: "top", colCount: 1, items: [
                     { dataField: "key", isRequired: true },
                     { dataField: "tr" },
                     { dataField: "en" },
