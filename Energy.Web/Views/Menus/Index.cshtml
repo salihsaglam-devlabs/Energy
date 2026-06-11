@@ -1,0 +1,25 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T[LocalizationKeys.MenusScreen.Title].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div>
+            <h2>@T[LocalizationKeys.MenusScreen.Title]</h2>
+            <p>@T[LocalizationKeys.MenusScreen.Subtitle]</p>
+        </div>
+    </header>
+
+    <div id="menus-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/app/pages/menus.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.Menus.init();
+        });
+    </script>
+}

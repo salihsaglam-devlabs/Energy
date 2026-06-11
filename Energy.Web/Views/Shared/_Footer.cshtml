@@ -1,0 +1,5 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+<footer class="energy-footer">
+    @T[LocalizationKeys.Layout.FooterCopyright, DateTime.Now.Year, T[LocalizationKeys.Common.AppName].Value]
+</footer>

@@ -1,0 +1,131 @@
+@using Energy.Localization
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> SL
+@{
+    string Tx(string key) => SL.GetText(key);
+}
+<script>
+    window.AppL10n = {
+        common: {
+            appName: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Common.AppName))),
+            error: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Common.Error))),
+            cancel: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Common.Cancel))),
+            save: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Common.Save))),
+            yes: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Grid.Yes))),
+            no: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Grid.No)))
+        },
+        grid: {
+            add: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Grid.Add))),
+            edit: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Grid.Edit))),
+            delete: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Grid.Delete))),
+            save: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Grid.Save))),
+            cancel: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Grid.Cancel))),
+            refresh: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Grid.Refresh))),
+            search: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Grid.Search))),
+            noData: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Grid.NoData))),
+            confirmDelete: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Grid.ConfirmDelete))),
+            actions: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Grid.Actions))),
+            loading: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Grid.Loading))),
+            yes: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Grid.Yes))),
+            no: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Grid.No)))
+        },
+        notifications: {
+            saved: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Notifications.Saved))),
+            deleted: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Notifications.Deleted))),
+            failed: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Notifications.Failed))),
+            unauthorized: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Notifications.Unauthorized))),
+            forbidden: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Notifications.Forbidden))),
+            networkError: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Notifications.NetworkError))),
+            genericError: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Notifications.GenericError))),
+            sessionExpired: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Auth.SessionExpired)))
+        },
+        layout: {
+            loading: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Layout.Loading))),
+            language: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Layout.Language))),
+            userMenu: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Layout.UserMenu))),
+            profile: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Layout.Profile))),
+            myProfile: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Layout.MyProfile))),
+            signOut: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Auth.SignOut)))
+        },
+        auth: {
+            signInTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Auth.SignInTitle))),
+            signInSubtitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Auth.SignInSubtitle))),
+            userNameOrEmail: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Auth.UserNameOrEmail))),
+            password: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Auth.Password))),
+            showPassword: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Auth.ShowPassword))),
+            hidePassword: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Auth.HidePassword))),
+            rememberMe: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Auth.RememberMe))),
+            signIn: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Auth.SignIn))),
+            signingIn: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Auth.SigningIn))),
+            invalidCredentials: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Auth.InvalidCredentials))),
+            fieldRequired: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Auth.FieldRequired)))
+        },
+        users: {
+            title: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.Title))),
+            firstName: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.FirstName))),
+            lastName: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.LastName))),
+            userName: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.UserName))),
+            email: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.Email))),
+            phoneNumber: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.PhoneNumber))),
+            isActive: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.IsActive))),
+            emailConfirmed: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.EmailConfirmed))),
+            phoneNumberConfirmed: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.PhoneNumberConfirmed))),
+            twoFactorEnabled: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.TwoFactorEnabled))),
+            lockoutEnabled: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.LockoutEnabled))),
+            lockoutEnd: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.LockoutEnd))),
+            password: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.Password))),
+            roles: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.Roles))),
+            manageRoles: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.ManageRoles))),
+            changePassword: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.ChangePassword))),
+            createTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.CreateTitle))),
+            editTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.EditTitle))),
+            passwordTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.PasswordTitle))),
+            rolesTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.UsersScreen.RolesTitle)))
+        },
+        roles: {
+            title: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.RolesScreen.Title))),
+            name: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.RolesScreen.Name))),
+            description: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.RolesScreen.Description))),
+            assignedUserCount: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.RolesScreen.AssignedUserCount))),
+            createTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.RolesScreen.CreateTitle))),
+            editTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.RolesScreen.EditTitle))),
+            managePermissions: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.RolesScreen.ManagePermissions))),
+            manageMenus: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.RolesScreen.ManageMenus))),
+            permissionsTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.RolesScreen.PermissionsTitle))),
+            menusTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.RolesScreen.MenusTitle)))
+        },
+        permissions: {
+            title: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.PermissionsScreen.Title))),
+            code: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.PermissionsScreen.Code))),
+            name: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.PermissionsScreen.Name))),
+            createTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.PermissionsScreen.CreateTitle))),
+            editTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.PermissionsScreen.EditTitle))),
+            seedDefaults: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.PermissionsScreen.SeedDefaults)))
+        },
+        menus: {
+            title: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.MenusScreen.Title))),
+            name: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.MenusScreen.Name))),
+            nameKey: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.MenusScreen.NameKey))),
+            url: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.MenusScreen.Url))),
+            icon: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.MenusScreen.Icon))),
+            order: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.MenusScreen.Order))),
+            parent: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.MenusScreen.Parent))),
+            createTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.MenusScreen.CreateTitle))),
+            editTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.MenusScreen.EditTitle))),
+            seedDefaults: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.MenusScreen.SeedDefaults))),
+            noParent: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.MenusScreen.NoParent)))
+        },
+        localization: {
+            title: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.LocalizationScreen.Title))),
+            key: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.LocalizationScreen.Key))),
+            tr: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.LocalizationScreen.TurkishValue))),
+            en: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.LocalizationScreen.EnglishValue))),
+            invariant: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.LocalizationScreen.InvariantValue))),
+            createTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.LocalizationScreen.CreateTitle))),
+            editTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.LocalizationScreen.EditTitle))),
+            importFromResx: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.LocalizationScreen.ImportFromResx))),
+            importConfirmTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.LocalizationScreen.ImportConfirmTitle))),
+            importConfirmMessage: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.LocalizationScreen.ImportConfirmMessage))),
+            imported: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.LocalizationScreen.Imported)))
+        }
+    };
+</script>

@@ -1,0 +1,21 @@
+@using Energy.Localization
+@model IReadOnlyList<Energy.Web.Services.Navigation.NavigationItem>
+@{
+    var json = System.Text.Json.JsonSerializer.Serialize(
+        Model.Select(i => new {
+            id = i.Id,
+            parentId = i.ParentId,
+            text = i.Name,
+            url = i.Url,
+            icon = i.Icon,
+            order = i.Order
+        }),
+        new System.Text.Json.JsonSerializerOptions {
+            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+        });
+}
+<aside class="energy-navigation" id="energy-navigation"
+       data-items="@json"
+       data-active-url="@(Context.Request.Path.HasValue ? Context.Request.Path.Value : "/")">
+    <div class="energy-navigation__tree" id="energy-navigation-tree"></div>
+</aside>

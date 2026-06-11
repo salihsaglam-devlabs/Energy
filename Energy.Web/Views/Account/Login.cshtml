@@ -1,0 +1,29 @@
+@using Energy.Localization
+@model Energy.Web.Models.Account.LoginViewModel
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = T[LocalizationKeys.Auth.SignInTitle].Value;
+}
+
+<div class="energy-auth-form">
+    <h1 class="energy-auth-form__title">@T[LocalizationKeys.Auth.SignInTitle]</h1>
+    <p class="energy-auth-form__subtitle">@T[LocalizationKeys.Auth.SignInSubtitle]</p>
+
+    <form id="energy-login-form" method="post" action="/account/login" autocomplete="on">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="ReturnUrl" value="@(Model.ReturnUrl ?? string.Empty)" />
+        <div id="energy-login-form-host"></div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/app/pages/login.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.Login.init({
+                returnUrl: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ReturnUrl))
+            });
+        });
+    </script>
+}

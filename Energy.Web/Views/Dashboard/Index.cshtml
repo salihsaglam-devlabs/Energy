@@ -1,0 +1,90 @@
+@using Energy.Localization
+@model Energy.Web.Models.Dashboard.DashboardIndexViewModel
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T[LocalizationKeys.Menus.Dashboard].Value;
+
+    string ResolveQuickLinkTitle(string titleOrKey) => T[titleOrKey].Value;
+
+    string? ResolveQuickLinkIconClass(string? icon)
+    {
+        if (string.IsNullOrWhiteSpace(icon))
+        {
+            return null;
+        }
+
+        return icon.Contains(' ', StringComparison.Ordinal)
+            ? icon
+            : $"dx-icon dx-icon-{icon}";
+    }
+}
+
+<section class="energy-dashboard">
+    <header class="energy-dashboard__hero">
+        <div class="energy-dashboard__hero-copy">
+            <span class="energy-dashboard__eyebrow">@T[LocalizationKeys.Common.AppName]</span>
+            <h2>@T[LocalizationKeys.Dashboard.Title]</h2>
+            <p>@T[LocalizationKeys.Dashboard.Subtitle]</p>
+        </div>
+
+        <div class="energy-dashboard__hero-status">
+            <span class="energy-dashboard__status-label">@T[LocalizationKeys.Dashboard.ConfigurationStatus]</span>
+            <strong>@T[Model.StatusKey]</strong>
+            <div class="energy-dashboard__score">@Model.ReadinessScore<small>%</small></div>
+            <p>@T[LocalizationKeys.Dashboard.ModuleSummary, Model.ConfiguredAreaCount]</p>
+        </div>
+    </header>
+
+    <div class="energy-dashboard__grid">
+        <section class="energy-dashboard__panel">
+            <div class="energy-dashboard__panel-heading">
+                <span class="energy-dashboard__eyebrow">@T[LocalizationKeys.Dashboard.Readiness]</span>
+                <h3>@T[LocalizationKeys.Dashboard.SystemOverview]</h3>
+                <p>@T[LocalizationKeys.Dashboard.SystemOverviewDescription]</p>
+            </div>
+
+            <div class="energy-dashboard__metrics">
+                @foreach (var metric in Model.Metrics)
+                {
+                    <article class="energy-dashboard__metric">
+                        <span class="energy-dashboard__metric-label">@T[metric.LabelKey]</span>
+                        <strong class="energy-dashboard__metric-value">@metric.Value</strong>
+                        <p class="energy-dashboard__metric-description">@T[metric.DescriptionKey]</p>
+                    </article>
+                }
+            </div>
+        </section>
+
+        <aside class="energy-dashboard__panel energy-dashboard__panel--actions">
+            <div class="energy-dashboard__panel-heading">
+                <span class="energy-dashboard__eyebrow">@T[LocalizationKeys.Dashboard.QuickActions]</span>
+                <h3>@T[LocalizationKeys.Dashboard.QuickActions]</h3>
+                <p>@T[LocalizationKeys.Dashboard.QuickActionsDescription]</p>
+            </div>
+
+            @if (Model.QuickLinks.Count == 0)
+            {
+                <div class="energy-dashboard__empty">@T[LocalizationKeys.Dashboard.EmptyState]</div>
+            }
+            else
+            {
+                <div class="energy-dashboard__quick-links">
+                    @foreach (var link in Model.QuickLinks)
+                    {
+                        var quickLinkIconClass = ResolveQuickLinkIconClass(link.Icon);
+                        <a class="energy-dashboard__quick-link" href="@link.Url">
+                            @if (!string.IsNullOrEmpty(quickLinkIconClass))
+                            {
+                                <span class="energy-dashboard__quick-link-icon"><i class="@quickLinkIconClass"></i></span>
+                            }
+                            <span class="energy-dashboard__quick-link-body">
+                                <strong>@ResolveQuickLinkTitle(link.Title)</strong>
+                                <small>@link.Url</small>
+                            </span>
+                        </a>
+                    }
+                </div>
+            }
+        </aside>
+    </div>
+</section>

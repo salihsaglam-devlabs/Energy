@@ -1,0 +1,88 @@
+@using Energy.Localization
+@using Energy.Web.Models.Profile
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@model ProfileViewModel
+@{
+    ViewData["Title"] = T[LocalizationKeys.ProfileScreen.Title].Value;
+    var user = Model.User;
+    var initials = string.IsNullOrWhiteSpace(user.FirstName + user.LastName)
+        ? "?"
+        : string.Concat(new[] { user.FirstName, user.LastName }
+            .Where(p => !string.IsNullOrWhiteSpace(p))
+            .Take(2)
+            .Select(p => char.ToUpperInvariant(p[0])));
+    var profileJson = System.Text.Json.JsonSerializer.Serialize(new
+    {
+        id = user.Id,
+        firstName = user.FirstName,
+        lastName = user.LastName,
+        userName = user.UserName,
+        email = user.Email,
+        phoneNumber = user.PhoneNumber,
+        isActive = user.IsActive,
+        emailConfirmed = user.EmailConfirmed,
+        phoneNumberConfirmed = user.PhoneNumberConfirmed,
+        twoFactorEnabled = user.TwoFactorEnabled,
+        lockoutEnabled = user.LockoutEnabled,
+        hasProfileImage = user.HasProfileImage,
+        roles = user.Roles.Select(r => new { id = r.Id, name = r.Name, description = r.Description }),
+        permissions = Model.Permissions,
+        roleKeys = Model.RoleKeys
+    });
+    var labels = System.Text.Json.JsonSerializer.Serialize(new
+    {
+        personalInfo = T[LocalizationKeys.ProfileScreen.PersonalInfo].Value,
+        accountInfo = T[LocalizationKeys.ProfileScreen.AccountInfo].Value,
+        roles = T[LocalizationKeys.ProfileScreen.Roles].Value,
+        permissions = T[LocalizationKeys.ProfileScreen.Permissions].Value,
+        profileImage = T[LocalizationKeys.ProfileScreen.ProfileImage].Value,
+        uploadImage = T[LocalizationKeys.ProfileScreen.UploadImage].Value,
+        removeImage = T[LocalizationKeys.ProfileScreen.RemoveImage].Value,
+        imageUploaded = T[LocalizationKeys.ProfileScreen.ImageUploaded].Value,
+        imageRemoved = T[LocalizationKeys.ProfileScreen.ImageRemoved].Value,
+        imageHint = T[LocalizationKeys.ProfileScreen.ImageHint].Value,
+        noRoles = T[LocalizationKeys.ProfileScreen.NoRoles].Value,
+        noPermissions = T[LocalizationKeys.ProfileScreen.NoPermissions].Value,
+        active = T[LocalizationKeys.ProfileScreen.AccountActive].Value,
+        inactive = T[LocalizationKeys.ProfileScreen.AccountInactive].Value,
+        confirmDelete = T[LocalizationKeys.Grid.ConfirmDelete].Value,
+        firstName = T[LocalizationKeys.UsersScreen.FirstName].Value,
+        lastName = T[LocalizationKeys.UsersScreen.LastName].Value,
+        userName = T[LocalizationKeys.UsersScreen.UserName].Value,
+        email = T[LocalizationKeys.UsersScreen.Email].Value,
+        phoneNumber = T[LocalizationKeys.UsersScreen.PhoneNumber].Value,
+        isActive = T[LocalizationKeys.UsersScreen.IsActive].Value,
+        emailConfirmed = T[LocalizationKeys.UsersScreen.EmailConfirmed].Value,
+        twoFactorEnabled = T[LocalizationKeys.UsersScreen.TwoFactorEnabled].Value,
+        lockoutEnabled = T[LocalizationKeys.UsersScreen.LockoutEnabled].Value,
+        roleName = T[LocalizationKeys.RolesScreen.Name].Value,
+        roleDescription = T[LocalizationKeys.RolesScreen.Description].Value,
+        permissionCode = T[LocalizationKeys.PermissionsScreen.Code].Value
+    });
+}
+
+<section class="energy-screen energy-profile">
+    <div class="energy-profile__layout"
+         data-profile="@profileJson"
+         data-labels="@labels"
+         data-initials="@initials">
+        <div class="energy-profile__avatar-pane">
+            <div id="profile-avatar-box"></div>
+            <div id="profile-image-uploader"></div>
+            <div id="profile-image-remove"></div>
+        </div>
+        <div class="energy-profile__main-pane">
+            <div id="profile-tabs"></div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/app/pages/profile.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.Profile.init();
+        });
+    </script>
+}
+

@@ -1,0 +1,18 @@
+@using Energy.Localization
+@model ErrorViewModel
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T[LocalizationKeys.Common.Error].Value;
+}
+
+<div class="energy-error-card">
+    <h2>@T[LocalizationKeys.Common.Error]</h2>
+    <p>@T[LocalizationKeys.Common.ErrorOccurred]</p>
+
+    @if (Model.ShowRequestId)
+    {
+        <p class="energy-error-card__request-id">
+            <strong>@T[LocalizationKeys.Common.RequestId]:</strong> <code>@Model.RequestId</code>
+        </p>
+    }
+</div>

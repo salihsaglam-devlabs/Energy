@@ -1,0 +1,80 @@
+@using Energy.Localization
+@using Energy.Web.Configuration
+@using Microsoft.AspNetCore.Antiforgery
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@inject IAntiforgery Antiforgery
+@inject Microsoft.Extensions.Options.IOptionsSnapshot<BrandSettings> BrandOptions
+@{
+    var requestToken = Antiforgery.GetAndStoreTokens(Context).RequestToken;
+    var currentCulture = System.Globalization.CultureInfo.CurrentUICulture.Name;
+    var currentUrl = Context.Request.Path + Context.Request.QueryString;
+    var trUrl = $"/culture/set?culture=tr-TR&uiCulture=tr-TR&returnUrl={Uri.EscapeDataString(currentUrl)}";
+    var enUrl = $"/culture/set?culture=en-US&uiCulture=en-US&returnUrl={Uri.EscapeDataString(currentUrl)}";
+    var dxLocale = currentCulture.StartsWith("tr") ? "tr" : "en";
+    var brand = BrandOptions.Value;
+    var brandName = string.IsNullOrWhiteSpace(brand.Name) ? T[LocalizationKeys.Common.AppName].Value : brand.Name;
+    var brandLogoSrc = brand.GetLogoSource(Url);
+    var brandLogoAlt = string.IsNullOrWhiteSpace(brand.LogoAlt) ? brandName : brand.LogoAlt;
+}
+<!DOCTYPE html>
+<html lang="@currentCulture">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - @T[LocalizationKeys.Common.AppName]</title>
+    <meta name="csrf-token" content="@requestToken" />
+
+    <link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/25.2.7/css/dx.common.css" />
+    <link rel="stylesheet" href="~/css/dx.fluent.energy-custom-scheme.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" />
+    <link rel="stylesheet" href="~/css/app.css" asp-append-version="true" />
+
+    @await Html.PartialAsync("_LocalizationBootstrap")
+</head>
+<body class="dx-viewport energy-auth-shell dx-swatch-energy-custom-scheme">
+    <main class="energy-auth-page" role="main">
+        <div class="energy-auth-card">
+            <header class="energy-auth-brand">
+                <span class="energy-auth-brand__mark">
+                    @if (!string.IsNullOrWhiteSpace(brandLogoSrc))
+                    {
+                        <img class="energy-brand-logo" src="@brandLogoSrc" alt="@brandLogoAlt" />
+                    }
+                    else
+                    {
+                        <i class="fas fa-bolt"></i>
+                    }
+                </span>
+                <span class="energy-auth-brand__name">@brandName</span>
+            </header>
+
+            @RenderBody()
+
+            <footer class="energy-auth-lang">
+                <a href="@trUrl">@T[LocalizationKeys.Common.Turkish]</a>
+                <span>|</span>
+                <a href="@enUrl">@T[LocalizationKeys.Common.English]</a>
+            </footer>
+        </div>
+    </main>
+
+    <div id="energy-toast"></div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdn3.devexpress.com/jslib/25.2.7/js/dx.all.js"></script>
+    <script src="~/js/app/dx-license.js" asp-append-version="true"></script>
+    <script src="https://cdn3.devexpress.com/jslib/25.2.7/js/localization/dx.messages.@(dxLocale).js"></script>
+    <script src="~/js/app/http.js" asp-append-version="true"></script>
+    <script src="~/js/app/notifications.js" asp-append-version="true"></script>
+    <script src="~/js/app/responsive.js" asp-append-version="true"></script>
+
+    <script>
+        DevExpress.localization.locale("@currentCulture");
+        window.AppContext = {
+            culture: "@currentCulture"
+        };
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

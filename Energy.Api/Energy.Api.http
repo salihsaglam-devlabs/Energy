@@ -1,0 +1,20 @@
+@Energy.Api_HostAddress = http://localhost:5004
+
+### Localization smoke test
+GET {{Energy.Api_HostAddress}}/api/localization/test
+Accept: application/json
+
+### Home dashboard query
+GET {{Energy.Api_HostAddress}}/api/v1/home/dashboard?IncludeQuickLinks=true&QuickLinkCount=4
+Accept: application/json
+
+### Home seed command
+POST {{Energy.Api_HostAddress}}/api/v1/home/seed
+Content-Type: application/json
+Accept: application/json
+
+{
+  "seedIdentity": true,
+  "seedPermissions": true,
+  "seedMenus": true
+}

@@ -1,0 +1,20 @@
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div>
+            <h2>Access Rules</h2>
+            <p>Centralized page/API access rules and their required permissions.</p>
+        </div>
+    </header>
+
+    <div id="access-rules-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/app/pages/access-rules.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.AccessRules.init();
+        });
+    </script>
+}
+

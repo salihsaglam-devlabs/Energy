@@ -1,0 +1,81 @@
+@using Energy.Localization
+@using Energy.Web.Common
+@using Energy.Web.Configuration
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@inject Microsoft.Extensions.Options.IOptionsSnapshot<BrandSettings> BrandOptions
+@{
+    var fullName = User.GetFullName() ?? string.Empty;
+    var currentUrl = Context.Request.Path + Context.Request.QueryString;
+    var trUrl = $"/culture/set?culture=tr-TR&uiCulture=tr-TR&returnUrl={Uri.EscapeDataString(currentUrl)}";
+    var enUrl = $"/culture/set?culture=en-US&uiCulture=en-US&returnUrl={Uri.EscapeDataString(currentUrl)}";
+    var brand = BrandOptions.Value;
+    var brandName = string.IsNullOrWhiteSpace(brand.Name) ? T[LocalizationKeys.Common.AppName].Value : brand.Name;
+    var brandLogoSrc = brand.GetLogoSource(Url);
+    var brandLogoAlt = string.IsNullOrWhiteSpace(brand.LogoAlt) ? brandName : brand.LogoAlt;
+    var currentCulture = System.Globalization.CultureInfo.CurrentUICulture.Name;
+    var isTr = currentCulture.StartsWith("tr", StringComparison.OrdinalIgnoreCase);
+    var initials = string.IsNullOrEmpty(fullName)
+        ? "?"
+        : string.Concat(fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Take(2)
+            .Select(p => char.ToUpperInvariant(p[0])));
+    // Profile image is served by ProfileController; the <img> below falls back to
+    // initials via onerror if the user has not uploaded one.
+    var avatarUrl = User.Identity?.IsAuthenticated == true
+        ? Url.Action("Image", "Profile")
+        : null;
+}
+<header class="energy-toolbar" role="banner">
+    <button type="button" class="energy-toolbar__menu" id="energy-drawer-toggle"
+            aria-label="@T[LocalizationKeys.Layout.ToggleMenu]">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <a class="energy-toolbar__brand" href="/">
+        <span class="energy-toolbar__brand-mark">
+            @if (!string.IsNullOrWhiteSpace(brandLogoSrc))
+            {
+                <img class="energy-brand-logo" src="@brandLogoSrc" alt="@brandLogoAlt" />
+            }
+            else
+            {
+                <i class="fas fa-bolt"></i>
+            }
+        </span>
+        <span class="energy-toolbar__brand-name">@brandName</span>
+    </a>
+
+    <h1 class="energy-toolbar__page-title">@ViewData["Title"]</h1>
+
+    <div class="energy-toolbar__spacer"></div>
+
+    <div class="energy-toolbar__actions">
+        <div class="energy-toolbar__lang">
+            <a href="@trUrl" class="energy-toolbar__lang-btn @(isTr ? "is-active" : "")"
+               aria-label="@T[LocalizationKeys.Common.Turkish]">TR</a>
+            <span class="energy-toolbar__lang-divider">|</span>
+            <a href="@enUrl" class="energy-toolbar__lang-btn @(!isTr ? "is-active" : "")"
+               aria-label="@T[LocalizationKeys.Common.English]">EN</a>
+        </div>
+
+        <div class="energy-toolbar__user" id="energy-user-menu" tabindex="0"
+             role="button" aria-label="@T[LocalizationKeys.Layout.UserMenu]">
+            <span class="energy-toolbar__user-avatar">
+                @if (!string.IsNullOrEmpty(avatarUrl))
+                {
+                    <img class="energy-toolbar__user-avatar-img"
+                         src="@avatarUrl"
+                         alt="@fullName"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';" />
+                    <span class="energy-toolbar__user-avatar-fallback" style="display:none">@initials</span>
+                }
+                else
+                {
+                    @initials
+                }
+            </span>
+            <span class="energy-toolbar__user-name">@fullName</span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </div>
+</header>

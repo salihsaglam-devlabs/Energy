@@ -1,0 +1,25 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T[LocalizationKeys.UsersScreen.Title].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div>
+            <h2>@T[LocalizationKeys.UsersScreen.Title]</h2>
+            <p>@T[LocalizationKeys.UsersScreen.Subtitle]</p>
+        </div>
+    </header>
+
+    <div id="users-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/app/pages/users.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.Users.init();
+        });
+    </script>
+}

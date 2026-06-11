@@ -1,0 +1,11 @@
+/Users/base/Codes/Energy/Energy.Domain/bin/Release/net10.0/Energy.Domain.deps.json
+/Users/base/Codes/Energy/Energy.Domain/bin/Release/net10.0/Energy.Domain.dll
+/Users/base/Codes/Energy/Energy.Domain/bin/Release/net10.0/Energy.Domain.pdb
+/Users/base/Codes/Energy/Energy.Domain/obj/Release/net10.0/Energy.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Users/base/Codes/Energy/Energy.Domain/obj/Release/net10.0/Energy.Domain.AssemblyInfoInputs.cache
+/Users/base/Codes/Energy/Energy.Domain/obj/Release/net10.0/Energy.Domain.AssemblyInfo.cs
+/Users/base/Codes/Energy/Energy.Domain/obj/Release/net10.0/Energy.Domain.csproj.CoreCompileInputs.cache
+/Users/base/Codes/Energy/Energy.Domain/obj/Release/net10.0/Energy.Domain.dll
+/Users/base/Codes/Energy/Energy.Domain/obj/Release/net10.0/refint/Energy.Domain.dll
+/Users/base/Codes/Energy/Energy.Domain/obj/Release/net10.0/Energy.Domain.pdb
+/Users/base/Codes/Energy/Energy.Domain/obj/Release/net10.0/ref/Energy.Domain.dll
