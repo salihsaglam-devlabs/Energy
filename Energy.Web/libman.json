@@ -11,11 +11,13 @@
       "destination": "wwwroot/lib/dev-timer/"
     },
     {
-      "library": "devextreme@25.1.5",
+      "provider": "jsdelivr",
+      "library": "devextreme@25.2.7",
       "destination": "wwwroot/lib/devextreme/"
     },
     {
-      "library": "devextreme-dist@25.1.5",
+      "provider": "jsdelivr",
+      "library": "devextreme-dist@25.2.7",
       "destination": "wwwroot/lib/devextreme-dist/"
     },
     {
