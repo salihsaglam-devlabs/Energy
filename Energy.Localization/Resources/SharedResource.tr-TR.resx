@@ -30,95 +30,63 @@
   <data name="Common.RequestId" xml:space="preserve"><value>İstek Kimliği</value></data>
   <data name="Common.ErrorOccurred" xml:space="preserve"><value>İsteğiniz işlenirken bir hata oluştu.</value></data>
 
-  <data name="Roles.Admin.DisplayName" xml:space="preserve"><value>Yönetici</value></data>
-  <data name="Roles.Admin.Description" xml:space="preserve"><value>Sistem yöneticisi</value></data>
-  <data name="Roles.OperationsManager.DisplayName" xml:space="preserve"><value>Operasyon Yöneticisi</value></data>
-  <data name="Roles.OperationsManager.Description" xml:space="preserve"><value>Operasyon yöneticisi</value></data>
-  <data name="Roles.LocalizationEditor.DisplayName" xml:space="preserve"><value>Yerelleştirme Editörü</value></data>
-  <data name="Roles.LocalizationEditor.Description" xml:space="preserve"><value>Yerelleştirme editörü</value></data>
-  <data name="Roles.ReadOnly.DisplayName" xml:space="preserve"><value>Salt Okunur</value></data>
-  <data name="Roles.ReadOnly.Description" xml:space="preserve"><value>Salt okunur kullanıcı</value></data>
 
-  <data name="Users.Admin.FirstName" xml:space="preserve"><value>Sistem</value></data>
-  <data name="Users.Admin.LastName" xml:space="preserve"><value>Yönetici</value></data>
-  <data name="Users.OperationsManager.FirstName" xml:space="preserve"><value>Operasyon</value></data>
-  <data name="Users.OperationsManager.LastName" xml:space="preserve"><value>Yöneticisi</value></data>
-  <data name="Users.LocalizationEditor.FirstName" xml:space="preserve"><value>Yerelleştirme</value></data>
-  <data name="Users.LocalizationEditor.LastName" xml:space="preserve"><value>Editörü</value></data>
-  <data name="Users.ReadOnly.FirstName" xml:space="preserve"><value>Salt</value></data>
-  <data name="Users.ReadOnly.LastName" xml:space="preserve"><value>Okunur</value></data>
+  <data name="Permissions.Dashboard.Read.Name" xml:space="preserve"><value>Gösterge Panelini Görüntüleme</value></data>
 
-  <data name="Permissions.Default.Read.Name" xml:space="preserve"><value>Okuma</value></data>
-  <data name="Permissions.Default.ReadAll.Name" xml:space="preserve"><value>Tümünü Okuma</value></data>
-  <data name="Permissions.Default.Create.Name" xml:space="preserve"><value>Oluşturma</value></data>
-  <data name="Permissions.Default.Update.Name" xml:space="preserve"><value>Güncelleme</value></data>
-   <data name="Permissions.Default.Delete.Name" xml:space="preserve"><value>Silme</value></data>
+  <data name="Permissions.User.Read.Name" xml:space="preserve"><value>Kullanıcı Görüntüleme</value></data>
+  <data name="Permissions.User.ReadAll.Name" xml:space="preserve"><value>Kullanıcıları Listeleme</value></data>
+  <data name="Permissions.User.Create.Name" xml:space="preserve"><value>Kullanıcı Oluşturma</value></data>
+  <data name="Permissions.User.Update.Name" xml:space="preserve"><value>Kullanıcı Güncelleme</value></data>
+  <data name="Permissions.User.Delete.Name" xml:space="preserve"><value>Kullanıcı Silme</value></data>
 
-   <data name="Permissions.AccessRules.Read.Name" xml:space="preserve"><value>Erişim Kuralı Okuma</value></data>
-   <data name="Permissions.AccessRules.ReadAll.Name" xml:space="preserve"><value>Erişim Kuralları Tümünü Okuma</value></data>
-   <data name="Permissions.AccessRules.Create.Name" xml:space="preserve"><value>Erişim Kuralı Oluşturma</value></data>
-   <data name="Permissions.AccessRules.Update.Name" xml:space="preserve"><value>Erişim Kuralı Güncelleme</value></data>
-   <data name="Permissions.AccessRules.Delete.Name" xml:space="preserve"><value>Erişim Kuralı Silme</value></data>
-   <data name="Permissions.AccessRules.ManagePermissions.Name" xml:space="preserve"><value>Erişim Kuralı Yetkilerini Yönetme</value></data>
+  <data name="Permissions.Role.Read.Name" xml:space="preserve"><value>Rol Görüntüleme</value></data>
+  <data name="Permissions.Role.ReadAll.Name" xml:space="preserve"><value>Rolleri Listeleme</value></data>
+  <data name="Permissions.Role.Create.Name" xml:space="preserve"><value>Rol Oluşturma</value></data>
+  <data name="Permissions.Role.Update.Name" xml:space="preserve"><value>Rol Güncelleme</value></data>
+  <data name="Permissions.Role.Delete.Name" xml:space="preserve"><value>Rol Silme</value></data>
 
-   <data name="Permissions.Home.GetDashboard.Name" xml:space="preserve"><value>Ana Sayfa Gösterge Panelini Görüntüleme</value></data>
+  <data name="Permissions.Permission.Read.Name" xml:space="preserve"><value>Yetki Görüntüleme</value></data>
+  <data name="Permissions.Permission.ReadAll.Name" xml:space="preserve"><value>Yetkileri Listeleme</value></data>
 
-   <data name="Permissions.User.GetUsers.Name" xml:space="preserve"><value>Kullanıcıları Listeleme</value></data>
-   <data name="Permissions.User.GetUser.Name" xml:space="preserve"><value>Kullanıcı Detayını Görüntüleme</value></data>
-   <data name="Permissions.User.CreateUser.Name" xml:space="preserve"><value>Kullanıcı Oluşturma</value></data>
-   <data name="Permissions.User.UpdateUser.Name" xml:space="preserve"><value>Kullanıcı Güncelleme</value></data>
-   <data name="Permissions.User.SetRoles.Name" xml:space="preserve"><value>Kullanıcı Rollerini Atama</value></data>
-   <data name="Permissions.User.UpdatePassword.Name" xml:space="preserve"><value>Kullanıcı Şifresini Güncelleme</value></data>
-   <data name="Permissions.User.DeleteUser.Name" xml:space="preserve"><value>Kullanıcı Silme</value></data>
-   <data name="Permissions.User.GetAdminPermissionHealth.Name" xml:space="preserve"><value>Admin Yetki Sağlığını Görüntüleme</value></data>
+  <data name="Permissions.Menu.Read.Name" xml:space="preserve"><value>Menü Görüntüleme</value></data>
+  <data name="Permissions.Menu.ReadAll.Name" xml:space="preserve"><value>Menüleri Listeleme</value></data>
+  <data name="Permissions.Menu.Create.Name" xml:space="preserve"><value>Menü Oluşturma</value></data>
+  <data name="Permissions.Menu.Update.Name" xml:space="preserve"><value>Menü Güncelleme</value></data>
+  <data name="Permissions.Menu.Delete.Name" xml:space="preserve"><value>Menü Silme</value></data>
 
-   <data name="Permissions.Permission.GetPermissions.Name" xml:space="preserve"><value>Yetkileri Listeleme</value></data>
-   <data name="Permissions.Permission.GetPermission.Name" xml:space="preserve"><value>Yetki Detayını Görüntüleme</value></data>
-   <data name="Permissions.Permission.CreatePermission.Name" xml:space="preserve"><value>Yetki Oluşturma</value></data>
-   <data name="Permissions.Permission.UpdatePermission.Name" xml:space="preserve"><value>Yetki Güncelleme</value></data>
-   <data name="Permissions.Permission.DeletePermission.Name" xml:space="preserve"><value>Yetki Silme</value></data>
+  <data name="Permissions.ApiAccess.Read.Name" xml:space="preserve"><value>API Erişimi Görüntüleme</value></data>
+  <data name="Permissions.ApiAccess.ReadAll.Name" xml:space="preserve"><value>API Erişimlerini Listeleme</value></data>
+  <data name="Permissions.ApiAccess.Create.Name" xml:space="preserve"><value>API Erişimi Oluşturma</value></data>
+  <data name="Permissions.ApiAccess.Update.Name" xml:space="preserve"><value>API Erişimi Güncelleme</value></data>
+  <data name="Permissions.ApiAccess.Delete.Name" xml:space="preserve"><value>API Erişimi Silme</value></data>
 
-   <data name="Permissions.Role.GetRoles.Name" xml:space="preserve"><value>Rolleri Listeleme</value></data>
-   <data name="Permissions.Role.GetRole.Name" xml:space="preserve"><value>Rol Detayını Görüntüleme</value></data>
-   <data name="Permissions.Role.CreateRole.Name" xml:space="preserve"><value>Rol Oluşturma</value></data>
-   <data name="Permissions.Role.UpdateRole.Name" xml:space="preserve"><value>Rol Güncelleme</value></data>
-   <data name="Permissions.Role.DeleteRole.Name" xml:space="preserve"><value>Rol Silme</value></data>
-   <data name="Permissions.Role.GetRolePermissions.Name" xml:space="preserve"><value>Rol Yetkilerini Listeleme</value></data>
-   <data name="Permissions.Role.SetRolePermissions.Name" xml:space="preserve"><value>Rol Yetkilerini Atama</value></data>
-   <data name="Permissions.Role.GetRoleMenus.Name" xml:space="preserve"><value>Rol Menülerini Listeleme</value></data>
-   <data name="Permissions.Role.SetRoleMenus.Name" xml:space="preserve"><value>Rol Menülerini Atama</value></data>
+  <data name="Permissions.Localization.Read.Name" xml:space="preserve"><value>Yerelleştirme Görüntüleme</value></data>
+  <data name="Permissions.Localization.ReadAll.Name" xml:space="preserve"><value>Yerelleştirmeleri Listeleme</value></data>
+  <data name="Permissions.Localization.Create.Name" xml:space="preserve"><value>Yerelleştirme Oluşturma</value></data>
+  <data name="Permissions.Localization.Update.Name" xml:space="preserve"><value>Yerelleştirme Güncelleme</value></data>
+  <data name="Permissions.Localization.Delete.Name" xml:space="preserve"><value>Yerelleştirme Silme</value></data>
 
-   <data name="Permissions.Menu.GetMenus.Name" xml:space="preserve"><value>Menüleri Listeleme</value></data>
-   <data name="Permissions.Menu.GetMenuTree.Name" xml:space="preserve"><value>Menü Ağacını Görüntüleme</value></data>
-   <data name="Permissions.Menu.GetMenu.Name" xml:space="preserve"><value>Menü Detayını Görüntüleme</value></data>
-   <data name="Permissions.Menu.CreateMenu.Name" xml:space="preserve"><value>Menü Oluşturma</value></data>
-   <data name="Permissions.Menu.UpdateMenu.Name" xml:space="preserve"><value>Menü Güncelleme</value></data>
-   <data name="Permissions.Menu.DeleteMenu.Name" xml:space="preserve"><value>Menü Silme</value></data>
-   <data name="Permissions.Menu.GetMenuPermissions.Name" xml:space="preserve"><value>Menü Yetkilerini Listeleme</value></data>
-   <data name="Permissions.Menu.SetMenuPermissions.Name" xml:space="preserve"><value>Menü Yetkilerini Atama</value></data>
+  <data name="Permissions.Log.Read.Name" xml:space="preserve"><value>Günlük Görüntüleme</value></data>
+  <data name="Permissions.Log.ReadAll.Name" xml:space="preserve"><value>Günlükleri Listeleme</value></data>
 
-   <data name="Permissions.Localization.GetAll.Name" xml:space="preserve"><value>Yerelleştirme Kayıtlarını Listeleme</value></data>
-   <data name="Permissions.Localization.GetByKey.Name" xml:space="preserve"><value>Yerelleştirme Anahtar Detayını Görüntüleme</value></data>
-   <data name="Permissions.Localization.Upsert.Name" xml:space="preserve"><value>Yerelleştirme Kaydı Ekleme/Güncelleme</value></data>
-   <data name="Permissions.Localization.Delete.Name" xml:space="preserve"><value>Yerelleştirme Kaydı Silme</value></data>
+  <data name="Permissions.Setting.Read.Name" xml:space="preserve"><value>Ayar Görüntüleme</value></data>
+  <data name="Permissions.Setting.Update.Name" xml:space="preserve"><value>Ayar Güncelleme</value></data>
 
-   <data name="Permissions.AccessRule.GetAccessRules.Name" xml:space="preserve"><value>Erişim Kurallarını Listeleme</value></data>
-   <data name="Permissions.AccessRule.GetAccessRule.Name" xml:space="preserve"><value>Erişim Kuralı Detayını Görüntüleme</value></data>
-   <data name="Permissions.AccessRule.CreateAccessRule.Name" xml:space="preserve"><value>Erişim Kuralı Oluşturma</value></data>
-   <data name="Permissions.AccessRule.UpdateAccessRule.Name" xml:space="preserve"><value>Erişim Kuralı Güncelleme</value></data>
-   <data name="Permissions.AccessRule.DeleteAccessRule.Name" xml:space="preserve"><value>Erişim Kuralı Silme</value></data>
-   <data name="Permissions.AccessRule.GetAccessRulePermissions.Name" xml:space="preserve"><value>Erişim Kuralı Yetkilerini Listeleme</value></data>
-   <data name="Permissions.AccessRule.SetAccessRulePermissions.Name" xml:space="preserve"><value>Erişim Kuralı Yetkilerini Atama</value></data>
-   <data name="Permissions.AccessRule.GetRequiredPermissions.Name" xml:space="preserve"><value>İstek İçin Gerekli Yetkileri Görüntüleme</value></data>
+  <data name="Permissions.Profile.Read.Name" xml:space="preserve"><value>Profil Görüntüleme</value></data>
+  <data name="Permissions.Profile.Update.Name" xml:space="preserve"><value>Profil Güncelleme</value></data>
 
-   <data name="Menus.Dashboard" xml:space="preserve"><value>Gösterge Paneli</value></data>
+  <data name="Menus.Dashboard" xml:space="preserve"><value>Gösterge Paneli</value></data>
   <data name="Menus.System" xml:space="preserve"><value>Sistem Yönetimi</value></data>
-  <data name="Menus.System.Users" xml:space="preserve"><value>Kullanıcılar</value></data>
-  <data name="Menus.System.Roles" xml:space="preserve"><value>Roller</value></data>
-  <data name="Menus.System.Permissions" xml:space="preserve"><value>Yetkiler</value></data>
-  <data name="Menus.System.Menus" xml:space="preserve"><value>Menüler</value></data>
-   <data name="Menus.System.Localization" xml:space="preserve"><value>Yerelleştirme</value></data>
-   <data name="Menus.System.AccessRules" xml:space="preserve"><value>Erişim Kuralları</value></data>
+  <data name="Menus.Profile" xml:space="preserve"><value>Profilim</value></data>
+  <data name="Menus.Chat" xml:space="preserve"><value>Sohbet</value></data>
+  <data name="Menus.Users" xml:space="preserve"><value>Kullanıcılar</value></data>
+  <data name="Menus.UserAccess" xml:space="preserve"><value>Kullanıcı Erişimleri</value></data>
+  <data name="Menus.Roles" xml:space="preserve"><value>Roller</value></data>
+  <data name="Menus.Permissions" xml:space="preserve"><value>Yetkiler</value></data>
+  <data name="Menus.Menus" xml:space="preserve"><value>Menüler</value></data>
+  <data name="Menus.ApiEndpoints" xml:space="preserve"><value>API Uç Noktaları</value></data>
+  <data name="Menus.Localization" xml:space="preserve"><value>Yerelleştirme</value></data>
+  <data name="Menus.Logs" xml:space="preserve"><value>Günlükler</value></data>
 
    <data name="Messages.AdminUserCreationFailed" xml:space="preserve"><value>Yönetici kullanıcı oluşturulamadı</value></data>
    <data name="Messages.RoleNotFound" xml:space="preserve"><value>Rol '{0}' bulunamadı.</value></data>
@@ -165,6 +133,59 @@
    <data name="LocalizationScreen.EntryDeleted" xml:space="preserve"><value>Yerelleştirme kaydı silindi.</value></data>
    <data name="LocalizationScreen.KeyNotFound" xml:space="preserve"><value>Yerelleştirme anahtarı '{0}' bulunamadı.</value></data>
 
+  <data name="ApiEndpointsScreen.Title" xml:space="preserve"><value>API Uç Noktaları</value></data>
+  <data name="ApiEndpointsScreen.Subtitle" xml:space="preserve"><value>API uç noktalarının ve gerekli yetkilerinin merkezi kataloğu.</value></data>
+  <data name="ApiEndpointsScreen.Name" xml:space="preserve"><value>Ad</value></data>
+  <data name="ApiEndpointsScreen.HttpMethod" xml:space="preserve"><value>Metot</value></data>
+  <data name="ApiEndpointsScreen.Path" xml:space="preserve"><value>Yol</value></data>
+  <data name="ApiEndpointsScreen.Description" xml:space="preserve"><value>Açıklama</value></data>
+  <data name="ApiEndpointsScreen.RequiredPermission" xml:space="preserve"><value>Gerekli yetki</value></data>
+  <data name="ApiEndpointsScreen.IsActive" xml:space="preserve"><value>Aktif</value></data>
+  <data name="ApiEndpointsScreen.PopupTitle" xml:space="preserve"><value>API Uç Noktası</value></data>
+
+  <data name="ChatScreen.Title" xml:space="preserve"><value>Sohbet</value></data>
+  <data name="ChatScreen.Subtitle" xml:space="preserve"><value>Kullanıcılarla gerçek zamanlı mesajlaşın.</value></data>
+  <data name="ChatScreen.SearchContacts" xml:space="preserve"><value>Kişi ara...</value></data>
+  <data name="ChatScreen.SelectContact" xml:space="preserve"><value>Mesajlaşmak için bir kişi seçin.</value></data>
+  <data name="ChatScreen.MessagePlaceholder" xml:space="preserve"><value>Bir mesaj yazın...</value></data>
+  <data name="ChatScreen.Notifications" xml:space="preserve"><value>Bildirimler</value></data>
+  <data name="ChatScreen.NoNotifications" xml:space="preserve"><value>Yeni mesaj yok.</value></data>
+  <data name="ChatScreen.NewMessageFrom" xml:space="preserve"><value>{0} kişisinden yeni mesaj</value></data>
+  <data name="ChatScreen.AttachFile" xml:space="preserve"><value>Dosya ekle</value></data>
+  <data name="ChatScreen.AttachmentLabel" xml:space="preserve"><value>Ek dosya</value></data>
+  <data name="ChatScreen.Online" xml:space="preserve"><value>Çevrimiçi</value></data>
+  <data name="ChatScreen.Offline" xml:space="preserve"><value>Çevrimdışı</value></data>
+  <data name="ChatScreen.Typing" xml:space="preserve"><value>yazıyor...</value></data>
+  <data name="ChatScreen.ConnectionStatus" xml:space="preserve"><value>Bağlantı durumu</value></data>
+  <data name="ChatScreen.Connected" xml:space="preserve"><value>Bağlı</value></data>
+  <data name="ChatScreen.Connecting" xml:space="preserve"><value>Bağlanıyor…</value></data>
+  <data name="ChatScreen.Reconnecting" xml:space="preserve"><value>Yeniden bağlanıyor…</value></data>
+  <data name="ChatScreen.Disconnected" xml:space="preserve"><value>Bağlantı kesildi</value></data>
+  <data name="ChatScreen.OnlineUsers" xml:space="preserve"><value>Çevrimiçi kullanıcılar</value></data>
+
+  <data name="LogsScreen.Title" xml:space="preserve"><value>Denetim Günlükleri</value></data>
+  <data name="LogsScreen.Subtitle" xml:space="preserve"><value>Sistem genelindeki istek ve hata kayıtları.</value></data>
+  <data name="LogsScreen.DetailTitle" xml:space="preserve"><value>Denetim Günlüğü</value></data>
+  <data name="LogsScreen.Occurred" xml:space="preserve"><value>Zaman</value></data>
+  <data name="LogsScreen.Source" xml:space="preserve"><value>Kaynak</value></data>
+  <data name="LogsScreen.User" xml:space="preserve"><value>Kullanıcı</value></data>
+  <data name="LogsScreen.IpAddress" xml:space="preserve"><value>IP</value></data>
+  <data name="LogsScreen.HttpMethod" xml:space="preserve"><value>Metot</value></data>
+  <data name="LogsScreen.Path" xml:space="preserve"><value>Yol</value></data>
+  <data name="LogsScreen.StatusCode" xml:space="preserve"><value>Durum</value></data>
+  <data name="LogsScreen.IsSuccess" xml:space="preserve"><value>Başarılı</value></data>
+  <data name="LogsScreen.HasException" xml:space="preserve"><value>Hata</value></data>
+  <data name="LogsScreen.DurationMs" xml:space="preserve"><value>Süre (ms)</value></data>
+  <data name="LogsScreen.Details" xml:space="preserve"><value>Detaylar</value></data>
+  <data name="LogsScreen.NotFound" xml:space="preserve"><value>Kayıt bulunamadı.</value></data>
+  <data name="LogsScreen.Id" xml:space="preserve"><value>ID</value></data>
+  <data name="LogsScreen.QueryString" xml:space="preserve"><value>Sorgu Dizesi</value></data>
+  <data name="LogsScreen.ExceptionType" xml:space="preserve"><value>Hata Tipi</value></data>
+  <data name="LogsScreen.ExceptionMessage" xml:space="preserve"><value>Hata Mesajı</value></data>
+  <data name="LogsScreen.CorrelationId" xml:space="preserve"><value>Korelasyon ID</value></data>
+  <data name="LogsScreen.RequestBody" xml:space="preserve"><value>İstek Gövdesi</value></data>
+  <data name="LogsScreen.ResponseBody" xml:space="preserve"><value>Yanıt Gövdesi</value></data>
+
   <data name="Dashboard.Title" xml:space="preserve"><value>Operasyonel görünüm</value></data>
   <data name="Dashboard.Subtitle" xml:space="preserve"><value>Sistemin temel yapılandırmasını tek bir panelden takip edin.</value></data>
   <data name="Dashboard.ConfigurationStatus" xml:space="preserve"><value>Yapılandırma durumu</value></data>
@@ -189,6 +210,8 @@
 
   <data name="Auth.SignInTitle" xml:space="preserve"><value>Hesabınıza giriş yapın</value></data>
   <data name="Auth.SignInSubtitle" xml:space="preserve"><value>Devam etmek için kullanıcı bilgilerinizi girin.</value></data>
+  <data name="Auth.DevQuickLogin" xml:space="preserve"><value>Geliştirici hızlı giriş</value></data>
+  <data name="Auth.DevSelectUser" xml:space="preserve"><value>Kullanıcı seçin…</value></data>
   <data name="Auth.UserNameOrEmail" xml:space="preserve"><value>Kullanıcı adı veya e-posta</value></data>
   <data name="Auth.Password" xml:space="preserve"><value>Şifre</value></data>
   <data name="Auth.ShowPassword" xml:space="preserve"><value>Şifreyi göster</value></data>
@@ -270,14 +293,17 @@
   <data name="RolesScreen.CreateTitle" xml:space="preserve"><value>Yeni rol</value></data>
   <data name="RolesScreen.EditTitle" xml:space="preserve"><value>Rolü düzenle</value></data>
   <data name="RolesScreen.ManagePermissions" xml:space="preserve"><value>Yetkileri yönet</value></data>
-  <data name="RolesScreen.ManageMenus" xml:space="preserve"><value>Menüleri yönet</value></data>
   <data name="RolesScreen.PermissionsTitle" xml:space="preserve"><value>Rol yetkileri</value></data>
-  <data name="RolesScreen.MenusTitle" xml:space="preserve"><value>Rol menüleri</value></data>
 
   <data name="PermissionsScreen.Title" xml:space="preserve"><value>Yetkiler</value></data>
   <data name="PermissionsScreen.Subtitle" xml:space="preserve"><value>Yetki tanımlarını yönetin.</value></data>
   <data name="PermissionsScreen.Code" xml:space="preserve"><value>Kod</value></data>
   <data name="PermissionsScreen.Name" xml:space="preserve"><value>Ad</value></data>
+  <data name="PermissionsScreen.Module" xml:space="preserve"><value>Modül</value></data>
+  <data name="PermissionsScreen.Action" xml:space="preserve"><value>İşlem</value></data>
+  <data name="PermissionsScreen.RoleCount" xml:space="preserve"><value>Rol Sayısı</value></data>
+  <data name="PermissionsScreen.MenuCount" xml:space="preserve"><value>Menü Sayısı</value></data>
+  <data name="PermissionsScreen.EndpointCount" xml:space="preserve"><value>Uç Nokta Sayısı</value></data>
   <data name="PermissionsScreen.CreateTitle" xml:space="preserve"><value>Yeni yetki</value></data>
   <data name="PermissionsScreen.EditTitle" xml:space="preserve"><value>Yetkiyi düzenle</value></data>
   <data name="PermissionsScreen.SeedDefaults" xml:space="preserve"><value>Varsayılanları yükle</value></data>
@@ -414,7 +440,6 @@
   <data name="AccessRules.Seed.AccessRule.GetRequiredPermissions.Name" xml:space="preserve"><value>Erişim Kuralı - Gerekli İzinler</value></data>
   <data name="AccessRules.Seed.AccessRule.GetRequiredPermissions.Description" xml:space="preserve"><value>Bir istek için gerekli izinleri hesaplar.</value></data>
 
-<data name="Menu.Test" xml:space="preserve"><value>Türkçe Test</value></data>  <data name="Menus.Profile" xml:space="preserve"><value>Profilim</value></data>
   <data name="Layout.MyProfile" xml:space="preserve"><value>Profilim</value></data>
   <data name="ProfileScreen.Title" xml:space="preserve"><value>Profilim</value></data>
   <data name="ProfileScreen.Subtitle" xml:space="preserve"><value>Hesap bilgilerinizi görüntüleyin ve profil fotoğrafınızı güncelleyin.</value></data>
@@ -434,5 +459,44 @@
   <data name="ProfileScreen.AccountInactive" xml:space="preserve"><value>Pasif</value></data>
   <data name="Messages.ProfileImageEmpty" xml:space="preserve"><value>Profil görseli boş olamaz.</value></data>
   <data name="Messages.ProfileImageInvalidType" xml:space="preserve"><value>Yalnızca PNG, JPG, GIF veya WebP görselleri kabul edilir.</value></data>
-  <data name="Messages.ProfileImageTooLarge" xml:space="preserve"><value>Profil görseli en fazla 2 MB olabilir.</value></data>
+  <data name="Messages.ProfileImageTooLarge" xml:space="preserve"><value>Profil grseli en fazla 2 MB olabilir.</value></data>
+
+  <data name="Messages.UserEmailAlreadyExists" xml:space="preserve"><value>'{0}' e-posta adresine sahip bir kullanıcı zaten mevcut.</value></data>
+  <data name="Messages.LogEntryNotFound" xml:space="preserve"><value>'{0}' kayıt günlüğü bulunamadı.</value></data>
+  <data name="Messages.EndpointNotRegistered" xml:space="preserve"><value>Bu uç nokta kayıtlı değil. Varsayılan politika REDDET.</value></data>
+  <data name="Messages.EndpointDisabled" xml:space="preserve"><value>Bu uç nokta devre dışı.</value></data>
+  <data name="Messages.EndpointNotFound" xml:space="preserve"><value>'{0}' API uç noktası bulunamadı.</value></data>
+  <data name="Messages.EndpointAlreadyExists" xml:space="preserve"><value>{0} {1} için bir uç nokta zaten mevcut.</value></data>
+  <data name="Messages.MissingPermission" xml:space="preserve"><value>Gerekli yetki eksik: {0}</value></data>
+  <data name="Messages.SystemRoleCannotBeRenamed" xml:space="preserve"><value>Sistem rolleri yeniden adlandırılamaz.</value></data>
+  <data name="Messages.SystemRoleCannotBeDeleted" xml:space="preserve"><value>Sistem rolleri silinemez.</value></data>
+  <data name="Messages.SuperAdminPermissionsAutoManaged" xml:space="preserve"><value>SuperAdmin yetkileri otomatik olarak yönetilir.</value></data>
+  <data name="Messages.MenuParentCycle" xml:space="preserve"><value>Seçilen üst menü, menü ağacında bir döngü oluşturur.</value></data>
+  <data name="Messages.MenuHasChildren" xml:space="preserve"><value>Önce alt menüleri taşıyın veya silin.</value></data>
+  <data name="Messages.InvalidCredentials" xml:space="preserve"><value>Geçersiz kimlik bilgileri.</value></data>
+  <data name="Messages.TokenNoLongerValid" xml:space="preserve"><value>Belirteç artık geçerli değil.</value></data>
+
+  <data name="RoleSeed.SuperAdmin.Description" xml:space="preserve"><value>Sınırsız erişime sahip yerleşik rol. Yetki kontrollerini atlar.</value></data>
+  <data name="RoleSeed.SystemAdmin.Description" xml:space="preserve"><value>Kimlik (kullanıcı, rol, yetki) ve API uç nokta kataloğunu yönetir.</value></data>
+  <data name="RoleSeed.OperationsManager.Description" xml:space="preserve"><value>Günlük operasyonlar: iş kullanıcılarını yönetir, menülerde gezinir, tüm günlükleri görüntüler.</value></data>
+  <data name="RoleSeed.SecurityAuditor.Description" xml:space="preserve"><value>Uyumluluk incelemeleri için kimlik kataloğu ve denetim günlüklerine salt okunur erişim.</value></data>
+  <data name="RoleSeed.LocalizationEditor.Description" xml:space="preserve"><value>Çok dilli çevirileri yönetir. Yerelleştirme ekranını ve panoyu görür.</value></data>
+  <data name="RoleSeed.ReadOnlyViewer.Description" xml:space="preserve"><value>Tüm modüllerde liste ve detayları görür ancak ekleme, güncelleme veya silme yapamaz.</value></data>
+  <data name="RoleSeed.BasicUser.Description" xml:space="preserve"><value>Asgari taban: yalnızca pano ve profil. Her kullanıcının aldığı temel seviye.</value></data>
+
+  <data name="Alerts.Success" xml:space="preserve"><value>Başarılı</value></data>
+  <data name="Alerts.Information" xml:space="preserve"><value>Bilgi</value></data>
+  <data name="Alerts.Warning" xml:space="preserve"><value>Uyarı</value></data>
+  <data name="Alerts.Error" xml:space="preserve"><value>Hata</value></data>
+  <data name="Alerts.Confirm" xml:space="preserve"><value>Lütfen onaylayın</value></data>
+  <data name="Alerts.Ok" xml:space="preserve"><value>Tamam</value></data>
+  <data name="UserAccessScreen.Title" xml:space="preserve"><value>Kullanıcı Erişim Yönetimi</value></data>
+  <data name="UserAccessScreen.Subtitle" xml:space="preserve"><value>Bir kullanıcının rollerini ve izinlerini tek ekrandan verin veya kaldırın.</value></data>
+  <data name="UserAccessScreen.SelectUserPrompt" xml:space="preserve"><value>Erişimini yönetmek için bir kullanıcı seçin.</value></data>
+  <data name="UserAccessScreen.RolesTab" xml:space="preserve"><value>Roller</value></data>
+  <data name="UserAccessScreen.PermissionsTab" xml:space="preserve"><value>İzinler</value></data>
+  <data name="UserAccessScreen.RolesNote" xml:space="preserve"><value>Bu kullanıcıda olması gereken rolleri işaretleyin.</value></data>
+  <data name="UserAccessScreen.PermissionsNote" xml:space="preserve"><value>Kilitli kayıtlar rollerden gelir. Doğrudan vermek istediğiniz ek izinleri işaretleyin.</value></data>
+  <data name="UserAccessScreen.Inherited" xml:space="preserve"><value>rolden</value></data>
+  <data name="UserAccessScreen.Saved" xml:space="preserve"><value>Erişim güncellendi.</value></data>
 </root>

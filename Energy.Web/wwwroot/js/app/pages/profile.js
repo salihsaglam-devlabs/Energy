@@ -146,10 +146,22 @@
         var $uploader = $("#profile-image-uploader");
         var $remove = $("#profile-image-remove");
 
+        // The new backend does not expose a profile-image endpoint; when the
+        // upload/remove DOM hooks are absent we only render the static avatar
+        // (initials) and skip the rest of the widget setup.
+        var hasUploadUi = $uploader.length > 0 && $remove.length > 0;
+
         var state = { hasProfileImage: !!profile.hasProfileImage };
+
+        if (!hasUploadUi) {
+            buildAvatar($avatarBox, initials, state.hasProfileImage);
+            return;
+        }
+
+        var removeBtn;
         var refresh = function () {
             buildAvatar($avatarBox, initials, state.hasProfileImage);
-            removeBtn.option("disabled", !state.hasProfileImage);
+            if (removeBtn) { removeBtn.option("disabled", !state.hasProfileImage); }
         };
 
         $uploader.dxFileUploader({
@@ -178,7 +190,7 @@
             }
         });
 
-        var removeBtn = $remove.dxButton({
+        removeBtn = $remove.dxButton({
             text: labels.removeImage,
             icon: "trash",
             type: "danger",

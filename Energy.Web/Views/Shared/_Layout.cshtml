@@ -1,5 +1,6 @@
 @using System.Globalization
 @using Energy.Localization
+@using Energy.Web.Common
 @using Microsoft.AspNetCore.Antiforgery
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @inject IAntiforgery Antiforgery
@@ -10,6 +11,13 @@
     var trUrl = $"/culture/set?culture=tr-TR&uiCulture=tr-TR&returnUrl={Uri.EscapeDataString(currentUrl)}";
     var enUrl = $"/culture/set?culture=en-US&uiCulture=en-US&returnUrl={Uri.EscapeDataString(currentUrl)}";
     var dxLocale = currentCulture.StartsWith("tr") ? "tr" : "en";
+    var userPermissions = User?.Claims
+        .Where(c => c.Type == EnergyClaimTypes.Permission)
+        .Select(c => c.Value)
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToArray() ?? Array.Empty<string>();
+    var userPermissionsJson = System.Text.Json.JsonSerializer.Serialize(userPermissions);
+    var isSuperAdmin = User?.IsSuperAdmin() ?? false;
 }
 <!DOCTYPE html>
 <html lang="@currentCulture">
@@ -56,10 +64,11 @@
     <script src="https://cdn3.devexpress.com/jslib/25.2.7/js/localization/dx.messages.@(dxLocale).js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
     <script src="~/js/app/http.js" asp-append-version="true"></script>
+    <script src="~/js/app/alerts.js" asp-append-version="true"></script>
     <script src="~/js/app/notifications.js" asp-append-version="true"></script>
     <script src="~/js/app/loading.js" asp-append-version="true"></script>
-    <script src="~/js/app/responsive.js" asp-append-version="true"></script>
     <script src="~/js/app/icons.js" asp-append-version="true"></script>
     <script src="~/js/app/shell.js" asp-append-version="true"></script>
 
@@ -74,12 +83,36 @@
             urls: {
                 logout: "/account/logout",
                 accessDenied: "/account/access-denied"
+            },
+            chat: {
+                hubUrl: "/hubs/chat",
+                unreadCountUrl: "/chat/unread-count",
+                pageUrl: "/chat",
+                me: "@(User.GetUserId()?.ToString())",
+                newMessageFrom: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T[LocalizationKeys.ChatScreen.NewMessageFrom].Value))
             }
         };
+        // PermissionCatalog codes so the UI can hide actions/menus the user is
+        // not allowed to use. The API still enforces every operation.
+        window.AppAuth = (function () {
+            var set = {};
+            var superAdmin = @(isSuperAdmin ? "true" : "false");
+            (@Html.Raw(userPermissionsJson) || []).forEach(function (p) { set[String(p).toLowerCase()] = true; });
+            return {
+                permissions: @Html.Raw(userPermissionsJson),
+                isSuperAdmin: superAdmin,
+                can: function (code) { return superAdmin || (!!code && set[String(code).toLowerCase()] === true); },
+                canAny: function (codes) { return superAdmin || (codes || []).some(function (c) { return window.AppAuth.can(c); }); }
+            };
+        })();
         document.addEventListener("DOMContentLoaded", function () {
             window.AppShell.init();
         });
     </script>
+
+    <!-- Loaded AFTER AppContext is defined so the chat realtime client can read
+         AppContext.chat.hubUrl; otherwise it falls back to the disabled no-op. -->
+    <script src="~/js/app/chat-realtime.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

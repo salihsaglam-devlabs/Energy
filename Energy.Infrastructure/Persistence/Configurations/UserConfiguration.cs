@@ -9,25 +9,21 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.ToTable("Users");
-        builder.HasKey(user => user.Id).HasName("PK_Users");
-        builder.Property(user => user.Id).ValueGeneratedNever();
-        builder.Property(user => user.FirstName).HasColumnType("text").IsRequired();
-        builder.Property(user => user.LastName).HasColumnType("text").IsRequired();
-        builder.Property(user => user.UserName).HasMaxLength(256);
-        builder.Property(user => user.NormalizedUserName).HasMaxLength(256);
-        builder.Property(user => user.Email).HasMaxLength(256);
-        builder.Property(user => user.NormalizedEmail).HasMaxLength(256);
-        builder.Property(user => user.PasswordHash).HasColumnType("text");
-        builder.Property(user => user.SecurityStamp).HasColumnType("text");
-        builder.Property(user => user.ConcurrencyStamp).HasColumnType("text");
-        builder.Property(user => user.PhoneNumber).HasColumnType("text");
-        builder.Property(user => user.LockoutEnd).HasColumnType("timestamp with time zone");
-        builder.Property(user => user.ProfileImage).HasColumnType("bytea");
-        builder.Property(user => user.ProfileImageContentType).HasMaxLength(100);
-        builder.HasIndex(user => user.NormalizedEmail)
-            .HasDatabaseName("EmailIndex");
-        builder.HasIndex(user => user.NormalizedUserName)
-            .IsUnique()
-            .HasDatabaseName("UserNameIndex");
+        builder.HasKey(u => u.Id);
+
+        builder.Property(u => u.UserName).IsRequired().HasMaxLength(50);
+        builder.Property(u => u.Email).IsRequired().HasMaxLength(200);
+        builder.Property(u => u.PasswordHash).IsRequired();
+        builder.Property(u => u.FirstName).IsRequired().HasMaxLength(100);
+        builder.Property(u => u.LastName).IsRequired().HasMaxLength(100);
+        builder.Property(u => u.IsActive).HasDefaultValue(true);
+        builder.Property(u => u.SecurityStamp).IsRequired();
+        builder.Property(u => u.ProfileImageContentType).HasMaxLength(100);
+
+        builder.HasIndex(u => u.UserName).IsUnique();
+        builder.HasIndex(u => u.Email).IsUnique();
+        builder.HasIndex(u => u.IsActive);
+
+        builder.HasQueryFilter(u => !u.IsDeleted);
     }
 }

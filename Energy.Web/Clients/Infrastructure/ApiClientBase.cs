@@ -60,6 +60,21 @@ public abstract class ApiClientBase
     }
 
     /// <summary>
+    /// Fire-style POST that does not parse the response envelope. Returns whether
+    /// the call succeeded (2xx). Used for best-effort calls such as audit-log
+    /// ingestion where the response body is irrelevant and must never surface a
+    /// deserialization error to the caller.
+    /// </summary>
+    protected async Task<bool> PostIgnoreResultAsync<TRequest>(
+        string requestUri,
+        TRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _httpClient.PostAsJsonAsync(requestUri, request, cancellationToken);
+        return response.IsSuccessStatusCode;
+    }
+
+    /// <summary>
     /// Performs a raw GET request and returns the response body as bytes along with
     /// the resolved <c>Content-Type</c> header. Used for binary payloads such as
     /// avatar images that bypass the JSON envelope.

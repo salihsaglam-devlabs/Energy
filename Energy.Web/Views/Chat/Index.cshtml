@@ -1,0 +1,62 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T[LocalizationKeys.ChatScreen.Title].Value;
+
+    var labels = System.Text.Json.JsonSerializer.Serialize(new
+    {
+        searchContacts = T[LocalizationKeys.ChatScreen.SearchContacts].Value,
+        selectContact = T[LocalizationKeys.ChatScreen.SelectContact].Value,
+        messagePlaceholder = T[LocalizationKeys.ChatScreen.MessagePlaceholder].Value,
+        attachFile = T[LocalizationKeys.ChatScreen.AttachFile].Value,
+        attachmentLabel = T[LocalizationKeys.ChatScreen.AttachmentLabel].Value,
+        online = T[LocalizationKeys.ChatScreen.Online].Value,
+        offline = T[LocalizationKeys.ChatScreen.Offline].Value,
+        typing = T[LocalizationKeys.ChatScreen.Typing].Value
+    });
+
+    var fullName = User.GetFullName() ?? string.Empty;
+    var userId = User.GetUserId()?.ToString() ?? string.Empty;
+    var userHasImage = (ViewData["UserHasImage"] as bool?) ?? false;
+}
+
+<section class="energy-screen energy-chat"
+         data-labels="@labels"
+         data-user-id="@userId"
+         data-user-name="@fullName"
+         data-user-has-image="@(userHasImage ? "true" : "false")">
+    <div class="energy-chat__sidebar">
+        <div id="chat-search"></div>
+        <div id="chat-contacts"></div>
+    </div>
+    <div class="energy-chat__main">
+        <div class="energy-chat__window-wrap" hidden>
+            <header id="chat-peer" class="energy-chat__peer">
+                <span class="energy-chat__peer-avatar"></span>
+                <span class="energy-chat__peer-meta">
+                    <span class="energy-chat__peer-name"></span>
+                    <span class="energy-chat__peer-status"></span>
+                </span>
+            </header>
+            <div id="chat-window" class="energy-chat__window"></div>
+            <div class="energy-chat__attach">
+                <button type="button" id="chat-attach-btn" class="energy-chat__attach-btn" title="@T[LocalizationKeys.ChatScreen.AttachFile]">
+                    <i class="fa-solid fa-paperclip"></i>
+                    <span>@T[LocalizationKeys.ChatScreen.AttachFile]</span>
+                </button>
+                <input type="file" id="chat-attach-input" class="energy-chat__attach-input" hidden />
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/app/pages/chat.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.Chat.init();
+        });
+    </script>
+}
+
+

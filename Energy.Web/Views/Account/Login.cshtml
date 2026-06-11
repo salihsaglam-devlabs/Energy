@@ -4,26 +4,108 @@
 @{
     Layout = "_AuthLayout";
     ViewData["Title"] = T[LocalizationKeys.Auth.SignInTitle].Value;
+
+    var devAccountsJson = System.Text.Json.JsonSerializer.Serialize(
+        Model.DevAccounts.Select(a => new { label = a.Label, userName = a.UserName, password = a.Password }));
 }
 
 <div class="energy-auth-form">
     <h1 class="energy-auth-form__title">@T[LocalizationKeys.Auth.SignInTitle]</h1>
     <p class="energy-auth-form__subtitle">@T[LocalizationKeys.Auth.SignInSubtitle]</p>
 
-    <form id="energy-login-form" method="post" action="/account/login" autocomplete="on">
+    <div asp-validation-summary="All" class="energy-errors"></div>
+
+    @if (Model.DevAccounts.Count > 0)
+    {
+        <div class="energy-dev-login">
+            <span class="energy-dev-login__label">@T[LocalizationKeys.Auth.DevQuickLogin]</span>
+            <div id="energy-dev-login"></div>
+        </div>
+    }
+
+    <form id="energy-login-form" method="post" action="/account/login">
         @Html.AntiForgeryToken()
         <input type="hidden" name="ReturnUrl" value="@(Model.ReturnUrl ?? string.Empty)" />
         <div id="energy-login-form-host"></div>
+        <div style="margin-top:16px">
+            <button type="submit" class="dx-button dx-button-mode-contained dx-button-default" style="display:block;height: 30px;width:100%">
+                @T[LocalizationKeys.Auth.SignInTitle]
+            </button>
+        </div>
     </form>
 </div>
 
 @section Scripts {
-    <script src="~/js/app/pages/login.js" asp-append-version="true"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            window.AppPages.Login.init({
-                returnUrl: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ReturnUrl))
+        $(function () {
+            var l = (window.AppL10n && window.AppL10n.auth) || {};
+
+            // Build the DevExtreme form inside the real <form> element. The
+            // editors carry the server model field names via inputAttr.name, so
+            // a native submit posts them straight to AccountController.
+            var form = $("#energy-login-form-host").dxForm({
+                formData: { userNameOrEmail: "", password: "" },
+                labelLocation: "top",
+                showValidationSummary: false,
+                items: [
+                    {
+                        dataField: "userNameOrEmail",
+                        label: { text: "@T[LocalizationKeys.Auth.UserNameOrEmail]" },
+                        editorOptions: {
+                            stylingMode: "outlined",
+                            inputAttr: { name: "UserNameOrEmail", autocomplete: "username" }
+                        },
+                        validationRules: [{ type: "required", message: l.fieldRequired }]
+                    },
+                    {
+                        dataField: "password",
+                        label: { text: "@T[LocalizationKeys.Auth.Password]" },
+                        editorType: "dxTextBox",
+                        editorOptions: {
+                            stylingMode: "outlined",
+                            mode: "password",
+                            inputAttr: { name: "Password", autocomplete: "current-password" }
+                        },
+                        validationRules: [{ type: "required", message: l.fieldRequired }]
+                    }
+                ]
+            }).dxForm("instance");
+
+            // Validate on the native submit; block the post when invalid.
+            $("#energy-login-form").on("submit", function (e) {
+                var result = form.validate();
+                if (!result.isValid) {
+                    e.preventDefault();
+                }
             });
+
+            $("#energy-login-form-host").on("keydown", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    $("#energy-login-form").submit();
+                }
+            });
+
+            // Development-only quick login: pick a seeded account and the
+            // username + password fields are filled in automatically. The user
+            // then just presses the Sign in button.
+            var devAccounts = @Html.Raw(Model.DevAccounts.Count > 0 ? devAccountsJson : "[]");
+            if (devAccounts.length && $("#energy-dev-login").length) {
+                $("#energy-dev-login").dxSelectBox({
+                    dataSource: devAccounts,
+                    displayExpr: "label",
+                    valueExpr: "userName",
+                    stylingMode: "outlined",
+                    placeholder: "@T[LocalizationKeys.Auth.DevSelectUser]",
+                    onValueChanged: function (e) {
+                        var acc = devAccounts.filter(function (a) { return a.userName === e.value; })[0];
+                        if (acc) {
+                            form.updateData("userNameOrEmail", acc.userName);
+                            form.updateData("password", acc.password);
+                        }
+                    }
+                });
+            }
         });
     </script>
 }

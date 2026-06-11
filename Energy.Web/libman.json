@@ -1,0 +1,46 @@
+{
+  "version": "3.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "devicons@1.8.0",
+      "destination": "wwwroot/lib/devicons/"
+    },
+    {
+      "library": "dev-timer@0.4.0",
+      "destination": "wwwroot/lib/dev-timer/"
+    },
+    {
+      "library": "devextreme@25.1.5",
+      "destination": "wwwroot/lib/devextreme/"
+    },
+    {
+      "library": "devextreme-dist@25.1.5",
+      "destination": "wwwroot/lib/devextreme-dist/"
+    },
+    {
+      "library": "devexpress-gantt@4.1.64",
+      "destination": "wwwroot/lib/devexpress-gantt/"
+    },
+    {
+      "library": "devextreme-quill@1.7.4",
+      "destination": "wwwroot/lib/devextreme-quill/"
+    },
+    {
+      "library": "devtools-detector@2.0.25",
+      "destination": "wwwroot/lib/devtools-detector/"
+    },
+    {
+      "library": "devexpress-diagram@2.2.24",
+      "destination": "wwwroot/lib/devexpress-diagram/"
+    },
+    {
+      "library": "devextreme-showdown@1.0.1",
+      "destination": "wwwroot/lib/devextreme-showdown/"
+    },
+    {
+      "library": "devextreme-aspnet-data@5.1.0",
+      "destination": "wwwroot/lib/devextreme-aspnet-data/"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Energy.Localization;
+using Energy.Shared.Identity.Permissions;
 using Energy.Shared.Models.V1.Identity.Requests;
-using Energy.Shared.Models.V1.Identity.Responses;
 using Energy.Web.Clients.Identity;
 using Energy.Web.Common;
 using Energy.Web.Common.Filters;
@@ -13,201 +13,171 @@ using Microsoft.Extensions.Logging;
 
 namespace Energy.Web.Controllers;
 
-/// <summary>
-/// Renders the current user's profile page (read-only summary of personal
-/// info + roles + permissions) and proxies profile-image management calls
-/// to the API. Linked from the top-right user menu and from the sidebar.
-/// </summary>
 [Authorize]
+[PagePermission(PermissionCatalog.ProfileRead)]
 [Route("profile")]
-[ServiceFilter(typeof(ApiExceptionFilter))]
 public sealed class ProfileController : Controller
 {
-    private static readonly HashSet<string> AllowedContentTypes = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "image/png",
-        "image/jpeg",
-        "image/jpg",
-        "image/gif",
-        "image/webp"
-    };
-
-    private const long MaxImageSizeBytes = 2 * 1024 * 1024; // 2 MB
-
-    private readonly IUserApiClient _userApiClient;
+    private readonly IUserApiClient _users;
     private readonly IStringLocalizer<SharedResource> _localizer;
     private readonly ILogger<ProfileController> _logger;
 
     public ProfileController(
-        IUserApiClient userApiClient,
+        IUserApiClient users,
         IStringLocalizer<SharedResource> localizer,
         ILogger<ProfileController> logger)
     {
-        _userApiClient = userApiClient;
+        _users = users;
         _localizer = localizer;
         _logger = logger;
     }
 
     [HttpGet("")]
     [HttpGet("Index")]
-    public async Task<IActionResult> Index(CancellationToken cancellationToken)
+    public async Task<IActionResult> Index(CancellationToken ct)
     {
         ViewData["Title"] = _localizer.GetText(LocalizationKeys.ProfileScreen.Title);
 
-        // Always render the page — even if the API call fails (e.g. the API
-        // is restarting or the /me endpoint is not yet deployed) the user
-        // should still see something useful built from the cookie claims
-        // instead of being bounced back to the dashboard.
-        UserDetailResponse detail;
-        try
-        {
-            var envelope = await _userApiClient.GetCurrentUserAsync(cancellationToken);
-            if (envelope.IsSuccess && envelope.Data is not null)
-            {
-                detail = envelope.Data;
-            }
-            else
-            {
-                _logger.LogWarning(
-                    "GetCurrentUser returned an unsuccessful envelope: {Message}",
-                    envelope.Message);
-                detail = BuildDetailFromClaims();
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "GetCurrentUser failed; falling back to claims-only profile data.");
-            detail = BuildDetailFromClaims();
-        }
-
-        var permissions = User.Claims
-            .Where(c => c.Type == EnergyClaimTypes.Permission)
-            .Select(c => c.Value)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(value => value, StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
-        var roleKeys = User.GetRoleKeys();
-
-        return View(new ProfileViewModel
-        {
-            User = detail,
-            Permissions = permissions,
-            RoleKeys = roleKeys
-        });
-    }
-
-    /// <summary>
-    /// Builds a minimal <see cref="UserDetailResponse"/> from the claims
-    /// already present on the cookie principal. Used as a fallback when the
-    /// API call cannot satisfy the request.
-    /// </summary>
-    private UserDetailResponse BuildDetailFromClaims()
-    {
-        var userId = User.GetUserId() ?? Guid.Empty;
-        var fullName = User.GetFullName() ?? string.Empty;
-        var parts = fullName.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
-        var firstName = parts.Length > 0 ? parts[0] : string.Empty;
-        var lastName = parts.Length > 1 ? parts[1] : string.Empty;
-        var email = User.FindFirstValue(ClaimTypes.Email);
-        var userName = User.FindFirstValue(ClaimTypes.Name);
-
-        var roles = User.FindAll(ClaimTypes.Role)
-            .Select(c => new RoleSummaryResponse { Id = Guid.Empty, Name = c.Value, Description = string.Empty })
-            .ToList();
-
-        return new UserDetailResponse
-        {
-            Id = userId,
-            FirstName = firstName,
-            LastName = lastName,
-            IsActive = true,
-            UserName = userName,
-            Email = email,
-            EmailConfirmed = false,
-            PhoneNumberConfirmed = false,
-            TwoFactorEnabled = false,
-            LockoutEnabled = false,
-            HasProfileImage = false,
-            Roles = roles
-        };
-    }
-
-    /// <summary>
-    /// Proxies the current user's avatar so the browser can render it with a
-    /// stable URL (<c>/profile/image</c>) even though storage lives in the API.
-    /// </summary>
-    [HttpGet("image")]
-    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-    public async Task<IActionResult> Image(CancellationToken cancellationToken)
-    {
         var userId = User.GetUserId();
-        if (userId is null)
-        {
-            return NotFound();
-        }
+        var model = BuildFromClaims(userId);
 
-        try
+        // Best-effort enrichment with the API's per-user record. Failures fall
+        // back to the claims-only view so the page is always renderable.
+        if (userId is Guid id)
         {
-            var image = await _userApiClient.GetProfileImageAsync(userId.Value, cancellationToken);
-            if (image is null)
+            try
             {
-                return NotFound();
+                var envelope = await _users.GetByIdAsync(id, ct);
+                if (envelope.IsSuccess && envelope.Data is not null)
+                {
+                    var u = envelope.Data;
+                    model = model with
+                    {
+                        FirstName = u.FirstName,
+                        LastName = u.LastName,
+                        Email = string.IsNullOrEmpty(u.Email) ? model.Email : u.Email,
+                        UserName = string.IsNullOrEmpty(u.UserName) ? model.UserName : u.UserName,
+                        FullName = $"{u.FirstName} {u.LastName}".Trim(),
+                        IsActive = u.IsActive,
+                        Roles = u.Roles.Select(r => new ProfileRoleViewModel
+                        {
+                            Id = r.Id, Name = r.Name, Description = r.Description
+                        }).ToArray(),
+                        Permissions = u.EffectivePermissions.OrderBy(p => p, StringComparer.OrdinalIgnoreCase).ToArray()
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "GetById failed for current user; using claims-only profile.");
             }
 
-            return File(image.Value.Content, image.Value.ContentType);
+            try
+            {
+                var (_, _, status) = await _users.GetProfileImageAsync(id, ct);
+                model = model with { HasProfileImage = status == StatusCodes.Status200OK };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Profile-image probe failed for current user.");
+            }
         }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Profile image proxy failed.");
-            return NotFound();
-        }
+
+        return View((ProfileViewModel)model);
+    }
+
+    [HttpGet("image")]
+    public async Task<IActionResult> Image(CancellationToken ct)
+    {
+        if (User.GetUserId() is not Guid id) return NotFound();
+        var (content, contentType, status) = await _users.GetProfileImageAsync(id, ct);
+        if (status != StatusCodes.Status200OK || content.Length == 0) return NotFound();
+        return File(content, contentType);
     }
 
     [HttpPost("image")]
     [IgnoreAntiforgeryToken]
-    [RequestSizeLimit(MaxImageSizeBytes + 4096)]
-    public async Task<IActionResult> UploadImage(IFormFile? file, CancellationToken cancellationToken)
+    public async Task<IActionResult> UploadImage(IFormFile? file, CancellationToken ct)
     {
+        if (User.GetUserId() is not Guid id) return Unauthorized();
         if (file is null || file.Length == 0)
-        {
-            return BadRequest(new { message = _localizer.GetText(LocalizationKeys.Messages.ProfileImageEmpty) });
-        }
-
-        if (file.Length > MaxImageSizeBytes)
-        {
-            return BadRequest(new { message = _localizer.GetText(LocalizationKeys.Messages.ProfileImageTooLarge) });
-        }
-
-        var contentType = string.IsNullOrWhiteSpace(file.ContentType) ? "application/octet-stream" : file.ContentType;
-        if (!AllowedContentTypes.Contains(contentType))
-        {
-            return BadRequest(new { message = _localizer.GetText(LocalizationKeys.Messages.ProfileImageInvalidType) });
-        }
+            return BadRequest(new { message = _localizer.GetText(LocalizationKeys.ProfileScreen.ImageHint) });
 
         await using var stream = new MemoryStream();
-        await file.CopyToAsync(stream, cancellationToken);
+        await file.CopyToAsync(stream, ct);
 
-        // The API resolves the target user from the JWT subject — this avoids
-        // any drift between the cookie principal's NameIdentifier and the row
-        // currently present in the database (e.g. after a reseed).
-        var envelope = await _userApiClient.UpdateMyProfileImageAsync(
-            new UpdateProfileImageRequest
-            {
-                Content = stream.ToArray(),
-                ContentType = contentType
-            },
-            cancellationToken);
+        var envelope = await _users.SetProfileImageAsync(id, new SetProfileImageRequest
+        {
+            ContentType = string.IsNullOrWhiteSpace(file.ContentType) ? "application/octet-stream" : file.ContentType,
+            ContentBase64 = Convert.ToBase64String(stream.ToArray())
+        }, ct);
 
-        return envelope.ToJsonResult();
+        if (!envelope.IsSuccess)
+            return BadRequest(new { message = envelope.Message });
+
+        return Ok(new { success = true });
     }
 
     [HttpPost("image/remove")]
     [IgnoreAntiforgeryToken]
-    public async Task<IActionResult> RemoveImage(CancellationToken cancellationToken)
+    public async Task<IActionResult> RemoveImage(CancellationToken ct)
     {
-        var envelope = await _userApiClient.RemoveMyProfileImageAsync(cancellationToken);
-        return envelope.ToJsonResult();
+        if (User.GetUserId() is not Guid id) return Unauthorized();
+        var envelope = await _users.RemoveProfileImageAsync(id, ct);
+        return Json(envelope);
+    }
+
+    private ProfileViewModelRecord BuildFromClaims(Guid? userId)
+    {
+        var permissions = User.Claims
+            .Where(c => c.Type == EnergyClaimTypes.Permission)
+            .Select(c => c.Value)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(v => v, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        var roles = User.FindAll(ClaimTypes.Role)
+            .Select(c => new ProfileRoleViewModel { Id = Guid.Empty, Name = c.Value })
+            .ToArray();
+
+        var fullName = User.GetFullName() ?? string.Empty;
+        var parts = fullName.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+        return new ProfileViewModelRecord
+        {
+            UserId = userId ?? Guid.Empty,
+            UserName = User.Identity?.Name ?? string.Empty,
+            Email = User.GetEmail() ?? string.Empty,
+            FullName = fullName,
+            FirstName = parts.Length > 0 ? parts[0] : string.Empty,
+            LastName = parts.Length > 1 ? parts[1] : string.Empty,
+            IsActive = true,
+            Roles = roles,
+            Permissions = permissions
+        };
+    }
+
+    // Local "with"-friendly clone helper. The view model is built with init-only
+    // properties so we mirror them via a record for incremental updates.
+    private sealed record ProfileViewModelRecord
+    {
+        public Guid UserId { get; init; }
+        public string UserName { get; init; } = string.Empty;
+        public string FirstName { get; init; } = string.Empty;
+        public string LastName { get; init; } = string.Empty;
+        public string Email { get; init; } = string.Empty;
+        public string FullName { get; init; } = string.Empty;
+        public bool IsActive { get; init; }
+        public bool HasProfileImage { get; init; }
+        public IReadOnlyList<ProfileRoleViewModel> Roles { get; init; } = Array.Empty<ProfileRoleViewModel>();
+        public IReadOnlyList<string> Permissions { get; init; } = Array.Empty<string>();
+
+        public static implicit operator ProfileViewModel(ProfileViewModelRecord r) => new()
+        {
+            UserId = r.UserId, UserName = r.UserName,
+            FirstName = r.FirstName, LastName = r.LastName,
+            Email = r.Email, FullName = r.FullName, IsActive = r.IsActive,
+            HasProfileImage = r.HasProfileImage,
+            Roles = r.Roles, Permissions = r.Permissions
+        };
     }
 }
-

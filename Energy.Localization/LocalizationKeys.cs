@@ -27,131 +27,110 @@ public static class LocalizationKeys
         public const string ErrorOccurred = "Common.ErrorOccurred";
     }
 
-    public static class Roles
-    {
-        public const string AdminDisplayName = "Roles.Admin.DisplayName";
-        public const string AdminDescription = "Roles.Admin.Description";
-        public const string OperationsManagerDisplayName = "Roles.OperationsManager.DisplayName";
-        public const string OperationsManagerDescription = "Roles.OperationsManager.Description";
-        public const string LocalizationEditorDisplayName = "Roles.LocalizationEditor.DisplayName";
-        public const string LocalizationEditorDescription = "Roles.LocalizationEditor.Description";
-        public const string ReadOnlyDisplayName = "Roles.ReadOnly.DisplayName";
-        public const string ReadOnlyDescription = "Roles.ReadOnly.Description";
-    }
 
-    public static class Users
-    {
-        public const string AdminFirstName = "Users.Admin.FirstName";
-        public const string AdminLastName = "Users.Admin.LastName";
-        public const string OperationsManagerFirstName = "Users.OperationsManager.FirstName";
-        public const string OperationsManagerLastName = "Users.OperationsManager.LastName";
-        public const string LocalizationEditorFirstName = "Users.LocalizationEditor.FirstName";
-        public const string LocalizationEditorLastName = "Users.LocalizationEditor.LastName";
-        public const string ReadOnlyFirstName = "Users.ReadOnly.FirstName";
-        public const string ReadOnlyLastName = "Users.ReadOnly.LastName";
-    }
-
+    /// <summary>
+    /// Display-name localization keys for every permission in
+    /// <c>Energy.Shared.Identity.Permissions.PermissionCatalog</c>. The key
+    /// format mirrors <c>PermissionCatalog.BuildDisplayNameKey</c>
+    /// (<c>Permissions.{Module}.{Action}.Name</c>) so the catalog code and its
+    /// localized label never drift apart.
+    /// </summary>
     public static class Permissions
     {
-        public const string ReadName = "Permissions.Default.Read.Name";
-        public const string ReadAllName = "Permissions.Default.ReadAll.Name";
-        public const string CreateName = "Permissions.Default.Create.Name";
-        public const string UpdateName = "Permissions.Default.Update.Name";
-        public const string DeleteName = "Permissions.Default.Delete.Name";
-
-        public static class AccessRules
+        public static class Dashboard
         {
-            public const string ReadName = "Permissions.AccessRules.Read.Name";
-            public const string ReadAllName = "Permissions.AccessRules.ReadAll.Name";
-            public const string CreateName = "Permissions.AccessRules.Create.Name";
-            public const string UpdateName = "Permissions.AccessRules.Update.Name";
-            public const string DeleteName = "Permissions.AccessRules.Delete.Name";
-            public const string ManagePermissionsName = "Permissions.AccessRules.ManagePermissions.Name";
-        }
-
-        public static class Home
-        {
-            public const string GetDashboardName = "Permissions.Home.GetDashboard.Name";
+            public const string ReadName = "Permissions.Dashboard.Read.Name";
         }
 
         public static class User
         {
-            public const string GetUsersName = "Permissions.User.GetUsers.Name";
-            public const string GetUserName = "Permissions.User.GetUser.Name";
-            public const string CreateUserName = "Permissions.User.CreateUser.Name";
-            public const string UpdateUserName = "Permissions.User.UpdateUser.Name";
-            public const string SetRolesName = "Permissions.User.SetRoles.Name";
-            public const string UpdatePasswordName = "Permissions.User.UpdatePassword.Name";
-            public const string DeleteUserName = "Permissions.User.DeleteUser.Name";
-            public const string GetAdminPermissionHealthName = "Permissions.User.GetAdminPermissionHealth.Name";
-        }
-
-        public static class Permission
-        {
-            public const string GetPermissionsName = "Permissions.Permission.GetPermissions.Name";
-            public const string GetPermissionName = "Permissions.Permission.GetPermission.Name";
-            public const string CreatePermissionName = "Permissions.Permission.CreatePermission.Name";
-            public const string UpdatePermissionName = "Permissions.Permission.UpdatePermission.Name";
-            public const string DeletePermissionName = "Permissions.Permission.DeletePermission.Name";
+            public const string ReadName = "Permissions.User.Read.Name";
+            public const string ReadAllName = "Permissions.User.ReadAll.Name";
+            public const string CreateName = "Permissions.User.Create.Name";
+            public const string UpdateName = "Permissions.User.Update.Name";
+            public const string DeleteName = "Permissions.User.Delete.Name";
         }
 
         public static class Role
         {
-            public const string GetRolesName = "Permissions.Role.GetRoles.Name";
-            public const string GetRoleName = "Permissions.Role.GetRole.Name";
-            public const string CreateRoleName = "Permissions.Role.CreateRole.Name";
-            public const string UpdateRoleName = "Permissions.Role.UpdateRole.Name";
-            public const string DeleteRoleName = "Permissions.Role.DeleteRole.Name";
-            public const string GetRolePermissionsName = "Permissions.Role.GetRolePermissions.Name";
-            public const string SetRolePermissionsName = "Permissions.Role.SetRolePermissions.Name";
-            public const string GetRoleMenusName = "Permissions.Role.GetRoleMenus.Name";
-            public const string SetRoleMenusName = "Permissions.Role.SetRoleMenus.Name";
+            public const string ReadName = "Permissions.Role.Read.Name";
+            public const string ReadAllName = "Permissions.Role.ReadAll.Name";
+            public const string CreateName = "Permissions.Role.Create.Name";
+            public const string UpdateName = "Permissions.Role.Update.Name";
+            public const string DeleteName = "Permissions.Role.Delete.Name";
+        }
+
+        public static class Permission
+        {
+            public const string ReadName = "Permissions.Permission.Read.Name";
+            public const string ReadAllName = "Permissions.Permission.ReadAll.Name";
         }
 
         public static class Menu
         {
-            public const string GetMenusName = "Permissions.Menu.GetMenus.Name";
-            public const string GetMenuTreeName = "Permissions.Menu.GetMenuTree.Name";
-            public const string GetMenuName = "Permissions.Menu.GetMenu.Name";
-            public const string CreateMenuName = "Permissions.Menu.CreateMenu.Name";
-            public const string UpdateMenuName = "Permissions.Menu.UpdateMenu.Name";
-            public const string DeleteMenuName = "Permissions.Menu.DeleteMenu.Name";
-            public const string GetMenuPermissionsName = "Permissions.Menu.GetMenuPermissions.Name";
-            public const string SetMenuPermissionsName = "Permissions.Menu.SetMenuPermissions.Name";
+            public const string ReadName = "Permissions.Menu.Read.Name";
+            public const string ReadAllName = "Permissions.Menu.ReadAll.Name";
+            public const string CreateName = "Permissions.Menu.Create.Name";
+            public const string UpdateName = "Permissions.Menu.Update.Name";
+            public const string DeleteName = "Permissions.Menu.Delete.Name";
+        }
+
+        public static class ApiAccess
+        {
+            public const string ReadName = "Permissions.ApiAccess.Read.Name";
+            public const string ReadAllName = "Permissions.ApiAccess.ReadAll.Name";
+            public const string CreateName = "Permissions.ApiAccess.Create.Name";
+            public const string UpdateName = "Permissions.ApiAccess.Update.Name";
+            public const string DeleteName = "Permissions.ApiAccess.Delete.Name";
         }
 
         public static class Localization
         {
-            public const string GetAllName = "Permissions.Localization.GetAll.Name";
-            public const string GetByKeyName = "Permissions.Localization.GetByKey.Name";
-            public const string UpsertName = "Permissions.Localization.Upsert.Name";
+            public const string ReadName = "Permissions.Localization.Read.Name";
+            public const string ReadAllName = "Permissions.Localization.ReadAll.Name";
+            public const string CreateName = "Permissions.Localization.Create.Name";
+            public const string UpdateName = "Permissions.Localization.Update.Name";
             public const string DeleteName = "Permissions.Localization.Delete.Name";
         }
 
-        public static class AccessRule
+        public static class Log
         {
-            public const string GetAccessRulesName = "Permissions.AccessRule.GetAccessRules.Name";
-            public const string GetAccessRuleName = "Permissions.AccessRule.GetAccessRule.Name";
-            public const string CreateAccessRuleName = "Permissions.AccessRule.CreateAccessRule.Name";
-            public const string UpdateAccessRuleName = "Permissions.AccessRule.UpdateAccessRule.Name";
-            public const string DeleteAccessRuleName = "Permissions.AccessRule.DeleteAccessRule.Name";
-            public const string GetAccessRulePermissionsName = "Permissions.AccessRule.GetAccessRulePermissions.Name";
-            public const string SetAccessRulePermissionsName = "Permissions.AccessRule.SetAccessRulePermissions.Name";
-            public const string GetRequiredPermissionsName = "Permissions.AccessRule.GetRequiredPermissions.Name";
+            public const string ReadName = "Permissions.Log.Read.Name";
+            public const string ReadAllName = "Permissions.Log.ReadAll.Name";
+        }
+
+        public static class Setting
+        {
+            public const string ReadName = "Permissions.Setting.Read.Name";
+            public const string UpdateName = "Permissions.Setting.Update.Name";
+        }
+
+        public static class Profile
+        {
+            public const string ReadName = "Permissions.Profile.Read.Name";
+            public const string UpdateName = "Permissions.Profile.Update.Name";
         }
     }
 
+    /// <summary>
+    /// Menu <c>NameKey</c> constants. These are the exact keys the system seeder
+    /// writes into <c>Menu.NameKey</c>, and the same keys the menu tree resolves
+    /// against the shared resource when rendering the navigation.
+    /// </summary>
     public static class Menus
     {
         public const string Dashboard = "Menus.Dashboard";
         public const string System = "Menus.System";
-        public const string SystemUsers = "Menus.System.Users";
-        public const string SystemRoles = "Menus.System.Roles";
-        public const string SystemPermissions = "Menus.System.Permissions";
-        public const string SystemMenus = "Menus.System.Menus";
-        public const string SystemLocalization = "Menus.System.Localization";
-        public const string SystemAccessRules = "Menus.System.AccessRules";
         public const string Profile = "Menus.Profile";
+        public const string Chat = "Menus.Chat";
+        public const string Users = "Menus.Users";
+        public const string UserAccess = "Menus.UserAccess";
+        public const string Roles = "Menus.Roles";
+        public const string Permissions = "Menus.Permissions";
+        public const string Menus_ = "Menus.Menus";
+        public const string ApiEndpoints = "Menus.ApiEndpoints";
+        public const string Localization = "Menus.Localization";
+        public const string Logs = "Menus.Logs";
     }
 
     public static class Messages
@@ -161,8 +140,6 @@ public static class LocalizationKeys
         public const string RoleAlreadyExists = "Messages.RoleAlreadyExists";
         public const string MenusNotFound = "Messages.MenusNotFound";
         public const string PermissionsNotFound = "Messages.PermissionsNotFound";
-        public const string AccessRuleNotFound = "Messages.AccessRuleNotFound";
-        public const string AccessRuleAlreadyExists = "Messages.AccessRuleAlreadyExists";
         public const string ScopeRequired = "Messages.ScopeRequired";
         public const string PathRequired = "Messages.PathRequired";
         public const string MenuNotFound = "Messages.MenuNotFound";
@@ -185,7 +162,6 @@ public static class LocalizationKeys
         public const string LocalizationKeyNotFound = "Messages.LocalizationKeyNotFound";
         public const string ValidationFailed = "Messages.ValidationFailed";
         public const string UnexpectedError = "Messages.UnexpectedError";
-        public const string AccessRuleCentralValidationFailed = "Messages.AccessRuleCentralValidationFailed";
         public const string PayloadLoggingSkipped = "Messages.PayloadLoggingSkipped";
         public const string ApiResponseDeserializationFailed = "Messages.ApiResponseDeserializationFailed";
         public const string ApiResponseBodyEmpty = "Messages.ApiResponseBodyEmpty";
@@ -197,6 +173,38 @@ public static class LocalizationKeys
         public const string ProfileImageEmpty = "Messages.ProfileImageEmpty";
         public const string ProfileImageInvalidType = "Messages.ProfileImageInvalidType";
         public const string ProfileImageTooLarge = "Messages.ProfileImageTooLarge";
+
+        // ---- New-architecture message keys ----
+        public const string UserEmailAlreadyExists = "Messages.UserEmailAlreadyExists";
+        public const string LogEntryNotFound = "Messages.LogEntryNotFound";
+        public const string EndpointNotRegistered = "Messages.EndpointNotRegistered";
+        public const string EndpointDisabled = "Messages.EndpointDisabled";
+        public const string EndpointNotFound = "Messages.EndpointNotFound";
+        public const string EndpointAlreadyExists = "Messages.EndpointAlreadyExists";
+        public const string MissingPermission = "Messages.MissingPermission";
+        public const string SystemRoleCannotBeRenamed = "Messages.SystemRoleCannotBeRenamed";
+        public const string SystemRoleCannotBeDeleted = "Messages.SystemRoleCannotBeDeleted";
+        public const string SuperAdminPermissionsAutoManaged = "Messages.SuperAdminPermissionsAutoManaged";
+        public const string MenuParentCycle = "Messages.MenuParentCycle";
+        public const string MenuHasChildren = "Messages.MenuHasChildren";
+        public const string InvalidCredentials = "Messages.InvalidCredentials";
+        public const string TokenNoLongerValid = "Messages.TokenNoLongerValid";
+    }
+
+    /// <summary>
+    /// Localization keys for the centrally-seeded role catalog. The database
+    /// stores these KEYS in <c>Role.Description</c>; the values are resolved
+    /// from the shared resource at read time.
+    /// </summary>
+    public static class RoleSeed
+    {
+        public const string SuperAdminDescription = "RoleSeed.SuperAdmin.Description";
+        public const string SystemAdminDescription = "RoleSeed.SystemAdmin.Description";
+        public const string OperationsManagerDescription = "RoleSeed.OperationsManager.Description";
+        public const string SecurityAuditorDescription = "RoleSeed.SecurityAuditor.Description";
+        public const string LocalizationEditorDescription = "RoleSeed.LocalizationEditor.Description";
+        public const string ReadOnlyViewerDescription = "RoleSeed.ReadOnlyViewer.Description";
+        public const string BasicUserDescription = "RoleSeed.BasicUser.Description";
     }
 
     public static class Dashboard
@@ -252,6 +260,8 @@ public static class LocalizationKeys
         public const string AccountLockedOut = "Auth.AccountLockedOut";
         public const string InvalidCredentialsDetail = "Auth.InvalidCredentialsDetail";
         public const string LoginSuccessful = "Auth.LoginSuccessful";
+        public const string DevQuickLogin = "Auth.DevQuickLogin";
+        public const string DevSelectUser = "Auth.DevSelectUser";
     }
 
     public static class Layout
@@ -313,6 +323,16 @@ public static class LocalizationKeys
         public const string GenericError = "Notifications.GenericError";
     }
 
+    public static class Alerts
+    {
+        public const string Success = "Alerts.Success";
+        public const string Information = "Alerts.Information";
+        public const string Warning = "Alerts.Warning";
+        public const string Error = "Alerts.Error";
+        public const string Confirm = "Alerts.Confirm";
+        public const string Ok = "Alerts.Ok";
+    }
+
     public static class UsersScreen
     {
         public const string Title = "UsersScreen.Title";
@@ -338,6 +358,19 @@ public static class LocalizationKeys
         public const string RolesTitle = "UsersScreen.RolesTitle";
     }
 
+    public static class UserAccessScreen
+    {
+        public const string Title = "UserAccessScreen.Title";
+        public const string Subtitle = "UserAccessScreen.Subtitle";
+        public const string SelectUserPrompt = "UserAccessScreen.SelectUserPrompt";
+        public const string RolesTab = "UserAccessScreen.RolesTab";
+        public const string PermissionsTab = "UserAccessScreen.PermissionsTab";
+        public const string RolesNote = "UserAccessScreen.RolesNote";
+        public const string PermissionsNote = "UserAccessScreen.PermissionsNote";
+        public const string Inherited = "UserAccessScreen.Inherited";
+        public const string Saved = "UserAccessScreen.Saved";
+    }
+
     public static class RolesScreen
     {
         public const string Title = "RolesScreen.Title";
@@ -348,9 +381,7 @@ public static class LocalizationKeys
         public const string CreateTitle = "RolesScreen.CreateTitle";
         public const string EditTitle = "RolesScreen.EditTitle";
         public const string ManagePermissions = "RolesScreen.ManagePermissions";
-        public const string ManageMenus = "RolesScreen.ManageMenus";
         public const string PermissionsTitle = "RolesScreen.PermissionsTitle";
-        public const string MenusTitle = "RolesScreen.MenusTitle";
     }
 
     public static class PermissionsScreen
@@ -359,6 +390,11 @@ public static class LocalizationKeys
         public const string Subtitle = "PermissionsScreen.Subtitle";
         public const string Code = "PermissionsScreen.Code";
         public const string Name = "PermissionsScreen.Name";
+        public const string Module = "PermissionsScreen.Module";
+        public const string Action = "PermissionsScreen.Action";
+        public const string RoleCount = "PermissionsScreen.RoleCount";
+        public const string MenuCount = "PermissionsScreen.MenuCount";
+        public const string EndpointCount = "PermissionsScreen.EndpointCount";
         public const string CreateTitle = "PermissionsScreen.CreateTitle";
         public const string EditTitle = "PermissionsScreen.EditTitle";
         public const string SeedDefaults = "PermissionsScreen.SeedDefaults";
@@ -399,148 +435,66 @@ public static class LocalizationKeys
         public const string KeyNotFound = "LocalizationScreen.KeyNotFound";
     }
 
-    public static class AccessRulesScreen
+    public static class ApiEndpointsScreen
     {
-        public const string Title = "AccessRulesScreen.Title";
-        public const string Subtitle = "AccessRulesScreen.Subtitle";
-        public const string Name = "AccessRulesScreen.Name";
-        public const string Scope = "AccessRulesScreen.Scope";
-        public const string ScopeApi = "AccessRulesScreen.Scope.API";
-        public const string ScopeWeb = "AccessRulesScreen.Scope.Web";
-        public const string Path = "AccessRulesScreen.Path";
-        public const string PathHint = "AccessRulesScreen.PathHint";
-        public const string HttpMethod = "AccessRulesScreen.HttpMethod";
-        public const string HttpMethodAll = "AccessRulesScreen.HttpMethod.All";
-        public const string Description = "AccessRulesScreen.Description";
-        public const string IsEnabled = "AccessRulesScreen.IsEnabled";
-        public const string CreateTitle = "AccessRulesScreen.CreateTitle";
-        public const string EditTitle = "AccessRulesScreen.EditTitle";
-        public const string ManagePermissions = "AccessRulesScreen.ManagePermissions";
-        public const string PermissionsTitle = "AccessRulesScreen.PermissionsTitle";
-        public const string PatternHelp = "AccessRulesScreen.PatternHelp";
-        public const string PatternExamples = "AccessRulesScreen.PatternExamples";
+        public const string Title = "ApiEndpointsScreen.Title";
+        public const string Subtitle = "ApiEndpointsScreen.Subtitle";
+        public const string Name = "ApiEndpointsScreen.Name";
+        public const string HttpMethod = "ApiEndpointsScreen.HttpMethod";
+        public const string Path = "ApiEndpointsScreen.Path";
+        public const string Description = "ApiEndpointsScreen.Description";
+        public const string RequiredPermission = "ApiEndpointsScreen.RequiredPermission";
+        public const string IsActive = "ApiEndpointsScreen.IsActive";
+        public const string PopupTitle = "ApiEndpointsScreen.PopupTitle";
     }
 
-    /// <summary>
-    /// Localization keys for the centrally-seeded access rules (one rule per
-    /// real API endpoint). Each rule has a display name and a description key so
-    /// the Access Rules screen is fully localized just like every other seed.
-    /// </summary>
-    public static class AccessRulesSeed
+    public static class ChatScreen
     {
-        public static class Home
-        {
-            public const string GetDashboardName = "AccessRules.Seed.Home.GetDashboard.Name";
-            public const string GetDashboardDescription = "AccessRules.Seed.Home.GetDashboard.Description";
-        }
+        public const string Title = "ChatScreen.Title";
+        public const string Subtitle = "ChatScreen.Subtitle";
+        public const string SearchContacts = "ChatScreen.SearchContacts";
+        public const string SelectContact = "ChatScreen.SelectContact";
+        public const string MessagePlaceholder = "ChatScreen.MessagePlaceholder";
+        public const string Notifications = "ChatScreen.Notifications";
+        public const string NoNotifications = "ChatScreen.NoNotifications";
+        public const string NewMessageFrom = "ChatScreen.NewMessageFrom";
+        public const string AttachFile = "ChatScreen.AttachFile";
+        public const string AttachmentLabel = "ChatScreen.AttachmentLabel";
+        public const string Online = "ChatScreen.Online";
+        public const string Offline = "ChatScreen.Offline";
+        public const string Typing = "ChatScreen.Typing";
+        public const string ConnectionStatus = "ChatScreen.ConnectionStatus";
+        public const string Connected = "ChatScreen.Connected";
+        public const string Connecting = "ChatScreen.Connecting";
+        public const string Reconnecting = "ChatScreen.Reconnecting";
+        public const string Disconnected = "ChatScreen.Disconnected";
+        public const string OnlineUsers = "ChatScreen.OnlineUsers";
+    }
 
-        public static class User
-        {
-            public const string GetUsersName = "AccessRules.Seed.User.GetUsers.Name";
-            public const string GetUsersDescription = "AccessRules.Seed.User.GetUsers.Description";
-            public const string GetUserName = "AccessRules.Seed.User.GetUser.Name";
-            public const string GetUserDescription = "AccessRules.Seed.User.GetUser.Description";
-            public const string CreateUserName = "AccessRules.Seed.User.CreateUser.Name";
-            public const string CreateUserDescription = "AccessRules.Seed.User.CreateUser.Description";
-            public const string UpdateUserName = "AccessRules.Seed.User.UpdateUser.Name";
-            public const string UpdateUserDescription = "AccessRules.Seed.User.UpdateUser.Description";
-            public const string SetRolesName = "AccessRules.Seed.User.SetRoles.Name";
-            public const string SetRolesDescription = "AccessRules.Seed.User.SetRoles.Description";
-            public const string UpdatePasswordName = "AccessRules.Seed.User.UpdatePassword.Name";
-            public const string UpdatePasswordDescription = "AccessRules.Seed.User.UpdatePassword.Description";
-            public const string DeleteUserName = "AccessRules.Seed.User.DeleteUser.Name";
-            public const string DeleteUserDescription = "AccessRules.Seed.User.DeleteUser.Description";
-            public const string GetAdminPermissionHealthName = "AccessRules.Seed.User.GetAdminPermissionHealth.Name";
-            public const string GetAdminPermissionHealthDescription = "AccessRules.Seed.User.GetAdminPermissionHealth.Description";
-        }
-
-        public static class Permission
-        {
-            public const string GetPermissionsName = "AccessRules.Seed.Permission.GetPermissions.Name";
-            public const string GetPermissionsDescription = "AccessRules.Seed.Permission.GetPermissions.Description";
-            public const string GetPermissionName = "AccessRules.Seed.Permission.GetPermission.Name";
-            public const string GetPermissionDescription = "AccessRules.Seed.Permission.GetPermission.Description";
-            public const string CreatePermissionName = "AccessRules.Seed.Permission.CreatePermission.Name";
-            public const string CreatePermissionDescription = "AccessRules.Seed.Permission.CreatePermission.Description";
-            public const string UpdatePermissionName = "AccessRules.Seed.Permission.UpdatePermission.Name";
-            public const string UpdatePermissionDescription = "AccessRules.Seed.Permission.UpdatePermission.Description";
-            public const string DeletePermissionName = "AccessRules.Seed.Permission.DeletePermission.Name";
-            public const string DeletePermissionDescription = "AccessRules.Seed.Permission.DeletePermission.Description";
-        }
-
-        public static class Role
-        {
-            public const string GetRolesName = "AccessRules.Seed.Role.GetRoles.Name";
-            public const string GetRolesDescription = "AccessRules.Seed.Role.GetRoles.Description";
-            public const string GetRoleName = "AccessRules.Seed.Role.GetRole.Name";
-            public const string GetRoleDescription = "AccessRules.Seed.Role.GetRole.Description";
-            public const string CreateRoleName = "AccessRules.Seed.Role.CreateRole.Name";
-            public const string CreateRoleDescription = "AccessRules.Seed.Role.CreateRole.Description";
-            public const string UpdateRoleName = "AccessRules.Seed.Role.UpdateRole.Name";
-            public const string UpdateRoleDescription = "AccessRules.Seed.Role.UpdateRole.Description";
-            public const string DeleteRoleName = "AccessRules.Seed.Role.DeleteRole.Name";
-            public const string DeleteRoleDescription = "AccessRules.Seed.Role.DeleteRole.Description";
-            public const string GetRolePermissionsName = "AccessRules.Seed.Role.GetRolePermissions.Name";
-            public const string GetRolePermissionsDescription = "AccessRules.Seed.Role.GetRolePermissions.Description";
-            public const string SetRolePermissionsName = "AccessRules.Seed.Role.SetRolePermissions.Name";
-            public const string SetRolePermissionsDescription = "AccessRules.Seed.Role.SetRolePermissions.Description";
-            public const string GetRoleMenusName = "AccessRules.Seed.Role.GetRoleMenus.Name";
-            public const string GetRoleMenusDescription = "AccessRules.Seed.Role.GetRoleMenus.Description";
-            public const string SetRoleMenusName = "AccessRules.Seed.Role.SetRoleMenus.Name";
-            public const string SetRoleMenusDescription = "AccessRules.Seed.Role.SetRoleMenus.Description";
-        }
-
-        public static class Menu
-        {
-            public const string GetMenusName = "AccessRules.Seed.Menu.GetMenus.Name";
-            public const string GetMenusDescription = "AccessRules.Seed.Menu.GetMenus.Description";
-            public const string GetMenuTreeName = "AccessRules.Seed.Menu.GetMenuTree.Name";
-            public const string GetMenuTreeDescription = "AccessRules.Seed.Menu.GetMenuTree.Description";
-            public const string GetMenuName = "AccessRules.Seed.Menu.GetMenu.Name";
-            public const string GetMenuDescription = "AccessRules.Seed.Menu.GetMenu.Description";
-            public const string CreateMenuName = "AccessRules.Seed.Menu.CreateMenu.Name";
-            public const string CreateMenuDescription = "AccessRules.Seed.Menu.CreateMenu.Description";
-            public const string UpdateMenuName = "AccessRules.Seed.Menu.UpdateMenu.Name";
-            public const string UpdateMenuDescription = "AccessRules.Seed.Menu.UpdateMenu.Description";
-            public const string DeleteMenuName = "AccessRules.Seed.Menu.DeleteMenu.Name";
-            public const string DeleteMenuDescription = "AccessRules.Seed.Menu.DeleteMenu.Description";
-            public const string GetMenuPermissionsName = "AccessRules.Seed.Menu.GetMenuPermissions.Name";
-            public const string GetMenuPermissionsDescription = "AccessRules.Seed.Menu.GetMenuPermissions.Description";
-            public const string SetMenuPermissionsName = "AccessRules.Seed.Menu.SetMenuPermissions.Name";
-            public const string SetMenuPermissionsDescription = "AccessRules.Seed.Menu.SetMenuPermissions.Description";
-        }
-
-        public static class Localization
-        {
-            public const string GetAllName = "AccessRules.Seed.Localization.GetAll.Name";
-            public const string GetAllDescription = "AccessRules.Seed.Localization.GetAll.Description";
-            public const string GetByKeyName = "AccessRules.Seed.Localization.GetByKey.Name";
-            public const string GetByKeyDescription = "AccessRules.Seed.Localization.GetByKey.Description";
-            public const string UpsertName = "AccessRules.Seed.Localization.Upsert.Name";
-            public const string UpsertDescription = "AccessRules.Seed.Localization.Upsert.Description";
-            public const string DeleteName = "AccessRules.Seed.Localization.Delete.Name";
-            public const string DeleteDescription = "AccessRules.Seed.Localization.Delete.Description";
-        }
-
-        public static class AccessRule
-        {
-            public const string GetAccessRulesName = "AccessRules.Seed.AccessRule.GetAccessRules.Name";
-            public const string GetAccessRulesDescription = "AccessRules.Seed.AccessRule.GetAccessRules.Description";
-            public const string GetAccessRuleName = "AccessRules.Seed.AccessRule.GetAccessRule.Name";
-            public const string GetAccessRuleDescription = "AccessRules.Seed.AccessRule.GetAccessRule.Description";
-            public const string CreateAccessRuleName = "AccessRules.Seed.AccessRule.CreateAccessRule.Name";
-            public const string CreateAccessRuleDescription = "AccessRules.Seed.AccessRule.CreateAccessRule.Description";
-            public const string UpdateAccessRuleName = "AccessRules.Seed.AccessRule.UpdateAccessRule.Name";
-            public const string UpdateAccessRuleDescription = "AccessRules.Seed.AccessRule.UpdateAccessRule.Description";
-            public const string DeleteAccessRuleName = "AccessRules.Seed.AccessRule.DeleteAccessRule.Name";
-            public const string DeleteAccessRuleDescription = "AccessRules.Seed.AccessRule.DeleteAccessRule.Description";
-            public const string GetAccessRulePermissionsName = "AccessRules.Seed.AccessRule.GetAccessRulePermissions.Name";
-            public const string GetAccessRulePermissionsDescription = "AccessRules.Seed.AccessRule.GetAccessRulePermissions.Description";
-            public const string SetAccessRulePermissionsName = "AccessRules.Seed.AccessRule.SetAccessRulePermissions.Name";
-            public const string SetAccessRulePermissionsDescription = "AccessRules.Seed.AccessRule.SetAccessRulePermissions.Description";
-            public const string GetRequiredPermissionsName = "AccessRules.Seed.AccessRule.GetRequiredPermissions.Name";
-            public const string GetRequiredPermissionsDescription = "AccessRules.Seed.AccessRule.GetRequiredPermissions.Description";
-        }
+    public static class LogsScreen
+    {
+        public const string Title = "LogsScreen.Title";
+        public const string Subtitle = "LogsScreen.Subtitle";
+        public const string DetailTitle = "LogsScreen.DetailTitle";
+        public const string Occurred = "LogsScreen.Occurred";
+        public const string Source = "LogsScreen.Source";
+        public const string User = "LogsScreen.User";
+        public const string IpAddress = "LogsScreen.IpAddress";
+        public const string HttpMethod = "LogsScreen.HttpMethod";
+        public const string Path = "LogsScreen.Path";
+        public const string StatusCode = "LogsScreen.StatusCode";
+        public const string IsSuccess = "LogsScreen.IsSuccess";
+        public const string HasException = "LogsScreen.HasException";
+        public const string DurationMs = "LogsScreen.DurationMs";
+        public const string Details = "LogsScreen.Details";
+        public const string NotFound = "LogsScreen.NotFound";
+        public const string Id = "LogsScreen.Id";
+        public const string QueryString = "LogsScreen.QueryString";
+        public const string ExceptionType = "LogsScreen.ExceptionType";
+        public const string ExceptionMessage = "LogsScreen.ExceptionMessage";
+        public const string CorrelationId = "LogsScreen.CorrelationId";
+        public const string RequestBody = "LogsScreen.RequestBody";
+        public const string ResponseBody = "LogsScreen.ResponseBody";
     }
 }
 

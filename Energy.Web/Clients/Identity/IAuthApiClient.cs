@@ -6,7 +6,5 @@ namespace Energy.Web.Clients.Identity;
 
 public interface IAuthApiClient
 {
-    Task<BaseResponse<AuthTokenResponse>> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default);
-
-    Task<BaseResponse<CredentialValidationResponse>> ValidateCredentialsAsync(ValidateCredentialsRequest request, CancellationToken cancellationToken = default);
+    Task<BaseResponse<AuthTokenResponse>> LoginAsync(LoginRequest request, CancellationToken ct = default);
 }

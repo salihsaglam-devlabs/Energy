@@ -8,11 +8,7 @@
 
     string? ResolveQuickLinkIconClass(string? icon)
     {
-        if (string.IsNullOrWhiteSpace(icon))
-        {
-            return null;
-        }
-
+        if (string.IsNullOrWhiteSpace(icon)) return null;
         return icon.Contains(' ', StringComparison.Ordinal)
             ? icon
             : $"dx-icon dx-icon-{icon}";
@@ -71,11 +67,11 @@
                 <div class="energy-dashboard__quick-links">
                     @foreach (var link in Model.QuickLinks)
                     {
-                        var quickLinkIconClass = ResolveQuickLinkIconClass(link.Icon);
+                        var iconClass = ResolveQuickLinkIconClass(link.Icon);
                         <a class="energy-dashboard__quick-link" href="@link.Url">
-                            @if (!string.IsNullOrEmpty(quickLinkIconClass))
+                            @if (!string.IsNullOrEmpty(iconClass))
                             {
-                                <span class="energy-dashboard__quick-link-icon"><i class="@quickLinkIconClass"></i></span>
+                                <span class="energy-dashboard__quick-link-icon"><i class="@iconClass"></i></span>
                             }
                             <span class="energy-dashboard__quick-link-body">
                                 <strong>@ResolveQuickLinkTitle(link.Title)</strong>
@@ -88,3 +84,4 @@
         </aside>
     </div>
 </section>
+

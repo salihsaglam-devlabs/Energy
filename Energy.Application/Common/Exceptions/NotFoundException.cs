@@ -1,8 +1,10 @@
 namespace Energy.Application.Common.Exceptions;
 
-public sealed class NotFoundException : Exception
+/// <summary>404 — carries a localization key plus optional placeholder args.</summary>
+public sealed class NotFoundException : LocalizedException
 {
-    public NotFoundException(string message) : base(message)
+    public NotFoundException(string messageKey, params object[] arguments)
+        : base(messageKey, arguments)
     {
     }
 }

@@ -1,8 +1,10 @@
 namespace Energy.Application.Common.Exceptions;
 
-public sealed class ConflictException : Exception
+/// <summary>409 — carries a localization key plus optional placeholder args.</summary>
+public sealed class ConflictException : LocalizedException
 {
-    public ConflictException(string message) : base(message)
+    public ConflictException(string messageKey, params object[] arguments)
+        : base(messageKey, arguments)
     {
     }
 }

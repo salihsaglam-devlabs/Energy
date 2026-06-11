@@ -7,7 +7,7 @@
     --energy-border: #e2e6ee;
     --energy-text: #1f2733;
     --energy-text-muted: #5b6776;
-    --energy-primary: #0b5fff;
+    --energy-primary: rgb(15 108 189);
     --energy-primary-soft: rgba(11, 95, 255, 0.08);
     --energy-success: #22a06b;
     --energy-warning: #d97706;
@@ -312,6 +312,22 @@ body.energy-nav-closed .energy-toolbar__menu {
 
 .energy-auth-form__title { font-size: 16px; margin: 0 0 2px; font-weight: 600; line-height: 1.3; }
 .energy-auth-form__subtitle { color: var(--energy-text-muted); margin: 0 0 16px; font-size: 12px; }
+.energy-dev-login {
+    margin: 0 0 16px;
+    padding: 10px 12px;
+    border: 1px dashed var(--energy-border, #cbd5e1);
+    border-radius: 8px;
+    background: rgba(148,163,184,0.08);
+}
+.energy-dev-login__label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--energy-text-muted, #64748b);
+}
 .energy-auth-form__actions { display: flex; gap: 12px; align-items: center; margin-top: 14px; color: var(--energy-text-muted); font-size: 12px; }
 .energy-auth-form__link { color: var(--energy-primary); font-size: 12px; }
 .energy-auth-lang {
@@ -396,6 +412,54 @@ body.energy-nav-closed .energy-toolbar__menu {
     border: 1px solid var(--energy-border);
     border-radius: 12px;
     padding: 24px;
+}
+
+/* ---------- User Access screen (single-screen role + permission manager) ---------- */
+.user-access {
+    display: grid;
+    grid-template-columns: minmax(280px, 360px) 1fr;
+    gap: 16px;
+    align-items: start;
+}
+.user-access__list,
+.user-access__detail {
+    background: var(--energy-surface);
+    border: 1px solid var(--energy-border);
+    border-radius: 12px;
+    padding: 12px;
+}
+.user-access__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 60vh;
+    color: var(--energy-text-muted);
+    text-align: center;
+}
+.user-access__empty-icon { font-size: 44px; opacity: 0.5; }
+.user-access__who { display: flex; flex-direction: column; line-height: 1.2; }
+.user-access__who-name { font-size: 16px; font-weight: 600; }
+.user-access__who-sub { font-size: 12px; color: var(--energy-text-muted); }
+.user-access__tab { padding: 8px 4px; }
+.user-access__note { margin: 0 0 10px; color: var(--energy-text-muted); font-size: 13px; }
+.user-access__role { display: flex; flex-direction: column; gap: 2px; }
+.user-access__role-name { font-weight: 600; }
+.user-access__role-desc { font-size: 12px; color: var(--energy-text-muted); }
+.user-access__badge {
+    align-self: flex-start;
+    margin-top: 2px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+.user-access__badge--system { background: rgba(120, 120, 160, 0.18); color: var(--energy-text-muted); }
+
+@media (max-width: 991.98px) {
+    .user-access { grid-template-columns: 1fr; }
 }
 
 /* DevExtreme widgets are styled exclusively by the ThemeBuilder
@@ -498,5 +562,368 @@ body.energy-nav-closed .energy-toolbar__menu {
         background: rgba(15, 23, 42, 0.35);
         z-index: 998;
     }
+}
+
+/* ===================================================================== */
+/* Alerts — embedded banners + modal popup (AppAlert).                   */
+/* Toasts reuse DevExtreme's dxToast (bottom, self-dismissing).          */
+/* ===================================================================== */
+:root {
+    --energy-info: #0b76ef;
+}
+
+/* Embedded inline alert */
+.energy-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    margin: 0 0 12px;
+    border: 1px solid var(--energy-border);
+    border-left-width: 4px;
+    border-radius: 10px;
+    background: var(--energy-surface);
+    box-shadow: var(--energy-shadow);
+    color: var(--energy-text);
+    animation: energy-alert-in 0.22s ease;
+}
+
+.energy-alert.is-leaving {
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.energy-alert__icon {
+    flex: 0 0 auto;
+    font-size: 18px;
+    line-height: 22px;
+    margin-top: 1px;
+}
+
+.energy-alert__content { flex: 1 1 auto; min-width: 0; }
+.energy-alert__title { font-weight: 600; margin-bottom: 2px; }
+.energy-alert__message { color: var(--energy-text-muted); word-wrap: break-word; }
+
+.energy-alert__close {
+    flex: 0 0 auto;
+    border: 0;
+    background: transparent;
+    color: var(--energy-text-muted);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 2px;
+    border-radius: 6px;
+}
+.energy-alert__close:hover { color: var(--energy-text); background: var(--energy-surface-muted); }
+
+.energy-alert.is-success { border-left-color: var(--energy-success); }
+.energy-alert.is-success .energy-alert__icon { color: var(--energy-success); }
+.energy-alert.is-info { border-left-color: var(--energy-info); }
+.energy-alert.is-info .energy-alert__icon { color: var(--energy-info); }
+.energy-alert.is-warning { border-left-color: var(--energy-warning); }
+.energy-alert.is-warning .energy-alert__icon { color: var(--energy-warning); }
+.energy-alert.is-error { border-left-color: var(--energy-danger); }
+.energy-alert.is-error .energy-alert__icon { color: var(--energy-danger); }
+
+@keyframes energy-alert-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Modal alert popup */
+.energy-alert-popup .dx-popup-content { padding: 0; }
+
+.energy-alert-popup__body {
+    display: flex;
+    gap: 16px;
+    padding: 22px 22px 8px;
+}
+
+.energy-alert-popup__icon {
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.energy-alert-popup__title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+.energy-alert-popup__message { color: var(--energy-text-muted); line-height: 1.5; }
+
+.energy-alert-popup__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 14px 22px 20px;
+}
+
+.energy-alert-popup.is-success .energy-alert-popup__icon { background: rgba(34,160,107,0.12); color: var(--energy-success); }
+.energy-alert-popup.is-info .energy-alert-popup__icon { background: rgba(11,118,239,0.12); color: var(--energy-info); }
+.energy-alert-popup.is-warning .energy-alert-popup__icon { background: rgba(217,119,6,0.12); color: var(--energy-warning); }
+.energy-alert-popup.is-error .energy-alert-popup__icon { background: rgba(220,38,38,0.12); color: var(--energy-danger); }
+
+
+/* ------------------------------------------------------------------ */
+/* Chat screen + notification bell                                    */
+/* ------------------------------------------------------------------ */
+.energy-chat { display: flex; gap: 16px; min-height: 70vh; }
+.energy-chat__sidebar {
+    flex: 0 0 280px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--energy-border, #e2e8f0);
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+}
+.energy-chat__sidebar #chat-contacts { flex: 1 1 auto; overflow: auto; }
+.energy-chat__main {
+    flex: 1 1 auto;
+    display: flex;
+    border: 1px solid var(--energy-border, #e2e8f0);
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+}
+.energy-chat__window { flex: 1 1 auto; min-height: 60vh; }
+.energy-chat__window-wrap {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.energy-chat__attach {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-top: 1px solid var(--energy-border, #e2e8f0);
+    background: #fff;
+}
+.energy-chat__attach-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--energy-border, #e2e8f0);
+    background: #f8fafc;
+    color: var(--energy-text-muted, #475569);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+}
+.energy-chat__attach-btn:hover { background: rgba(148,163,184,0.18); }
+.energy-chat__empty {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--energy-text-muted, #64748b);
+    padding: 24px;
+}
+.energy-chat__contact {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+}
+.energy-chat__contact-name { font-weight: 500; }
+.energy-chat__contact-avatar {
+    flex: 0 0 auto;
+    position: relative;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--energy-primary, #2563eb);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+}
+.energy-chat__contact-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.energy-chat__contact { gap: 10px; }
+.energy-chat__contact-meta { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; line-height: 1.2; }
+.energy-chat__contact-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.energy-chat__contact-status { font-size: 11px; }
+.energy-chat__contact-status.is-online { color: var(--energy-success, #16a34a); }
+.energy-chat__contact-status.is-offline { color: var(--energy-text-muted, #94a3b8); }
+
+/* Presence dot overlaid on the contact avatar (allowed to overflow the circle). */
+.energy-chat__contact-avatar { overflow: visible; }
+.energy-chat__contact-avatar img { border-radius: 50%; }
+.energy-chat__presence-dot {
+    position: absolute;
+    right: -1px;
+    bottom: -1px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-sizing: border-box;
+}
+.energy-chat__presence-dot.is-online { background: var(--energy-success, #16a34a); }
+.energy-chat__presence-dot.is-offline { background: var(--energy-text-muted, #cbd5e1); }
+
+/* Conversation header: peer name + online/offline + typing. */
+.energy-chat__peer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--energy-border, #e2e8f0);
+    background: #fff;
+}
+.energy-chat__peer-avatar {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--energy-primary, #2563eb);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+}
+.energy-chat__peer-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.energy-chat__peer-meta { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.energy-chat__peer-name { font-weight: 600; }
+.energy-chat__peer-status { font-size: 12px; color: var(--energy-text-muted, #94a3b8); }
+.energy-chat__peer-status.is-online { color: var(--energy-success, #16a34a); }
+.energy-chat__peer-status.is-typing { color: var(--energy-primary, #2563eb); font-style: italic; }
+
+/* Message bubble content (custom messageTemplate: text + attachment) */
+.energy-chat__msg { display: flex; flex-direction: column; gap: 6px; }
+.energy-chat__msg-text { white-space: pre-wrap; word-break: break-word; }
+.energy-chat__att { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+.energy-chat__att--file {
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: rgba(148,163,184,0.18);
+    color: inherit;
+    max-width: 240px;
+}
+.energy-chat__att--file span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.energy-chat__att--image img {
+    max-width: 220px;
+    max-height: 220px;
+    border-radius: 8px;
+    display: block;
+}
+.energy-chat__contact-badge,
+.energy-toolbar__notify-badge {
+    background: var(--energy-danger, #dc2626);
+    color: #fff;
+    border-radius: 999px;
+    font-size: 11px;
+    line-height: 1;
+    padding: 3px 6px;
+    min-width: 18px;
+    text-align: center;
+}
+
+/* Connection status indicator */
+.energy-toolbar__conn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--energy-text-muted, #64748b);
+}
+.energy-toolbar__conn:hover { background: rgba(148,163,184,0.18); }
+.energy-toolbar__conn-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    background: var(--energy-text-muted, #94a3b8);
+}
+.energy-toolbar__conn.is-connected .energy-toolbar__conn-dot { background: var(--energy-success, #16a34a); }
+.energy-toolbar__conn.is-connecting .energy-toolbar__conn-dot { background: var(--energy-warning, #d97706); }
+.energy-toolbar__conn.is-down .energy-toolbar__conn-dot { background: var(--energy-danger, #dc2626); }
+.energy-toolbar__conn.is-connected i { color: var(--energy-success, #16a34a); }
+.energy-toolbar__conn.is-connecting i { color: var(--energy-warning, #d97706); }
+.energy-toolbar__conn.is-down i { color: var(--energy-danger, #dc2626); }
+.energy-toolbar__conn-panel {
+    position: absolute;
+    top: 110%;
+    right: 0;
+    width: 220px;
+    background: #fff;
+    border: 1px solid var(--energy-border, #e2e8f0);
+    border-radius: 10px;
+    box-shadow: 0 12px 32px rgba(15,23,42,0.18);
+    z-index: 1200;
+}
+.energy-toolbar__conn-body { padding: 10px 14px; }
+.energy-toolbar__conn-row { font-weight: 600; margin-bottom: 4px; }
+.energy-toolbar__conn-muted { color: var(--energy-text-muted, #64748b); font-size: 12px; }
+
+/* Notification bell */
+.energy-toolbar__notify {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.energy-toolbar__notify:hover { background: rgba(148,163,184,0.18); }
+.energy-toolbar__notify.has-unread i { color: var(--energy-danger, #dc2626); }
+.energy-toolbar__notify-badge { position: absolute; top: 2px; right: 0; }
+.energy-toolbar__notify-panel {
+    position: absolute;
+    top: 110%;
+    right: 0;
+    width: 320px;
+    max-height: 420px;
+    overflow: auto;
+    background: #fff;
+    border: 1px solid var(--energy-border, #e2e8f0);
+    border-radius: 10px;
+    box-shadow: 0 12px 32px rgba(15,23,42,0.18);
+    z-index: 1200;
+}
+.energy-toolbar__notify-header {
+    padding: 12px 14px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--energy-border, #e2e8f0);
+}
+.energy-toolbar__notify-list { list-style: none; margin: 0; padding: 0; }
+.energy-toolbar__notify-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--energy-border, #f1f5f9);
+    cursor: pointer;
+}
+.energy-toolbar__notify-item:hover { background: rgba(148,163,184,0.12); }
+.energy-toolbar__notify-item-title { font-weight: 600; font-size: 13px; }
+.energy-toolbar__notify-item-text {
+    font-size: 12px;
+    color: var(--energy-text-muted, #64748b);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 

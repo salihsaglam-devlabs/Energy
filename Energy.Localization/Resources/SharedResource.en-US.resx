@@ -30,108 +30,63 @@
   <data name="Common.RequestId" xml:space="preserve"><value>Request ID</value></data>
   <data name="Common.ErrorOccurred" xml:space="preserve"><value>An error occurred while processing your request.</value></data>
 
-  <data name="Roles.Admin.DisplayName" xml:space="preserve"><value>Administrator</value></data>
-  <data name="Roles.Admin.Description" xml:space="preserve"><value>System administrator</value></data>
-  <data name="Roles.OperationsManager.DisplayName" xml:space="preserve"><value>Operations Manager</value></data>
-  <data name="Roles.OperationsManager.Description" xml:space="preserve"><value>Operations manager</value></data>
-  <data name="Roles.LocalizationEditor.DisplayName" xml:space="preserve"><value>Localization Editor</value></data>
-  <data name="Roles.LocalizationEditor.Description" xml:space="preserve"><value>Localization editor</value></data>
-  <data name="Roles.ReadOnly.DisplayName" xml:space="preserve"><value>Read Only</value></data>
-  <data name="Roles.ReadOnly.Description" xml:space="preserve"><value>Read-only user</value></data>
 
-  <data name="Users.Admin.FirstName" xml:space="preserve"><value>System</value></data>
-  <data name="Users.Admin.LastName" xml:space="preserve"><value>Admin</value></data>
-  <data name="Users.OperationsManager.FirstName" xml:space="preserve"><value>Operations</value></data>
-  <data name="Users.OperationsManager.LastName" xml:space="preserve"><value>Manager</value></data>
-  <data name="Users.LocalizationEditor.FirstName" xml:space="preserve"><value>Localization</value></data>
-  <data name="Users.LocalizationEditor.LastName" xml:space="preserve"><value>Editor</value></data>
-  <data name="Users.ReadOnly.FirstName" xml:space="preserve"><value>Read</value></data>
-  <data name="Users.ReadOnly.LastName" xml:space="preserve"><value>Only</value></data>
+  <data name="Permissions.Dashboard.Read.Name" xml:space="preserve"><value>View Dashboard</value></data>
 
-  <data name="Permissions.DashboardView.Name" xml:space="preserve"><value>Dashboard View</value></data>
-  <data name="Permissions.DashboardView.Description" xml:space="preserve"><value>Allows viewing dashboard data.</value></data>
-  <data name="Permissions.UserManage.Name" xml:space="preserve"><value>User Management</value></data>
-  <data name="Permissions.UserManage.Description" xml:space="preserve"><value>Allows managing users.</value></data>
-  <data name="Permissions.RoleManage.Name" xml:space="preserve"><value>Role Management</value></data>
-  <data name="Permissions.RoleManage.Description" xml:space="preserve"><value>Allows managing roles.</value></data>
-  <data name="Permissions.MenuManage.Name" xml:space="preserve"><value>Menu Management</value></data>
-  <data name="Permissions.MenuManage.Description" xml:space="preserve"><value>Allows managing menus.</value></data>
-  <data name="Permissions.ProjectView.Name" xml:space="preserve"><value>Project View</value></data>
-  <data name="Permissions.ProjectView.Description" xml:space="preserve"><value>Allows viewing projects.</value></data>
-  <data name="Permissions.ProjectManage.Name" xml:space="preserve"><value>Project Management</value></data>
-  <data name="Permissions.ProjectManage.Description" xml:space="preserve"><value>Allows managing projects.</value></data>
-  <data name="Permissions.WarehouseView.Name" xml:space="preserve"><value>Warehouse View</value></data>
-  <data name="Permissions.WarehouseView.Description" xml:space="preserve"><value>Allows viewing warehouses.</value></data>
-   <data name="Permissions.WarehouseManage.Name" xml:space="preserve"><value>Warehouse Management</value></data>
-   <data name="Permissions.WarehouseManage.Description" xml:space="preserve"><value>Allows managing warehouses.</value></data>
+  <data name="Permissions.User.Read.Name" xml:space="preserve"><value>View User</value></data>
+  <data name="Permissions.User.ReadAll.Name" xml:space="preserve"><value>List Users</value></data>
+  <data name="Permissions.User.Create.Name" xml:space="preserve"><value>Create User</value></data>
+  <data name="Permissions.User.Update.Name" xml:space="preserve"><value>Update User</value></data>
+  <data name="Permissions.User.Delete.Name" xml:space="preserve"><value>Delete User</value></data>
 
-   <data name="Permissions.AccessRules.Read.Name" xml:space="preserve"><value>Access Rules Read</value></data>
-   <data name="Permissions.AccessRules.ReadAll.Name" xml:space="preserve"><value>Access Rules Read All</value></data>
-   <data name="Permissions.AccessRules.Create.Name" xml:space="preserve"><value>Access Rules Create</value></data>
-   <data name="Permissions.AccessRules.Update.Name" xml:space="preserve"><value>Access Rules Update</value></data>
-   <data name="Permissions.AccessRules.Delete.Name" xml:space="preserve"><value>Access Rules Delete</value></data>
-   <data name="Permissions.AccessRules.ManagePermissions.Name" xml:space="preserve"><value>Access Rules Manage Permissions</value></data>
+  <data name="Permissions.Role.Read.Name" xml:space="preserve"><value>View Role</value></data>
+  <data name="Permissions.Role.ReadAll.Name" xml:space="preserve"><value>List Roles</value></data>
+  <data name="Permissions.Role.Create.Name" xml:space="preserve"><value>Create Role</value></data>
+  <data name="Permissions.Role.Update.Name" xml:space="preserve"><value>Update Role</value></data>
+  <data name="Permissions.Role.Delete.Name" xml:space="preserve"><value>Delete Role</value></data>
 
-   <data name="Permissions.Home.GetDashboard.Name" xml:space="preserve"><value>Home Get Dashboard</value></data>
+  <data name="Permissions.Permission.Read.Name" xml:space="preserve"><value>View Permission</value></data>
+  <data name="Permissions.Permission.ReadAll.Name" xml:space="preserve"><value>List Permissions</value></data>
 
-   <data name="Permissions.User.GetUsers.Name" xml:space="preserve"><value>User Get Users</value></data>
-   <data name="Permissions.User.GetUser.Name" xml:space="preserve"><value>User Get User</value></data>
-   <data name="Permissions.User.CreateUser.Name" xml:space="preserve"><value>User Create User</value></data>
-   <data name="Permissions.User.UpdateUser.Name" xml:space="preserve"><value>User Update User</value></data>
-   <data name="Permissions.User.SetRoles.Name" xml:space="preserve"><value>User Set Roles</value></data>
-   <data name="Permissions.User.UpdatePassword.Name" xml:space="preserve"><value>User Update Password</value></data>
-   <data name="Permissions.User.DeleteUser.Name" xml:space="preserve"><value>User Delete User</value></data>
-   <data name="Permissions.User.GetAdminPermissionHealth.Name" xml:space="preserve"><value>User Get Admin Permission Health</value></data>
+  <data name="Permissions.Menu.Read.Name" xml:space="preserve"><value>View Menu</value></data>
+  <data name="Permissions.Menu.ReadAll.Name" xml:space="preserve"><value>List Menus</value></data>
+  <data name="Permissions.Menu.Create.Name" xml:space="preserve"><value>Create Menu</value></data>
+  <data name="Permissions.Menu.Update.Name" xml:space="preserve"><value>Update Menu</value></data>
+  <data name="Permissions.Menu.Delete.Name" xml:space="preserve"><value>Delete Menu</value></data>
 
-   <data name="Permissions.Permission.GetPermissions.Name" xml:space="preserve"><value>Permission Get Permissions</value></data>
-   <data name="Permissions.Permission.GetPermission.Name" xml:space="preserve"><value>Permission Get Permission</value></data>
-   <data name="Permissions.Permission.CreatePermission.Name" xml:space="preserve"><value>Permission Create Permission</value></data>
-   <data name="Permissions.Permission.UpdatePermission.Name" xml:space="preserve"><value>Permission Update Permission</value></data>
-   <data name="Permissions.Permission.DeletePermission.Name" xml:space="preserve"><value>Permission Delete Permission</value></data>
+  <data name="Permissions.ApiAccess.Read.Name" xml:space="preserve"><value>View API Access</value></data>
+  <data name="Permissions.ApiAccess.ReadAll.Name" xml:space="preserve"><value>List API Access</value></data>
+  <data name="Permissions.ApiAccess.Create.Name" xml:space="preserve"><value>Create API Access</value></data>
+  <data name="Permissions.ApiAccess.Update.Name" xml:space="preserve"><value>Update API Access</value></data>
+  <data name="Permissions.ApiAccess.Delete.Name" xml:space="preserve"><value>Delete API Access</value></data>
 
-   <data name="Permissions.Role.GetRoles.Name" xml:space="preserve"><value>Role Get Roles</value></data>
-   <data name="Permissions.Role.GetRole.Name" xml:space="preserve"><value>Role Get Role</value></data>
-   <data name="Permissions.Role.CreateRole.Name" xml:space="preserve"><value>Role Create Role</value></data>
-   <data name="Permissions.Role.UpdateRole.Name" xml:space="preserve"><value>Role Update Role</value></data>
-   <data name="Permissions.Role.DeleteRole.Name" xml:space="preserve"><value>Role Delete Role</value></data>
-   <data name="Permissions.Role.GetRolePermissions.Name" xml:space="preserve"><value>Role Get Role Permissions</value></data>
-   <data name="Permissions.Role.SetRolePermissions.Name" xml:space="preserve"><value>Role Set Role Permissions</value></data>
-   <data name="Permissions.Role.GetRoleMenus.Name" xml:space="preserve"><value>Role Get Role Menus</value></data>
-   <data name="Permissions.Role.SetRoleMenus.Name" xml:space="preserve"><value>Role Set Role Menus</value></data>
+  <data name="Permissions.Localization.Read.Name" xml:space="preserve"><value>View Localization</value></data>
+  <data name="Permissions.Localization.ReadAll.Name" xml:space="preserve"><value>List Localizations</value></data>
+  <data name="Permissions.Localization.Create.Name" xml:space="preserve"><value>Create Localization</value></data>
+  <data name="Permissions.Localization.Update.Name" xml:space="preserve"><value>Update Localization</value></data>
+  <data name="Permissions.Localization.Delete.Name" xml:space="preserve"><value>Delete Localization</value></data>
 
-   <data name="Permissions.Menu.GetMenus.Name" xml:space="preserve"><value>Menu Get Menus</value></data>
-   <data name="Permissions.Menu.GetMenuTree.Name" xml:space="preserve"><value>Menu Get Menu Tree</value></data>
-   <data name="Permissions.Menu.GetMenu.Name" xml:space="preserve"><value>Menu Get Menu</value></data>
-   <data name="Permissions.Menu.CreateMenu.Name" xml:space="preserve"><value>Menu Create Menu</value></data>
-   <data name="Permissions.Menu.UpdateMenu.Name" xml:space="preserve"><value>Menu Update Menu</value></data>
-   <data name="Permissions.Menu.DeleteMenu.Name" xml:space="preserve"><value>Menu Delete Menu</value></data>
-   <data name="Permissions.Menu.GetMenuPermissions.Name" xml:space="preserve"><value>Menu Get Menu Permissions</value></data>
-   <data name="Permissions.Menu.SetMenuPermissions.Name" xml:space="preserve"><value>Menu Set Menu Permissions</value></data>
+  <data name="Permissions.Log.Read.Name" xml:space="preserve"><value>View Log</value></data>
+  <data name="Permissions.Log.ReadAll.Name" xml:space="preserve"><value>List Logs</value></data>
 
-   <data name="Permissions.Localization.GetAll.Name" xml:space="preserve"><value>Localization Get All</value></data>
-   <data name="Permissions.Localization.GetByKey.Name" xml:space="preserve"><value>Localization Get By Key</value></data>
-   <data name="Permissions.Localization.Upsert.Name" xml:space="preserve"><value>Localization Upsert</value></data>
-   <data name="Permissions.Localization.Delete.Name" xml:space="preserve"><value>Localization Delete</value></data>
+  <data name="Permissions.Setting.Read.Name" xml:space="preserve"><value>View Setting</value></data>
+  <data name="Permissions.Setting.Update.Name" xml:space="preserve"><value>Update Setting</value></data>
 
-   <data name="Permissions.AccessRule.GetAccessRules.Name" xml:space="preserve"><value>Access Rule Get Access Rules</value></data>
-   <data name="Permissions.AccessRule.GetAccessRule.Name" xml:space="preserve"><value>Access Rule Get Access Rule</value></data>
-   <data name="Permissions.AccessRule.CreateAccessRule.Name" xml:space="preserve"><value>Access Rule Create Access Rule</value></data>
-   <data name="Permissions.AccessRule.UpdateAccessRule.Name" xml:space="preserve"><value>Access Rule Update Access Rule</value></data>
-   <data name="Permissions.AccessRule.DeleteAccessRule.Name" xml:space="preserve"><value>Access Rule Delete Access Rule</value></data>
-   <data name="Permissions.AccessRule.GetAccessRulePermissions.Name" xml:space="preserve"><value>Access Rule Get Access Rule Permissions</value></data>
-   <data name="Permissions.AccessRule.SetAccessRulePermissions.Name" xml:space="preserve"><value>Access Rule Set Access Rule Permissions</value></data>
-   <data name="Permissions.AccessRule.GetRequiredPermissions.Name" xml:space="preserve"><value>Access Rule Get Required Permissions</value></data>
+  <data name="Permissions.Profile.Read.Name" xml:space="preserve"><value>View Profile</value></data>
+  <data name="Permissions.Profile.Update.Name" xml:space="preserve"><value>Update Profile</value></data>
 
-   <data name="Menus.Dashboard" xml:space="preserve"><value>Dashboard</value></data>
-  <data name="Menus.System" xml:space="preserve"><value>System</value></data>
-  <data name="Menus.Identity" xml:space="preserve"><value>Identity</value></data>
-  <data name="Menus.Inventory" xml:space="preserve"><value>Inventory</value></data>
-  <data name="Menus.Reports" xml:space="preserve"><value>Reports</value></data>
-  <data name="Menus.System.Users" xml:space="preserve"><value>Users</value></data>
-  <data name="Menus.System.Roles" xml:space="preserve"><value>Roles</value></data>
-   <data name="Menus.System.Permissions" xml:space="preserve"><value>Permissions</value></data>
-   <data name="Menus.System.Menus" xml:space="preserve"><value>Menus</value></data>
-   <data name="Menus.System.AccessRules" xml:space="preserve"><value>Access Rules</value></data>
+  <data name="Menus.Dashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="Menus.System" xml:space="preserve"><value>System Management</value></data>
+  <data name="Menus.Profile" xml:space="preserve"><value>My Profile</value></data>
+  <data name="Menus.Chat" xml:space="preserve"><value>Chat</value></data>
+  <data name="Menus.Users" xml:space="preserve"><value>Users</value></data>
+  <data name="Menus.UserAccess" xml:space="preserve"><value>User Access</value></data>
+  <data name="Menus.Roles" xml:space="preserve"><value>Roles</value></data>
+  <data name="Menus.Permissions" xml:space="preserve"><value>Permissions</value></data>
+  <data name="Menus.Menus" xml:space="preserve"><value>Menus</value></data>
+  <data name="Menus.ApiEndpoints" xml:space="preserve"><value>API Endpoints</value></data>
+  <data name="Menus.Localization" xml:space="preserve"><value>Localization</value></data>
+  <data name="Menus.Logs" xml:space="preserve"><value>Logs</value></data>
    <data name="Menus.Identity.Profile" xml:space="preserve"><value>My Profile</value></data>
   <data name="Menus.Identity.Sessions" xml:space="preserve"><value>Sessions</value></data>
   <data name="Menus.Inventory.Projects" xml:space="preserve"><value>Projects</value></data>
@@ -183,6 +138,59 @@
   <data name="LocalizationScreen.EntryDeleted" xml:space="preserve"><value>Localization entry deleted.</value></data>
   <data name="LocalizationScreen.KeyNotFound" xml:space="preserve"><value>Localization key '{0}' was not found.</value></data>
 
+  <data name="ApiEndpointsScreen.Title" xml:space="preserve"><value>API Endpoints</value></data>
+  <data name="ApiEndpointsScreen.Subtitle" xml:space="preserve"><value>Centralized catalog of API endpoints and their required permissions.</value></data>
+  <data name="ApiEndpointsScreen.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="ApiEndpointsScreen.HttpMethod" xml:space="preserve"><value>Method</value></data>
+  <data name="ApiEndpointsScreen.Path" xml:space="preserve"><value>Path</value></data>
+  <data name="ApiEndpointsScreen.Description" xml:space="preserve"><value>Description</value></data>
+  <data name="ApiEndpointsScreen.RequiredPermission" xml:space="preserve"><value>Required permission</value></data>
+  <data name="ApiEndpointsScreen.IsActive" xml:space="preserve"><value>Active</value></data>
+  <data name="ApiEndpointsScreen.PopupTitle" xml:space="preserve"><value>API Endpoint</value></data>
+
+  <data name="ChatScreen.Title" xml:space="preserve"><value>Chat</value></data>
+  <data name="ChatScreen.Subtitle" xml:space="preserve"><value>Message other users in real time.</value></data>
+  <data name="ChatScreen.SearchContacts" xml:space="preserve"><value>Search contacts...</value></data>
+  <data name="ChatScreen.SelectContact" xml:space="preserve"><value>Select a contact to start messaging.</value></data>
+  <data name="ChatScreen.MessagePlaceholder" xml:space="preserve"><value>Type a message...</value></data>
+  <data name="ChatScreen.Notifications" xml:space="preserve"><value>Notifications</value></data>
+  <data name="ChatScreen.NoNotifications" xml:space="preserve"><value>No new messages.</value></data>
+  <data name="ChatScreen.NewMessageFrom" xml:space="preserve"><value>New message from {0}</value></data>
+  <data name="ChatScreen.AttachFile" xml:space="preserve"><value>Attach file</value></data>
+  <data name="ChatScreen.AttachmentLabel" xml:space="preserve"><value>Attachment</value></data>
+  <data name="ChatScreen.Online" xml:space="preserve"><value>Online</value></data>
+  <data name="ChatScreen.Offline" xml:space="preserve"><value>Offline</value></data>
+  <data name="ChatScreen.Typing" xml:space="preserve"><value>typing...</value></data>
+  <data name="ChatScreen.ConnectionStatus" xml:space="preserve"><value>Connection status</value></data>
+  <data name="ChatScreen.Connected" xml:space="preserve"><value>Connected</value></data>
+  <data name="ChatScreen.Connecting" xml:space="preserve"><value>Connecting…</value></data>
+  <data name="ChatScreen.Reconnecting" xml:space="preserve"><value>Reconnecting…</value></data>
+  <data name="ChatScreen.Disconnected" xml:space="preserve"><value>Disconnected</value></data>
+  <data name="ChatScreen.OnlineUsers" xml:space="preserve"><value>Online users</value></data>
+
+  <data name="LogsScreen.Title" xml:space="preserve"><value>Audit Logs</value></data>
+  <data name="LogsScreen.Subtitle" xml:space="preserve"><value>System-wide request and error records.</value></data>
+  <data name="LogsScreen.DetailTitle" xml:space="preserve"><value>Audit Log</value></data>
+  <data name="LogsScreen.Occurred" xml:space="preserve"><value>Occurred</value></data>
+  <data name="LogsScreen.Source" xml:space="preserve"><value>Source</value></data>
+  <data name="LogsScreen.User" xml:space="preserve"><value>User</value></data>
+  <data name="LogsScreen.IpAddress" xml:space="preserve"><value>IP</value></data>
+  <data name="LogsScreen.HttpMethod" xml:space="preserve"><value>Method</value></data>
+  <data name="LogsScreen.Path" xml:space="preserve"><value>Path</value></data>
+  <data name="LogsScreen.StatusCode" xml:space="preserve"><value>Status</value></data>
+  <data name="LogsScreen.IsSuccess" xml:space="preserve"><value>OK</value></data>
+  <data name="LogsScreen.HasException" xml:space="preserve"><value>Exception</value></data>
+  <data name="LogsScreen.DurationMs" xml:space="preserve"><value>Duration (ms)</value></data>
+  <data name="LogsScreen.Details" xml:space="preserve"><value>Details</value></data>
+  <data name="LogsScreen.NotFound" xml:space="preserve"><value>Record not found.</value></data>
+  <data name="LogsScreen.Id" xml:space="preserve"><value>ID</value></data>
+  <data name="LogsScreen.QueryString" xml:space="preserve"><value>Query string</value></data>
+  <data name="LogsScreen.ExceptionType" xml:space="preserve"><value>Exception type</value></data>
+  <data name="LogsScreen.ExceptionMessage" xml:space="preserve"><value>Exception message</value></data>
+  <data name="LogsScreen.CorrelationId" xml:space="preserve"><value>Correlation ID</value></data>
+  <data name="LogsScreen.RequestBody" xml:space="preserve"><value>Request body</value></data>
+  <data name="LogsScreen.ResponseBody" xml:space="preserve"><value>Response body</value></data>
+
   <data name="Dashboard.Title" xml:space="preserve"><value>Operational overview</value></data>
   <data name="Dashboard.Subtitle" xml:space="preserve"><value>Track core system configuration from a single home dashboard.</value></data>
   <data name="Dashboard.ConfigurationStatus" xml:space="preserve"><value>Configuration status</value></data>
@@ -207,6 +215,8 @@
 
   <data name="Auth.SignInTitle" xml:space="preserve"><value>Sign in to your account</value></data>
   <data name="Auth.SignInSubtitle" xml:space="preserve"><value>Enter your credentials to continue.</value></data>
+  <data name="Auth.DevQuickLogin" xml:space="preserve"><value>Developer quick login</value></data>
+  <data name="Auth.DevSelectUser" xml:space="preserve"><value>Select a user…</value></data>
   <data name="Auth.UserNameOrEmail" xml:space="preserve"><value>User name or email</value></data>
   <data name="Auth.Password" xml:space="preserve"><value>Password</value></data>
   <data name="Auth.ShowPassword" xml:space="preserve"><value>Show password</value></data>
@@ -288,14 +298,17 @@
   <data name="RolesScreen.CreateTitle" xml:space="preserve"><value>New role</value></data>
   <data name="RolesScreen.EditTitle" xml:space="preserve"><value>Edit role</value></data>
   <data name="RolesScreen.ManagePermissions" xml:space="preserve"><value>Manage permissions</value></data>
-  <data name="RolesScreen.ManageMenus" xml:space="preserve"><value>Manage menus</value></data>
   <data name="RolesScreen.PermissionsTitle" xml:space="preserve"><value>Role permissions</value></data>
-  <data name="RolesScreen.MenusTitle" xml:space="preserve"><value>Role menus</value></data>
 
   <data name="PermissionsScreen.Title" xml:space="preserve"><value>Permissions</value></data>
   <data name="PermissionsScreen.Subtitle" xml:space="preserve"><value>Manage permission definitions.</value></data>
   <data name="PermissionsScreen.Code" xml:space="preserve"><value>Code</value></data>
   <data name="PermissionsScreen.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="PermissionsScreen.Module" xml:space="preserve"><value>Module</value></data>
+  <data name="PermissionsScreen.Action" xml:space="preserve"><value>Action</value></data>
+  <data name="PermissionsScreen.RoleCount" xml:space="preserve"><value>Role count</value></data>
+  <data name="PermissionsScreen.MenuCount" xml:space="preserve"><value>Menu count</value></data>
+  <data name="PermissionsScreen.EndpointCount" xml:space="preserve"><value>Endpoint count</value></data>
   <data name="PermissionsScreen.CreateTitle" xml:space="preserve"><value>New permission</value></data>
   <data name="PermissionsScreen.EditTitle" xml:space="preserve"><value>Edit permission</value></data>
   <data name="PermissionsScreen.SeedDefaults" xml:space="preserve"><value>Seed defaults</value></data>
@@ -432,7 +445,6 @@
   <data name="AccessRules.Seed.AccessRule.GetRequiredPermissions.Name" xml:space="preserve"><value>Access Rule - Required Permissions</value></data>
   <data name="AccessRules.Seed.AccessRule.GetRequiredPermissions.Description" xml:space="preserve"><value>Computes the permissions required for a request.</value></data>
 
-<data name="Menu.Test" xml:space="preserve"><value>İngilizce Test</value></data>  <data name="Menus.Profile" xml:space="preserve"><value>My profile</value></data>
   <data name="Layout.MyProfile" xml:space="preserve"><value>My profile</value></data>
   <data name="ProfileScreen.Title" xml:space="preserve"><value>My profile</value></data>
   <data name="ProfileScreen.Subtitle" xml:space="preserve"><value>Review your account details and update your profile picture.</value></data>
@@ -453,4 +465,43 @@
   <data name="Messages.ProfileImageEmpty" xml:space="preserve"><value>Profile image content cannot be empty.</value></data>
   <data name="Messages.ProfileImageInvalidType" xml:space="preserve"><value>Only PNG, JPG, GIF or WebP images are accepted.</value></data>
   <data name="Messages.ProfileImageTooLarge" xml:space="preserve"><value>Profile image must be 2 MB or smaller.</value></data>
+
+  <data name="Messages.UserEmailAlreadyExists" xml:space="preserve"><value>A user with the email '{0}' already exists.</value></data>
+  <data name="Messages.LogEntryNotFound" xml:space="preserve"><value>Log entry '{0}' was not found.</value></data>
+  <data name="Messages.EndpointNotRegistered" xml:space="preserve"><value>This endpoint is not registered. Default policy is DENY.</value></data>
+  <data name="Messages.EndpointDisabled" xml:space="preserve"><value>This endpoint is disabled.</value></data>
+  <data name="Messages.EndpointNotFound" xml:space="preserve"><value>API endpoint '{0}' was not found.</value></data>
+  <data name="Messages.EndpointAlreadyExists" xml:space="preserve"><value>An endpoint for {0} {1} already exists.</value></data>
+  <data name="Messages.MissingPermission" xml:space="preserve"><value>Missing required permission: {0}</value></data>
+  <data name="Messages.SystemRoleCannotBeRenamed" xml:space="preserve"><value>System roles cannot be renamed.</value></data>
+  <data name="Messages.SystemRoleCannotBeDeleted" xml:space="preserve"><value>System roles cannot be deleted.</value></data>
+  <data name="Messages.SuperAdminPermissionsAutoManaged" xml:space="preserve"><value>SuperAdmin permissions are managed automatically.</value></data>
+  <data name="Messages.MenuParentCycle" xml:space="preserve"><value>The selected parent would create a cycle in the menu tree.</value></data>
+  <data name="Messages.MenuHasChildren" xml:space="preserve"><value>Move or delete the child menus first.</value></data>
+  <data name="Messages.InvalidCredentials" xml:space="preserve"><value>Invalid credentials.</value></data>
+  <data name="Messages.TokenNoLongerValid" xml:space="preserve"><value>The token is no longer valid.</value></data>
+
+  <data name="RoleSeed.SuperAdmin.Description" xml:space="preserve"><value>Built-in role with unrestricted access. Bypasses permission checks.</value></data>
+  <data name="RoleSeed.SystemAdmin.Description" xml:space="preserve"><value>Manages identity (users, roles, permissions) and the API endpoint catalog.</value></data>
+  <data name="RoleSeed.OperationsManager.Description" xml:space="preserve"><value>Day-to-day operations: manage business users, navigate menus, view all logs.</value></data>
+  <data name="RoleSeed.SecurityAuditor.Description" xml:space="preserve"><value>Read-only access to the identity catalog and audit logs for compliance reviews.</value></data>
+  <data name="RoleSeed.LocalizationEditor.Description" xml:space="preserve"><value>Manages multi-culture translations. Sees the Localization screen plus the dashboard.</value></data>
+  <data name="RoleSeed.ReadOnlyViewer.Description" xml:space="preserve"><value>Sees lists and details across every module but cannot create, update or delete.</value></data>
+  <data name="RoleSeed.BasicUser.Description" xml:space="preserve"><value>Minimum baseline: dashboard and profile only. The floor every user receives.</value></data>
+
+  <data name="Alerts.Success" xml:space="preserve"><value>Success</value></data>
+  <data name="Alerts.Information" xml:space="preserve"><value>Information</value></data>
+  <data name="Alerts.Warning" xml:space="preserve"><value>Warning</value></data>
+  <data name="Alerts.Error" xml:space="preserve"><value>Error</value></data>
+  <data name="Alerts.Confirm" xml:space="preserve"><value>Please confirm</value></data>
+  <data name="Alerts.Ok" xml:space="preserve"><value>OK</value></data>
+  <data name="UserAccessScreen.Title" xml:space="preserve"><value>User Access</value></data>
+  <data name="UserAccessScreen.Subtitle" xml:space="preserve"><value>Grant or revoke a user's roles and permissions from a single screen.</value></data>
+  <data name="UserAccessScreen.SelectUserPrompt" xml:space="preserve"><value>Select a user to manage their access.</value></data>
+  <data name="UserAccessScreen.RolesTab" xml:space="preserve"><value>Roles</value></data>
+  <data name="UserAccessScreen.PermissionsTab" xml:space="preserve"><value>Permissions</value></data>
+  <data name="UserAccessScreen.RolesNote" xml:space="preserve"><value>Tick the roles this user should have.</value></data>
+  <data name="UserAccessScreen.PermissionsNote" xml:space="preserve"><value>Locked items are inherited from roles. Tick extra permissions to grant them directly.</value></data>
+  <data name="UserAccessScreen.Inherited" xml:space="preserve"><value>from role</value></data>
+  <data name="UserAccessScreen.Saved" xml:space="preserve"><value>Access updated.</value></data>
 </root>

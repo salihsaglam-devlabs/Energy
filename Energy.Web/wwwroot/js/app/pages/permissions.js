@@ -3,7 +3,6 @@
     var L = function () { return window.AppL10n.permissions; };
     var LG = function () { return window.AppL10n.grid; };
     var LN = function () { return window.AppL10n.notifications; };
-    var R = function () { return window.AppResponsive; };
     var gridInstance;
 
     function exportGrid(e, fileName) {
@@ -21,22 +20,18 @@
     }
 
     function init() {
+        // The permission catalog is a compile-time, read-only list. The endpoint
+        // returns the full set as a plain array, so the grid runs client-side.
         var store = new DevExpress.data.CustomStore({
-            key: "id",
-            load: function (loadOptions) {
-                var params = $.param({
-                    skip: loadOptions.skip || 0, take: loadOptions.take || 20,
-                    sort: loadOptions.sort ? JSON.stringify(loadOptions.sort) : "",
-                    searchValue: loadOptions.searchValue || ""
-                });
-                return window.AppHttp.get("/permissions/list?" + params);
+            key: "code",
+            loadMode: "raw",
+            load: function () {
+                return window.AppHttp.get("/permissions/list");
             }
         });
 
-        var g = R().getGridOptions();
         gridInstance = $("#permissions-grid").dxDataGrid({
             dataSource: store,
-            remoteOperations: { paging: true, sorting: true },
             showBorders: true,
             headerFilter: { visible: true },
             filterRow: { visible: true },
@@ -48,16 +43,15 @@
             hoverStateEnabled: true,
             allowColumnResizing: true,
             columnResizingMode: "widget",
-            columnAutoWidth: g.columnAutoWidth,
-            columnHidingEnabled: g.columnHidingEnabled,
-            wordWrapEnabled: g.wordWrapEnabled,
+            columnAutoWidth: true,
+            columnHidingEnabled: false,
+            wordWrapEnabled: false,
             width: "100%",
-            height: g.height,
-            scrolling: g.scrolling,
-            repaintChangesOnly: true,
+            height: "75vh",
+            scrolling: { mode: "standard", useNative: true, showScrollbar: "onScroll", columnRenderingMode: "standard" },
             paging: { pageSize: 20 },
-            pager: R().getPagerOptions(),
-            searchPanel: R().getSearchPanelOptions(LG().search),
+            pager: { visible: true, allowedPageSizes: [10, 20, 50], showPageSizeSelector: true, showInfo: true, showNavigationButtons: true, displayMode: "full" },
+            searchPanel: { visible: true, placeholder: LG().search, width: 240 },
             sorting: { mode: "multiple" },
             columnChooser: { enabled: true, mode: "select", height: 320, search: { enabled: true } },
             loadPanel: { enabled: true, text: LG().loading },
@@ -65,17 +59,15 @@
             export: { enabled: true, formats: ["xlsx"] },
             onExporting: function (e) { exportGrid(e, L().title); },
             columns: [
+                { dataField: "module", caption: L().module, groupIndex: 0 },
                 { dataField: "code", caption: L().code },
                 { dataField: "name", caption: L().name },
-                { type: "buttons", width: 120, caption: LG().actions, fixed: true, fixedPosition: "right",
-                  buttons: [
-                      { hint: LG().edit, icon: "edit", onClick: function (e) { openEdit(e.row.data); } },
-                      { hint: LG().delete, icon: "trash", onClick: function (e) { confirmDelete(e.row.data); } }
-                  ]}
+                { dataField: "action", caption: L().action },
+                { dataField: "roleCount", caption: L().roleCount, dataType: "number", width: 110, alignment: "center" },
+                { dataField: "menuCount", caption: L().menuCount, dataType: "number", width: 110, alignment: "center" },
+                { dataField: "endpointCount", caption: L().endpointCount, dataType: "number", width: 130, alignment: "center" }
             ],
             toolbar: { items: [
-                { location: "after", widget: "dxButton", locateInMenu: "auto",
-                  options: { icon: "add", text: LG().add, type: "default", stylingMode: "contained", onClick: openCreate } },
                 { location: "after", widget: "dxButton", locateInMenu: "auto",
                   options: { icon: "refresh", hint: LG().refresh, stylingMode: "text", onClick: function () { gridInstance.refresh(); } } },
                 { name: "columnChooserButton", location: "after", locateInMenu: "auto" },
@@ -85,50 +77,6 @@
         }).dxDataGrid("instance");
     }
 
-    function openCreate() {
-        showFormPopup({ title: L().createTitle, data: { code: "", name: "" },
-            onSave: function (d) { return window.AppHttp.post("/permissions", d); } });
-    }
-    function openEdit(row) {
-        showFormPopup({ title: L().editTitle, data: { code: row.code, name: row.name },
-            onSave: function (d) { return window.AppHttp.put("/permissions/" + row.id, d); } });
-    }
-    function showFormPopup(opts) {
-        var formData = opts.data;
-        var popup = $("<div>").appendTo("body").dxPopup(R().getPopupOptions({
-            title: opts.title, width: 480, height: 280, showCloseButton: true,
-            contentTemplate: function (host) {
-                $("<div>").appendTo(host).dxForm(R().getFormOptions({
-                    formData: formData, labelLocation: "top",
-                    items: [
-                        { dataField: "code", label: { text: L().code }, validationRules: [{ type: "required" }] },
-                        { dataField: "name", label: { text: L().name }, validationRules: [{ type: "required" }] }
-                    ]
-                }));
-            },
-            toolbarItems: [
-                { widget: "dxButton", location: "after", toolbar: "bottom",
-                  options: { text: LG().save, type: "default", onClick: function () {
-                      window.AppLoading.wrap(opts.onSave(formData))
-                          .then(function () { window.AppNotify.success(LN().saved); popup.hide(); gridInstance.refresh(); })
-                          .catch(window.AppNotify.fromHttpError);
-                  }}},
-                { widget: "dxButton", location: "after", toolbar: "bottom",
-                  options: { text: LG().cancel, onClick: function () { popup.hide(); } }}
-            ],
-            onHidden: function () { popup.dispose(); $(popup.element()).remove(); }
-        })).dxPopup("instance");
-        popup.show();
-    }
-
-    function confirmDelete(row) {
-        DevExpress.ui.dialog.confirm(LG().confirmDelete, LG().delete).then(function (ok) {
-            if (!ok) return;
-            window.AppLoading.wrap(window.AppHttp.del("/permissions/" + row.id))
-                .then(function () { window.AppNotify.success(LN().deleted); gridInstance.refresh(); })
-                .catch(window.AppNotify.fromHttpError);
-        });
-    }
 
     window.AppPages = window.AppPages || {};
     window.AppPages.Permissions = { init: init };
