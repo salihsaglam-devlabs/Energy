@@ -65,23 +65,35 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 });
 
 // --------------------------------------------------------------------
-// Data Protection key ring persistence.
-// The auth cookie ("energy.auth") that carries the API JWT is encrypted with
-// Data Protection. Without a persisted key ring the keys are regenerated on
-// every app (re)start / app-pool recycle / scale-out instance, which makes the
-// previously issued cookie undecryptable -> the user silently becomes
-// unauthenticated and the menu/API calls fail with 401. Locally the default
-// per-user profile storage hides this; on the server it must be explicit.
-// Set "DataProtection:KeysPath" in appsettings to a stable, writable folder
-// (shared across instances). The application name pins the purpose string so
-// keys stay compatible across deployments.
+// Data Protection.
+// The auth cookie ("energy.auth") no longer depends on the DataProtection key
+// ring: it is protected with a static HMAC key (see "Auth:CookieProtectionKey"
+// and HmacTicketDataFormat below), so sessions survive restarts / app-pool
+// recycles / scale-out WITHOUT any writable or persisted key store.
+//
+// DataProtection is still registered because antiforgery and cookie TempData
+// use it. Persisting the key ring is now OPTIONAL: set "DataProtection:KeysPath"
+// to a writable folder if you want antiforgery tokens to stay valid across
+// restarts; if it is unset or not writable we fall back to in-memory keys
+// (only currently-open forms break on a restart — sessions are unaffected).
 var keysPath = builder.Configuration["DataProtection:KeysPath"];
 var dataProtection = builder.Services.AddDataProtection()
     .SetApplicationName("Energy.Web");
 if (!string.IsNullOrWhiteSpace(keysPath))
 {
-    Directory.CreateDirectory(keysPath);
-    dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keysPath));
+    try
+    {
+        Directory.CreateDirectory(keysPath);
+        dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keysPath));
+    }
+    catch (Exception ex)
+    {
+        // A non-writable path must not crash startup; sessions do not rely on
+        // this anymore. Fall back to ephemeral keys and carry on.
+        Console.Error.WriteLine(
+            $"[DataProtection] Could not persist keys to '{keysPath}': {ex.Message}. " +
+            "Falling back to in-memory keys (antiforgery tokens reset on restart).");
+    }
 }
 
 // In-memory cache backs the role/menu navigation lookups so we do not hit
@@ -121,6 +133,18 @@ builder.Services
         options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
             ? CookieSecurePolicy.SameAsRequest
             : CookieSecurePolicy.Always;
+
+        // Protect the auth cookie with a static HMAC key from configuration
+        // instead of the DataProtection key ring. This removes the need for a
+        // writable/persisted key store (e.g. C:\Energy\keys\web): the key is
+        // stable across restarts and instances, so issued cookies stay valid.
+        // If the key is not configured we keep the default DataProtection-based
+        // format (e.g. for local development).
+        var cookieProtectionKey = builder.Configuration["Auth:CookieProtectionKey"];
+        if (!string.IsNullOrWhiteSpace(cookieProtectionKey))
+        {
+            options.TicketDataFormat = new HmacTicketDataFormat(cookieProtectionKey);
+        }
     });
 
 builder.Services.AddAuthorization(options =>
