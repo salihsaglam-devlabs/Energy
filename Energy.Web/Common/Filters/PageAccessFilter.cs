@@ -45,7 +45,23 @@ public sealed class PageAccessFilter : IAsyncAuthorizationFilter
 
         if (!user.HasPermission(attribute.Permission))
         {
-            context.Result = new RedirectToActionResult("AccessDenied", "Account", null);
+            // Carry the real requested path + permission code into the
+            // access-denied screen so it can show actionable "request access"
+            // details instead of placeholder defaults.
+            var request = context.HttpContext.Request;
+            var deniedUrl = "/account/access-denied"
+                + "?path=" + Uri.EscapeDataString(request.Path + request.QueryString)
+                + "&permission=" + Uri.EscapeDataString(attribute.Permission);
+
+            // AJAX/JSON callers get a machine-readable redirect envelope; full
+            // page navigations get a classic 302 to the access-denied screen.
+            context.Result = request.WantsJson()
+                ? new JsonResult(new { redirect = deniedUrl }) { StatusCode = StatusCodes.Status403Forbidden }
+                : new RedirectToActionResult("AccessDenied", "Account", new
+                {
+                    path = request.Path + request.QueryString,
+                    permission = attribute.Permission
+                });
         }
 
         return Task.CompletedTask;

@@ -14,7 +14,7 @@ public static class SystemSeederExtensions
         try
         {
             var seeder = scope.ServiceProvider.GetRequiredService<SystemSeeder>();
-            await seeder.SeedAsync(ct);
+            await seeder.SeedAllAsync(ct);
         }
         catch (Exception ex)
         {

@@ -3,6 +3,7 @@ using Energy.Application.Common.Exceptions;
 using Energy.Application.Identity.Services;
 using Energy.Application.Logger.Services;
 using Energy.Localization;
+using Energy.Shared.Identity;
 using Energy.Shared.Models.V1.Common.Requests;
 using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Logger.Requests;
@@ -38,17 +39,28 @@ public sealed class AuditLogsController : ControllerBase
     }
 
     /// <summary>
-    /// Ingests an audit entry from an upper layer (Web). Identity and source are
-    /// stamped server-side from the authenticated principal — the body is only
-    /// trusted for the request/response payload, never for the user identity.
+    /// Ingests an audit entry from an upper layer (Web). The Web tier always
+    /// authenticates this call as the non-interactive system service account, so
+    /// when that trusted caller forwards an entry the real actor is taken from the
+    /// request body. A normal (human) caller can only ever log under their own
+    /// identity — the body identity is ignored for them. Source and IP are always
+    /// stamped server-side.
     /// </summary>
     [HttpPost]
     public async Task<ActionResult<BaseResponse<bool>>> Ingest(CreateAuditLogRequest request, CancellationToken ct)
     {
+        // Trust the body-supplied identity ONLY when the caller is the system
+        // service account; otherwise attribute the entry to the authenticated
+        // principal so a user cannot forge another user's identity.
+        var isSystemService = string.Equals(
+            _currentUser.UserName, ServiceAccount.UserName, StringComparison.OrdinalIgnoreCase);
+        var userId = isSystemService ? request.UserId : _currentUser.UserId;
+        var userName = isSystemService ? request.UserName : _currentUser.UserName;
+
         await _logs.IngestAsync(
             request,
-            _currentUser.UserId,
-            _currentUser.UserName,
+            userId,
+            userName,
             HttpContext.Connection.RemoteIpAddress?.ToString(),
             ct);
         return Ok(BaseResponse<bool>.Success(true));

@@ -78,6 +78,11 @@ public sealed class ApiEndpointSyncService
             ["Localization.Upsert"]   = PermissionCatalog.LocalizationUpdate,
             ["Localization.Delete"]   = PermissionCatalog.LocalizationDelete,
 
+            // Seed — high-privilege maintenance operations gated by System.Seed.
+            ["Seed.SeedAll"]                  = PermissionCatalog.SystemSeed,
+            ["Seed.SeedLocalization"]         = PermissionCatalog.SystemSeed,
+            ["Seed.SeedLocalizationFromResx"] = PermissionCatalog.SystemSeed,
+
             // Audit logs
             ["AuditLogs.Query"]   = PermissionCatalog.LogReadAll,
             ["AuditLogs.GetById"] = PermissionCatalog.LogRead,

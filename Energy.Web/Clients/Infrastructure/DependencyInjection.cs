@@ -17,6 +17,8 @@ public static class DependencyInjection
     {
         services.AddHttpContextAccessor();
         services.AddScoped<IUserApiTokenProvider, UserApiTokenProvider>();
+        // Singleton: caches the system/service account token across requests.
+        services.AddSingleton<IServiceApiTokenProvider, ServiceApiTokenProvider>();
         services.AddTransient<AuthHeaderHandler>();
         services.AddScoped<BrowserClientIdService>();
         services.AddTransient<ClientIdentityHeaderHandler>();
@@ -39,6 +41,7 @@ public static class DependencyInjection
         where TContract : class where TImpl : class, TContract
     {
         services.AddHttpClient<TContract, TImpl>(Configure)
+            .ConfigurePrimaryHttpMessageHandler(CreatePrimaryHandler)
             .AddHttpMessageHandler<ClientIdentityHeaderHandler>()
             .AddHttpMessageHandler<AuthHeaderHandler>();
     }
@@ -47,6 +50,7 @@ public static class DependencyInjection
         where TContract : class where TImpl : class, TContract
     {
         services.AddHttpClient<TContract, TImpl>(Configure)
+            .ConfigurePrimaryHttpMessageHandler(CreatePrimaryHandler)
             .AddHttpMessageHandler<ClientIdentityHeaderHandler>();
     }
 
@@ -56,5 +60,21 @@ public static class DependencyInjection
         if (string.IsNullOrWhiteSpace(settings.BaseUrl))
             throw new InvalidOperationException("Api:BaseUrl is not configured.");
         http.BaseAddress = new Uri(settings.BaseUrl);
+    }
+
+    private static HttpMessageHandler CreatePrimaryHandler(IServiceProvider sp)
+    {
+        var settings = sp.GetRequiredService<IOptions<ApiSettings>>().Value;
+        var handler = new HttpClientHandler();
+
+        // Opt-in bypass for invalid/self-signed API TLS certificates. Only the
+        // configured API host is exempted; everything else keeps default checks.
+        if (settings.AllowInvalidCertificate)
+        {
+            handler.ServerCertificateCustomValidationCallback =
+                HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+        }
+
+        return handler;
     }
 }

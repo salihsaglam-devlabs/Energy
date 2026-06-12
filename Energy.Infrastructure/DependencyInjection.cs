@@ -75,6 +75,7 @@ public static class DependencyInjection
 
         services.AddLocalizationOverrides();
         services.AddScoped<SystemSeeder>();
+        services.AddScoped<ISystemSeeder>(sp => sp.GetRequiredService<SystemSeeder>());
 
         return services;
     }
@@ -95,6 +96,7 @@ public static class DependencyInjection
     {
         services.AddSingleton<LocalizationCache>();
         services.AddSingleton<ResxFileWriter>();
+        services.AddSingleton<EmbeddedResourceReader>();
         services.AddScoped<ILocalizationService, DatabaseLocalizationService>();
         services.AddSingleton<ResourceManagerStringLocalizerFactory>();
         services.AddSingleton<IStringLocalizerFactory, DbStringLocalizerFactory>();

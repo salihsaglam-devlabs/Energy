@@ -13,15 +13,18 @@ public sealed class DatabaseLocalizationService : ILocalizationService
     private readonly AppDbContext _dbContext;
     private readonly LocalizationCache _cache;
     private readonly ResxFileWriter _resxWriter;
+    private readonly EmbeddedResourceReader _embeddedReader;
 
     public DatabaseLocalizationService(
         AppDbContext dbContext,
         LocalizationCache cache,
-        ResxFileWriter resxWriter)
+        ResxFileWriter resxWriter,
+        EmbeddedResourceReader embeddedReader)
     {
         _dbContext = dbContext;
         _cache = cache;
         _resxWriter = resxWriter;
+        _embeddedReader = embeddedReader;
     }
 
     public async Task<IReadOnlyList<LocalizationEntryResponse>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -125,12 +128,34 @@ public sealed class DatabaseLocalizationService : ILocalizationService
 
     public async Task<SeedResultResponse> ImportFromResxAsync(CancellationToken cancellationToken = default)
     {
+        var resxEntries = _resxWriter.ReadAll();
+        return await SeedEntriesAsync(resxEntries, forceOverwrite: false, cancellationToken);
+    }
+
+    public async Task<SeedResultResponse> SeedFromResourcesAsync(CancellationToken cancellationToken = default)
+    {
+        // Reads from the EMBEDDED resources, so it works in production even when
+        // the source .resx files are not present on disk. Existing rows are
+        // overwritten with the embedded value.
+        var embeddedEntries = _embeddedReader.ReadAll();
+        return await SeedEntriesAsync(embeddedEntries, forceOverwrite: true, cancellationToken);
+    }
+
+    /// <summary>
+    /// Inserts/updates the supplied (culture, key, value) tuples into the
+    /// database. When <paramref name="forceOverwrite"/> is true an existing row
+    /// is always re-stamped even if the value is unchanged.
+    /// </summary>
+    private async Task<SeedResultResponse> SeedEntriesAsync(
+        IReadOnlyList<(string Culture, string Key, string Value)> entries,
+        bool forceOverwrite,
+        CancellationToken cancellationToken)
+    {
         var added = 0;
         var updated = 0;
         var now = DateTime.UtcNow;
 
-        var resxEntries = _resxWriter.ReadAll();
-        if (resxEntries.Count == 0)
+        if (entries.Count == 0)
         {
             var total = await _dbContext.Resources.CountAsync(cancellationToken);
             return new SeedResultResponse { Added = 0, Updated = 0, Total = total };
@@ -142,11 +167,11 @@ public sealed class DatabaseLocalizationService : ILocalizationService
             e => e,
             new KeyCultureComparer());
 
-        foreach (var (culture, key, value) in resxEntries)
+        foreach (var (culture, key, value) in entries)
         {
             if (lookup.TryGetValue((key, culture), out var row))
             {
-                if (!string.Equals(row.Value, value, StringComparison.Ordinal))
+                if (forceOverwrite || !string.Equals(row.Value, value, StringComparison.Ordinal))
                 {
                     row.Value = value;
                     row.UpdatedAt = now;

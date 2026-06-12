@@ -10,6 +10,7 @@ using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Identity.Requests;
 using Energy.Shared.Models.V1.Identity.Responses;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Energy.Infrastructure.Identity.Services;
 
@@ -19,17 +20,20 @@ public sealed class UserService : IUserService
     private readonly PasswordHashingService _passwords;
     private readonly IJwtTokenService _tokens;
     private readonly IPermissionResolver _permissions;
+    private readonly ILogger<UserService> _logger;
 
     public UserService(
         AppDbContext db,
         PasswordHashingService passwords,
         IJwtTokenService tokens,
-        IPermissionResolver permissions)
+        IPermissionResolver permissions,
+        ILogger<UserService> logger)
     {
         _db = db;
         _passwords = passwords;
         _tokens = tokens;
         _permissions = permissions;
+        _logger = logger;
     }
 
     public async Task<PaginatedResponse<UserSummaryResponse>> GetAllAsync(PaginatedRequest request, CancellationToken ct = default)
@@ -284,13 +288,33 @@ public sealed class UserService : IUserService
         var user = await _db.Users.FirstOrDefaultAsync(
             u => u.UserName == identifier || u.Email == identifier, ct);
 
-        if (user is null || !user.IsActive) return null;
-        if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow) return null;
+        if (user is null)
+        {
+            // Diagnostic only — never logs the password. Helps pinpoint why login
+            // fails in a specific environment (e.g. user missing on that database).
+            _logger.LogWarning("[Login] FAILED: no user matches identifier '{Identifier}'.", identifier);
+            return null;
+        }
+        if (!user.IsActive)
+        {
+            _logger.LogWarning("[Login] FAILED: user '{Identifier}' (Id={UserId}) is inactive.", identifier, user.Id);
+            return null;
+        }
+        if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
+        {
+            _logger.LogWarning("[Login] FAILED: user '{Identifier}' (Id={UserId}) is locked out until {LockoutEnd:o} (UTC now {Now:o}).",
+                identifier, user.Id, user.LockoutEnd, DateTime.UtcNow);
+            return null;
+        }
         if (!_passwords.Verify(request.Password, user.PasswordHash))
         {
             user.FailedLoginCount += 1;
             if (user.FailedLoginCount >= 5) user.LockoutEnd = DateTime.UtcNow.AddMinutes(15);
             await _db.SaveChangesAsync(ct);
+            _logger.LogWarning(
+                "[Login] FAILED: wrong password for '{Identifier}' (Id={UserId}). FailedCount={FailedCount}{Locked}.",
+                identifier, user.Id, user.FailedLoginCount,
+                user.LockoutEnd is null ? string.Empty : $", locked until {user.LockoutEnd:o}");
             return null;
         }
 
@@ -298,6 +322,7 @@ public sealed class UserService : IUserService
         user.LockoutEnd = null;
         user.LastLoginAt = DateTime.UtcNow;
         await _db.SaveChangesAsync(ct);
+        _logger.LogInformation("[Login] OK for '{Identifier}' (Id={UserId}).", identifier, user.Id);
 
         var token = _tokens.Issue(user);
 
