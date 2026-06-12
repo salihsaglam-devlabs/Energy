@@ -11,10 +11,22 @@ namespace Energy.Domain.Chat;
 public class ChatMessage : AuditableEntity
 {
     public Guid SenderId { get; set; }
-    public Guid RecipientId { get; set; }
+
+    /// <summary>
+    /// Target user for a direct (1-to-1) message. Null when the message is
+    /// addressed to a group (see <see cref="GroupId"/>).
+    /// </summary>
+    public Guid? RecipientId { get; set; }
+
+    /// <summary>Target group for a group message. Null for direct messages.</summary>
+    public Guid? GroupId { get; set; }
+
     public string Text { get; set; } = string.Empty;
     public bool IsRead { get; set; }
     public DateTime? ReadAt { get; set; }
+
+    /// <summary>The message this one replies to (quote), when set.</summary>
+    public Guid? ReplyToMessageId { get; set; }
 
     /// <summary>Original file name of an attached file, when the message carries one.</summary>
     public string? AttachmentFileName { get; set; }

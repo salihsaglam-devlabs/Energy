@@ -32,14 +32,14 @@ public sealed class ChatService : IChatService
             .ToListAsync(ct);
 
         var unreadBySender = await _db.ChatMessages.AsNoTracking()
-            .Where(m => m.RecipientId == currentUserId && !m.IsRead)
+            .Where(m => m.GroupId == null && m.RecipientId == currentUserId && !m.IsRead)
             .GroupBy(m => m.SenderId)
             .Select(g => new { SenderId = g.Key, Count = g.Count() })
             .ToDictionaryAsync(x => x.SenderId, x => x.Count, ct);
 
         var lastByPeer = await _db.ChatMessages.AsNoTracking()
-            .Where(m => m.SenderId == currentUserId || m.RecipientId == currentUserId)
-            .GroupBy(m => m.SenderId == currentUserId ? m.RecipientId : m.SenderId)
+            .Where(m => m.GroupId == null && (m.SenderId == currentUserId || m.RecipientId == currentUserId))
+            .GroupBy(m => m.SenderId == currentUserId ? m.RecipientId!.Value : m.SenderId)
             .Select(g => new { PeerId = g.Key, LastAt = g.Max(m => m.CreatedAt) })
             .ToDictionaryAsync(x => x.PeerId, x => x.LastAt, ct);
 
@@ -63,8 +63,9 @@ public sealed class ChatService : IChatService
         // Project only metadata (never the attachment bytes) so listing a long
         // conversation stays cheap; the bytes are streamed on demand via GetAttachmentAsync.
         var rows = await _db.ChatMessages.AsNoTracking()
-            .Where(m => (m.SenderId == currentUserId && m.RecipientId == peerId)
-                     || (m.SenderId == peerId && m.RecipientId == currentUserId))
+            .Where(m => m.GroupId == null
+                     && ((m.SenderId == currentUserId && m.RecipientId == peerId)
+                      || (m.SenderId == peerId && m.RecipientId == currentUserId)))
             .OrderBy(m => m.CreatedAt)
             .Join(_db.Users.AsNoTracking(), m => m.SenderId, u => u.Id,
                 (m, u) => new ChatMessageResponse
@@ -77,12 +78,14 @@ public sealed class ChatService : IChatService
                     Text = m.Text,
                     SentAt = m.CreatedAt,
                     IsRead = m.IsRead,
+                    ReplyToId = m.ReplyToMessageId,
                     HasAttachment = m.AttachmentData != null,
                     AttachmentFileName = m.AttachmentFileName,
                     AttachmentContentType = m.AttachmentContentType
                 })
             .ToListAsync(ct);
 
+        await EnrichAsync(rows, currentUserId, ct);
         return rows;
     }
 
@@ -104,13 +107,27 @@ public sealed class ChatService : IChatService
         {
             Id = Guid.NewGuid(),
             SenderId = senderId,
-            RecipientId = request.RecipientId,
+            RecipientId = request.GroupId.HasValue ? null : request.RecipientId,
+            GroupId = request.GroupId,
             Text = (request.Text ?? string.Empty).Trim(),
             IsRead = false,
+            ReplyToMessageId = request.ReplyToMessageId,
             AttachmentFileName = attachmentName,
             AttachmentContentType = attachmentContentType,
             AttachmentData = attachmentData
         };
+
+        // Group messages require an accepted membership; direct messages a recipient.
+        if (request.GroupId is { } groupId)
+        {
+            var isMember = await _db.ChatGroupMembers.AsNoTracking().AnyAsync(
+                gm => gm.GroupId == groupId && gm.UserId == senderId && gm.Status == ChatGroupMemberStatus.Accepted, ct);
+            if (!isMember)
+            {
+                throw new InvalidOperationException("Not a member of the group.");
+            }
+        }
+
         _db.ChatMessages.Add(message);
         await _db.SaveChangesAsync(ct);
 
@@ -119,7 +136,9 @@ public sealed class ChatService : IChatService
             .Select(u => new { Name = $"{u.FirstName} {u.LastName}".Trim(), HasImage = u.ProfileImage != null })
             .FirstOrDefaultAsync(ct);
 
-        return Map(message, sender?.Name ?? string.Empty, sender?.HasImage ?? false);
+        var response = Map(message, sender?.Name ?? string.Empty, sender?.HasImage ?? false);
+        await EnrichAsync(new[] { response }, senderId, ct);
+        return response;
     }
 
     public async Task<ChatAttachmentResponse?> GetAttachmentAsync(Guid currentUserId, Guid messageId, CancellationToken ct = default)
@@ -167,7 +186,7 @@ public sealed class ChatService : IChatService
     public async Task<int> MarkReadAsync(Guid currentUserId, Guid peerId, CancellationToken ct = default)
     {
         var unread = await _db.ChatMessages
-            .Where(m => m.RecipientId == currentUserId && m.SenderId == peerId && !m.IsRead)
+            .Where(m => m.GroupId == null && m.RecipientId == currentUserId && m.SenderId == peerId && !m.IsRead)
             .ToListAsync(ct);
         if (unread.Count == 0) return 0;
 
@@ -182,7 +201,429 @@ public sealed class ChatService : IChatService
     }
 
     public Task<int> GetUnreadCountAsync(Guid currentUserId, CancellationToken ct = default)
-        => _db.ChatMessages.AsNoTracking().CountAsync(m => m.RecipientId == currentUserId && !m.IsRead, ct);
+        => _db.ChatMessages.AsNoTracking().CountAsync(m => m.GroupId == null && m.RecipientId == currentUserId && !m.IsRead, ct);
+
+    // ----- Groups -----------------------------------------------------------
+
+    public async Task<IReadOnlyList<ChatGroupResponse>> GetGroupsAsync(Guid currentUserId, CancellationToken ct = default)
+    {
+        var myGroupIds = await _db.ChatGroupMembers.AsNoTracking()
+            .Where(gm => gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatus.Accepted)
+            .Select(gm => gm.GroupId)
+            .ToListAsync(ct);
+        if (myGroupIds.Count == 0) return [];
+
+        var groups = await _db.ChatGroups.AsNoTracking()
+            .Where(g => myGroupIds.Contains(g.Id))
+            .ToListAsync(ct);
+
+        var memberCounts = await _db.ChatGroupMembers.AsNoTracking()
+            .Where(gm => myGroupIds.Contains(gm.GroupId) && gm.Status == ChatGroupMemberStatus.Accepted)
+            .GroupBy(gm => gm.GroupId)
+            .Select(g => new { GroupId = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.GroupId, x => x.Count, ct);
+
+        var lastByGroup = await _db.ChatMessages.AsNoTracking()
+            .Where(m => m.GroupId != null && myGroupIds.Contains(m.GroupId!.Value))
+            .GroupBy(m => m.GroupId!.Value)
+            .Select(g => new { GroupId = g.Key, LastAt = g.Max(m => m.CreatedAt) })
+            .ToDictionaryAsync(x => x.GroupId, x => x.LastAt, ct);
+
+        return groups
+            .Select(g => new ChatGroupResponse
+            {
+                Id = g.Id,
+                Name = g.Name,
+                OwnerId = g.OwnerId,
+                IsOwner = g.OwnerId == currentUserId,
+                MemberCount = memberCounts.GetValueOrDefault(g.Id),
+                UnreadCount = 0,
+                LastMessageAt = lastByGroup.TryGetValue(g.Id, out var at) ? at : null
+            })
+            .OrderByDescending(g => g.LastMessageAt ?? DateTime.MinValue)
+            .ThenBy(g => g.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
+    public async Task<IReadOnlyList<ChatGroupInviteResponse>> GetGroupInvitesAsync(Guid currentUserId, CancellationToken ct = default)
+    {
+        var invites = await _db.ChatGroupMembers.AsNoTracking()
+            .Where(gm => gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatus.Pending)
+            .Join(_db.ChatGroups.AsNoTracking(), gm => gm.GroupId, g => g.Id, (gm, g) => new { gm, g })
+            .ToListAsync(ct);
+
+        if (invites.Count == 0) return [];
+
+        var inviterIds = invites.Where(x => x.gm.InvitedById.HasValue).Select(x => x.gm.InvitedById!.Value).Distinct().ToList();
+        var inviterNames = await _db.Users.AsNoTracking()
+            .Where(u => inviterIds.Contains(u.Id))
+            .Select(u => new { u.Id, Name = ((u.FirstName ?? "") + " " + (u.LastName ?? "")).Trim() })
+            .ToDictionaryAsync(x => x.Id, x => x.Name, ct);
+
+        return invites
+            .Select(x => new ChatGroupInviteResponse
+            {
+                GroupId = x.g.Id,
+                GroupName = x.g.Name,
+                OwnerId = x.g.OwnerId,
+                InvitedByName = x.gm.InvitedById.HasValue ? inviterNames.GetValueOrDefault(x.gm.InvitedById.Value, "") : "",
+                InvitedAt = x.gm.CreatedAt
+            })
+            .OrderByDescending(i => i.InvitedAt)
+            .ToList();
+    }
+
+    public async Task<ChatGroupResponse> CreateGroupAsync(Guid ownerId, CreateChatGroupRequest request, CancellationToken ct = default)
+    {
+        var name = (request.Name ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new InvalidOperationException("Group name is required.");
+        }
+
+        var group = new ChatGroup { Id = Guid.NewGuid(), Name = name, OwnerId = ownerId };
+        _db.ChatGroups.Add(group);
+
+        // Owner is an immediate accepted member.
+        _db.ChatGroupMembers.Add(new ChatGroupMember
+        {
+            Id = Guid.NewGuid(),
+            GroupId = group.Id,
+            UserId = ownerId,
+            Status = ChatGroupMemberStatus.Accepted,
+            IsOwner = true
+        });
+
+        // Invited users get pending memberships (active only after they accept).
+        foreach (var userId in (request.MemberUserIds ?? []).Distinct().Where(id => id != ownerId && id != Guid.Empty))
+        {
+            _db.ChatGroupMembers.Add(new ChatGroupMember
+            {
+                Id = Guid.NewGuid(),
+                GroupId = group.Id,
+                UserId = userId,
+                Status = ChatGroupMemberStatus.Pending,
+                InvitedById = ownerId
+            });
+        }
+
+        await _db.SaveChangesAsync(ct);
+
+        return new ChatGroupResponse
+        {
+            Id = group.Id,
+            Name = group.Name,
+            OwnerId = ownerId,
+            IsOwner = true,
+            MemberCount = 1,
+            UnreadCount = 0,
+            LastMessageAt = null
+        };
+    }
+
+    public async Task<IReadOnlyList<Guid>> InviteToGroupAsync(Guid currentUserId, Guid groupId, InviteToGroupRequest request, CancellationToken ct = default)
+    {
+        // The inviter must be an accepted member of the group.
+        var isMember = await _db.ChatGroupMembers.AsNoTracking().AnyAsync(
+            gm => gm.GroupId == groupId && gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatus.Accepted, ct);
+        if (!isMember)
+        {
+            throw new InvalidOperationException("Not a member of the group.");
+        }
+
+        var existing = await _db.ChatGroupMembers
+            .Where(gm => gm.GroupId == groupId)
+            .ToListAsync(ct);
+        var existingByUser = existing.ToDictionary(gm => gm.UserId, gm => gm);
+
+        var invited = new List<Guid>();
+        foreach (var userId in (request.UserIds ?? []).Distinct().Where(id => id != Guid.Empty))
+        {
+            if (existingByUser.TryGetValue(userId, out var row))
+            {
+                // Re-invite a previously declined/removed user.
+                if (row.Status == ChatGroupMemberStatus.Declined)
+                {
+                    row.Status = ChatGroupMemberStatus.Pending;
+                    row.InvitedById = currentUserId;
+                    row.UpdatedAt = DateTime.UtcNow;
+                    invited.Add(userId);
+                }
+                continue;
+            }
+
+            _db.ChatGroupMembers.Add(new ChatGroupMember
+            {
+                Id = Guid.NewGuid(),
+                GroupId = groupId,
+                UserId = userId,
+                Status = ChatGroupMemberStatus.Pending,
+                InvitedById = currentUserId
+            });
+            invited.Add(userId);
+        }
+
+        await _db.SaveChangesAsync(ct);
+        return invited;
+    }
+
+    public async Task<bool> RespondInviteAsync(Guid currentUserId, Guid groupId, bool accept, CancellationToken ct = default)
+    {
+        var row = await _db.ChatGroupMembers
+            .FirstOrDefaultAsync(gm => gm.GroupId == groupId && gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatus.Pending, ct);
+        if (row is null)
+        {
+            return false;
+        }
+
+        row.Status = accept ? ChatGroupMemberStatus.Accepted : ChatGroupMemberStatus.Declined;
+        row.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync(ct);
+        return true;
+    }
+
+    public async Task<IReadOnlyList<ChatGroupMemberResponse>> GetGroupMembersAsync(Guid currentUserId, Guid groupId, CancellationToken ct = default)
+    {
+        var isMember = await _db.ChatGroupMembers.AsNoTracking().AnyAsync(
+            gm => gm.GroupId == groupId && gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatus.Accepted, ct);
+        if (!isMember)
+        {
+            return [];
+        }
+
+        return await _db.ChatGroupMembers.AsNoTracking()
+            .Where(gm => gm.GroupId == groupId && gm.Status != ChatGroupMemberStatus.Declined)
+            .Join(_db.Users.AsNoTracking(), gm => gm.UserId, u => u.Id, (gm, u) => new ChatGroupMemberResponse
+            {
+                UserId = u.Id,
+                FullName = ((u.FirstName ?? "") + " " + (u.LastName ?? "")).Trim(),
+                UserName = u.UserName,
+                HasProfileImage = u.ProfileImage != null,
+                IsOwner = gm.IsOwner,
+                Status = (int)gm.Status
+            })
+            .ToListAsync(ct);
+    }
+
+    public async Task<IReadOnlyList<Guid>> GetGroupMemberIdsAsync(Guid groupId, CancellationToken ct = default)
+        => await _db.ChatGroupMembers.AsNoTracking()
+            .Where(gm => gm.GroupId == groupId && gm.Status == ChatGroupMemberStatus.Accepted)
+            .Select(gm => gm.UserId)
+            .ToListAsync(ct);
+
+    public async Task<IReadOnlyList<ChatMessageResponse>> GetGroupConversationAsync(Guid currentUserId, Guid groupId, CancellationToken ct = default)
+    {
+        var isMember = await _db.ChatGroupMembers.AsNoTracking().AnyAsync(
+            gm => gm.GroupId == groupId && gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatus.Accepted, ct);
+        if (!isMember)
+        {
+            return [];
+        }
+
+        var rows = await _db.ChatMessages.AsNoTracking()
+            .Where(m => m.GroupId == groupId)
+            .OrderBy(m => m.CreatedAt)
+            .Join(_db.Users.AsNoTracking(), m => m.SenderId, u => u.Id, (m, u) => new ChatMessageResponse
+            {
+                Id = m.Id,
+                SenderId = m.SenderId,
+                SenderName = ((u.FirstName ?? "") + " " + (u.LastName ?? "")).Trim(),
+                SenderHasProfileImage = u.ProfileImage != null,
+                RecipientId = null,
+                GroupId = m.GroupId,
+                Text = m.Text,
+                SentAt = m.CreatedAt,
+                IsRead = m.IsRead,
+                ReplyToId = m.ReplyToMessageId,
+                HasAttachment = m.AttachmentData != null,
+                AttachmentFileName = m.AttachmentFileName,
+                AttachmentContentType = m.AttachmentContentType
+            })
+            .ToListAsync(ct);
+
+        await EnrichAsync(rows, currentUserId, ct);
+        return rows;
+    }
+
+    // ----- Delete / Forward / Reactions ------------------------------------
+
+    public async Task<ChatMessageResponse?> DeleteMessageAsync(Guid currentUserId, Guid messageId, CancellationToken ct = default)
+    {
+        var m = await _db.ChatMessages.FirstOrDefaultAsync(x => x.Id == messageId, ct);
+        if (m is null || m.SenderId != currentUserId)
+        {
+            return null;
+        }
+
+        m.IsDeleted = true;
+        m.DeletedAt = DateTime.UtcNow;
+        m.DeletedBy = currentUserId;
+        await _db.SaveChangesAsync(ct);
+
+        return new ChatMessageResponse
+        {
+            Id = m.Id,
+            SenderId = m.SenderId,
+            RecipientId = m.RecipientId,
+            GroupId = m.GroupId,
+            IsDeleted = true
+        };
+    }
+
+    public async Task<ChatMessageResponse?> ForwardAsync(Guid currentUserId, ForwardChatMessageRequest request, CancellationToken ct = default)
+    {
+        var src = await _db.ChatMessages.AsNoTracking().FirstOrDefaultAsync(x => x.Id == request.MessageId, ct);
+        if (src is null || !await CanAccessMessageAsync(currentUserId, src, ct))
+        {
+            return null;
+        }
+
+        if (request.GroupId is { } targetGroup)
+        {
+            var isMember = await _db.ChatGroupMembers.AsNoTracking().AnyAsync(
+                gm => gm.GroupId == targetGroup && gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatus.Accepted, ct);
+            if (!isMember)
+            {
+                return null;
+            }
+        }
+        else if (request.RecipientId is null)
+        {
+            return null;
+        }
+
+        var fwd = new ChatMessage
+        {
+            Id = Guid.NewGuid(),
+            SenderId = currentUserId,
+            RecipientId = request.GroupId.HasValue ? null : request.RecipientId,
+            GroupId = request.GroupId,
+            Text = src.Text,
+            IsRead = false,
+            AttachmentFileName = src.AttachmentFileName,
+            AttachmentContentType = src.AttachmentContentType,
+            AttachmentData = src.AttachmentData
+        };
+        _db.ChatMessages.Add(fwd);
+        await _db.SaveChangesAsync(ct);
+
+        var sender = await _db.Users.AsNoTracking()
+            .Where(u => u.Id == currentUserId)
+            .Select(u => new { Name = $"{u.FirstName} {u.LastName}".Trim(), HasImage = u.ProfileImage != null })
+            .FirstOrDefaultAsync(ct);
+        return Map(fwd, sender?.Name ?? string.Empty, sender?.HasImage ?? false);
+    }
+
+    public async Task<ChatMessageResponse?> ToggleReactionAsync(Guid currentUserId, Guid messageId, string emoji, CancellationToken ct = default)
+    {
+        emoji = (emoji ?? string.Empty).Trim();
+        if (string.IsNullOrEmpty(emoji))
+        {
+            return null;
+        }
+
+        var msg = await _db.ChatMessages.AsNoTracking().FirstOrDefaultAsync(x => x.Id == messageId, ct);
+        if (msg is null || !await CanAccessMessageAsync(currentUserId, msg, ct))
+        {
+            return null;
+        }
+
+        var existing = await _db.ChatMessageReactions
+            .FirstOrDefaultAsync(r => r.MessageId == messageId && r.UserId == currentUserId, ct);
+        if (existing is null)
+        {
+            _db.ChatMessageReactions.Add(new ChatMessageReaction
+            {
+                Id = Guid.NewGuid(),
+                MessageId = messageId,
+                UserId = currentUserId,
+                Emoji = emoji
+            });
+        }
+        else if (string.Equals(existing.Emoji, emoji, StringComparison.Ordinal))
+        {
+            _db.ChatMessageReactions.Remove(existing); // toggle the same emoji off
+        }
+        else
+        {
+            existing.Emoji = emoji;
+            existing.UpdatedAt = DateTime.UtcNow;
+        }
+        await _db.SaveChangesAsync(ct);
+
+        var sender = await _db.Users.AsNoTracking()
+            .Where(u => u.Id == msg.SenderId)
+            .Select(u => new { Name = $"{u.FirstName} {u.LastName}".Trim(), HasImage = u.ProfileImage != null })
+            .FirstOrDefaultAsync(ct);
+        var response = Map(msg, sender?.Name ?? string.Empty, sender?.HasImage ?? false);
+        await EnrichAsync(new[] { response }, currentUserId, ct);
+        return response;
+    }
+
+    // True when the user is a participant of the message (direct peer or accepted group member).
+    private async Task<bool> CanAccessMessageAsync(Guid userId, ChatMessage m, CancellationToken ct)
+    {
+        if (m.SenderId == userId || m.RecipientId == userId)
+        {
+            return true;
+        }
+        return m.GroupId.HasValue && await _db.ChatGroupMembers.AsNoTracking().AnyAsync(
+            gm => gm.GroupId == m.GroupId && gm.UserId == userId && gm.Status == ChatGroupMemberStatus.Accepted, ct);
+    }
+
+    // Fills reply snippets + reaction summaries onto the supplied projections.
+    private async Task EnrichAsync(IReadOnlyList<ChatMessageResponse> msgs, Guid currentUserId, CancellationToken ct)
+    {
+        if (msgs.Count == 0)
+        {
+            return;
+        }
+
+        var ids = msgs.Select(m => m.Id).ToList();
+
+        var reactions = await _db.ChatMessageReactions.AsNoTracking()
+            .Where(r => ids.Contains(r.MessageId))
+            .Select(r => new { r.MessageId, r.UserId, r.Emoji })
+            .ToListAsync(ct);
+        var reactionsByMsg = reactions.GroupBy(r => r.MessageId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        var replyIds = msgs.Where(m => m.ReplyToId.HasValue).Select(m => m.ReplyToId!.Value).Distinct().ToList();
+        var replyMap = replyIds.Count == 0
+            ? new Dictionary<Guid, (string Text, string Sender, string? File)>()
+            : (await _db.ChatMessages.AsNoTracking()
+                .Where(m => replyIds.Contains(m.Id))
+                .Join(_db.Users.AsNoTracking(), m => m.SenderId, u => u.Id, (m, u) => new
+                {
+                    m.Id,
+                    m.Text,
+                    m.AttachmentFileName,
+                    Sender = ((u.FirstName ?? "") + " " + (u.LastName ?? "")).Trim()
+                })
+                .ToListAsync(ct))
+              .ToDictionary(x => x.Id, x => (Text: x.Text, Sender: x.Sender, File: (string?)x.AttachmentFileName));
+
+        foreach (var m in msgs)
+        {
+            if (reactionsByMsg.TryGetValue(m.Id, out var rs))
+            {
+                m.Reactions = rs.GroupBy(r => r.Emoji)
+                    .Select(g => new ChatReactionSummary
+                    {
+                        Emoji = g.Key,
+                        Count = g.Count(),
+                        Reacted = g.Any(x => x.UserId == currentUserId)
+                    })
+                    .ToList();
+            }
+
+            if (m.ReplyToId.HasValue && replyMap.TryGetValue(m.ReplyToId.Value, out var r))
+            {
+                m.ReplyToSenderName = r.Sender;
+                m.ReplyToText = !string.IsNullOrEmpty(r.Text) ? r.Text : (r.File ?? string.Empty);
+            }
+        }
+    }
 
     private static ChatMessageResponse Map(ChatMessage m, string senderName, bool senderHasImage) => new()
     {
@@ -191,9 +632,11 @@ public sealed class ChatService : IChatService
         SenderName = senderName,
         SenderHasProfileImage = senderHasImage,
         RecipientId = m.RecipientId,
+        GroupId = m.GroupId,
         Text = m.Text,
         SentAt = m.CreatedAt,
         IsRead = m.IsRead,
+        ReplyToId = m.ReplyToMessageId,
         HasAttachment = m.AttachmentData != null || !string.IsNullOrEmpty(m.AttachmentFileName),
         AttachmentFileName = m.AttachmentFileName,
         AttachmentContentType = m.AttachmentContentType

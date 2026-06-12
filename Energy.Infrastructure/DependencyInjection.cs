@@ -48,11 +48,14 @@ public static class DependencyInjection
         {
             if (useSqlServer)
             {
-                options.UseSqlServer(connectionString);
+                // SQL Server migrations live in their own assembly.
+                options.UseSqlServer(connectionString, sql => sql.MigrationsAssembly("Energy.Migrations.SqlServer"));
             }
             else
             {
-                options.UseNpgsql(connectionString);
+                // PostgreSQL migrations live in their own assembly so the two
+                // providers don't share a single ModelSnapshot.
+                options.UseNpgsql(connectionString, npg => npg.MigrationsAssembly("Energy.Migrations.PostgreSql"));
             }
             options.AddInterceptors(sp.GetRequiredService<AuditingSaveChangesInterceptor>());
         });

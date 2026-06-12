@@ -23,6 +23,8 @@
       <ProjectReference Include="..\Energy.Shared\Energy.Shared.csproj" />
       <ProjectReference Include="..\Energy.Infrastructure\Energy.Infrastructure.csproj" />
       <ProjectReference Include="..\Energy.Localization\Energy.Localization.csproj" />
+      <ProjectReference Include="..\Energy.Migrations.PostgreSql\Energy.Migrations.PostgreSql.csproj" />
+      <ProjectReference Include="..\Energy.Migrations.SqlServer\Energy.Migrations.SqlServer.csproj" />
     </ItemGroup>
 
 </Project>

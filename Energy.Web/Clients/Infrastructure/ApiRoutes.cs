@@ -73,5 +73,17 @@ internal static class ApiRoutes
         public static string MarkRead(Guid peerId) => $"{Base}/conversation/{peerId}/read";
         public static string MessageAttachment(Guid messageId) => $"{Base}/messages/{messageId}/attachment";
         public static string UserAvatar(Guid userId) => $"{Base}/users/{userId}/avatar";
+        public static string MessageDelete(Guid messageId) => $"{Base}/messages/{messageId}";
+        public static string MessageForward(Guid messageId) => $"{Base}/messages/{messageId}/forward";
+        public static string MessageReact(Guid messageId) => $"{Base}/messages/{messageId}/react";
+
+        // Groups
+        public static readonly string Groups = $"{Base}/groups";
+        public static readonly string GroupInvites = $"{Base}/groups/invites";
+        public static string GroupInvite(Guid groupId) => $"{Base}/groups/{groupId}/invite";
+        public static string GroupRespond(Guid groupId) => $"{Base}/groups/{groupId}/respond";
+        public static string GroupMembers(Guid groupId) => $"{Base}/groups/{groupId}/members";
+        public static string GroupMemberIds(Guid groupId) => $"{Base}/groups/{groupId}/member-ids";
+        public static string GroupConversation(Guid groupId) => $"{Base}/groups/{groupId}/conversation";
     }
 }

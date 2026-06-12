@@ -21,10 +21,12 @@ public sealed class ChatMessageConfiguration : IEntityTypeConfiguration<ChatMess
         // Restrict kullanılıyor çünkü SenderId ve RecipientId aynı Users tablosuna işaret ediyor.
         // Her ikisi de Cascade olursa SQL Server "çoklu cascade yolu" hatası verir (Error 1785).
         builder.HasOne<User>().WithMany().HasForeignKey(m => m.SenderId).OnDelete(DeleteBehavior.Restrict);
+        // RecipientId is null for group messages, so the FK is optional.
         builder.HasOne<User>().WithMany().HasForeignKey(m => m.RecipientId).OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(m => new { m.SenderId, m.RecipientId });
         builder.HasIndex(m => new { m.RecipientId, m.IsRead });
+        builder.HasIndex(m => m.GroupId);
 
         builder.HasQueryFilter(m => !m.IsDeleted);
     }
