@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Energy.Infrastructure.Persistence.Migrations.MsSql
+namespace Energy.Migrations.SqlServer.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMsSql : Migration
+    public partial class M202606122033 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -38,6 +38,26 @@ namespace Energy.Infrastructure.Persistence.Migrations.MsSql
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AuditLogs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ChatGroups",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    OwnerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ChatGroups", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -125,6 +145,35 @@ namespace Energy.Infrastructure.Persistence.Migrations.MsSql
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ChatGroupMembers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    GroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    IsOwner = table.Column<bool>(type: "bit", nullable: false),
+                    InvitedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ChatGroupMembers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ChatGroupMembers_ChatGroups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "ChatGroups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -225,10 +274,12 @@ namespace Energy.Infrastructure.Persistence.Migrations.MsSql
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     SenderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    RecipientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RecipientId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    GroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Text = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false),
                     IsRead = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     ReadAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ReplyToMessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     AttachmentFileName = table.Column<string>(type: "nvarchar(260)", maxLength: 260, nullable: true),
                     AttachmentContentType = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
                     AttachmentData = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
@@ -305,6 +356,33 @@ namespace Energy.Infrastructure.Persistence.Migrations.MsSql
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ChatMessageReactions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Emoji = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ChatMessageReactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ChatMessageReactions_ChatMessages_MessageId",
+                        column: x => x.MessageId,
+                        principalTable: "ChatMessages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_ApiEndpoints_HttpMethod_Path",
                 table: "ApiEndpoints",
@@ -341,6 +419,33 @@ namespace Energy.Infrastructure.Persistence.Migrations.MsSql
                 name: "IX_AuditLogs_UserId",
                 table: "AuditLogs",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ChatGroupMembers_GroupId_UserId",
+                table: "ChatGroupMembers",
+                columns: new[] { "GroupId", "UserId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ChatGroupMembers_UserId_Status",
+                table: "ChatGroupMembers",
+                columns: new[] { "UserId", "Status" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ChatGroups_OwnerId",
+                table: "ChatGroups",
+                column: "OwnerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ChatMessageReactions_MessageId_UserId",
+                table: "ChatMessageReactions",
+                columns: new[] { "MessageId", "UserId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ChatMessages_GroupId",
+                table: "ChatMessages",
+                column: "GroupId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ChatMessages_RecipientId_IsRead",
@@ -432,7 +537,10 @@ namespace Energy.Infrastructure.Persistence.Migrations.MsSql
                 name: "AuditLogs");
 
             migrationBuilder.DropTable(
-                name: "ChatMessages");
+                name: "ChatGroupMembers");
+
+            migrationBuilder.DropTable(
+                name: "ChatMessageReactions");
 
             migrationBuilder.DropTable(
                 name: "LocalizationResources");
@@ -448,6 +556,12 @@ namespace Energy.Infrastructure.Persistence.Migrations.MsSql
 
             migrationBuilder.DropTable(
                 name: "UserRoles");
+
+            migrationBuilder.DropTable(
+                name: "ChatGroups");
+
+            migrationBuilder.DropTable(
+                name: "ChatMessages");
 
             migrationBuilder.DropTable(
                 name: "Permissions");

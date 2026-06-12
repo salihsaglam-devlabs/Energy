@@ -89,7 +89,8 @@
                 unreadCountUrl: "/chat/unread-count",
                 pageUrl: "/chat",
                 me: "@(User.GetUserId()?.ToString())",
-                newMessageFrom: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T[LocalizationKeys.ChatScreen.NewMessageFrom].Value))
+                newMessageFrom: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T[LocalizationKeys.ChatScreen.NewMessageFrom].Value)),
+                attachmentLabel: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T[LocalizationKeys.ChatScreen.AttachmentLabel].Value))
             }
         };
         // PermissionCatalog codes so the UI can hide actions/menus the user is

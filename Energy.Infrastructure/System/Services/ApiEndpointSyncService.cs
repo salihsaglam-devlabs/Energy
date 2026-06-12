@@ -98,6 +98,19 @@ public sealed class ApiEndpointSyncService
             ["Chat.UnreadCount"]     = PermissionCatalog.ChatUse,
             ["Chat.GetAttachment"]   = PermissionCatalog.ChatUse,
             ["Chat.GetUserAvatar"]   = PermissionCatalog.ChatUse,
+            // Chat groups
+            ["Chat.GetGroups"]            = PermissionCatalog.ChatUse,
+            ["Chat.GetGroupInvites"]      = PermissionCatalog.ChatUse,
+            ["Chat.CreateGroup"]          = PermissionCatalog.ChatUse,
+            ["Chat.InviteToGroup"]        = PermissionCatalog.ChatUse,
+            ["Chat.RespondInvite"]        = PermissionCatalog.ChatUse,
+            ["Chat.GetGroupMembers"]      = PermissionCatalog.ChatUse,
+            ["Chat.GetGroupMemberIds"]    = PermissionCatalog.ChatUse,
+            ["Chat.GetGroupConversation"] = PermissionCatalog.ChatUse,
+            // Chat message actions
+            ["Chat.DeleteMessage"]        = PermissionCatalog.ChatUse,
+            ["Chat.Forward"]              = PermissionCatalog.ChatUse,
+            ["Chat.React"]                = PermissionCatalog.ChatUse,
         };
 
     private readonly AppDbContext _db;

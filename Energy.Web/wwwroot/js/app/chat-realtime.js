@@ -14,6 +14,16 @@
             onPresence: function () { },
             onTyping: function () { },
             onStatus: function () { },
+            onGroupInvite: function () { },
+            onGroupChanged: function () { },
+            onMessageDeleted: function () { },
+            onMessageReacted: function () { },
+            onMessagesRead: function () { },
+            onCall: function () { },
+            callUser: function () { return Promise.resolve(); },
+            answerCall: function () { return Promise.resolve(); },
+            sendIce: function () { return Promise.resolve(); },
+            endCall: function () { return Promise.resolve(); },
             sendTyping: function () { },
             isOnline: function () { return false; },
             getOnlineUsers: function () { return []; },
@@ -34,6 +44,12 @@
     var presenceSubscribers = [];  // notified on every presence change/snapshot
     var typingSubscribers = [];    // notified on incoming typing indicators
     var statusSubscribers = [];    // notified on connection status changes
+    var groupInviteSubscribers = [];  // notified when invited to a group
+    var groupChangedSubscribers = []; // notified when a group's roster changes
+    var msgDeletedSubscribers = [];
+    var msgReactedSubscribers = [];
+    var msgReadSubscribers = [];
+    var callSubscribers = [];          // notified on call signaling events
     var connection = null;
     var status = "disconnected";
     var lastStatusAt = Date.now();
@@ -155,6 +171,47 @@
         $panel.prop("hidden", !next);
     }
 
+    // Bottom-center, auto-dismissing toast shown when a new message arrives.
+    var $toastHost = null;
+    function ensureToastHost() {
+        if ($toastHost && $toastHost.length) { return $toastHost; }
+        $toastHost = $("<div>").addClass("energy-chat-toasts").attr("aria-live", "polite").appendTo(document.body);
+        return $toastHost;
+    }
+    function showCenterToast(message) {
+        var host = ensureToastHost();
+        var title = (cfg.newMessageFrom || "{0}").replace("{0}", message.senderName || "");
+        var body = message.text
+            || (message.hasAttachment ? (cfg.attachmentLabel || "Attachment") : "");
+        var $toast = $("<div>").addClass("energy-chat-toast");
+        var $avatar = $("<span>").addClass("energy-chat-toast__avatar");
+        if (message.senderHasProfileImage && message.senderId) {
+            $("<img>").attr({ src: "/chat/avatar/" + message.senderId, alt: "" }).appendTo($avatar);
+        } else {
+            $avatar.addClass("is-initials").text(String(title || "?").trim().charAt(0).toUpperCase() || "?");
+        }
+        $avatar.appendTo($toast);
+        var $meta = $("<div>").addClass("energy-chat-toast__meta");
+        $("<div>").addClass("energy-chat-toast__title").text(title).appendTo($meta);
+        if (body) { $("<div>").addClass("energy-chat-toast__text").text(body).appendTo($meta); }
+        $meta.appendTo($toast);
+        $toast.on("click", function () { window.location.href = cfg.pageUrl; });
+        host.append($toast);
+
+        // Animate in, then auto-dismiss after a few seconds.
+        requestAnimationFrame(function () { $toast.addClass("is-visible"); });
+        var hide = function () {
+            $toast.removeClass("is-visible");
+            setTimeout(function () { $toast.remove(); }, 300);
+        };
+        var timer = setTimeout(hide, 5000);
+        $toast.on("mouseenter", function () { clearTimeout(timer); });
+        $toast.on("mouseleave", function () { timer = setTimeout(hide, 2500); });
+
+        // Keep at most 3 stacked toasts.
+        host.children().slice(0, -3).remove();
+    }
+
     $bell.on("click", function (e) {
         e.stopPropagation();
         togglePanel();
@@ -182,6 +239,20 @@
         });
     }
 
+    function invokeSafe() {
+        var args = Array.prototype.slice.call(arguments);
+        try {
+            if (connection && connection.state === "Connected") {
+                return connection.invoke.apply(connection, args).catch(function () { /* best effort */ });
+            }
+        } catch (e) { /* never break the UI */ }
+        return Promise.resolve();
+    }
+
+    function fire(list, payload) {
+        list.forEach(function (cb) { try { cb(payload); } catch (e) { /* ignore */ } });
+    }
+
     function handleIncoming(message) {
         if (!message) { return; }
         var fromMe = (String(message.senderId || "").toLowerCase() === me);
@@ -194,9 +265,7 @@
         // Incoming message: bump the bell, drop a notification entry + toast.
         setBadge(unread + 1);
         addNotification(message);
-        if (window.AppNotify && window.AppNotify.info) {
-            window.AppNotify.info((cfg.newMessageFrom || "{0}").replace("{0}", message.senderName || ""));
-        }
+        showCenterToast(message);
     }
 
     window.EnergyChat = {
@@ -204,6 +273,16 @@
         refreshUnread: refreshUnread,
         onPresence: function (cb) { if (typeof cb === "function") { presenceSubscribers.push(cb); } },
         onTyping: function (cb) { if (typeof cb === "function") { typingSubscribers.push(cb); } },
+        onGroupInvite: function (cb) { if (typeof cb === "function") { groupInviteSubscribers.push(cb); } },
+        onGroupChanged: function (cb) { if (typeof cb === "function") { groupChangedSubscribers.push(cb); } },
+        onMessageDeleted: function (cb) { if (typeof cb === "function") { msgDeletedSubscribers.push(cb); } },
+        onMessageReacted: function (cb) { if (typeof cb === "function") { msgReactedSubscribers.push(cb); } },
+        onMessagesRead: function (cb) { if (typeof cb === "function") { msgReadSubscribers.push(cb); } },
+        onCall: function (cb) { if (typeof cb === "function") { callSubscribers.push(cb); } },
+        callUser: function (targetUserId, callerName, offer) { return invokeSafe("CallUser", targetUserId, callerName, offer); },
+        answerCall: function (targetUserId, answer) { return invokeSafe("AnswerCall", targetUserId, answer); },
+        sendIce: function (targetUserId, candidate) { return invokeSafe("SendIce", targetUserId, candidate); },
+        endCall: function (targetUserId) { return invokeSafe("EndCall", targetUserId); },
         sendTyping: function (recipientId, isTyping) {
             try {
                 if (connection && connection.state === "Connected" && recipientId) {
@@ -265,6 +344,28 @@
             };
             typingSubscribers.forEach(function (cb) { try { cb(norm); } catch (e) { /* ignore */ } });
         });
+        connection.on("GroupInvite", function (p) {
+            if (!p) { return; }
+            var norm = {
+                groupId: (p.groupId != null) ? p.groupId : p.GroupId,
+                groupName: (p.groupName != null) ? p.groupName : p.GroupName
+            };
+            groupInviteSubscribers.forEach(function (cb) { try { cb(norm); } catch (e) { /* ignore */ } });
+            // Surface a toast so the user notices even when not on the chat page.
+            showCenterToast({ senderName: norm.groupName || "Grup", text: "Yeni grup daveti" });
+        });
+        connection.on("GroupChanged", function (p) {
+            if (!p) { return; }
+            var norm = { groupId: (p.groupId != null) ? p.groupId : p.GroupId };
+            groupChangedSubscribers.forEach(function (cb) { try { cb(norm); } catch (e) { /* ignore */ } });
+        });
+        connection.on("MessageDeleted", function (p) { fire(msgDeletedSubscribers, p || {}); });
+        connection.on("MessageReacted", function (p) { fire(msgReactedSubscribers, p || {}); });
+        connection.on("MessagesRead", function (p) { fire(msgReadSubscribers, p || {}); });
+        connection.on("CallOffer", function (p) { fire(callSubscribers, { type: "offer", data: p || {} }); });
+        connection.on("CallAnswered", function (p) { fire(callSubscribers, { type: "answer", data: p || {} }); });
+        connection.on("CallIce", function (p) { fire(callSubscribers, { type: "ice", data: p || {} }); });
+        connection.on("CallEnded", function (p) { fire(callSubscribers, { type: "ended", data: p || {} }); });
 
         connection.onreconnecting(function (err) {
             clearPresence();

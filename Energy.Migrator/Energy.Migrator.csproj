@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!--
+    Interactive EF Core migration manager (companion to Energy.Publish).
+    It does NOT reference the EF projects: it shells out to `dotnet ef`, picking
+    the correct migrations assembly from the active provider in appsettings.json
+    (PostgreSql -> Energy.Migrations.PostgreSql, SqlServer -> Energy.Migrations.SqlServer).
+  -->
+
+</Project>
+

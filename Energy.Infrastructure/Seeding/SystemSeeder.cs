@@ -186,6 +186,15 @@ public sealed class SystemSeeder : ISystemSeeder
             await EnsureChatSchemaAsync(ct);
         }
 
+        // Chat groups (works on both providers; new tables are not added by
+        // EnsureCreated on an already-existing SQL Server database).
+        _logger.LogInformation("Seeding: chat group tables + message GroupId column");
+        await EnsureChatGroupSchemaAsync(ct);
+
+        // Chat extras: reply column + reactions table (WhatsApp-like features).
+        _logger.LogInformation("Seeding: chat reply column + reactions table");
+        await EnsureChatExtrasSchemaAsync(ct);
+
         _logger.LogInformation("Seeding: permission catalog");
         var permissionsAdded = await _permissions.SyncCatalogAsync(ct);
         _logger.LogInformation("Seeding: {Added} permission(s) added to catalog", permissionsAdded);
@@ -328,6 +337,168 @@ public sealed class SystemSeeder : ISystemSeeder
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Could not ensure the ChatMessages table; it may already exist or a referenced table is not yet created.");
+        }
+    }
+
+    /// <summary>
+    /// Idempotently creates the <c>ChatGroups</c> / <c>ChatGroupMembers</c> tables
+    /// and the <c>ChatMessages.GroupId</c> column, and relaxes
+    /// <c>ChatMessages.RecipientId</c> to NULL (group messages have no single
+    /// recipient). Provider-specific but idempotent on PostgreSQL and SQL Server.
+    /// </summary>
+    private async Task EnsureChatGroupSchemaAsync(CancellationToken ct)
+    {
+        var sql = _db.Database.IsSqlServer()
+            ? """
+              IF OBJECT_ID(N'[ChatGroups]', N'U') IS NULL
+              CREATE TABLE [ChatGroups] (
+                  [Id] uniqueidentifier NOT NULL,
+                  [Name] nvarchar(150) NOT NULL,
+                  [OwnerId] uniqueidentifier NOT NULL,
+                  [CreatedAt] datetime2 NOT NULL,
+                  [CreatedBy] uniqueidentifier NULL,
+                  [UpdatedAt] datetime2 NULL,
+                  [UpdatedBy] uniqueidentifier NULL,
+                  [IsDeleted] bit NOT NULL CONSTRAINT [DF_ChatGroups_IsDeleted] DEFAULT(0),
+                  [DeletedAt] datetime2 NULL,
+                  [DeletedBy] uniqueidentifier NULL,
+                  CONSTRAINT [PK_ChatGroups] PRIMARY KEY ([Id])
+              );
+              IF OBJECT_ID(N'[ChatGroupMembers]', N'U') IS NULL
+              CREATE TABLE [ChatGroupMembers] (
+                  [Id] uniqueidentifier NOT NULL,
+                  [GroupId] uniqueidentifier NOT NULL,
+                  [UserId] uniqueidentifier NOT NULL,
+                  [Status] int NOT NULL,
+                  [IsOwner] bit NOT NULL CONSTRAINT [DF_ChatGroupMembers_IsOwner] DEFAULT(0),
+                  [InvitedById] uniqueidentifier NULL,
+                  [CreatedAt] datetime2 NOT NULL,
+                  [CreatedBy] uniqueidentifier NULL,
+                  [UpdatedAt] datetime2 NULL,
+                  [UpdatedBy] uniqueidentifier NULL,
+                  [IsDeleted] bit NOT NULL CONSTRAINT [DF_ChatGroupMembers_IsDeleted] DEFAULT(0),
+                  [DeletedAt] datetime2 NULL,
+                  [DeletedBy] uniqueidentifier NULL,
+                  CONSTRAINT [PK_ChatGroupMembers] PRIMARY KEY ([Id]),
+                  CONSTRAINT [FK_ChatGroupMembers_ChatGroups_GroupId] FOREIGN KEY ([GroupId]) REFERENCES [ChatGroups]([Id]) ON DELETE CASCADE
+              );
+              IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChatGroupMembers_GroupId_UserId')
+              CREATE UNIQUE INDEX [IX_ChatGroupMembers_GroupId_UserId] ON [ChatGroupMembers]([GroupId],[UserId]);
+              IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChatGroupMembers_UserId_Status')
+              CREATE INDEX [IX_ChatGroupMembers_UserId_Status] ON [ChatGroupMembers]([UserId],[Status]);
+              IF COL_LENGTH('ChatMessages','GroupId') IS NULL ALTER TABLE [ChatMessages] ADD [GroupId] uniqueidentifier NULL;
+              IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChatMessages_GroupId')
+              CREATE INDEX [IX_ChatMessages_GroupId] ON [ChatMessages]([GroupId]);
+              IF EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('ChatMessages') AND name = 'RecipientId' AND is_nullable = 0)
+              BEGIN
+                  IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChatMessages_SenderId_RecipientId') DROP INDEX [IX_ChatMessages_SenderId_RecipientId] ON [ChatMessages];
+                  IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChatMessages_RecipientId_IsRead') DROP INDEX [IX_ChatMessages_RecipientId_IsRead] ON [ChatMessages];
+                  ALTER TABLE [ChatMessages] ALTER COLUMN [RecipientId] uniqueidentifier NULL;
+                  CREATE INDEX [IX_ChatMessages_SenderId_RecipientId] ON [ChatMessages]([SenderId],[RecipientId]);
+                  CREATE INDEX [IX_ChatMessages_RecipientId_IsRead] ON [ChatMessages]([RecipientId],[IsRead]);
+              END
+              """
+            : """
+              CREATE TABLE IF NOT EXISTS "ChatGroups" (
+                  "Id" uuid NOT NULL,
+                  "Name" character varying(150) NOT NULL,
+                  "OwnerId" uuid NOT NULL,
+                  "CreatedAt" timestamp with time zone NOT NULL,
+                  "CreatedBy" uuid,
+                  "UpdatedAt" timestamp with time zone,
+                  "UpdatedBy" uuid,
+                  "IsDeleted" boolean NOT NULL DEFAULT FALSE,
+                  "DeletedAt" timestamp with time zone,
+                  "DeletedBy" uuid,
+                  CONSTRAINT "PK_ChatGroups" PRIMARY KEY ("Id")
+              );
+              CREATE TABLE IF NOT EXISTS "ChatGroupMembers" (
+                  "Id" uuid NOT NULL,
+                  "GroupId" uuid NOT NULL,
+                  "UserId" uuid NOT NULL,
+                  "Status" integer NOT NULL,
+                  "IsOwner" boolean NOT NULL DEFAULT FALSE,
+                  "InvitedById" uuid,
+                  "CreatedAt" timestamp with time zone NOT NULL,
+                  "CreatedBy" uuid,
+                  "UpdatedAt" timestamp with time zone,
+                  "UpdatedBy" uuid,
+                  "IsDeleted" boolean NOT NULL DEFAULT FALSE,
+                  "DeletedAt" timestamp with time zone,
+                  "DeletedBy" uuid,
+                  CONSTRAINT "PK_ChatGroupMembers" PRIMARY KEY ("Id"),
+                  CONSTRAINT "FK_ChatGroupMembers_ChatGroups_GroupId" FOREIGN KEY ("GroupId") REFERENCES "ChatGroups" ("Id") ON DELETE CASCADE
+              );
+              CREATE UNIQUE INDEX IF NOT EXISTS "IX_ChatGroupMembers_GroupId_UserId" ON "ChatGroupMembers" ("GroupId","UserId");
+              CREATE INDEX IF NOT EXISTS "IX_ChatGroupMembers_UserId_Status" ON "ChatGroupMembers" ("UserId","Status");
+              ALTER TABLE "ChatMessages" ADD COLUMN IF NOT EXISTS "GroupId" uuid;
+              CREATE INDEX IF NOT EXISTS "IX_ChatMessages_GroupId" ON "ChatMessages" ("GroupId");
+              ALTER TABLE "ChatMessages" ALTER COLUMN "RecipientId" DROP NOT NULL;
+              """;
+        try
+        {
+            await _db.Database.ExecuteSqlRawAsync(sql, ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Could not ensure the chat group schema; parts may already exist.");
+        }
+    }
+
+    /// <summary>
+    /// Idempotently adds <c>ChatMessages.ReplyToMessageId</c> and creates the
+    /// <c>ChatMessageReactions</c> table (emoji reactions). Idempotent on both providers.
+    /// </summary>
+    private async Task EnsureChatExtrasSchemaAsync(CancellationToken ct)
+    {
+        var sql = _db.Database.IsSqlServer()
+            ? """
+              IF COL_LENGTH('ChatMessages','ReplyToMessageId') IS NULL ALTER TABLE [ChatMessages] ADD [ReplyToMessageId] uniqueidentifier NULL;
+              IF OBJECT_ID(N'[ChatMessageReactions]', N'U') IS NULL
+              CREATE TABLE [ChatMessageReactions] (
+                  [Id] uniqueidentifier NOT NULL,
+                  [MessageId] uniqueidentifier NOT NULL,
+                  [UserId] uniqueidentifier NOT NULL,
+                  [Emoji] nvarchar(16) NOT NULL,
+                  [CreatedAt] datetime2 NOT NULL,
+                  [CreatedBy] uniqueidentifier NULL,
+                  [UpdatedAt] datetime2 NULL,
+                  [UpdatedBy] uniqueidentifier NULL,
+                  [IsDeleted] bit NOT NULL CONSTRAINT [DF_ChatMessageReactions_IsDeleted] DEFAULT(0),
+                  [DeletedAt] datetime2 NULL,
+                  [DeletedBy] uniqueidentifier NULL,
+                  CONSTRAINT [PK_ChatMessageReactions] PRIMARY KEY ([Id]),
+                  CONSTRAINT [FK_ChatMessageReactions_ChatMessages_MessageId] FOREIGN KEY ([MessageId]) REFERENCES [ChatMessages]([Id]) ON DELETE CASCADE
+              );
+              IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChatMessageReactions_MessageId_UserId')
+              CREATE UNIQUE INDEX [IX_ChatMessageReactions_MessageId_UserId] ON [ChatMessageReactions]([MessageId],[UserId]);
+              """
+            : """
+              ALTER TABLE "ChatMessages" ADD COLUMN IF NOT EXISTS "ReplyToMessageId" uuid;
+              CREATE TABLE IF NOT EXISTS "ChatMessageReactions" (
+                  "Id" uuid NOT NULL,
+                  "MessageId" uuid NOT NULL,
+                  "UserId" uuid NOT NULL,
+                  "Emoji" character varying(16) NOT NULL,
+                  "CreatedAt" timestamp with time zone NOT NULL,
+                  "CreatedBy" uuid,
+                  "UpdatedAt" timestamp with time zone,
+                  "UpdatedBy" uuid,
+                  "IsDeleted" boolean NOT NULL DEFAULT FALSE,
+                  "DeletedAt" timestamp with time zone,
+                  "DeletedBy" uuid,
+                  CONSTRAINT "PK_ChatMessageReactions" PRIMARY KEY ("Id"),
+                  CONSTRAINT "FK_ChatMessageReactions_ChatMessages_MessageId" FOREIGN KEY ("MessageId") REFERENCES "ChatMessages" ("Id") ON DELETE CASCADE
+              );
+              CREATE UNIQUE INDEX IF NOT EXISTS "IX_ChatMessageReactions_MessageId_UserId" ON "ChatMessageReactions" ("MessageId","UserId");
+              """;
+        try
+        {
+            await _db.Database.ExecuteSqlRawAsync(sql, ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Could not ensure the chat extras schema; parts may already exist.");
         }
     }
 

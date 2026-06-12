@@ -672,6 +672,9 @@ body.energy-nav-closed .energy-toolbar__menu {
 /* Chat screen + notification bell                                    */
 /* ------------------------------------------------------------------ */
 .energy-chat { display: flex; gap: 16px; min-height: 70vh; }
+/* Ensure the [hidden] attribute always wins over the flex/auto display rules
+   below (panes, window-wrap, recorder, reply-bar, call overlay, badges …). */
+.energy-chat [hidden] { display: none !important; }
 .energy-chat__sidebar {
     flex: 0 0 280px;
     display: flex;
@@ -681,7 +684,8 @@ body.energy-nav-closed .energy-toolbar__menu {
     overflow: hidden;
     background: #fff;
 }
-.energy-chat__sidebar #chat-contacts { flex: 1 1 auto; overflow: auto; }
+.energy-chat__sidebar #chat-contacts { flex: 1 1 auto; overflow: auto; min-height: 0; }
+.energy-chat__pane #chat-search { flex: 0 0 auto; }
 .energy-chat__main {
     flex: 1 1 auto;
     display: flex;
@@ -697,26 +701,205 @@ body.energy-nav-closed .energy-toolbar__menu {
     flex-direction: column;
     min-width: 0;
 }
-.energy-chat__attach {
+
+/* Composer toolbar: compact icon actions (attach + voice) above dxChat input. */
+.energy-chat__composer {
     display: flex;
     align-items: center;
-    padding: 8px 12px;
+    gap: 6px;
+    padding: 6px 12px;
     border-top: 1px solid var(--energy-border, #e2e8f0);
     background: #fff;
 }
-.energy-chat__attach-btn {
+.energy-chat__composer-actions { display: inline-flex; align-items: center; gap: 4px; }
+.energy-chat__icon-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    border: 1px solid var(--energy-border, #e2e8f0);
-    background: #f8fafc;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: none;
+    background: transparent;
     color: var(--energy-text-muted, #475569);
-    border-radius: 8px;
-    padding: 6px 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.energy-chat__icon-btn:hover { background: rgba(148,163,184,0.18); }
+.energy-chat__icon-btn.is-primary { color: var(--energy-primary, #2563eb); }
+.energy-chat__icon-btn.is-danger { color: var(--energy-danger, #dc2626); }
+.energy-chat__icon-btn.is-recording { color: var(--energy-danger, #dc2626); }
+
+/* Recording bar (shown while capturing a voice message). */
+.energy-chat__recorder {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 8px;
+    border-radius: 10px;
+    background: rgba(220,38,38,0.08);
+}
+.energy-chat__recorder-spacer { flex: 1 1 auto; }
+.energy-chat__recorder-time { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--energy-danger, #dc2626); }
+.energy-chat__recorder-dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--energy-danger, #dc2626);
+    animation: energy-chat-pulse 1s ease-in-out infinite;
+}
+@keyframes energy-chat-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+/* Audio (voice message) attachment player. */
+.energy-chat__att--audio { width: 240px; max-width: 100%; }
+.energy-chat__att--audio audio { width: 100%; height: 38px; }
+
+/* Sidebar drawer head (only visible when the sidebar acts as a drawer). */
+.energy-chat__sidebar-head { display: none; }
+.energy-chat__drawer-toggle { display: none; }
+.energy-chat__backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.45);
+    z-index: 1190;
+}
+
+/* Sidebar tabs (Contacts / Groups). */
+.energy-chat__tabs { display: flex; border-bottom: 1px solid var(--energy-border, #e2e8f0); }
+.energy-chat__tab {
+    flex: 1 1 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 8px;
+    border: none;
+    background: transparent;
+    color: var(--energy-text-muted, #64748b);
     font-size: 13px;
     cursor: pointer;
+    border-bottom: 2px solid transparent;
+    position: relative;
 }
-.energy-chat__attach-btn:hover { background: rgba(148,163,184,0.18); }
+.energy-chat__tab.is-active { color: var(--energy-primary, #2563eb); border-bottom-color: var(--energy-primary, #2563eb); font-weight: 600; }
+.energy-chat__tab-badge {
+    background: var(--energy-danger, #dc2626);
+    color: #fff; border-radius: 999px; font-size: 10px; line-height: 1;
+    padding: 2px 5px; min-width: 16px; text-align: center;
+}
+.energy-chat__pane { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.energy-chat__pane #chat-groups { flex: 1 1 auto; overflow: auto; min-height: 0; }
+.energy-chat__pane-actions { padding: 8px; flex: 0 0 auto; }
+.energy-chat__new-group {
+    width: 100%;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 8px; border: 1px dashed var(--energy-border, #cbd5e1);
+    background: #f8fafc; color: var(--energy-text-muted, #475569);
+    border-radius: 8px; cursor: pointer; font-size: 13px;
+}
+.energy-chat__new-group:hover { background: rgba(148,163,184,0.18); }
+.energy-chat__group-avatar { background: #0ea5e9; }
+
+/* Pending invitation cards. */
+.energy-chat__invites { display: flex; flex-direction: column; gap: 6px; padding: 0 8px; flex: 0 0 auto; }
+.energy-chat__invite {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 8px 10px; border: 1px solid var(--energy-border, #e2e8f0);
+    border-radius: 8px; background: rgba(14,165,233,0.06);
+}
+.energy-chat__invite-info { display: flex; flex-direction: column; min-width: 0; }
+.energy-chat__invite-name { font-weight: 600; font-size: 13px; }
+.energy-chat__invite-by { font-size: 11px; color: var(--energy-text-muted, #64748b); }
+.energy-chat__invite-actions { display: inline-flex; gap: 2px; flex: 0 0 auto; }
+.energy-chat__field-label { display: block; font-size: 12px; font-weight: 600; margin: 10px 0 4px; color: var(--energy-text-muted, #475569); }
+.energy-chat__group-manage { margin-left: auto; }
+
+/* Reply quote inside a bubble. */
+.energy-chat__msg { position: relative; }
+.energy-chat__quote {
+    display: flex; flex-direction: column;
+    border-left: 3px solid var(--energy-primary, #2563eb);
+    padding: 4px 8px; margin-bottom: 4px;
+    background: rgba(37,99,235,0.08); border-radius: 6px;
+}
+.energy-chat__quote-sender { font-size: 11px; font-weight: 600; color: var(--energy-primary, #2563eb); }
+.energy-chat__quote-text { font-size: 12px; color: var(--energy-text-muted, #475569); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 240px; }
+
+/* Reaction chips. */
+.energy-chat__reactions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.energy-chat__reaction {
+    border: 1px solid var(--energy-border, #e2e8f0);
+    background: #fff; border-radius: 999px; padding: 1px 8px;
+    font-size: 12px; cursor: pointer; line-height: 1.6;
+}
+.energy-chat__reaction.is-mine { background: rgba(37,99,235,0.12); border-color: var(--energy-primary, #2563eb); }
+
+/* Read-receipt ticks. */
+.energy-chat__ticks { display: inline-block; margin-top: 2px; font-size: 11px; color: var(--energy-text-muted, #94a3b8); }
+.energy-chat__ticks.is-read { color: var(--energy-primary, #2563eb); }
+
+/* Per-message action toolbar (appears on hover). */
+.energy-chat__msg-tools {
+    position: absolute; top: -10px; right: 6px;
+    display: none; gap: 2px;
+    background: #fff; border: 1px solid var(--energy-border, #e2e8f0);
+    border-radius: 999px; padding: 2px 4px;
+    box-shadow: 0 4px 12px rgba(15,23,42,0.12);
+}
+.energy-chat__msg:hover .energy-chat__msg-tools { display: inline-flex; }
+.energy-chat__msg-action {
+    border: none; background: transparent; cursor: pointer;
+    width: 26px; height: 26px; border-radius: 50%;
+    color: var(--energy-text-muted, #475569); font-size: 12px; position: relative;
+}
+.energy-chat__msg-action:hover { background: rgba(148,163,184,0.18); }
+.energy-chat__msg-action.is-danger { color: var(--energy-danger, #dc2626); }
+.energy-chat__palette {
+    display: none; position: absolute; bottom: 120%; right: 0;
+    background: #fff; border: 1px solid var(--energy-border, #e2e8f0);
+    border-radius: 999px; padding: 4px 6px; gap: 2px; white-space: nowrap;
+    box-shadow: 0 6px 18px rgba(15,23,42,0.18); z-index: 5;
+}
+.energy-chat__msg-action.is-open .energy-chat__palette { display: inline-flex; }
+.energy-chat__palette-emoji { border: none; background: transparent; cursor: pointer; font-size: 18px; padding: 2px 4px; }
+.energy-chat__palette-emoji:hover { transform: scale(1.2); }
+
+/* Reply bar above the composer. */
+.energy-chat__reply-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 12px; border-top: 1px solid var(--energy-border, #e2e8f0);
+    background: rgba(37,99,235,0.06);
+}
+.energy-chat__reply-bar-info { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; border-left: 3px solid var(--energy-primary, #2563eb); padding-left: 8px; }
+.energy-chat__reply-bar-sender { font-size: 12px; font-weight: 600; color: var(--energy-primary, #2563eb); }
+.energy-chat__reply-bar-text { font-size: 12px; color: var(--energy-text-muted, #475569); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Voice call overlay. */
+.energy-chat__call {
+    position: fixed; inset: 0; z-index: 1400;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(15,23,42,0.6);
+}
+.energy-chat__call-card {
+    width: 300px; max-width: 92vw; background: #0f172a; color: #fff;
+    border-radius: 16px; padding: 28px 24px; text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+.energy-chat__call-avatar {
+    width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 14px;
+    background: var(--energy-primary, #2563eb); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 600;
+}
+.energy-chat__call-name { font-size: 18px; font-weight: 600; }
+.energy-chat__call-state { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+.energy-chat__call-actions { display: flex; justify-content: center; gap: 24px; margin-top: 22px; }
+.energy-chat__call-btn-accept, .energy-chat__call-btn-hangup {
+    width: 56px; height: 56px; border-radius: 50%; border: none; cursor: pointer;
+    color: #fff; font-size: 20px;
+}
+.energy-chat__call-btn-accept { background: var(--energy-success, #16a34a); }
+.energy-chat__call-btn-hangup { background: var(--energy-danger, #dc2626); }
 .energy-chat__empty {
     flex: 1 1 auto;
     display: flex;
@@ -830,6 +1013,95 @@ body.energy-nav-closed .energy-toolbar__menu {
     padding: 3px 6px;
     min-width: 18px;
     text-align: center;
+}
+
+/* New-message center toast (bottom-center, auto-dismiss). */
+.energy-chat-toasts {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: 1300;
+    pointer-events: none;
+}
+.energy-chat-toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 92vw;
+    width: 340px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: #0f172a;
+    color: #fff;
+    box-shadow: 0 12px 32px rgba(15,23,42,0.35);
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.energy-chat-toast.is-visible { opacity: 1; transform: translateY(0); }
+.energy-chat-toast__avatar {
+    flex: 0 0 auto;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--energy-primary, #2563eb);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+}
+.energy-chat-toast__avatar img { width: 100%; height: 100%; object-fit: cover; }
+.energy-chat-toast__meta { min-width: 0; }
+.energy-chat-toast__title { font-weight: 600; font-size: 13px; }
+.energy-chat-toast__text {
+    font-size: 12px;
+    color: rgba(255,255,255,0.75);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 270px;
+}
+
+/* ---- Responsive: contacts sidebar collapses into a slide-in drawer ---- */
+@media (max-width: 768px) {
+    .energy-chat { gap: 0; position: relative; min-height: 80vh; }
+    .energy-chat__sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 84vw;
+        max-width: 320px;
+        flex: 0 0 auto;
+        border-radius: 0;
+        transform: translateX(-105%);
+        transition: transform 0.25s ease;
+        z-index: 1200;
+    }
+    .energy-chat__sidebar.is-open { transform: translateX(0); }
+    .energy-chat__sidebar-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--energy-border, #e2e8f0);
+        font-weight: 600;
+    }
+    .energy-chat__main { width: 100%; flex: 1 1 auto; }
+    .energy-chat__drawer-toggle { display: inline-flex; }
+}
+@media (min-width: 769px) {
+    .energy-chat__backdrop { display: none !important; }
+    .energy-chat__drawer-close { display: none; }
 }
 
 /* Connection status indicator */

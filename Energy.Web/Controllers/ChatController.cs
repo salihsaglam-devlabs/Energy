@@ -97,7 +97,8 @@ public sealed class ChatController : Controller
 
     public sealed class SendInput
     {
-        public Guid RecipientId { get; set; }
+        public Guid? RecipientId { get; set; }
+        public Guid? GroupId { get; set; }
         public string Text { get; set; } = string.Empty;
         public string? AttachmentFileName { get; set; }
         public string? AttachmentContentType { get; set; }
@@ -111,6 +112,7 @@ public sealed class ChatController : Controller
         var envelope = await _chat.SendAsync(new SendChatMessageRequest
         {
             RecipientId = input.RecipientId,
+            GroupId = input.GroupId,
             Text = input.Text,
             AttachmentFileName = input.AttachmentFileName,
             AttachmentContentType = input.AttachmentContentType,
@@ -120,10 +122,25 @@ public sealed class ChatController : Controller
         var message = envelope.Data;
         if (envelope.IsSuccess && message is not null)
         {
-            // Deliver to the recipient (live append + bell) and echo to the
-            // sender's other open tabs so every surface stays in sync.
-            await _hub.Clients.User(message.RecipientId.ToString()).SendAsync(ChatHub.ReceiveMessage, message, ct);
-            await _hub.Clients.User(message.SenderId.ToString()).SendAsync(ChatHub.ReceiveMessage, message, ct);
+            if (message.GroupId is { } groupId)
+            {
+                // Fan-out to every accepted group member (including the sender's tabs).
+                var memberEnvelope = await _chat.GetGroupMemberIdsAsync(groupId, ct);
+                var memberIds = (memberEnvelope.Data ?? Array.Empty<Guid>())
+                    .Select(id => id.ToString())
+                    .ToArray();
+                if (memberIds.Length > 0)
+                {
+                    await _hub.Clients.Users(memberIds).SendAsync(ChatHub.ReceiveMessage, message, ct);
+                }
+            }
+            else if (message.RecipientId is { } recipientId)
+            {
+                // Deliver to the recipient (live append + bell) and echo to the
+                // sender's other open tabs so every surface stays in sync.
+                await _hub.Clients.User(recipientId.ToString()).SendAsync(ChatHub.ReceiveMessage, message, ct);
+                await _hub.Clients.User(message.SenderId.ToString()).SendAsync(ChatHub.ReceiveMessage, message, ct);
+            }
         }
 
         return Json(envelope);
@@ -134,7 +151,114 @@ public sealed class ChatController : Controller
     public async Task<IActionResult> MarkRead(Guid peerId, CancellationToken ct)
     {
         var envelope = await _chat.MarkReadAsync(peerId, ct);
+
+        // Read receipt: tell the peer (the original sender) that we read their
+        // messages so their ticks turn to "read".
+        var me = User.GetUserId();
+        if (envelope.IsSuccess && me is { } readerId)
+        {
+            await _hub.Clients.User(peerId.ToString()).SendAsync(
+                ChatHub.MessagesRead, new { readerId = readerId.ToString() }, ct);
+        }
+
         return Json(envelope);
+    }
+
+    [HttpDelete("messages/{messageId:guid}")]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> DeleteMessage(Guid messageId, CancellationToken ct)
+    {
+        var envelope = await _chat.DeleteMessageAsync(messageId, ct);
+        if (envelope.IsSuccess && envelope.Data is { } m)
+        {
+            await BroadcastToParticipantsAsync(m, ChatHub.MessageDeleted,
+                new { id = m.Id.ToString(), groupId = m.GroupId?.ToString(), peerId = m.RecipientId?.ToString(), senderId = m.SenderId.ToString() }, ct);
+        }
+        return Json(envelope);
+    }
+
+    public sealed class ForwardInput
+    {
+        public Guid? RecipientId { get; set; }
+        public Guid? GroupId { get; set; }
+    }
+
+    [HttpPost("messages/{messageId:guid}/forward")]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> Forward(Guid messageId, [FromBody] ForwardInput input, CancellationToken ct)
+    {
+        var envelope = await _chat.ForwardAsync(messageId, new Shared.Models.V1.Chat.Requests.ForwardChatMessageRequest
+        {
+            MessageId = messageId,
+            RecipientId = input.RecipientId,
+            GroupId = input.GroupId
+        }, ct);
+
+        if (envelope.IsSuccess && envelope.Data is { } msg)
+        {
+            await DeliverMessageAsync(msg, ct);
+        }
+        return Json(envelope);
+    }
+
+    public sealed class ReactInput
+    {
+        public string Emoji { get; set; } = string.Empty;
+    }
+
+    [HttpPost("messages/{messageId:guid}/react")]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> React(Guid messageId, [FromBody] ReactInput input, CancellationToken ct)
+    {
+        var envelope = await _chat.ReactAsync(messageId, new Shared.Models.V1.Chat.Requests.ReactChatMessageRequest
+        {
+            Emoji = input.Emoji
+        }, ct);
+
+        if (envelope.IsSuccess && envelope.Data is { } m)
+        {
+            await BroadcastToParticipantsAsync(m, ChatHub.MessageReacted, m, ct);
+        }
+        return Json(envelope);
+    }
+
+    // Delivers a (just-created) message to its recipient/group + sender tabs.
+    private async Task DeliverMessageAsync(Shared.Models.V1.Chat.Responses.ChatMessageResponse message, CancellationToken ct)
+    {
+        if (message.GroupId is { } groupId)
+        {
+            var memberEnvelope = await _chat.GetGroupMemberIdsAsync(groupId, ct);
+            var memberIds = (memberEnvelope.Data ?? Array.Empty<Guid>()).Select(id => id.ToString()).ToArray();
+            if (memberIds.Length > 0)
+            {
+                await _hub.Clients.Users(memberIds).SendAsync(ChatHub.ReceiveMessage, message, ct);
+            }
+        }
+        else if (message.RecipientId is { } recipientId)
+        {
+            await _hub.Clients.User(recipientId.ToString()).SendAsync(ChatHub.ReceiveMessage, message, ct);
+            await _hub.Clients.User(message.SenderId.ToString()).SendAsync(ChatHub.ReceiveMessage, message, ct);
+        }
+    }
+
+    // Sends an arbitrary event/payload to every participant of a message.
+    private async Task BroadcastToParticipantsAsync(
+        Shared.Models.V1.Chat.Responses.ChatMessageResponse message, string eventName, object payload, CancellationToken ct)
+    {
+        if (message.GroupId is { } groupId)
+        {
+            var memberEnvelope = await _chat.GetGroupMemberIdsAsync(groupId, ct);
+            var memberIds = (memberEnvelope.Data ?? Array.Empty<Guid>()).Select(id => id.ToString()).ToArray();
+            if (memberIds.Length > 0)
+            {
+                await _hub.Clients.Users(memberIds).SendAsync(eventName, payload, ct);
+            }
+        }
+        else if (message.RecipientId is { } recipientId)
+        {
+            await _hub.Clients.User(recipientId.ToString()).SendAsync(eventName, payload, ct);
+            await _hub.Clients.User(message.SenderId.ToString()).SendAsync(eventName, payload, ct);
+        }
     }
 
     [HttpGet("unread-count")]
@@ -142,6 +266,121 @@ public sealed class ChatController : Controller
     {
         var envelope = await _chat.GetUnreadCountAsync(ct);
         return Json(new { count = envelope.Data });
+    }
+
+    // ----- Groups -----------------------------------------------------------
+
+    [HttpGet("groups")]
+    public async Task<IActionResult> Groups(CancellationToken ct)
+    {
+        var envelope = await _chat.GetGroupsAsync(ct);
+        return Json(envelope.Data ?? Array.Empty<Shared.Models.V1.Chat.Responses.ChatGroupResponse>());
+    }
+
+    [HttpGet("groups/invites")]
+    public async Task<IActionResult> GroupInvites(CancellationToken ct)
+    {
+        var envelope = await _chat.GetGroupInvitesAsync(ct);
+        return Json(envelope.Data ?? Array.Empty<Shared.Models.V1.Chat.Responses.ChatGroupInviteResponse>());
+    }
+
+    [HttpGet("groups/{groupId:guid}/members")]
+    public async Task<IActionResult> GroupMembers(Guid groupId, CancellationToken ct)
+    {
+        var envelope = await _chat.GetGroupMembersAsync(groupId, ct);
+        return Json(envelope.Data ?? Array.Empty<Shared.Models.V1.Chat.Responses.ChatGroupMemberResponse>());
+    }
+
+    [HttpGet("groups/{groupId:guid}/conversation")]
+    public async Task<IActionResult> GroupConversation(Guid groupId, CancellationToken ct)
+    {
+        var envelope = await _chat.GetGroupConversationAsync(groupId, ct);
+        return Json(envelope.Data ?? Array.Empty<Shared.Models.V1.Chat.Responses.ChatMessageResponse>());
+    }
+
+    public sealed class CreateGroupInput
+    {
+        public string Name { get; set; } = string.Empty;
+        public List<Guid> MemberUserIds { get; set; } = new();
+    }
+
+    [HttpPost("groups")]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> CreateGroup([FromBody] CreateGroupInput input, CancellationToken ct)
+    {
+        var envelope = await _chat.CreateGroupAsync(new Shared.Models.V1.Chat.Requests.CreateChatGroupRequest
+        {
+            Name = input.Name,
+            MemberUserIds = input.MemberUserIds ?? new List<Guid>()
+        }, ct);
+
+        if (envelope.IsSuccess && envelope.Data is { } group && input.MemberUserIds is { Count: > 0 })
+        {
+            await NotifyInviteesAsync(input.MemberUserIds, group.Id, group.Name, ct);
+        }
+
+        return Json(envelope);
+    }
+
+    public sealed class InviteInput
+    {
+        public List<Guid> UserIds { get; set; } = new();
+    }
+
+    [HttpPost("groups/{groupId:guid}/invite")]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> InviteToGroup(Guid groupId, [FromBody] InviteInput input, CancellationToken ct)
+    {
+        var envelope = await _chat.InviteToGroupAsync(groupId, new Shared.Models.V1.Chat.Requests.InviteToGroupRequest
+        {
+            UserIds = input.UserIds ?? new List<Guid>()
+        }, ct);
+
+        if (envelope.IsSuccess && envelope.Data is { Count: > 0 } invited)
+        {
+            await NotifyInviteesAsync(invited.ToList(), groupId, string.Empty, ct);
+        }
+
+        return Json(envelope);
+    }
+
+    public sealed class RespondInput
+    {
+        public bool Accept { get; set; }
+    }
+
+    [HttpPost("groups/{groupId:guid}/respond")]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> RespondInvite(Guid groupId, [FromBody] RespondInput input, CancellationToken ct)
+    {
+        var envelope = await _chat.RespondInviteAsync(groupId, new Shared.Models.V1.Chat.Requests.RespondGroupInviteRequest
+        {
+            Accept = input.Accept
+        }, ct);
+
+        if (envelope.IsSuccess && envelope.Data)
+        {
+            // Tell existing members the roster changed (refresh members/groups).
+            var memberEnvelope = await _chat.GetGroupMemberIdsAsync(groupId, ct);
+            var memberIds = (memberEnvelope.Data ?? Array.Empty<Guid>()).Select(id => id.ToString()).ToArray();
+            if (memberIds.Length > 0)
+            {
+                await _hub.Clients.Users(memberIds).SendAsync(ChatHub.GroupChanged, new { groupId = groupId.ToString() }, ct);
+            }
+        }
+
+        return Json(envelope);
+    }
+
+    // Pushes a "you've been invited" event to each invitee's open tabs.
+    private async Task NotifyInviteesAsync(IEnumerable<Guid> userIds, Guid groupId, string groupName, CancellationToken ct)
+    {
+        var ids = userIds.Select(id => id.ToString()).ToArray();
+        if (ids.Length == 0) { return; }
+        await _hub.Clients.Users(ids).SendAsync(
+            ChatHub.GroupInvite,
+            new { groupId = groupId.ToString(), groupName },
+            ct);
     }
 }
 

@@ -22,6 +22,27 @@ public sealed class ChatHub : Hub
     public const string PresenceSnapshot = "PresenceSnapshot";
     public const string TypingChanged = "TypingChanged";
 
+    /// <summary>A user was invited to a group (delivered to the invitee).</summary>
+    public const string GroupInvite = "GroupInvite";
+
+    /// <summary>A group's membership/state changed (delivered to members).</summary>
+    public const string GroupChanged = "GroupChanged";
+
+    /// <summary>A message was deleted for everyone.</summary>
+    public const string MessageDeleted = "MessageDeleted";
+
+    /// <summary>A message's reactions changed.</summary>
+    public const string MessageReacted = "MessageReacted";
+
+    /// <summary>The peer read the current user's messages (read receipts).</summary>
+    public const string MessagesRead = "MessagesRead";
+
+    // Voice-call (WebRTC) signaling events (server → client).
+    public const string CallOffer = "CallOffer";
+    public const string CallAnswered = "CallAnswered";
+    public const string CallIce = "CallIce";
+    public const string CallEnded = "CallEnded";
+
     private readonly IChatPresenceTracker _presence;
 
     public ChatHub(IChatPresenceTracker presence)
@@ -93,6 +114,41 @@ public sealed class ChatHub : Hub
         => Clients.Caller.SendAsync(
             PresenceSnapshot,
             _presence.OnlineUsers.Select(u => u.ToString()).ToArray());
+
+    // ----- Voice call (WebRTC) signaling. Each method relays the SDP/ICE to the
+    // target user, tagging the payload with the caller's identity. -------------
+
+    public Task CallUser(string targetUserId, string callerName, object offer)
+    {
+        var userId = CurrentUserId;
+        if (userId is null || string.IsNullOrWhiteSpace(targetUserId)) { return Task.CompletedTask; }
+        return Clients.User(targetUserId).SendAsync(CallOffer,
+            new { fromUserId = userId.Value.ToString(), callerName, offer });
+    }
+
+    public Task AnswerCall(string targetUserId, object answer)
+    {
+        var userId = CurrentUserId;
+        if (userId is null || string.IsNullOrWhiteSpace(targetUserId)) { return Task.CompletedTask; }
+        return Clients.User(targetUserId).SendAsync(CallAnswered,
+            new { fromUserId = userId.Value.ToString(), answer });
+    }
+
+    public Task SendIce(string targetUserId, object candidate)
+    {
+        var userId = CurrentUserId;
+        if (userId is null || string.IsNullOrWhiteSpace(targetUserId)) { return Task.CompletedTask; }
+        return Clients.User(targetUserId).SendAsync(CallIce,
+            new { fromUserId = userId.Value.ToString(), candidate });
+    }
+
+    public Task EndCall(string targetUserId)
+    {
+        var userId = CurrentUserId;
+        if (userId is null || string.IsNullOrWhiteSpace(targetUserId)) { return Task.CompletedTask; }
+        return Clients.User(targetUserId).SendAsync(CallEnded,
+            new { fromUserId = userId.Value.ToString() });
+    }
 
     private Guid? CurrentUserId
         => Guid.TryParse(Context.UserIdentifier, out var id) ? id : null;

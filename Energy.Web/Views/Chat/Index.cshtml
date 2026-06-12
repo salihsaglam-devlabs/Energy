@@ -25,27 +25,108 @@
          data-user-id="@userId"
          data-user-name="@fullName"
          data-user-has-image="@(userHasImage ? "true" : "false")">
-    <div class="energy-chat__sidebar">
-        <div id="chat-search"></div>
-        <div id="chat-contacts"></div>
+    <div class="energy-chat__backdrop" id="chat-backdrop" hidden></div>
+    <div class="energy-chat__sidebar" id="chat-sidebar">
+        <div class="energy-chat__sidebar-head">
+            <span class="energy-chat__sidebar-title">@T[LocalizationKeys.ChatScreen.Title]</span>
+            <button type="button" class="energy-chat__icon-btn energy-chat__drawer-close" id="chat-drawer-close" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="energy-chat__tabs">
+            <button type="button" class="energy-chat__tab is-active" data-tab="contacts" id="chat-tab-contacts">
+                <i class="fa-solid fa-user"></i> <span>@T[LocalizationKeys.ChatScreen.SearchContacts]</span>
+            </button>
+            <button type="button" class="energy-chat__tab" data-tab="groups" id="chat-tab-groups">
+                <i class="fa-solid fa-users"></i> <span>Gruplar</span>
+                <span class="energy-chat__tab-badge" id="chat-invite-badge" hidden></span>
+            </button>
+        </div>
+        <div class="energy-chat__pane" id="chat-pane-contacts">
+            <div id="chat-search"></div>
+            <div id="chat-contacts"></div>
+        </div>
+        <div class="energy-chat__pane" id="chat-pane-groups" hidden>
+            <div class="energy-chat__pane-actions">
+                <button type="button" class="energy-chat__new-group" id="chat-new-group">
+                    <i class="fa-solid fa-plus"></i> <span>Yeni grup</span>
+                </button>
+            </div>
+            <div id="chat-invites" class="energy-chat__invites"></div>
+            <div id="chat-groups"></div>
+        </div>
     </div>
     <div class="energy-chat__main">
         <div class="energy-chat__window-wrap" hidden>
             <header id="chat-peer" class="energy-chat__peer">
+                <button type="button" class="energy-chat__icon-btn energy-chat__drawer-toggle" id="chat-drawer-toggle" aria-label="Contacts">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
                 <span class="energy-chat__peer-avatar"></span>
                 <span class="energy-chat__peer-meta">
                     <span class="energy-chat__peer-name"></span>
                     <span class="energy-chat__peer-status"></span>
                 </span>
+                <button type="button" class="energy-chat__icon-btn energy-chat__call-btn" id="chat-call-btn" title="Sesli ara" aria-label="Sesli ara" hidden>
+                    <i class="fa-solid fa-phone"></i>
+                </button>
+                <button type="button" class="energy-chat__icon-btn energy-chat__group-manage" id="chat-group-manage" title="Üyeler" aria-label="Üyeler" hidden>
+                    <i class="fa-solid fa-user-plus"></i>
+                </button>
             </header>
             <div id="chat-window" class="energy-chat__window"></div>
-            <div class="energy-chat__attach">
-                <button type="button" id="chat-attach-btn" class="energy-chat__attach-btn" title="@T[LocalizationKeys.ChatScreen.AttachFile]">
-                    <i class="fa-solid fa-paperclip"></i>
-                    <span>@T[LocalizationKeys.ChatScreen.AttachFile]</span>
+            <div class="energy-chat__reply-bar" id="chat-reply-bar" hidden>
+                <div class="energy-chat__reply-bar-info">
+                    <span class="energy-chat__reply-bar-sender" id="chat-reply-sender"></span>
+                    <span class="energy-chat__reply-bar-text" id="chat-reply-text"></span>
+                </div>
+                <button type="button" class="energy-chat__icon-btn" id="chat-reply-cancel" title="İptal" aria-label="İptal">
+                    <i class="fa-solid fa-xmark"></i>
                 </button>
-                <input type="file" id="chat-attach-input" class="energy-chat__attach-input" hidden />
             </div>
+            <div class="energy-chat__composer">
+                <div class="energy-chat__composer-actions">
+                    <button type="button" id="chat-attach-btn" class="energy-chat__icon-btn" title="@T[LocalizationKeys.ChatScreen.AttachFile]" aria-label="@T[LocalizationKeys.ChatScreen.AttachFile]">
+                        <i class="fa-solid fa-paperclip"></i>
+                    </button>
+                    <button type="button" id="chat-voice-btn" class="energy-chat__icon-btn" title="Sesli mesaj" aria-label="Sesli mesaj">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+                </div>
+                <input type="file" id="chat-attach-input" class="energy-chat__attach-input" hidden />
+                <div class="energy-chat__recorder" id="chat-recorder" hidden>
+                    <span class="energy-chat__recorder-dot"></span>
+                    <span class="energy-chat__recorder-time" id="chat-recorder-time">0:00</span>
+                    <span class="energy-chat__recorder-spacer"></span>
+                    <button type="button" id="chat-rec-cancel" class="energy-chat__icon-btn is-danger" title="İptal" aria-label="İptal">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                    <button type="button" id="chat-rec-send" class="energy-chat__icon-btn is-primary" title="Gönder" aria-label="Gönder">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="chat-group-popup"></div>
+    <div id="chat-members-popup"></div>
+    <div id="chat-forward-popup"></div>
+
+    <!-- Voice call overlay -->
+    <div class="energy-chat__call" id="chat-call" hidden>
+        <div class="energy-chat__call-card">
+            <div class="energy-chat__call-avatar" id="chat-call-avatar"></div>
+            <div class="energy-chat__call-name" id="chat-call-name"></div>
+            <div class="energy-chat__call-state" id="chat-call-state">Aranıyor…</div>
+            <div class="energy-chat__call-actions">
+                <button type="button" class="energy-chat__call-btn-accept" id="chat-call-accept" hidden>
+                    <i class="fa-solid fa-phone"></i>
+                </button>
+                <button type="button" class="energy-chat__call-btn-hangup" id="chat-call-hangup">
+                    <i class="fa-solid fa-phone-slash"></i>
+                </button>
+            </div>
+            <audio id="chat-call-audio" autoplay></audio>
         </div>
     </div>
 </section>

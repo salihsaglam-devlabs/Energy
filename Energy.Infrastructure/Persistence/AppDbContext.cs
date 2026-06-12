@@ -24,6 +24,9 @@ public class AppDbContext : DbContext
     public DbSet<Resource> Resources => Set<Resource>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
+    public DbSet<ChatGroup> ChatGroups => Set<ChatGroup>();
+    public DbSet<ChatGroupMember> ChatGroupMembers => Set<ChatGroupMember>();
+    public DbSet<ChatMessageReaction> ChatMessageReactions => Set<ChatMessageReaction>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
