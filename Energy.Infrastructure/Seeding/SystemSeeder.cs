@@ -1,5 +1,6 @@
 using Energy.Application.Identity.Services;
 using Energy.Application.Localization.Services;
+using Energy.Application.System.Services;
 using Energy.Domain.Identity;
 using Energy.Domain.System;
 using Energy.Infrastructure.Identity.Services;
@@ -21,7 +22,7 @@ namespace Energy.Infrastructure.Seeding;
 /// and a curated catalog of sample roles + demo users covering the common
 /// usage patterns the new architecture supports. Every step is safe to re-run.
 /// </summary>
-public sealed class SystemSeeder
+public sealed class SystemSeeder : ISystemSeeder
 {
     /// <summary>
     /// Reference catalog of user archetypes. Each entry maps a role to the
@@ -159,7 +160,7 @@ public sealed class SystemSeeder
         _logger = logger;
     }
 
-    public async Task SeedAsync(CancellationToken ct = default)
+    public async Task SeedAllAsync(CancellationToken ct = default)
     {
         if (_db.Database.IsSqlServer())
         {
@@ -210,8 +211,16 @@ public sealed class SystemSeeder
         _logger.LogInformation("Seeding: localization resources (resx → DB)");
         var localizationResult = await _localization.ImportFromResxAsync(ct);
         _logger.LogInformation(
-            "Localization: {Added} added, {Updated} updated, {Total} total entries.",
+            "Localization (resx): {Added} added, {Updated} updated, {Total} total entries.",
             localizationResult.Added, localizationResult.Updated, localizationResult.Total);
+
+        // Embedded-resource seed runs unconditionally so the database is populated
+        // even in production where the source .resx files are not on disk.
+        _logger.LogInformation("Seeding: localization resources (embedded → DB)");
+        var embeddedResult = await _localization.SeedFromResourcesAsync(ct);
+        _logger.LogInformation(
+            "Localization (embedded): {Added} added, {Updated} updated, {Total} total entries.",
+            embeddedResult.Added, embeddedResult.Updated, embeddedResult.Total);
     }
 
     /// <summary>

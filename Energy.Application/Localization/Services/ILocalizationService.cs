@@ -27,5 +27,13 @@ public interface ILocalizationService
     /// the number of rows added and updated.
     /// </summary>
     Task<SeedResultResponse> ImportFromResxAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Seeds the database from the localization resources EMBEDDED in the
+    /// application assemblies (works without the source .resx files on disk,
+    /// i.e. in production). Existing (key, culture) rows are OVERWRITTEN with the
+    /// embedded value; missing rows are inserted. Returns the added/updated counts.
+    /// </summary>
+    Task<SeedResultResponse> SeedFromResourcesAsync(CancellationToken cancellationToken = default);
 }
 

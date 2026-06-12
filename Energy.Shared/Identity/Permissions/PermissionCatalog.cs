@@ -49,6 +49,10 @@ public static class PermissionCatalog
     public const string SettingRead = "Setting.Read";
     public const string SettingUpdate = "Setting.Update";
 
+    // System maintenance: triggering the (idempotent) data seeders on demand.
+    // High-privilege operation; granted to SystemAdmin and bypassed by SuperAdmin.
+    public const string SystemSeed = "System.Seed";
+
     // Self-service: every authenticated user may read and update their own
     // profile. These ship as DEFAULT grants (see <see cref="DefaultGrants"/>).
     public const string ProfileRead = "Profile.Read";
@@ -78,6 +82,8 @@ public static class PermissionCatalog
         Describe(LogRead), Describe(LogReadAll),
 
         Describe(SettingRead), Describe(SettingUpdate),
+
+        Describe(SystemSeed),
 
         Describe(ProfileRead), Describe(ProfileUpdate),
 
