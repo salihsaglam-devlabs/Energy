@@ -1,7 +1,10 @@
 using System.Diagnostics;
+using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using Energy.Shared.Logging;
 using Energy.Shared.Models.V1.Logger.Requests;
+using Energy.Web.Clients.Infrastructure.Authentication;
 using Energy.Web.Clients.Logger;
 
 namespace Energy.Web.Common.Middleware;
@@ -9,15 +12,16 @@ namespace Energy.Web.Common.Middleware;
 /// <summary>
 /// Records every Web-tier request (page navigations and MVC/JSON actions) in
 /// the single audit sink by forwarding a masked request/response entry to the
-/// API. Static assets are skipped; anonymous requests are skipped because they
-/// cannot authenticate against the API (the corresponding API call — e.g. the
-/// login POST — is already audited on the API side). Logging never breaks the
-/// request: every failure is swallowed.
+/// API. Static assets and SignalR transport are skipped. Requests are ALWAYS
+/// audited: the ingest call authenticates to the API as the non-interactive
+/// system service account (never with the signed-in user's token), so audit
+/// logging can never be blocked by the user's permissions, an expired/invalid
+/// user token, or any other Web-side restriction. The real signed-in actor is
+/// forwarded in the request body so the entry is still attributed correctly.
+/// Logging never breaks the request: every failure is swallowed.
 /// </summary>
 public sealed class WebRequestLoggingMiddleware
 {
-    private const string Source = "Web";
-
     private static readonly string[] SkippedPrefixes =
     [
         "/css", "/js", "/lib", "/images", "/img", "/fonts", "/favicon", "/_", "/health",
@@ -42,7 +46,11 @@ public sealed class WebRequestLoggingMiddleware
         _logger = logger;
     }
 
-    public async Task InvokeAsync(HttpContext context, IAuditLogIngestClient ingest)
+    public async Task InvokeAsync(
+        HttpContext context,
+        IAuditLogIngestClient ingest,
+        IUserApiTokenProvider userTokens,
+        IServiceApiTokenProvider serviceTokens)
     {
         // Never buffer streaming/upgrade responses (SignalR WebSocket/SSE):
         // swapping Response.Body for a MemoryStream would break the connection.
@@ -70,12 +78,22 @@ public sealed class WebRequestLoggingMiddleware
         catch (Exception ex)
         {
             exception = ex;
+            // Log WITH the exception so the full stack trace (the exact method +
+            // line where it was raised) is captured before it bubbles up to the
+            // framework error handler.
+            _logger.LogError(ex,
+                "Unhandled exception for {Method} {Path}. CorrelationId: {CorrelationId}.",
+                context.Request.Method, context.Request.Path.Value, correlationId);
             throw;
         }
         finally
         {
             stopwatch.Stop();
             var responseBody = ReadResponseBody(context, buffer);
+
+            // Surface business failures too: a BaseResponse with success=false is a
+            // logical failure even when no exception was thrown.
+            LogFailedEnvelope(context, correlationId, responseBody, exception);
 
             try
             {
@@ -91,14 +109,16 @@ public sealed class WebRequestLoggingMiddleware
                 context.Response.Body = originalBody;
             }
 
-            await SafeIngestAsync(context, ingest, startedAt, stopwatch.ElapsedMilliseconds,
-                correlationId, exception, requestBody, responseBody);
+            await SafeIngestAsync(context, ingest, userTokens, serviceTokens, startedAt,
+                stopwatch.ElapsedMilliseconds, correlationId, exception, requestBody, responseBody);
         }
     }
 
     private async Task SafeIngestAsync(
         HttpContext context,
         IAuditLogIngestClient ingest,
+        IUserApiTokenProvider userTokens,
+        IServiceApiTokenProvider serviceTokens,
         DateTime startedAt,
         long durationMs,
         Guid correlationId,
@@ -106,34 +126,103 @@ public sealed class WebRequestLoggingMiddleware
         string? requestBody,
         string? responseBody)
     {
-        // Anonymous requests cannot authenticate against the API ingest endpoint;
-        // their equivalent API call (e.g. login) is audited on the API side.
-        if (context.User.Identity?.IsAuthenticated != true) return;
-
         try
         {
-            var status = context.Response.StatusCode;
-            await ingest.IngestAsync(new CreateAuditLogRequest
+            // Audit logging ALWAYS authenticates to the API as the non-interactive
+            // system service account — never with the signed-in user's token. This
+            // guarantees the audit trail can never be blocked by the user's
+            // permissions, an expired/invalid user token, or any other Web-side
+            // restriction: EVERY request (anonymous login attempts included) is
+            // captured. The real actor is forwarded in the request body so the
+            // entry is still attributed to the signed-in user.
+            var serviceToken = await serviceTokens.GetAccessTokenAsync(context.RequestAborted);
+            if (string.IsNullOrEmpty(serviceToken))
             {
-                OccurredAt = startedAt,
-                HttpMethod = context.Request.Method,
-                Path = context.Request.Path.Value,
-                QueryString = SensitiveDataMasker.MaskQueryString(context.Request.QueryString.Value),
-                StatusCode = status,
-                IsSuccess = exception is null && status is >= 200 and < 400,
-                RequestBody = requestBody,
-                ResponseBody = responseBody,
-                HasException = exception is not null,
-                ExceptionType = exception?.GetType().FullName,
-                ExceptionMessage = exception?.Message,
-                CorrelationId = correlationId,
-                DurationMs = (int)durationMs
-            }, context.RequestAborted);
+                // Service token unavailable (e.g. API down). Do not lose the request
+                // silently — record the reason and skip this single entry.
+                _logger.LogWarning("Skipping audit for {Path}: no service token available.",
+                    context.Request.Path);
+                return;
+            }
+
+            // Resolve the real signed-in actor (if any) from the cookie principal.
+            ResolveActor(context, out var actorId, out var actorName);
+
+            using (userTokens.UseAccessToken(serviceToken))
+            {
+                var status = context.Response.StatusCode;
+                await ingest.IngestAsync(new CreateAuditLogRequest
+                {
+                    OccurredAt = startedAt,
+                    UserId = actorId,
+                    UserName = actorName,
+                    HttpMethod = context.Request.Method,
+                    Path = context.Request.Path.Value,
+                    QueryString = SensitiveDataMasker.MaskQueryString(context.Request.QueryString.Value),
+                    StatusCode = status,
+                    IsSuccess = exception is null && status is >= 200 and < 400,
+                    RequestBody = requestBody,
+                    ResponseBody = responseBody,
+                    HasException = exception is not null,
+                    ExceptionType = exception?.GetType().FullName,
+                    ExceptionMessage = exception?.Message,
+                    CorrelationId = correlationId,
+                    DurationMs = (int)durationMs
+                }, context.RequestAborted);
+            }
         }
         catch (Exception ex)
         {
             // Auditing must never break the user request.
             _logger.LogWarning(ex, "Failed to forward Web audit log entry for {Path}.", context.Request.Path);
+        }
+    }
+
+    /// <summary>
+    /// Extracts the signed-in user's id and name from the cookie principal so the
+    /// audit entry is attributed correctly even though the ingest call itself is
+    /// authenticated as the system service account. Returns <c>null</c> for
+    /// anonymous requests (e.g. the login POST).
+    /// </summary>
+    private static void ResolveActor(HttpContext context, out Guid? userId, out string? userName)
+    {
+        userId = null;
+        userName = null;
+
+        if (context.User.Identity?.IsAuthenticated != true) return;
+
+        var idValue = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (Guid.TryParse(idValue, out var parsed)) userId = parsed;
+        userName = context.User.Identity?.Name;
+    }
+
+    /// <summary>
+    /// Inspects the captured response envelope and, if it represents a business
+    /// failure (<c>success:false</c>) that did NOT originate from an exception,
+    /// records it so failed outcomes are never silently lost in the logs.
+    /// </summary>
+    private void LogFailedEnvelope(HttpContext context, Guid correlationId, string? responseBody, Exception? exception)
+    {
+        // Exception paths are already logged above with their full stack trace.
+        if (exception is not null) return;
+        if (string.IsNullOrEmpty(responseBody)) return;
+        if (!responseBody.Contains("\"success\"", StringComparison.OrdinalIgnoreCase)) return;
+
+        try
+        {
+            using var doc = JsonDocument.Parse(responseBody);
+            if (doc.RootElement.ValueKind != JsonValueKind.Object) return;
+            if (!doc.RootElement.TryGetProperty("success", out var success)) return;
+            if (success.ValueKind != JsonValueKind.False) return;
+
+            var message = doc.RootElement.TryGetProperty("message", out var m) ? m.GetString() : null;
+            _logger.LogWarning(
+                "Business failure (success=false) for {Method} {Path} -> {StatusCode}. Message: {Message}. CorrelationId: {CorrelationId}.",
+                context.Request.Method, context.Request.Path.Value, context.Response.StatusCode, message, correlationId);
+        }
+        catch (JsonException)
+        {
+            // Non-JSON or partial payload — nothing to extract; ignore.
         }
     }
 

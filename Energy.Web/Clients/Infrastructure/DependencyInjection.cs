@@ -17,6 +17,8 @@ public static class DependencyInjection
     {
         services.AddHttpContextAccessor();
         services.AddScoped<IUserApiTokenProvider, UserApiTokenProvider>();
+        // Singleton: caches the system/service account token across requests.
+        services.AddSingleton<IServiceApiTokenProvider, ServiceApiTokenProvider>();
         services.AddTransient<AuthHeaderHandler>();
         services.AddScoped<BrowserClientIdService>();
         services.AddTransient<ClientIdentityHeaderHandler>();

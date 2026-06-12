@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Energy.Infrastructure.Persistence.Migrations.MsSql
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260612065822_InitialMsSql")]
+    [Migration("20260612125444_InitialMsSql")]
     partial class InitialMsSql
     {
         /// <inheritdoc />

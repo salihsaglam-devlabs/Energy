@@ -61,19 +61,31 @@ public sealed class RequestLoggingMiddleware
         catch (NotFoundException ex)
         {
             exception = ex;
+            // Expected/handled domain outcome: log WITH the exception so the full
+            // stack trace (the exact method + line where it was raised) is captured.
+            _logger.LogWarning(ex,
+                "Handled {ExceptionType} for {Method} {Path} -> 404. CorrelationId: {CorrelationId}.",
+                nameof(NotFoundException), context.Request.Method, context.Request.Path.Value, correlationId);
             var message = localizer[ex.MessageKey, ex.Arguments].Value;
             await WriteFailureAsync(context, StatusCodes.Status404NotFound, message, new[] { message });
         }
         catch (ConflictException ex)
         {
             exception = ex;
+            _logger.LogWarning(ex,
+                "Handled {ExceptionType} for {Method} {Path} -> 409. CorrelationId: {CorrelationId}.",
+                nameof(ConflictException), context.Request.Method, context.Request.Path.Value, correlationId);
             var message = localizer[ex.MessageKey, ex.Arguments].Value;
             await WriteFailureAsync(context, StatusCodes.Status409Conflict, message, new[] { message });
         }
         catch (Exception ex)
         {
             exception = ex;
-            _logger.LogError(ex, "Unhandled exception in pipeline.");
+            // Unexpected failure: log at Error with the full stack trace pinpointing
+            // WHERE the error occurred (method/line), plus request context.
+            _logger.LogError(ex,
+                "Unhandled exception for {Method} {Path} -> 500. CorrelationId: {CorrelationId}.",
+                context.Request.Method, context.Request.Path.Value, correlationId);
             await WriteFailureAsync(context, StatusCodes.Status500InternalServerError,
                 localizer[LocalizationKeys.Messages.UnexpectedError].Value,
                 new[] { localizer[LocalizationKeys.Messages.UnexpectedError].Value });
@@ -83,6 +95,10 @@ public sealed class RequestLoggingMiddleware
             stopwatch.Stop();
 
             var responseBody = ReadResponseBody(context, buffer);
+
+            // Surface business failures too: a BaseResponse with success=false is a
+            // logical failure even when no exception was thrown (e.g. validation).
+            LogFailedEnvelope(context, correlationId, responseBody, exception);
 
             // Always flush the captured response back to the real connection.
             try
@@ -164,6 +180,36 @@ public sealed class RequestLoggingMiddleware
         context.Response.StatusCode = status;
         context.Response.ContentType = "application/json";
         await context.Response.WriteAsync(JsonSerializer.Serialize(BaseResponse<object>.Failure(message, errors)));
+    }
+
+    /// <summary>
+    /// Inspects the captured response envelope and, if it represents a business
+    /// failure (<c>success:false</c>) that did NOT originate from an exception,
+    /// records it so failed outcomes are never silently lost in the logs.
+    /// </summary>
+    private void LogFailedEnvelope(HttpContext context, string correlationId, string? responseBody, Exception? exception)
+    {
+        // Exception paths are already logged above with their full stack trace.
+        if (exception is not null) return;
+        if (string.IsNullOrEmpty(responseBody)) return;
+        if (!responseBody.Contains("\"success\"", StringComparison.OrdinalIgnoreCase)) return;
+
+        try
+        {
+            using var doc = JsonDocument.Parse(responseBody);
+            if (doc.RootElement.ValueKind != JsonValueKind.Object) return;
+            if (!doc.RootElement.TryGetProperty("success", out var success)) return;
+            if (success.ValueKind != JsonValueKind.False) return;
+
+            var message = doc.RootElement.TryGetProperty("message", out var m) ? m.GetString() : null;
+            _logger.LogWarning(
+                "Business failure (success=false) for {Method} {Path} -> {StatusCode}. Message: {Message}. CorrelationId: {CorrelationId}.",
+                context.Request.Method, context.Request.Path.Value, context.Response.StatusCode, message, correlationId);
+        }
+        catch (JsonException)
+        {
+            // Non-JSON or partial payload — nothing to extract; ignore.
+        }
     }
 
     private async Task SafeWriteLogAsync(

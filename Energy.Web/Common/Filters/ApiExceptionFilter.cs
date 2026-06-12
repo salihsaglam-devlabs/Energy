@@ -22,6 +22,13 @@ namespace Energy.Web.Common.Filters;
 /// </summary>
 public sealed class ApiExceptionFilter : IAsyncExceptionFilter
 {
+    private readonly ILogger<ApiExceptionFilter> _logger;
+
+    public ApiExceptionFilter(ILogger<ApiExceptionFilter> logger)
+    {
+        _logger = logger;
+    }
+
     public async Task OnExceptionAsync(ExceptionContext context)
     {
         var request = context.HttpContext.Request;
@@ -30,6 +37,8 @@ public sealed class ApiExceptionFilter : IAsyncExceptionFilter
         switch (context.Exception)
         {
             case ApiUnauthorizedException:
+                _logger.LogWarning(context.Exception,
+                    "API rejected request as unauthorized (401) for {Path}.", currentPath);
                 // The cookie was accepted locally but the JWT inside it was
                 // rejected by the API (expired, signing-key/security-stamp
                 // mismatch, ...). Drop the cookie so the user is no longer
@@ -48,6 +57,8 @@ public sealed class ApiExceptionFilter : IAsyncExceptionFilter
                 break;
 
             case ApiForbiddenException:
+                _logger.LogWarning(context.Exception,
+                    "API rejected operation as forbidden (403) for {Path}.", currentPath);
                 // The API rejected the operation with 403. Surface the real
                 // requested path on the access-denied screen (the specific
                 // permission code is only known API-side, so it is left to the

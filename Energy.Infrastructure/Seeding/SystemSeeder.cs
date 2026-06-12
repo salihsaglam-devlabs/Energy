@@ -9,6 +9,7 @@ using Energy.Localization;
 using Energy.Shared.Identity;
 using Energy.Shared.Identity.Permissions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Energy.Infrastructure.Seeding;
@@ -135,6 +136,7 @@ public sealed class SystemSeeder
     private readonly ApiEndpointSyncService _endpointSync;
     private readonly ILocalizationService _localization;
     private readonly PasswordHashingService _passwords;
+    private readonly IConfiguration _configuration;
     private readonly ILogger<SystemSeeder> _logger;
 
     public SystemSeeder(
@@ -144,6 +146,7 @@ public sealed class SystemSeeder
         ApiEndpointSyncService endpointSync,
         ILocalizationService localization,
         PasswordHashingService passwords,
+        IConfiguration configuration,
         ILogger<SystemSeeder> logger)
     {
         _db = db;
@@ -152,6 +155,7 @@ public sealed class SystemSeeder
         _endpointSync = endpointSync;
         _localization = localization;
         _passwords = passwords;
+        _configuration = configuration;
         _logger = logger;
     }
 
@@ -187,6 +191,9 @@ public sealed class SystemSeeder
 
         _logger.LogInformation("Seeding: SuperAdmin role + admin user");
         await EnsureSuperAdminAsync(ct);
+
+        _logger.LogInformation("Seeding: non-interactive system service account");
+        await EnsureSystemServiceAccountAsync(ct);
 
         _logger.LogInformation("Seeding: baseline menu tree");
         await EnsureBaselineMenusAsync(ct);
@@ -348,6 +355,74 @@ public sealed class SystemSeeder
             };
             _db.Users.Add(user);
             await _db.SaveChangesAsync(ct);
+        }
+
+        if (!await _db.UserRoles.AnyAsync(ur => ur.UserId == user.Id && ur.RoleId == role.Id, ct))
+        {
+            _db.UserRoles.Add(new UserRole { UserId = user.Id, RoleId = role.Id });
+            await _db.SaveChangesAsync(ct);
+        }
+    }
+
+    /// <summary>
+    /// Ensures a non-interactive system/service account exists and is assigned the
+    /// SuperAdmin role (so it bypasses every permission check). Internal/system
+    /// processes (e.g. the Web tier auditing anonymous requests) authenticate as
+    /// this account to reach API endpoints independently of any signed-in user.
+    /// The password is taken from configuration ("ServiceAccount:Password") and
+    /// always re-asserted so the API and Web tiers stay in sync after a rotation.
+    /// </summary>
+    private async Task EnsureSystemServiceAccountAsync(CancellationToken ct)
+    {
+        var role = await _db.Roles.FirstOrDefaultAsync(r => r.Name == SystemRoles.SuperAdmin, ct);
+        if (role is null)
+        {
+            // EnsureSuperAdminAsync runs first, so this should never happen.
+            _logger.LogWarning("Service account seeding skipped: SuperAdmin role is missing.");
+            return;
+        }
+
+        var password = _configuration[ServiceAccount.ApiPasswordConfigKey];
+        if (string.IsNullOrWhiteSpace(password)) password = ServiceAccount.DefaultPassword;
+
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == ServiceAccount.Email, ct);
+        if (user is null)
+        {
+            user = new User
+            {
+                Id = Guid.NewGuid(),
+                UserName = ServiceAccount.UserName,
+                Email = ServiceAccount.Email,
+                FirstName = ServiceAccount.FirstName,
+                LastName = ServiceAccount.LastName,
+                PasswordHash = _passwords.Hash(password),
+                IsActive = true,
+                SecurityStamp = Guid.NewGuid()
+            };
+            _db.Users.Add(user);
+            await _db.SaveChangesAsync(ct);
+            _logger.LogInformation("Service account '{UserName}' created.", ServiceAccount.UserName);
+        }
+        else
+        {
+            // Re-assert the configured password / active state so the Web tier can
+            // always log in even after the secret is rotated or the account locked.
+            var changed = false;
+            if (!_passwords.Verify(password, user.PasswordHash))
+            {
+                user.PasswordHash = _passwords.Hash(password);
+                user.SecurityStamp = Guid.NewGuid();
+                changed = true;
+            }
+            if (!user.IsActive) { user.IsActive = true; changed = true; }
+            if (user.LockoutEnd is not null) { user.LockoutEnd = null; changed = true; }
+            if (user.FailedLoginCount != 0) { user.FailedLoginCount = 0; changed = true; }
+            if (changed)
+            {
+                await _db.SaveChangesAsync(ct);
+                _permissionResolver.InvalidateUser(user.Id);
+                _logger.LogInformation("Service account '{UserName}' credentials re-asserted.", ServiceAccount.UserName);
+            }
         }
 
         if (!await _db.UserRoles.AnyAsync(ur => ur.UserId == user.Id && ur.RoleId == role.Id, ct))
