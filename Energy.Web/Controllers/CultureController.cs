@@ -1,4 +1,4 @@
-using System.Globalization;
+using Energy.Web.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +16,7 @@ public sealed class CultureController : Controller
             CookieRequestCultureProvider.DefaultCookieName,
             CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture, uiCulture)),
             new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) });
-        return Redirect(string.IsNullOrEmpty(returnUrl) ? "/" : returnUrl);
+        // Guard against open-redirect: only honour same-site local return URLs.
+        return Redirect(Url.GetLocalReturnUrl(returnUrl, "/"));
     }
 }

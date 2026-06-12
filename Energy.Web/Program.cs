@@ -6,6 +6,7 @@ using Energy.Web.Services.Authentication;
 using Energy.Web.Services.Navigation;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,6 +42,9 @@ builder.Services
         // bubbling up to the developer exception page.
         options.Filters.AddService<ApiExceptionFilter>();
         options.Filters.AddService<PageAccessFilter>();
+        // Promote failed BaseResponse envelopes (returned with HTTP 200 by the
+        // JSON proxy actions) to 400 so the client treats them as errors.
+        options.Filters.Add<EnvelopeStatusResultFilter>();
     })
     .AddEnergyMvcLocalization();
 
@@ -59,6 +63,26 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownIPNetworks.Clear();
     options.KnownProxies.Clear();
 });
+
+// --------------------------------------------------------------------
+// Data Protection key ring persistence.
+// The auth cookie ("energy.auth") that carries the API JWT is encrypted with
+// Data Protection. Without a persisted key ring the keys are regenerated on
+// every app (re)start / app-pool recycle / scale-out instance, which makes the
+// previously issued cookie undecryptable -> the user silently becomes
+// unauthenticated and the menu/API calls fail with 401. Locally the default
+// per-user profile storage hides this; on the server it must be explicit.
+// Set "DataProtection:KeysPath" in appsettings to a stable, writable folder
+// (shared across instances). The application name pins the purpose string so
+// keys stay compatible across deployments.
+var keysPath = builder.Configuration["DataProtection:KeysPath"];
+var dataProtection = builder.Services.AddDataProtection()
+    .SetApplicationName("Energy.Web");
+if (!string.IsNullOrWhiteSpace(keysPath))
+{
+    Directory.CreateDirectory(keysPath);
+    dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keysPath));
+}
 
 // In-memory cache backs the role/menu navigation lookups so we do not hit
 // the API on every request.
