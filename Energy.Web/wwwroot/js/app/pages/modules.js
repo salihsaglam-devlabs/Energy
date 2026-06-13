@@ -286,6 +286,7 @@
 
     function exportGrid(e, fileName) {
         if (typeof ExcelJS === "undefined" || typeof saveAs === "undefined" ||
+            !DevExpress.excelExporter || !DevExpress.excelExporter.exportDataGrid) { return; }
         var workbook = new ExcelJS.Workbook();
         var worksheet = workbook.addWorksheet("Data");
         DevExpress.excelExporter.exportDataGrid({ component: e.component, worksheet: worksheet, autoFilterEnabled: true })
