@@ -21,7 +21,7 @@ public sealed class LogsController : Controller
     [HttpGet]
     public IActionResult Index() => View();
 
-    /// <summary>DevExtreme CustomStore load endpoint, proxied to the API.</summary>
+    /// <summary>API'ye vekillenen DevExtreme CustomStore yükleme uç noktası.</summary>
     [HttpGet("/logs/list")]
     public async Task<IActionResult> List(int skip = 0, int take = 25, CancellationToken ct = default)
     {
@@ -60,7 +60,7 @@ public sealed class LogsController : Controller
         return View();
     }
 
-    /// <summary>Single audit entry as JSON, proxied to the API.</summary>
+    /// <summary>API'ye vekillenen, JSON olarak tek bir denetim kaydı.</summary>
     [HttpGet("/logs/{id:long}/detail")]
     public async Task<IActionResult> Detail(long id, CancellationToken ct)
     {

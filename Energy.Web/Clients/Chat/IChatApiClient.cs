@@ -26,5 +26,8 @@ public interface IChatApiClient
     Task<BaseResponse<IReadOnlyList<ChatGroupMemberResponse>>> GetGroupMembersAsync(Guid groupId, CancellationToken ct = default);
     Task<BaseResponse<IReadOnlyList<Guid>>> GetGroupMemberIdsAsync(Guid groupId, CancellationToken ct = default);
     Task<BaseResponse<IReadOnlyList<ChatMessageResponse>>> GetGroupConversationAsync(Guid groupId, CancellationToken ct = default);
+    Task<BaseResponse<bool>> DeleteGroupAsync(Guid groupId, CancellationToken ct = default);
+    Task<BaseResponse<bool>> RemoveMemberAsync(Guid groupId, Guid userId, CancellationToken ct = default);
+    Task<BaseResponse<bool>> SetGroupAdminAsync(Guid groupId, Guid userId, SetGroupAdminRequest request, CancellationToken ct = default);
 }
 

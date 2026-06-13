@@ -1,10 +1,22 @@
+/*
+ * AppIcons — kullanılabilir DevExtreme ikon adlarının standart kataloğu.
+ *
+ * Sorumluluk:
+ *   - Aktif DevExtreme Fluent temasında (dx.fluent.energy-custom-scheme.css) gerçekten
+ *     görüntülenebilen ikon adlarının düz bir listesini sağlar.
+ *   - Menüler ekranındaki ikon seçiciyi doldurmak için kullanılır; böylece yöneticiler
+ *     yalnızca geçerli ikonları seçebilir.
+ *
+ * Not: Temanın dx-icon-* glifleriyle senkronize tutulmalıdır.
+ * Genel API: window.AppIcons (string dizisi).
+ */
 (function (window) {
     "use strict";
 
-    // Canonical list of icon names available in the active DevExtreme Fluent
-    // theme (dx.fluent.energy-custom-scheme.css). Used to populate the icon
-    // picker on the Menus screen so administrators can only choose icons that
-    // actually render. Keep in sync with the theme's dx-icon-* glyphs.
+    // Aktif DevExtreme Fluent temasında (dx.fluent.energy-custom-scheme.css) bulunan
+    // ikon adlarının standart listesi. Menüler ekranındaki ikon seçiciyi doldurmak için
+    // kullanılır; böylece yöneticiler yalnızca gerçekten görüntülenebilen ikonları
+    // seçebilir. Temanın dx-icon-* glifleriyle senkronize tut.
     var icons = [
         "accountbox", "activefolder", "add", "addcirclefilled", "addcircleoutline", "addcolumnleft", "addcolumnright", "addrowabove",
         "addrowbelow", "addtable", "addtableheader", "airplane", "aligncenter", "alignjustify", "alignleft", "alignright",

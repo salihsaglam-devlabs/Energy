@@ -3,11 +3,13 @@ using Energy.Shared.Models.V1.Common.Responses;
 
 namespace Energy.Application.Common.Pagination;
 
+/// <summary>Bellek içi (in-memory) dizilere sayfalama/arama/sıralama uygulayan yardımcı metotlar.</summary>
 public static class PaginationExtensions
 {
     /// <summary>
-    /// Applies the search, sort, and page slice described by <paramref name="request"/>
-    /// to an in-memory sequence and wraps the result in a <see cref="PaginatedResponse{T}"/>.
+    /// <paramref name="request"/> ile tarif edilen arama, sıralama ve sayfa dilimini
+    /// bellek içi bir diziye uygular ve sonucu bir <see cref="PaginatedResponse{T}"/>
+    /// içine sarar.
     /// </summary>
     public static PaginatedResponse<T> ToPaginatedResponse<T>(
         this IEnumerable<T> source,
@@ -17,12 +19,14 @@ public static class PaginationExtensions
     {
         IEnumerable<T> query = source;
 
+        // Arama terimi ve bir arama yüklemi (predicate) verildiyse filtreyi uygula.
         if (!string.IsNullOrWhiteSpace(request.Search) && searchPredicate is not null)
         {
             var term = request.Search!;
             query = query.Where(item => searchPredicate(item, term));
         }
 
+        // İstenen sütun için bir sıralama seçici (selector) varsa sıralamayı uygula.
         if (!string.IsNullOrWhiteSpace(request.SortBy)
             && sortSelectors is not null
             && sortSelectors.TryGetValue(request.SortBy!, out var selector))
@@ -32,9 +36,11 @@ public static class PaginationExtensions
                 : query.OrderBy(selector);
         }
 
+        // Toplam sayıyı bir kez hesaplamak için diziyi tek seferde maddeleştir.
         var materialized = query as IList<T> ?? query.ToList();
         var totalCount = materialized.Count;
 
+        // İstenen sayfa dilimini al.
         var items = materialized
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)

@@ -14,11 +14,11 @@ using Microsoft.Extensions.Localization;
 namespace Energy.Api.Common.Middleware;
 
 /// <summary>
-/// Wraps every request in an audit context: captures the (masked) request and
-/// response bodies, writes a single immutable <see cref="AuditLog"/> row per
-/// request — NEVER skipping any — and converts unhandled exceptions into a
-/// standardized, LOCALIZED <see cref="BaseResponse{T}"/> payload. Sensitive
-/// fields are redacted via <see cref="SensitiveDataMasker"/>.
+/// Her isteği bir denetim bağlamına sarar: (maskelenmiş) istek ve yanıt gövdelerini
+/// yakalar, istek başına tek ve değiştirilemez bir <see cref="AuditLog"/> satırı
+/// yazar — ASLA atlamadan — ve işlenmemiş istisnaları standartlaştırılmış,
+/// YERELLEŞTİRİLMİŞ bir <see cref="BaseResponse{T}"/> yüküne dönüştürür. Hassas
+/// alanlar <see cref="SensitiveDataMasker"/> ile maskelenir.
 /// </summary>
 public sealed class RequestLoggingMiddleware
 {
@@ -28,12 +28,14 @@ public sealed class RequestLoggingMiddleware
     private readonly RequestDelegate _next;
     private readonly ILogger<RequestLoggingMiddleware> _logger;
 
+    /// <summary>Sonraki ara katmanı ve günlükleyiciyi enjekte eder.</summary>
     public RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggingMiddleware> logger)
     {
         _next = next;
         _logger = logger;
     }
 
+    /// <summary>İstek ardışık düzenini denetim, istisna işleme ve günlükleme ile sarmalar.</summary>
     public async Task InvokeAsync(
         HttpContext context,
         IAuditLogService auditLogs,
@@ -45,11 +47,11 @@ public sealed class RequestLoggingMiddleware
         var correlationId = ResolveCorrelationId(context);
         Exception? exception = null;
 
-        // Capture the request body up-front (buffering lets model binding re-read it).
+        // İstek gövdesini önceden yakala (tamponlama, model bağlamanın yeniden okumasını sağlar).
         var requestBody = await CaptureRequestBodyAsync(context);
 
-        // Swap the response stream so we can read what downstream produced and
-        // still flush it to the real client connection afterwards.
+        // Yanıt akışını değiştir; böylece alt katmanın ürettiğini okuyabilir ve
+        // sonrasında gerçek istemci bağlantısına aktarabiliriz.
         var originalBody = context.Response.Body;
         await using var buffer = new MemoryStream();
         context.Response.Body = buffer;
@@ -61,8 +63,8 @@ public sealed class RequestLoggingMiddleware
         catch (NotFoundException ex)
         {
             exception = ex;
-            // Expected/handled domain outcome: log WITH the exception so the full
-            // stack trace (the exact method + line where it was raised) is captured.
+            // Beklenen/işlenen domain sonucu: tam yığın izi (hatanın oluştuğu kesin
+            // metot + satır) yakalansın diye istisnayla BİRLİKTE günlükle.
             _logger.LogWarning(ex,
                 "Handled {ExceptionType} for {Method} {Path} -> 404. CorrelationId: {CorrelationId}.",
                 nameof(NotFoundException), context.Request.Method, context.Request.Path.Value, correlationId);
@@ -81,8 +83,8 @@ public sealed class RequestLoggingMiddleware
         catch (Exception ex)
         {
             exception = ex;
-            // Unexpected failure: log at Error with the full stack trace pinpointing
-            // WHERE the error occurred (method/line), plus request context.
+            // Beklenmeyen hata: tam yığın iziyle (metot/satır) hatanın NEREDE oluştuğunu
+            // ve istek bağlamını belirterek Error seviyesinde günlükle.
             _logger.LogError(ex,
                 "Unhandled exception for {Method} {Path} -> 500. CorrelationId: {CorrelationId}.",
                 context.Request.Method, context.Request.Path.Value, correlationId);
@@ -96,11 +98,12 @@ public sealed class RequestLoggingMiddleware
 
             var responseBody = ReadResponseBody(context, buffer);
 
-            // Surface business failures too: a BaseResponse with success=false is a
-            // logical failure even when no exception was thrown (e.g. validation).
+            // İş kuralı başarısızlıklarını da yüzeye çıkar: success=false içeren bir
+            // BaseResponse, hiçbir istisna fırlatılmamış olsa bile (ör. doğrulama)
+            // mantıksal bir başarısızlıktır.
             LogFailedEnvelope(context, correlationId, responseBody, exception);
 
-            // Always flush the captured response back to the real connection.
+            // Yakalanan yanıtı her zaman gerçek bağlantıya geri aktar.
             try
             {
                 buffer.Position = 0;
@@ -120,6 +123,7 @@ public sealed class RequestLoggingMiddleware
         }
     }
 
+    /// <summary>İstek gövdesini güvenli ve maskelenmiş şekilde yakalar (tamponlamayla yeniden okunabilir).</summary>
     private static async Task<string?> CaptureRequestBodyAsync(HttpContext context)
     {
         var request = context.Request;
@@ -140,6 +144,7 @@ public sealed class RequestLoggingMiddleware
         return SensitiveDataMasker.MaskBody(raw, contentType);
     }
 
+    /// <summary>Yakalanan yanıt gövdesini okur ve maskeleyerek döndürür.</summary>
     private static string? ReadResponseBody(HttpContext context, MemoryStream buffer)
     {
         if (buffer.Length == 0) return null;
@@ -156,9 +161,10 @@ public sealed class RequestLoggingMiddleware
         return SensitiveDataMasker.MaskBody(raw, contentType);
     }
 
+    /// <summary>İçerik türünün metin olarak güvenle yakalanabilir olup olmadığını belirler.</summary>
     private static bool IsTextCapturable(string? contentType)
     {
-        if (string.IsNullOrEmpty(contentType)) return true; // unknown small payloads are safe to read
+        if (string.IsNullOrEmpty(contentType)) return true; // bilinmeyen küçük yükleri okumak güvenlidir
         var ct = contentType.ToLowerInvariant();
         return ct.Contains("json")
                || ct.Contains("xml")
@@ -166,6 +172,7 @@ public sealed class RequestLoggingMiddleware
                || ct.Contains("x-www-form-urlencoded");
     }
 
+    /// <summary>İlişkilendirme (correlation) kimliğini başlıktan çözer veya yeni bir tane üretir.</summary>
     private static string ResolveCorrelationId(HttpContext context)
     {
         var id = context.Request.Headers[CorrelationHeader].FirstOrDefault();
@@ -174,6 +181,7 @@ public sealed class RequestLoggingMiddleware
         return id;
     }
 
+    /// <summary>Standartlaştırılmış bir başarısızlık yanıtı (BaseResponse) yazar.</summary>
     private static async Task WriteFailureAsync(HttpContext context, int status, string message, IEnumerable<string> errors)
     {
         if (context.Response.HasStarted) return;
@@ -183,13 +191,13 @@ public sealed class RequestLoggingMiddleware
     }
 
     /// <summary>
-    /// Inspects the captured response envelope and, if it represents a business
-    /// failure (<c>success:false</c>) that did NOT originate from an exception,
-    /// records it so failed outcomes are never silently lost in the logs.
+    /// Yakalanan yanıt zarfını inceler ve eğer bir istisnadan KAYNAKLANMAYAN bir iş
+    /// kuralı başarısızlığını (<c>success:false</c>) temsil ediyorsa kaydeder; böylece
+    /// başarısız sonuçlar günlüklerde sessizce kaybolmaz.
     /// </summary>
     private void LogFailedEnvelope(HttpContext context, string correlationId, string? responseBody, Exception? exception)
     {
-        // Exception paths are already logged above with their full stack trace.
+        // İstisna yolları yukarıda zaten tam yığın iziyle günlüğe yazılmıştır.
         if (exception is not null) return;
         if (string.IsNullOrEmpty(responseBody)) return;
         if (!responseBody.Contains("\"success\"", StringComparison.OrdinalIgnoreCase)) return;
@@ -208,10 +216,11 @@ public sealed class RequestLoggingMiddleware
         }
         catch (JsonException)
         {
-            // Non-JSON or partial payload — nothing to extract; ignore.
+            // JSON olmayan veya kısmi yük — çıkarılacak bir şey yok; yok say.
         }
     }
 
+    /// <summary>Denetim günlüğü kaydını güvenli şekilde (hata fırlatmadan) kalıcılaştırır.</summary>
     private async Task SafeWriteLogAsync(
         IAuditLogService auditLogs,
         HttpContext context,

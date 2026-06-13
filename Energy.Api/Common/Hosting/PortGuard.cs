@@ -4,14 +4,15 @@ using System.Runtime.InteropServices;
 namespace Energy.Api.Common.Hosting;
 
 /// <summary>
-/// Development helper that frees the configured listen ports before Kestrel
-/// binds. If a previous instance (or any other process) is still holding a
-/// port, it is killed first so the app can start instead of failing with
-/// "address already in use". Cross-platform: uses <c>lsof</c> on macOS/Linux
-/// and <c>netstat</c> on Windows. Never throws — best effort only.
+/// Kestrel bağlanmadan önce yapılandırılan dinleme portlarını serbest bırakan
+/// geliştirme yardımcısı. Önceki bir örnek (veya başka bir süreç) bir portu hâlâ
+/// tutuyorsa, uygulama "address already in use" hatasıyla başarısız olmak yerine
+/// başlayabilsin diye önce o süreç sonlandırılır. Çapraz platform: macOS/Linux'ta
+/// <c>lsof</c>, Windows'ta <c>netstat</c> kullanır. Asla hata fırlatmaz — yalnızca en iyi çaba.
 /// </summary>
 public static class PortGuard
 {
+    /// <summary>Yapılandırmada belirtilen tüm portları serbest bırakır.</summary>
     public static void FreeConfiguredPorts(IConfiguration configuration, ILogger logger)
     {
         foreach (var port in ResolvePorts(configuration))
@@ -20,9 +21,9 @@ public static class PortGuard
         }
     }
 
+    /// <summary>Yapılandırma kaynaklarından dinlenecek port numaralarını çözer.</summary>
     private static IEnumerable<int> ResolvePorts(IConfiguration configuration)
-    {
-        var ports = new HashSet<int>();
+    {        var ports = new HashSet<int>();
 
         var sources = new[]
         {
@@ -58,6 +59,7 @@ public static class PortGuard
         return ports;
     }
 
+    /// <summary>Belirtilen portu tutan süreçleri (varsa) sonlandırarak portu serbest bırakır.</summary>
     private static void FreePort(int port, ILogger logger)
     {
         try
@@ -86,11 +88,13 @@ public static class PortGuard
         }
     }
 
+    /// <summary>Bir sürecin adını güvenli şekilde (hata fırlatmadan) döndürür.</summary>
     private static string SafeName(Process p)
     {
         try { return p.ProcessName; } catch { return "?"; }
     }
 
+    /// <summary>Belirtilen portu dinleyen süreç kimliklerini (PID) işletim sistemine göre bulur.</summary>
     private static IEnumerable<int> GetListeningPids(int port)
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -107,6 +111,7 @@ public static class PortGuard
             .Distinct();
     }
 
+    /// <summary>Windows <c>netstat</c> çıktısını ayrıştırarak portu dinleyen PID'leri çıkarır.</summary>
     private static IEnumerable<int> ParseWindows(string netstatOutput, int port)
     {
         var marker = ":" + port;
@@ -116,13 +121,14 @@ public static class PortGuard
             if (!line.Contains("LISTENING", StringComparison.OrdinalIgnoreCase)) continue;
             var parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             if (parts.Length < 4) continue;
-            // local address is parts[1]; ensure the port matches exactly
+            // yerel adres parts[1]'dir; portun tam olarak eşleştiğinden emin ol
             if (!parts[1].EndsWith(marker, StringComparison.Ordinal)) continue;
             if (int.TryParse(parts[^1], out var pid) && pid > 0) pids.Add(pid);
         }
         return pids;
     }
 
+    /// <summary>Harici bir komutu çalıştırır ve standart çıktısını güvenli şekilde döndürür.</summary>
     private static string RunCommand(string fileName, string arguments)
     {
         try

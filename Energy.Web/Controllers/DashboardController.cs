@@ -47,9 +47,8 @@ public sealed class DashboardController : Controller
 
         var d = envelope.Data;
 
-        // Build a simple "readiness" view over the six counters returned by
-        // the API: every area that has at least one configured entity counts
-        // as ready.
+        // API'nin döndürdüğü altı sayaç üzerinden basit bir "hazırlık" görünümü oluştur:
+        // en az bir yapılandırılmış varlığı olan her alan hazır sayılır.
         var areas = new[]
         {
             d.ActiveUsers > 0,

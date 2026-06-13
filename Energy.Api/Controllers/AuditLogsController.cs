@@ -39,19 +39,19 @@ public sealed class AuditLogsController : ControllerBase
     }
 
     /// <summary>
-    /// Ingests an audit entry from an upper layer (Web). The Web tier always
-    /// authenticates this call as the non-interactive system service account, so
-    /// when that trusted caller forwards an entry the real actor is taken from the
-    /// request body. A normal (human) caller can only ever log under their own
-    /// identity — the body identity is ignored for them. Source and IP are always
-    /// stamped server-side.
+    /// Üst bir katmandan (Web) gelen bir denetim kaydını alır. Web katmanı bu çağrıyı
+    /// her zaman etkileşimsiz sistem servis hesabı olarak kimlik doğrular; bu yüzden o
+    /// güvenilir çağıran bir kayıt ilettiğinde gerçek aktör istek gövdesinden alınır.
+    /// Normal (insan) bir çağıran yalnızca kendi kimliği altında kayıt tutabilir —
+    /// onlar için gövdedeki kimlik yok sayılır. Kaynak ve IP her zaman sunucu tarafında
+    /// damgalanır.
     /// </summary>
     [HttpPost]
     public async Task<ActionResult<BaseResponse<bool>>> Ingest(CreateAuditLogRequest request, CancellationToken ct)
     {
-        // Trust the body-supplied identity ONLY when the caller is the system
-        // service account; otherwise attribute the entry to the authenticated
-        // principal so a user cannot forge another user's identity.
+        // Gövdeyle verilen kimliğe YALNIZCA çağıran sistem servis hesabı olduğunda
+        // güven; aksi halde kaydı kimliği doğrulanmış asıl kullanıcıya ata; böylece
+        // bir kullanıcı başka bir kullanıcının kimliğini sahteleyemez.
         var isSystemService = string.Equals(
             _currentUser.UserName, ServiceAccount.UserName, StringComparison.OrdinalIgnoreCase);
         var userId = isSystemService ? request.UserId : _currentUser.UserId;

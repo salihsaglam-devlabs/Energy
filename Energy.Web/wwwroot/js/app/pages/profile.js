@@ -1,8 +1,19 @@
+/*
+ * Profile sayfası — geçerli kullanıcının profil ekranı.
+ *
+ * Sorumluluk:
+ *   - Kullanıcının temel bilgilerini ve rollerini/yetkilerini görüntüler.
+ *   - Profil avatarını (resim varsa) veya baş harflerden oluşan yedek avatarı çizer.
+ *   - Parola değiştirme gibi self servis işlemleri yönetir.
+ *
+ * Genel API: window.AppPages.Profile.init().
+ */
 (function (window, $) {
     "use strict";
 
     window.AppPages = window.AppPages || {};
 
+    // Bir data-* özniteliğindeki JSON değerini güvenli şekilde ayrıştırır (hata olursa yedek değer).
     function readJson($el, attr, fallback) {
         try {
             var raw = $el.attr(attr);
@@ -146,9 +157,9 @@
         var $uploader = $("#profile-image-uploader");
         var $remove = $("#profile-image-remove");
 
-        // The new backend does not expose a profile-image endpoint; when the
-        // upload/remove DOM hooks are absent we only render the static avatar
-        // (initials) and skip the rest of the widget setup.
+        // Yeni arka uç bir profil resmi uç noktası sunmaz; yükleme/kaldırma DOM
+        // bağlantıları yoksa yalnızca statik avatarı (baş harfler) çizer ve bileşen
+        // kurulumunun geri kalanını atlarız.
         var hasUploadUi = $uploader.length > 0 && $remove.length > 0;
 
         var state = { hasProfileImage: !!profile.hasProfileImage };
@@ -185,7 +196,7 @@
                 try {
                     var body = e.request && e.request.responseText ? JSON.parse(e.request.responseText) : null;
                     if (body && body.message) { msg = body.message; }
-                } catch (err) { /* ignore */ }
+                } catch (err) { /* yok say */ }
                 window.AppNotify && window.AppNotify.error(msg);
             }
         });
@@ -216,7 +227,7 @@
                                 try {
                                     var body = xhr.responseText ? JSON.parse(xhr.responseText) : null;
                                     if (body && body.message) { msg = body.message; }
-                                } catch (err) { /* ignore */ }
+                                } catch (err) { /* yok say */ }
                                 window.AppNotify && window.AppNotify.error(msg);
                             });
                     });

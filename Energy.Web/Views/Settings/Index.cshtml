@@ -1,0 +1,64 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T[LocalizationKeys.SettingsScreen.Title].Value;
+}
+
+<section class="energy-screen energy-settings" id="settings-screen">
+    <p class="energy-settings__subtitle">@T[LocalizationKeys.SettingsScreen.Subtitle]</p>
+
+    <div class="energy-settings__grid">
+        <div class="energy-settings__card">
+            <h2 class="energy-settings__group-title">@T[LocalizationKeys.SettingsScreen.Notifications]</h2>
+
+            <label class="energy-settings__row">
+                <span class="energy-settings__row-label">@T[LocalizationKeys.SettingsScreen.NotificationSound]</span>
+                <input type="checkbox" class="energy-settings__switch" data-setting="notificationSound" />
+            </label>
+            <label class="energy-settings__row">
+                <span class="energy-settings__row-label">@T[LocalizationKeys.SettingsScreen.CallSound]</span>
+                <input type="checkbox" class="energy-settings__switch" data-setting="callSound" />
+            </label>
+            <label class="energy-settings__row">
+                <span class="energy-settings__row-label">@T[LocalizationKeys.SettingsScreen.DesktopNotifications]</span>
+                <input type="checkbox" class="energy-settings__switch" data-setting="desktopNotifications" />
+            </label>
+        </div>
+
+        <div class="energy-settings__card">
+            <h2 class="energy-settings__group-title">@T[LocalizationKeys.SettingsScreen.Privacy]</h2>
+            <label class="energy-settings__row">
+                <span class="energy-settings__row-label">@T[LocalizationKeys.SettingsScreen.ReadReceipts]</span>
+                <input type="checkbox" class="energy-settings__switch" data-setting="readReceipts" />
+            </label>
+        </div>
+
+        <div class="energy-card energy-settings__card">
+            <h2 class="energy-settings__group-title">@T[LocalizationKeys.SettingsScreen.Appearance]</h2>
+            <label class="energy-settings__row">
+                <span class="energy-settings__row-label">@T[LocalizationKeys.SettingsScreen.Theme]</span>
+                <select class="energy-settings__select" data-setting="theme">
+                    <option value="system">@T[LocalizationKeys.SettingsScreen.ThemeSystem]</option>
+                    <option value="light">@T[LocalizationKeys.SettingsScreen.ThemeLight]</option>
+                    <option value="dark">@T[LocalizationKeys.SettingsScreen.ThemeDark]</option>
+                </select>
+            </label>
+        </div>
+    </div>
+
+    <div class="energy-settings__actions">
+        <button type="button" class="energy-settings__save" id="settings-save">@T[LocalizationKeys.SettingsScreen.Save]</button>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/app/pages/settings.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.Settings.init({
+                savedMessage: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T[LocalizationKeys.SettingsScreen.Saved].Value))
+            });
+        });
+    </script>
+}
+

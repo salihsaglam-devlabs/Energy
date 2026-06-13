@@ -10,21 +10,24 @@ using Microsoft.IdentityModel.Tokens;
 namespace Energy.Infrastructure.Identity.Services;
 
 /// <summary>
-/// Issues access tokens with the absolute minimum payload: <c>sub</c>,
-/// <c>name</c>, <c>sst</c> (security stamp). Permissions are NEVER embedded in
-/// the token; they are resolved server-side per request and cached.
+/// Mutlak asgari yükle erişim jetonları üretir: <c>sub</c>, <c>name</c>,
+/// <c>sst</c> (security stamp). Yetkiler jetona ASLA gömülmez; her istekte sunucu
+/// tarafında çözülür ve önbelleğe alınır.
 /// </summary>
 public sealed class JwtTokenService : IJwtTokenService
 {
+    /// <summary>Güvenlik damgasını (security stamp) taşıyan talep (claim) adı.</summary>
     public const string SecurityStampClaim = "sst";
 
     private readonly JwtSettings _settings;
 
+    /// <summary>JWT ayarlarıyla servisi başlatır.</summary>
     public JwtTokenService(IOptions<JwtSettings> settings)
     {
         _settings = settings.Value;
     }
 
+    /// <summary>Verilen kullanıcı için imzalı bir erişim jetonu üretir.</summary>
     public AuthTokenResponse Issue(User user)
     {
         var expiresAt = DateTime.UtcNow.AddMinutes(_settings.ExpiresInMinutes);

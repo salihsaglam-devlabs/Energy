@@ -8,27 +8,29 @@ using Microsoft.AspNetCore.Mvc.Filters;
 namespace Energy.Web.Common.Filters;
 
 /// <summary>
-/// Converts the API auth exceptions raised by the outbound HttpClient handler
-/// chain into the right client response:
+/// Giden HttpClient işleyici zinciri tarafından fırlatılan API kimlik doğrulama
+/// istisnalarını doğru istemci yanıtına dönüştürür:
 /// <list type="bullet">
-/// <item>Full-page navigations get a classic 302 redirect to the login /
-/// access-denied screen.</item>
-/// <item>AJAX/JSON requests (DevExtreme grids, fetch helpers) get a JSON
-/// envelope <c>{ redirect }</c> with the matching 401/403 status, which the
-/// client-side <c>AppHttp</c> layer turns into a notification + redirect.
-/// Emitting a 302 here would be useless: <c>fetch</c> follows it transparently
-/// and the grid then fails parsing an HTML page as JSON.</item>
+/// <item>Tam sayfa gezinmeleri, giriş / erişim reddedildi ekranına klasik bir 302
+/// yönlendirmesi alır.</item>
+/// <item>AJAX/JSON istekleri (DevExtreme grid'leri, fetch yardımcıları), eşleşen
+/// 401/403 durumuyla birlikte <c>{ redirect }</c> JSON zarfı alır; istemci tarafındaki
+/// <c>AppHttp</c> katmanı bunu bir bildirim + yönlendirmeye dönüştürür. Burada 302
+/// üretmek işe yaramazdı: <c>fetch</c> onu şeffaf şekilde izler ve grid bir HTML
+/// sayfasını JSON olarak ayrıştırmada başarısız olur.</item>
 /// </list>
 /// </summary>
 public sealed class ApiExceptionFilter : IAsyncExceptionFilter
 {
     private readonly ILogger<ApiExceptionFilter> _logger;
 
+    /// <summary>Günlükleyiciyi enjekte eder.</summary>
     public ApiExceptionFilter(ILogger<ApiExceptionFilter> logger)
     {
         _logger = logger;
     }
 
+    /// <summary>API kimlik doğrulama istisnalarını yakalayıp uygun yönlendirmeyi üretir.</summary>
     public async Task OnExceptionAsync(ExceptionContext context)
     {
         var request = context.HttpContext.Request;
@@ -39,11 +41,11 @@ public sealed class ApiExceptionFilter : IAsyncExceptionFilter
             case ApiUnauthorizedException:
                 _logger.LogWarning(context.Exception,
                     "API rejected request as unauthorized (401) for {Path}.", currentPath);
-                // The cookie was accepted locally but the JWT inside it was
-                // rejected by the API (expired, signing-key/security-stamp
-                // mismatch, ...). Drop the cookie so the user is no longer
-                // "signed in" with a token the API will never honour, then
-                // send them to the login page.
+                // Çerez yerel olarak kabul edildi ancak içindeki JWT API tarafından
+                // reddedildi (süresi dolmuş, imzalama anahtarı/güvenlik damgası
+                // uyuşmazlığı, ...). Kullanıcının, API'nin asla kabul etmeyeceği bir
+                // jetonla artık "oturum açmış" görünmemesi için çerezi düşür ve onu
+                // giriş sayfasına gönder.
                 if (context.HttpContext.User.Identity?.IsAuthenticated == true)
                 {
                     await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -59,10 +61,9 @@ public sealed class ApiExceptionFilter : IAsyncExceptionFilter
             case ApiForbiddenException:
                 _logger.LogWarning(context.Exception,
                     "API rejected operation as forbidden (403) for {Path}.", currentPath);
-                // The API rejected the operation with 403. Surface the real
-                // requested path on the access-denied screen (the specific
-                // permission code is only known API-side, so it is left to the
-                // page default).
+                // API işlemi 403 ile reddetti. Erişim reddedildi ekranında gerçek
+                // istenen yolu göster (belirli yetki kodu yalnızca API tarafında
+                // bilindiğinden sayfa varsayılanına bırakılır).
                 var deniedUrl = "/account/access-denied?path=" + Uri.EscapeDataString(currentPath);
                 context.Result = request.WantsJson()
                     ? new JsonResult(new { redirect = deniedUrl }) { StatusCode = StatusCodes.Status403Forbidden }

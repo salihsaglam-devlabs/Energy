@@ -1,10 +1,23 @@
+/*
+ * Localization sayfası — yerelleştirme (çeviri) kaynak yönetim ekranı.
+ *
+ * Sorumluluk:
+ *   - DevExtreme dxDataGrid ile (anahtar, kültür, değer) çeviri girdilerini listeler,
+ *     ekler/günceller (upsert) ve siler.
+ *   - Grid içeriğini ExcelJS + FileSaver ile .xlsx olarak dışa aktarır.
+ *
+ * Genel API: window.AppPages.Localization.init().
+ */
 (function (window, $) {
     "use strict";
+    // Yerelleştirme sözlüğü kısayolları (yerelleştirme / grid / bildirimler).
     var L = function () { return window.AppL10n.localization; };
     var LG = function () { return window.AppL10n.grid; };
     var LN = function () { return window.AppL10n.notifications; };
+    // Grid örneği.
     var gridInstance;
 
+    // Grid'i ExcelJS ile bir .xlsx çalışma kitabına aktarır ve indirilmesini sağlar.
     function exportGrid(e, fileName) {
         if (typeof ExcelJS === "undefined" || typeof saveAs === "undefined" ||
             !DevExpress.excelExporter || !DevExpress.excelExporter.exportDataGrid) { return; }

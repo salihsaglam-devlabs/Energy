@@ -1,68 +1,109 @@
 namespace Energy.Shared.Identity.Permissions;
 
 /// <summary>
-/// Compile-time list of every <c>Module.Action</c> permission supported by the
-/// application. This is the single source of truth that is mirrored into the
-/// <c>permissions</c> table at startup. UI never creates or deletes rows here;
-/// adding a new permission is a release-time change.
+/// Uygulamanın desteklediği her <c>Modül.Eylem</c> yetkisinin derleme zamanı listesi.
+/// Bu, başlangıçta <c>permissions</c> tablosuna yansıtılan tek doğruluk kaynağıdır.
+/// Arayüz burada satır oluşturmaz veya silmez; yeni bir yetki eklemek sürüm
+/// zamanına ait bir değişikliktir.
 /// </summary>
 public static class PermissionCatalog
 {
+    /// <summary>Gösterge panosunu okuma yetkisi.</summary>
     public const string DashboardRead = "Dashboard.Read";
 
+    /// <summary>Tek bir kullanıcıyı okuma yetkisi.</summary>
     public const string UserRead = "User.Read";
+    /// <summary>Tüm kullanıcıları okuma yetkisi.</summary>
     public const string UserReadAll = "User.ReadAll";
+    /// <summary>Kullanıcı oluşturma yetkisi.</summary>
     public const string UserCreate = "User.Create";
+    /// <summary>Kullanıcı güncelleme yetkisi.</summary>
     public const string UserUpdate = "User.Update";
+    /// <summary>Kullanıcı silme yetkisi.</summary>
     public const string UserDelete = "User.Delete";
 
+    /// <summary>Tek bir rolü okuma yetkisi.</summary>
     public const string RoleRead = "Role.Read";
+    /// <summary>Tüm rolleri okuma yetkisi.</summary>
     public const string RoleReadAll = "Role.ReadAll";
+    /// <summary>Rol oluşturma yetkisi.</summary>
     public const string RoleCreate = "Role.Create";
+    /// <summary>Rol güncelleme yetkisi.</summary>
     public const string RoleUpdate = "Role.Update";
+    /// <summary>Rol silme yetkisi.</summary>
     public const string RoleDelete = "Role.Delete";
 
+    /// <summary>Tek bir yetkiyi okuma yetkisi.</summary>
     public const string PermissionRead = "Permission.Read";
+    /// <summary>Tüm yetkileri okuma yetkisi.</summary>
     public const string PermissionReadAll = "Permission.ReadAll";
 
+    /// <summary>Tek bir menüyü okuma yetkisi.</summary>
     public const string MenuRead = "Menu.Read";
+    /// <summary>Tüm menüleri okuma yetkisi.</summary>
     public const string MenuReadAll = "Menu.ReadAll";
+    /// <summary>Menü oluşturma yetkisi.</summary>
     public const string MenuCreate = "Menu.Create";
+    /// <summary>Menü güncelleme yetkisi.</summary>
     public const string MenuUpdate = "Menu.Update";
+    /// <summary>Menü silme yetkisi.</summary>
     public const string MenuDelete = "Menu.Delete";
 
+    /// <summary>Tek bir API erişim kaydını okuma yetkisi.</summary>
     public const string ApiAccessRead = "ApiAccess.Read";
+    /// <summary>Tüm API erişim kayıtlarını okuma yetkisi.</summary>
     public const string ApiAccessReadAll = "ApiAccess.ReadAll";
+    /// <summary>API erişim kaydı oluşturma yetkisi.</summary>
     public const string ApiAccessCreate = "ApiAccess.Create";
+    /// <summary>API erişim kaydı güncelleme yetkisi.</summary>
     public const string ApiAccessUpdate = "ApiAccess.Update";
+    /// <summary>API erişim kaydı silme yetkisi.</summary>
     public const string ApiAccessDelete = "ApiAccess.Delete";
 
+    /// <summary>Tek bir yerelleştirme girdisini okuma yetkisi.</summary>
     public const string LocalizationRead = "Localization.Read";
+    /// <summary>Tüm yerelleştirme girdilerini okuma yetkisi.</summary>
     public const string LocalizationReadAll = "Localization.ReadAll";
+    /// <summary>Yerelleştirme girdisi oluşturma yetkisi.</summary>
     public const string LocalizationCreate = "Localization.Create";
+    /// <summary>Yerelleştirme girdisi güncelleme yetkisi.</summary>
     public const string LocalizationUpdate = "Localization.Update";
+    /// <summary>Yerelleştirme girdisi silme yetkisi.</summary>
     public const string LocalizationDelete = "Localization.Delete";
 
+    /// <summary>Tek bir denetim günlüğünü okuma yetkisi.</summary>
     public const string LogRead = "Log.Read";
+    /// <summary>Tüm denetim günlüklerini okuma yetkisi.</summary>
     public const string LogReadAll = "Log.ReadAll";
 
+    /// <summary>Ayarları okuma yetkisi.</summary>
     public const string SettingRead = "Setting.Read";
+    /// <summary>Ayarları güncelleme yetkisi.</summary>
     public const string SettingUpdate = "Setting.Update";
 
-    // System maintenance: triggering the (idempotent) data seeders on demand.
-    // High-privilege operation; granted to SystemAdmin and bypassed by SuperAdmin.
+    /// <summary>
+    /// Sistem bakımı: (idempotent) veri tohumlayıcılarını isteğe bağlı tetikleme.
+    /// Yüksek ayrıcalıklı işlem; SystemAdmin'e verilir, SuperAdmin tarafından atlanır.
+    /// </summary>
     public const string SystemSeed = "System.Seed";
 
-    // Self-service: every authenticated user may read and update their own
-    // profile. These ship as DEFAULT grants (see <see cref="DefaultGrants"/>).
+    /// <summary>Self servis: her kimlik doğrulanmış kullanıcı kendi profilini okuyabilir (varsayılan verilir).</summary>
     public const string ProfileRead = "Profile.Read";
+    /// <summary>Self servis: her kimlik doğrulanmış kullanıcı kendi profilini güncelleyebilir (varsayılan verilir).</summary>
     public const string ProfileUpdate = "Profile.Update";
 
-    // Collaboration: every authenticated user may use the chat. Ships as a
-    // DEFAULT grant so all roles can message each other out-of-the-box.
+    /// <summary>
+    /// İşbirliği: her kimlik doğrulanmış kullanıcı sohbeti kullanabilir. Varsayılan
+    /// verilir; böylece tüm roller kutudan çıktığı gibi birbiriyle mesajlaşabilir.
+    /// </summary>
     public const string ChatUse = "Chat.Use";
 
-    /// <summary>Flat list of every declared permission code.</summary>
+    /// <summary>Self servis: kullanıcı kendi tercihlerini okuyabilir (bildirim sesi, tema vb.). Varsayılan verilir.</summary>
+    public const string UserSettingsRead = "UserSettings.Read";
+    /// <summary>Self servis: kullanıcı kendi tercihlerini güncelleyebilir. Varsayılan verilir.</summary>
+    public const string UserSettingsUpdate = "UserSettings.Update";
+
+    /// <summary>Tanımlanmış her yetki kodunun düz listesi.</summary>
     public static IReadOnlyList<PermissionDescriptor> All { get; } =
     [
         Describe(DashboardRead),
@@ -88,16 +129,18 @@ public static class PermissionCatalog
         Describe(ProfileRead), Describe(ProfileUpdate),
 
         Describe(ChatUse),
+
+        Describe(UserSettingsRead), Describe(UserSettingsUpdate),
     ];
 
-    /// <summary>Convenience set for membership checks (O(1)).</summary>
+    /// <summary>Üyelik kontrolleri için pratik küme (O(1)).</summary>
     public static IReadOnlySet<string> AllCodes { get; } =
         new HashSet<string>(All.Select(item => item.Code), StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Permissions every authenticated user must own regardless of role — the
-    /// "floor" that requires no explicit assignment. Seeded onto every role so
-    /// the dashboard and self-service profile are always reachable.
+    /// Her kimlik doğrulanmış kullanıcının roründen bağımsız olarak sahip olması
+    /// gereken yetkiler — açık atama gerektirmeyen "taban". Gösterge panosu ve
+    /// self servis profilin her zaman erişilebilir olması için her role tohumlanır.
     /// </summary>
     public static IReadOnlyList<string> DefaultGrants { get; } =
     [
@@ -105,14 +148,17 @@ public static class PermissionCatalog
         ProfileRead,
         ProfileUpdate,
         ChatUse,
+        UserSettingsRead,
+        UserSettingsUpdate,
     ];
 
-    /// <summary>Localization key for the display name.</summary>
+    /// <summary>Görünen ad için yerelleştirme anahtarı.</summary>
     public static string BuildDisplayNameKey(string code) => $"Permissions.{code}.Name";
 
-    /// <summary>Localization key for the description.</summary>
+    /// <summary>Açıklama için yerelleştirme anahtarı.</summary>
     public static string BuildDescriptionKey(string code) => $"Permissions.{code}.Description";
 
+    /// <summary>Bir yetki kodunu ayrıştırıp tanımlayıcı (descriptor) oluşturur.</summary>
     private static PermissionDescriptor Describe(string code)
     {
         var parts = code.Split('.', 2);
@@ -130,6 +176,7 @@ public static class PermissionCatalog
     }
 }
 
+/// <summary>Bir yetkinin kodunu, modülünü, eylemini ve yerelleştirme anahtarlarını taşıyan tanımlayıcı.</summary>
 public readonly record struct PermissionDescriptor(
     string Code,
     string Module,

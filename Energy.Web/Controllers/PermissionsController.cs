@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace Energy.Web.Controllers;
 
 /// <summary>
-/// Permissions catalog is read-only — it surfaces the compile-time
-/// <c>PermissionCatalog</c> that the API syncs into the database at startup.
-/// The view renders a dxDataGrid that consumes the JSON list endpoint below.
+/// Yetki kataloğu salt okunurdur — API'nin başlangıçta veritabanına senkronladığı
+/// derleme zamanı <c>PermissionCatalog</c>'unu yüzeye çıkarır. Görünüm, aşağıdaki JSON
+/// liste uç noktasını tüketen bir dxDataGrid oluşturur.
 /// </summary>
 [Authorize]
 [PagePermission(PermissionCatalog.PermissionReadAll)]

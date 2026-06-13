@@ -63,6 +63,11 @@ internal static class ApiRoutes
         public static readonly string Dashboard = $"{V1}/home/dashboard";
     }
 
+    public static class Settings
+    {
+        public static readonly string Mine = $"{V1}/settings/me";
+    }
+
     public static class Chat
     {
         public static readonly string Base = $"{V1}/chat";
@@ -85,5 +90,8 @@ internal static class ApiRoutes
         public static string GroupMembers(Guid groupId) => $"{Base}/groups/{groupId}/members";
         public static string GroupMemberIds(Guid groupId) => $"{Base}/groups/{groupId}/member-ids";
         public static string GroupConversation(Guid groupId) => $"{Base}/groups/{groupId}/conversation";
+        public static string GroupDelete(Guid groupId) => $"{Base}/groups/{groupId}";
+        public static string GroupRemoveMember(Guid groupId, Guid userId) => $"{Base}/groups/{groupId}/members/{userId}";
+        public static string GroupSetAdmin(Guid groupId, Guid userId) => $"{Base}/groups/{groupId}/members/{userId}/admin";
     }
 }

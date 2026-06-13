@@ -3,9 +3,9 @@ using Microsoft.Extensions.Localization;
 namespace Energy.Infrastructure.Localization;
 
 /// <summary>
-/// Decorates the framework's <see cref="ResourceManagerStringLocalizerFactory"/>
-/// so every <see cref="IStringLocalizer"/> resolved from DI checks the
-/// <see cref="LocalizationCache"/> before falling back to .resx resources.
+/// DI'dan çözülen her <see cref="IStringLocalizer"/>, .resx kaynaklarına geri
+/// düşmeden önce <see cref="LocalizationCache"/>'i kontrol etsin diye, çatının
+/// <see cref="ResourceManagerStringLocalizerFactory"/> tipini süsleyen (decorator) fabrika.
 /// </summary>
 public sealed class DbStringLocalizerFactory : IStringLocalizerFactory
 {

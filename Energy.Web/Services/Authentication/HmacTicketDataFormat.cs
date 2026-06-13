@@ -6,23 +6,21 @@ using Microsoft.AspNetCore.Authentication;
 namespace Energy.Web.Services.Authentication;
 
 /// <summary>
-/// Protects the auth cookie ticket with a static HMAC-SHA256 key taken from
-/// configuration ("Auth:CookieProtectionKey") instead of the ASP.NET Core
-/// DataProtection key ring.
+/// Kimlik doğrulama çerez biletini, ASP.NET Core DataProtection anahtar halkası yerine
+/// yapılandırmadan ("Auth:CookieProtectionKey") alınan statik bir HMAC-SHA256 anahtarıyla korur.
 ///
-/// Why: the default cookie protection needs a persisted, writable key store
-/// (e.g. C:\Energy\keys\web). On servers where that folder is not writable the
-/// keys become ephemeral and every restart / app-pool recycle / scaled-out
-/// instance invalidates previously issued cookies -> users silently drop to 401
-/// and menus/data stop loading. A static configured key is stable across
-/// restarts and instances, so no writable key store is required.
+/// Neden: varsayılan çerez koruması, kalıcı ve yazılabilir bir anahtar deposuna
+/// (örn. C:\Energy\keys\web) ihtiyaç duyar. Bu klasörün yazılamadığı sunucularda anahtarlar
+/// geçici olur ve her yeniden başlatma / app-pool geri dönüşümü / ölçeklenmiş örnek, daha
+/// önce verilmiş çerezleri geçersiz kılar -> kullanıcılar sessizce 401'e düşer ve menüler/veri
+/// yüklenmeyi durdurur. Yapılandırılmış statik bir anahtar, yeniden başlatmalar ve örnekler
+/// arasında kararlıdır; bu yüzden yazılabilir bir anahtar deposu gerekmez.
 ///
-/// The ticket payload already carries the API-signed JWT plus the effective
-/// permission/role claims. We only need INTEGRITY (so a user cannot tamper with
-/// their permission claims), not confidentiality: the JWT is self-protecting and
-/// possession of the cookie already implies access. HttpOnly + Secure guard the
-/// cookie in transit. Therefore the payload is signed, not encrypted — exactly
-/// the "the JWT is already signed, no separate encryption needed" model.
+/// Bilet yükü zaten API tarafından imzalanmış JWT'yi ve etkin yetki/rol taleplerini taşır.
+/// Yalnızca BÜTÜNLÜĞE ihtiyacımız var (bir kullanıcı yetki taleplerini değiştiremesin diye),
+/// gizliliğe değil: JWT kendini korur ve çereze sahip olmak zaten erişim anlamına gelir.
+/// HttpOnly + Secure çerezi aktarım sırasında korur. Bu nedenle yük şifrelenmez, imzalanır —
+/// tam olarak "JWT zaten imzalı, ayrı şifreleme gerekmez" modeli.
 /// </summary>
 public sealed class HmacTicketDataFormat : ISecureDataFormat<AuthenticationTicket>
 {
@@ -92,8 +90,8 @@ public sealed class HmacTicketDataFormat : ISecureDataFormat<AuthenticationTicke
         }
         catch
         {
-            // Malformed cookie (truncated, wrong key, format change) -> treat as
-            // unauthenticated rather than throwing.
+            // Bozuk çerez (kesik, yanlış anahtar, biçim değişikliği) -> istisna fırlatmak
+            // yerine kimliği doğrulanmamış olarak değerlendir.
             return null;
         }
     }

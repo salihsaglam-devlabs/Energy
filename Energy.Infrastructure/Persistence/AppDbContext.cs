@@ -19,6 +19,7 @@ public class AppDbContext : DbContext
     public DbSet<Permission> Permissions => Set<Permission>();
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
     public DbSet<UserPermission> UserPermissions => Set<UserPermission>();
+    public DbSet<UserSetting> UserSettings => Set<UserSetting>();
     public DbSet<Menu> Menus => Set<Menu>();
     public DbSet<ApiEndpoint> ApiEndpoints => Set<ApiEndpoint>();
     public DbSet<Resource> Resources => Set<Resource>();

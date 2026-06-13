@@ -1,10 +1,10 @@
 namespace Energy.Web.Clients.Infrastructure.ClientIdentity;
 
 /// <summary>
-/// Issues and persists a per-browser correlation id via an HTTP cookie so the
-/// API can attribute requests to a specific client (separately from the
-/// authenticated user). Falls back to a server-machine prefixed id when no
-/// HTTP context is available (e.g. background tasks).
+/// Bir HTTP çerezi aracılığıyla tarayıcı başına bir ilişkilendirme (correlation) kimliği
+/// üretip kalıcı hale getirir; böylece API, istekleri belirli bir istemciye (kimliği
+/// doğrulanmış kullanıcıdan ayrı olarak) atfedebilir. HTTP bağlamı yokken (örn. arka plan
+/// görevleri) sunucu makinesi önekli bir kimliğe geri düşer.
 /// </summary>
 public sealed class BrowserClientIdService
 {
@@ -13,11 +13,13 @@ public sealed class BrowserClientIdService
 
     private readonly IHttpContextAccessor _httpContextAccessor;
 
+    /// <summary>HTTP bağlam erişimcisi ile servisi başlatır.</summary>
     public BrowserClientIdService(IHttpContextAccessor httpContextAccessor)
     {
         _httpContextAccessor = httpContextAccessor;
     }
 
+    /// <summary>Tarayıcı istemci kimliğini döndürür; yoksa oluşturup çereze kaydeder.</summary>
     public string GetOrCreate()
     {
         var httpContext = _httpContextAccessor.HttpContext;

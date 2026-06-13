@@ -8,8 +8,8 @@ using Microsoft.Extensions.Caching.Memory;
 namespace Energy.Infrastructure.Identity.Services;
 
 /// <summary>
-/// Computes the User → Role → Permission chain once per user and caches the
-/// result. SuperAdmin is hard-wired to the full <see cref="PermissionCatalog"/>.
+/// Kullanıcı → Rol → Yetki zincirini kullanıcı başına bir kez hesaplar ve sonucu
+/// önbelleğe alır. SuperAdmin, tüm <see cref="PermissionCatalog"/> kümesine sabitlenir.
 /// </summary>
 public sealed class PermissionResolver : IPermissionResolver
 {
@@ -52,7 +52,7 @@ public sealed class PermissionResolver : IPermissionResolver
                 .Distinct()
                 .ToListAsync(cancellationToken);
 
-            // Direct, per-user grants are layered on top of the role-derived set.
+            // Doğrudan, kullanıcıya özel tanımlar, rolden türeyen kümenin üzerine eklenir.
             var directCodes = await _dbContext.UserPermissions
                 .AsNoTracking()
                 .Where(up => up.UserId == userId)

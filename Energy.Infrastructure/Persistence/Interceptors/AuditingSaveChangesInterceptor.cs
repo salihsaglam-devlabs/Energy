@@ -7,24 +7,28 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 namespace Energy.Infrastructure.Persistence.Interceptors;
 
 /// <summary>
-/// Stamps Created/Updated/Deleted audit fields on every save and translates
-/// hard deletes of <see cref="AuditableEntity"/> roots into soft deletes.
+/// Her kaydetmede Oluşturma/Güncelleme/Silme denetim alanlarını damgalar ve
+/// <see cref="AuditableEntity"/> köklerinin kalıcı (hard) silmelerini yumuşak
+/// (soft) silmeye dönüştürür.
 /// </summary>
 public sealed class AuditingSaveChangesInterceptor : SaveChangesInterceptor
 {
     private readonly ICurrentUser _currentUser;
 
+    /// <summary>Geçerli kullanıcı bağlamını enjekte eder.</summary>
     public AuditingSaveChangesInterceptor(ICurrentUser currentUser)
     {
         _currentUser = currentUser;
     }
 
+    /// <summary>Senkron kaydetme öncesi denetim alanlarını damgalar.</summary>
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
         Stamp(eventData.Context);
         return base.SavingChanges(eventData, result);
     }
 
+    /// <summary>Asenkron kaydetme öncesi denetim alanlarını damgalar.</summary>
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
         InterceptionResult<int> result,
@@ -34,6 +38,7 @@ public sealed class AuditingSaveChangesInterceptor : SaveChangesInterceptor
         return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
+    /// <summary>İzlenen varlıkların durumuna göre denetim alanlarını ayarlar ve silmeyi yumuşatır.</summary>
     private void Stamp(DbContext? context)
     {
         if (context is null) return;

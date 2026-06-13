@@ -1,11 +1,24 @@
+/*
+ * ApiEndpoints sayfası — API uç noktası erişim yönetim ekranı.
+ *
+ * Sorumluluk:
+ *   - DevExtreme dxDataGrid ile keşfedilen API uç noktalarını listeler, düzenler ve
+ *     siler; her uç noktanın etkin/pasif durumunu ve gerektirdiği yetkiyi yönetir.
+ *   - Uç nokta-yetki eşlemesi için yetki kataloğunu arama (lookup) olarak yükler.
+ *
+ * Genel API: window.AppPages.ApiEndpoints.init().
+ */
 (function (window, $) {
     "use strict";
+    // Yerelleştirme sözlüğü kısayolları (API uç noktaları / grid / bildirimler).
     var LA = function () { return window.AppL10n.apiEndpoints; };
     var LG = function () { return window.AppL10n.grid; };
     var LN = function () { return window.AppL10n.notifications; };
 
+    // Grid örneği ve uç nokta-yetki eşlemesi için arama verisi.
     var gridInstance, permissions = [];
 
+    // Sayfayı başlatır: yetkileri yükler, ardından grid'i kurar.
     function init() {
         loadPermissions().then(buildGrid);
     }

@@ -10,10 +10,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace Energy.Web.Controllers;
 
 /// <summary>
-/// Single-screen user access management. From one page an administrator can
-/// grant or revoke a user's roles and individual permissions entirely through
-/// DevExtreme check-boxes. Every action is proxied to the API and gated behind
-/// the <see cref="PermissionCatalog.UserUpdate"/> permission.
+/// Tek ekranlı kullanıcı erişim yönetimi. Bir yönetici, tek bir sayfadan bir kullanıcının
+/// rollerini ve bireysel yetkilerini tamamen DevExtreme onay kutuları aracılığıyla
+/// verebilir veya geri alabilir. Her aksiyon API'ye vekillenir ve
+/// <see cref="PermissionCatalog.UserUpdate"/> yetkisiyle korunur.
 /// </summary>
 [Authorize]
 [PagePermission(PermissionCatalog.UserUpdate)]
@@ -35,7 +35,7 @@ public sealed class UserAccessController : Controller
     [HttpGet("index")]
     public IActionResult Index() => View();
 
-    /// <summary>DevExtreme CustomStore load endpoint for the user picker grid.</summary>
+    /// <summary>Kullanıcı seçici grid'i için DevExtreme CustomStore yükleme uç noktası.</summary>
     [HttpGet("users-list")]
     public async Task<IActionResult> UsersList(int skip = 0, int take = 20, string? searchValue = null, CancellationToken ct = default)
     {
@@ -62,7 +62,7 @@ public sealed class UserAccessController : Controller
         return Json(new { data = items, totalCount = page?.TotalCount ?? 0 });
     }
 
-    /// <summary>All roles, for the role check-box list.</summary>
+    /// <summary>Rol onay kutusu listesi için tüm roller.</summary>
     [HttpGet("roles-lookup")]
     public async Task<IActionResult> RolesLookup(CancellationToken ct)
     {
@@ -74,7 +74,7 @@ public sealed class UserAccessController : Controller
         return Json(items);
     }
 
-    /// <summary>The full permission catalog grouped by module, for the permission tree.</summary>
+    /// <summary>Yetki ağacı için modüllere göre gruplanmış tam yetki kataloğu.</summary>
     [HttpGet("permissions-catalog")]
     public async Task<IActionResult> PermissionsCatalog(CancellationToken ct)
     {
@@ -86,7 +86,7 @@ public sealed class UserAccessController : Controller
         return Json(items);
     }
 
-    /// <summary>Current access snapshot for a single user.</summary>
+    /// <summary>Tek bir kullanıcının geçerli erişim anlık görüntüsü.</summary>
     [HttpGet("{id:guid}/access")]
     public async Task<IActionResult> GetAccess(Guid id, CancellationToken ct)
     {

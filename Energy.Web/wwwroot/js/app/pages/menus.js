@@ -1,10 +1,24 @@
+/*
+ * Menus sayfası — gezinme menüsü yönetim ekranı.
+ *
+ * Sorumluluk:
+ *   - DevExtreme dxDataGrid ile menü öğelerini listeler, oluşturur, düzenler ve siler (CRUD).
+ *   - Hiyerarşi için üst menü araması (lookup) ve erişim kapısı için yetki araması yükler.
+ *   - İkon seçimi için AppIcons kataloğunu kullanır.
+ *   - Grid içeriğini ExcelJS + FileSaver ile .xlsx olarak dışa aktarır.
+ *
+ * Genel API: window.AppPages.Menus.init().
+ */
 (function (window, $) {
     "use strict";
+    // Yerelleştirme sözlüğü kısayolları (menüler / grid / bildirimler).
     var L = function () { return window.AppL10n.menus; };
     var LG = function () { return window.AppL10n.grid; };
     var LN = function () { return window.AppL10n.notifications; };
+    // Grid örneği, üst menü araması ve yetki araması verileri.
     var gridInstance, lookupItems = [], permissionsLookup = [];
 
+    // Grid'i ExcelJS ile bir .xlsx çalışma kitabına aktarır ve indirilmesini sağlar.
     function exportGrid(e, fileName) {
         if (typeof ExcelJS === "undefined" || typeof saveAs === "undefined" ||
             !DevExpress.excelExporter || !DevExpress.excelExporter.exportDataGrid) { return; }

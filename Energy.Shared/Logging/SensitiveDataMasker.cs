@@ -4,24 +4,27 @@ using System.Text.Json.Nodes;
 namespace Energy.Shared.Logging;
 
 /// <summary>
-/// Redacts sensitive values (passwords, tokens, secrets, ...) before a payload
-/// is persisted to the audit log. Used by both the API request-logging
-/// middleware and the Web request-logging middleware so masking is identical
-/// across every layer. Masking never throws: on any parse failure the input is
-/// returned best-effort (still passed through key-based text redaction).
+/// Bir veri, denetim günlüğüne kalıcı olarak yazılmadan önce hassas değerleri
+/// (parolalar, jeton/token, sırlar, ...) maskeler. Hem API istek günlükleme
+/// ara katmanı hem de Web istek günlükleme ara katmanı tarafından kullanılır;
+/// böylece maskeleme her katmanda aynıdır. Maskeleme asla hata fırlatmaz: herhangi
+/// bir ayrıştırma hatasında girdi olabildiğince korunarak döndürülür (yine de
+/// anahtar tabanlı metin maskelemesinden geçirilir).
 /// </summary>
 public static class SensitiveDataMasker
 {
+    /// <summary>Hassas değerlerin yerine konan maske ifadesi.</summary>
     public const string Mask = "***";
 
-    /// <summary>Max characters persisted per body; longer payloads are truncated.</summary>
+    /// <summary>Gövde başına kalıcı yazılan en fazla karakter sayısı; daha uzun veriler kırpılır.</summary>
     public const int MaxBodyLength = 16 * 1024;
 
+    /// <summary>Kırpılmış değerlerin sonuna eklenen son ek.</summary>
     private const string TruncationSuffix = "...[truncated]";
 
     /// <summary>
-    /// Case-insensitive fragments. A field/parameter whose name contains any of
-    /// these is redacted.
+    /// Büyük/küçük harfe duyarsız parçacıklar. Adı bunlardan herhangi birini
+    /// içeren bir alan/parametre maskelenir.
     /// </summary>
     private static readonly string[] SensitiveFragments =
     [
@@ -32,20 +35,21 @@ public static class SensitiveDataMasker
         "creditcard", "cardnumber", "cvv", "pin", "ssn", "iban"
     ];
 
+    /// <summary>Verilen anahtarın hassas bir alana işaret edip etmediğini belirler.</summary>
     public static bool IsSensitiveKey(string? key)
         => !string.IsNullOrEmpty(key)
            && Array.Exists(SensitiveFragments, f => key.Contains(f, StringComparison.OrdinalIgnoreCase));
 
     /// <summary>
-    /// Masks a request/response body. JSON objects/arrays are walked and any
-    /// sensitive property is redacted; non-JSON bodies fall back to
-    /// form/query-style <c>key=value</c> redaction. Result is length-capped.
+    /// Bir istek/yanıt gövdesini maskeler. JSON nesneleri/dizileri gezilir ve
+    /// hassas her özellik maskelenir; JSON olmayan gövdeler form/sorgu biçimindeki
+    /// <c>anahtar=değer</c> maskelemesine düşer. Sonuç uzunluk sınırına çekilir.
     /// </summary>
     public static string? MaskBody(string? body, string? contentType = null)
     {
         if (string.IsNullOrWhiteSpace(body)) return body;
 
-        // Binary payloads are never stored verbatim.
+        // İkili (binary) veriler asla olduğu gibi saklanmaz.
         if (!string.IsNullOrEmpty(contentType) && IsBinary(contentType))
         {
             return $"[binary:{contentType}]";
@@ -65,10 +69,11 @@ public static class SensitiveDataMasker
         return Truncate(masked);
     }
 
-    /// <summary>Masks an URL query string (<c>?a=1&amp;password=secret</c>).</summary>
+    /// <summary>Bir URL sorgu dizesini maskeler (<c>?a=1&amp;password=secret</c>).</summary>
     public static string? MaskQueryString(string? query)
         => string.IsNullOrWhiteSpace(query) ? query : Truncate(MaskKeyValuePairs(query));
 
+    /// <summary>Bir JSON metnini ayrıştırıp hassas özellikleri maskeler; ayrıştırılamazsa null döner.</summary>
     public static string? MaskJson(string? json)
     {
         if (string.IsNullOrWhiteSpace(json)) return json;
@@ -85,6 +90,7 @@ public static class SensitiveDataMasker
         }
     }
 
+    /// <summary>Bir JSON düğümünü özyinelemeli gezerek hassas özellikleri maskeler.</summary>
     private static void MaskNode(JsonNode? node)
     {
         switch (node)
@@ -110,7 +116,7 @@ public static class SensitiveDataMasker
 
     private static string MaskKeyValuePairs(string text)
     {
-        // Handles "a=1&password=x" and "?a=1&token=y" shapes.
+        // "a=1&password=x" ve "?a=1&token=y" biçimlerini ele alır.
         var leading = text.StartsWith('?') ? "?" : string.Empty;
         var payload = leading.Length == 1 ? text[1..] : text;
 
@@ -128,6 +134,7 @@ public static class SensitiveDataMasker
         return leading + string.Join('&', pairs);
     }
 
+    /// <summary>İçerik türünün ikili (binary) bir veri olup olmadığını belirler.</summary>
     private static bool IsBinary(string contentType)
     {
         var ct = contentType.ToLowerInvariant();
@@ -139,6 +146,7 @@ public static class SensitiveDataMasker
                || ct.Contains("zip");
     }
 
+    /// <summary>Değeri <see cref="MaxBodyLength"/> sınırına çeker ve gerekirse son ek ekler.</summary>
     private static string Truncate(string value)
         => value.Length <= MaxBodyLength ? value : value[..MaxBodyLength] + TruncationSuffix;
 }

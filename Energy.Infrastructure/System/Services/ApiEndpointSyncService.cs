@@ -8,31 +8,31 @@ using Microsoft.Extensions.Logging;
 namespace Energy.Infrastructure.System.Services;
 
 /// <summary>
-/// Scans <see cref="ApiDescription"/> at startup and registers every (method, path)
-/// the application exposes. Rows that the seeder recognises from
-/// <see cref="DefaultEndpointPermissionMap"/> are inserted as ACTIVE with the
-/// matching permission so the system is usable out-of-the-box. Unknown routes
-/// remain inactive with no permission — default DENY is preserved until an
-/// admin reviews them. Rows that already exist are never overwritten so manual
-/// edits in the UI survive every restart.
+/// Başlangıçta <see cref="ApiDescription"/> taranır ve uygulamanın sunduğu her
+/// (metot, yol) ikilisi kaydedilir. Tohumlayıcının <see cref="DefaultEndpointPermissionMap"/>
+/// içinden tanıdığı satırlar, eşleşen yetkiyle ETKİN olarak eklenir; böylece sistem
+/// kutudan çıktığı gibi kullanılabilir. Bilinmeyen rotalar yetkisiz ve pasif kalır —
+/// bir yönetici gözden geçirene kadar varsayılan REDDET korunur. Zaten var olan
+/// satırların üzerine asla yazılmaz; böylece arayüzde yapılan elle düzenlemeler her
+/// yeniden başlatmada korunur.
 /// </summary>
 public sealed class ApiEndpointSyncService
 {
     /// <summary>
-    /// Convention map keyed by <c>"Controller.Action"</c> (case-insensitive).
-    /// Value is the required permission code; <c>null</c> marks the route as
-    /// public (active, no permission needed — e.g. login, "my menu").
+    /// <c>"Controller.Action"</c> anahtarına göre (büyük/küçük harfe duyarsız)
+    /// düzenlenmiş kural haritası. Değer, gereken yetki kodudur; <c>null</c> ise
+    /// rotayı herkese açık olarak işaretler (etkin, yetki gerekmez — ör. login, "menüm").
     /// </summary>
     private static readonly IReadOnlyDictionary<string, string?> DefaultEndpointPermissionMap =
         new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
         {
-            // Auth — login is anonymous; the row exists for visibility in the admin UI.
+            // Auth — login anonimdir; satır yönetici arayüzünde görünürlük için vardır.
             ["Auth.Login"] = null,
 
-            // Home / Dashboard
+            // Ana sayfa / Gösterge panosu
             ["Home.GetDashboard"] = PermissionCatalog.DashboardRead,
 
-            // Users
+            // Kullanıcılar
             ["Users.GetAll"]         = PermissionCatalog.UserReadAll,
             ["Users.GetById"]        = PermissionCatalog.UserRead,
             ["Users.Create"]         = PermissionCatalog.UserCreate,
@@ -45,7 +45,7 @@ public sealed class ApiEndpointSyncService
             ["Users.GetAccess"]      = PermissionCatalog.UserReadAll,
             ["Users.SetAccess"]      = PermissionCatalog.UserUpdate,
 
-            // Roles
+            // Roller
             ["Roles.GetAll"]         = PermissionCatalog.RoleReadAll,
             ["Roles.GetById"]        = PermissionCatalog.RoleRead,
             ["Roles.Create"]         = PermissionCatalog.RoleCreate,
@@ -53,11 +53,11 @@ public sealed class ApiEndpointSyncService
             ["Roles.Delete"]         = PermissionCatalog.RoleDelete,
             ["Roles.SetPermissions"] = PermissionCatalog.RoleUpdate,
 
-            // Permissions (read-only from UI)
+            // Yetkiler (arayüzden salt okunur)
             ["Permissions.GetAll"]    = PermissionCatalog.PermissionReadAll,
             ["Permissions.GetByCode"] = PermissionCatalog.PermissionRead,
 
-            // Menus — "me" returns the current user's tree, must work for any signed-in user.
+            // Menüler — "me" geçerli kullanıcının ağacını döndürür, oturum açan herkes için çalışmalıdır.
             ["Menus.GetAll"]    = PermissionCatalog.MenuReadAll,
             ["Menus.GetById"]   = PermissionCatalog.MenuRead,
             ["Menus.GetMyMenu"] = null,
@@ -65,32 +65,32 @@ public sealed class ApiEndpointSyncService
             ["Menus.Update"]    = PermissionCatalog.MenuUpdate,
             ["Menus.Delete"]    = PermissionCatalog.MenuDelete,
 
-            // API endpoints
+            // API uç noktaları
             ["ApiEndpoints.GetAll"]  = PermissionCatalog.ApiAccessReadAll,
             ["ApiEndpoints.GetById"] = PermissionCatalog.ApiAccessRead,
             ["ApiEndpoints.Create"]  = PermissionCatalog.ApiAccessCreate,
             ["ApiEndpoints.Update"]  = PermissionCatalog.ApiAccessUpdate,
             ["ApiEndpoints.Delete"]  = PermissionCatalog.ApiAccessDelete,
 
-            // Localization
+            // Yerelleştirme
             ["Localization.GetAll"]   = PermissionCatalog.LocalizationReadAll,
             ["Localization.GetByKey"] = PermissionCatalog.LocalizationRead,
             ["Localization.Upsert"]   = PermissionCatalog.LocalizationUpdate,
             ["Localization.Delete"]   = PermissionCatalog.LocalizationDelete,
 
-            // Seed — high-privilege maintenance operations gated by System.Seed.
+            // Tohumlama — System.Seed ile korunan yüksek ayrıcalıklı bakım işlemleri.
             ["Seed.SeedAll"]                  = PermissionCatalog.SystemSeed,
             ["Seed.SeedLocalization"]         = PermissionCatalog.SystemSeed,
             ["Seed.SeedLocalizationFromResx"] = PermissionCatalog.SystemSeed,
 
-            // Audit logs
+            // Denetim günlükleri
             ["AuditLogs.Query"]   = PermissionCatalog.LogReadAll,
             ["AuditLogs.GetById"] = PermissionCatalog.LogRead,
-            // Ingest is used by upper layers (Web) to record their own request
-            // logs; any authenticated user may post their own navigation entry.
+            // Ingest, üst katmanlar (Web) tarafından kendi istek günlüklerini kaydetmek
+            // için kullanılır; kimliği doğrulanmış her kullanıcı kendi gezinme kaydını gönderebilir.
             ["AuditLogs.Ingest"]  = null,
 
-            // Chat — every authenticated user collaborates; ships as a default grant.
+            // Sohbet — kimliği doğrulanmış her kullanıcı işbirliği yapar; varsayılan yetki olarak gelir.
             ["Chat.GetContacts"]     = PermissionCatalog.ChatUse,
             ["Chat.GetConversation"] = PermissionCatalog.ChatUse,
             ["Chat.Send"]            = PermissionCatalog.ChatUse,
@@ -98,7 +98,7 @@ public sealed class ApiEndpointSyncService
             ["Chat.UnreadCount"]     = PermissionCatalog.ChatUse,
             ["Chat.GetAttachment"]   = PermissionCatalog.ChatUse,
             ["Chat.GetUserAvatar"]   = PermissionCatalog.ChatUse,
-            // Chat groups
+            // Sohbet grupları
             ["Chat.GetGroups"]            = PermissionCatalog.ChatUse,
             ["Chat.GetGroupInvites"]      = PermissionCatalog.ChatUse,
             ["Chat.CreateGroup"]          = PermissionCatalog.ChatUse,
@@ -107,16 +107,25 @@ public sealed class ApiEndpointSyncService
             ["Chat.GetGroupMembers"]      = PermissionCatalog.ChatUse,
             ["Chat.GetGroupMemberIds"]    = PermissionCatalog.ChatUse,
             ["Chat.GetGroupConversation"] = PermissionCatalog.ChatUse,
-            // Chat message actions
+            // Sohbet grubu yönetimi (serviste sahip/yönetici tarafından grup bazında yetkilendirilir)
+            ["Chat.DeleteGroup"]          = PermissionCatalog.ChatUse,
+            ["Chat.RemoveMember"]         = PermissionCatalog.ChatUse,
+            ["Chat.SetGroupAdmin"]        = PermissionCatalog.ChatUse,
+            // Sohbet mesajı eylemleri
             ["Chat.DeleteMessage"]        = PermissionCatalog.ChatUse,
             ["Chat.Forward"]              = PermissionCatalog.ChatUse,
             ["Chat.React"]                = PermissionCatalog.ChatUse,
+
+            // Self servis kullanıcı ayarları — kimliği doğrulanmış her kullanıcı için varsayılan yetki.
+            ["Settings.GetMine"]    = PermissionCatalog.UserSettingsRead,
+            ["Settings.UpdateMine"] = PermissionCatalog.UserSettingsUpdate,
         };
 
     private readonly AppDbContext _db;
     private readonly IApiDescriptionGroupCollectionProvider _descriptions;
     private readonly ILogger<ApiEndpointSyncService> _logger;
 
+    /// <summary>Bağımlılıkları (veritabanı, API tanımları sağlayıcısı, günlükleyici) enjekte eder.</summary>
     public ApiEndpointSyncService(
         AppDbContext db,
         IApiDescriptionGroupCollectionProvider descriptions,
@@ -127,6 +136,7 @@ public sealed class ApiEndpointSyncService
         _logger = logger;
     }
 
+    /// <summary>Keşfedilen tüm uç noktaları veritabanıyla senkronize eder (yalnızca eksikleri ekler).</summary>
     public async Task SyncAsync(CancellationToken ct = default)
     {
         var discovered = _descriptions.ApiDescriptionGroups.Items
@@ -157,8 +167,8 @@ public sealed class ApiEndpointSyncService
 
             if (existingByKey.TryGetValue((d.Method, d.Path), out var row))
             {
-                // Heuristic: only auto-configure rows that the previous sync inserted
-                // as INACTIVE with NO permission — i.e. rows the admin has never touched.
+                // Sezgisel: yalnızca önceki senkronizasyonun YETKİSİZ ve PASİF olarak
+                // eklediği — yani yöneticinin hiç dokunmadığı — satırları otomatik yapılandır.
                 if (hasDefault && !row.IsActive && row.RequiredPermissionCode is null)
                 {
                     row.IsActive = true;
@@ -189,6 +199,7 @@ public sealed class ApiEndpointSyncService
         }
     }
 
+    /// <summary>Bir eylem tanımındaki rota değerini (controller/action) güvenli şekilde okur.</summary>
     private static string RouteValue(ApiDescription d, string key)
         => d.ActionDescriptor.RouteValues.TryGetValue(key, out var value) && !string.IsNullOrEmpty(value)
             ? value

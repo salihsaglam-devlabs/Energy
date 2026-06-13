@@ -3,20 +3,32 @@ using Energy.Domain.Common;
 namespace Energy.Domain.Chat;
 
 /// <summary>
-/// Link row between a <see cref="ChatGroup"/> and a user. Carries the invitation
-/// state so a user is only included in the group once they accept.
+/// Bir <see cref="ChatGroup"/> ile bir kullanıcı arasındaki bağlantı satırı.
+/// Davet durumunu taşır; böylece kullanıcı yalnızca daveti kabul ettiğinde gruba
+/// dahil edilir.
 /// </summary>
 public class ChatGroupMember : AuditableEntity
 {
+    /// <summary>Üyeliğin ait olduğu grubun kimliği.</summary>
     public Guid GroupId { get; set; }
+
+    /// <summary>Üye olan kullanıcının kimliği.</summary>
     public Guid UserId { get; set; }
 
+    /// <summary>Üyelik durumu (beklemede / kabul / red).</summary>
     public ChatGroupMemberStatus Status { get; set; } = ChatGroupMemberStatus.Pending;
 
-    /// <summary>True for the group owner (created the group).</summary>
+    /// <summary>Grup sahibi için true (grubu oluşturan kişi).</summary>
     public bool IsOwner { get; set; }
 
-    /// <summary>User who sent the invitation (null for the owner's own row).</summary>
+    /// <summary>
+    /// Bu üye bir grup yöneticisiyse true. Yöneticiler (ve her zaman örtük olarak
+    /// yönetici sayılan sahip) üye ekleyip çıkarabilir, başka üyeleri yönetici
+    /// yapabilir veya yöneticilikten alabilir. Sahibin yöneticiliği alınamaz ve
+    /// sahip gruptan çıkarılamaz.
+    /// </summary>
+    public bool IsAdmin { get; set; }
+
+    /// <summary>Daveti gönderen kullanıcının kimliği (sahibin kendi satırında null).</summary>
     public Guid? InvitedById { get; set; }
 }
-

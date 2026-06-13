@@ -4,79 +4,96 @@ using Energy.Shared.Models.V1.Chat.Responses;
 namespace Energy.Application.Chat.Services;
 
 /// <summary>
-/// Direct (1-to-1) messaging between users. Every message is persisted; the
-/// real-time delivery is handled by the Web layer's SignalR hub on top of the
-/// values returned here.
+/// Kullanıcılar arası birebir (1-1) ve grup mesajlaşması. Her mesaj kalıcı olarak
+/// saklanır; gerçek zamanlı iletim, burada döndürülen değerlerin üzerine Web
+/// katmanındaki SignalR hub'ı tarafından eklenir.
 /// </summary>
 public interface IChatService
 {
-    /// <summary>Every other active user, with the current user's unread count from each.</summary>
+    /// <summary>Geçerli kullanıcının her kişiden okunmamış mesaj sayısıyla birlikte diğer tüm aktif kullanıcıları.</summary>
     Task<IReadOnlyList<ChatContactResponse>> GetContactsAsync(Guid currentUserId, CancellationToken cancellationToken = default);
 
-    /// <summary>Ordered message history between the current user and a peer.</summary>
+    /// <summary>Geçerli kullanıcı ile bir kişi arasındaki sıralı mesaj geçmişi.</summary>
     Task<IReadOnlyList<ChatMessageResponse>> GetConversationAsync(Guid currentUserId, Guid peerId, CancellationToken cancellationToken = default);
 
-    /// <summary>Persists a message from the current user and returns the stored row.</summary>
+    /// <summary>Geçerli kullanıcıdan bir mesaj saklar ve kaydedilen satırı döndürür.</summary>
     Task<ChatMessageResponse> SendAsync(Guid senderId, SendChatMessageRequest request, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Soft-deletes a message for everyone (only the sender may delete). Returns the
-    /// deleted message projection (for realtime fan-out) or null if not allowed/found.
+    /// Bir mesajı herkes için yumuşak siler (yalnızca gönderen silebilir). Silinen
+    /// mesaj projeksiyonunu (gerçek zamanlı dağıtım için) döndürür; izin yoksa/bulunamazsa null.
     /// </summary>
     Task<ChatMessageResponse?> DeleteMessageAsync(Guid currentUserId, Guid messageId, CancellationToken cancellationToken = default);
 
-    /// <summary>Forwards an existing message's content to a new target. Returns the new message.</summary>
+    /// <summary>Mevcut bir mesajın içeriğini yeni bir hedefe iletir. Yeni mesajı döndürür.</summary>
     Task<ChatMessageResponse?> ForwardAsync(Guid currentUserId, ForwardChatMessageRequest request, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Toggles the current user's emoji reaction on a message (same emoji removes it,
-    /// a different emoji replaces it). Returns the updated message projection or null.
+    /// Geçerli kullanıcının bir mesaja verdiği emoji tepkisini aç/kapa yapar (aynı emoji
+    /// kaldırır, farklı emoji değiştirir). Güncellenen mesaj projeksiyonunu veya null döndürür.
     /// </summary>
     Task<ChatMessageResponse?> ToggleReactionAsync(Guid currentUserId, Guid messageId, string emoji, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Returns the binary attachment of a message, but only if the current user is a
-    /// participant (sender or recipient) of that message. Returns <c>null</c> otherwise.
+    /// Bir mesajın ikili (binary) ekini döndürür; yalnızca geçerli kullanıcı o mesajın
+    /// katılımcısıysa (gönderen veya alıcı). Aksi halde <c>null</c> döner.
     /// </summary>
     Task<ChatAttachmentResponse?> GetAttachmentAsync(Guid currentUserId, Guid messageId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Returns a user's profile image for rendering chat avatars. Scoped to chat
-    /// (any participant may see a peer's avatar) so it does not require the
-    /// user-management/profile permissions the Users endpoints demand.
+    /// Sohbet avatarlarını çizmek için bir kullanıcının profil resmini döndürür. Sohbet
+    /// kapsamlıdır (her katılımcı bir başkasının avatarını görebilir); bu nedenle Users
+    /// uç noktalarının istediği kullanıcı yönetimi/profil yetkilerini gerektirmez.
     /// </summary>
     Task<ChatAttachmentResponse?> GetUserAvatarAsync(Guid userId, CancellationToken cancellationToken = default);
 
-    /// <summary>Marks every message from <paramref name="peerId"/> to the current user as read.</summary>
+    /// <summary><paramref name="peerId"/> kullanıcısından geçerli kullanıcıya gelen tüm mesajları okundu işaretler.</summary>
     Task<int> MarkReadAsync(Guid currentUserId, Guid peerId, CancellationToken cancellationToken = default);
 
-    /// <summary>Total unread messages addressed to the current user (drives the global bell).</summary>
+    /// <summary>Geçerli kullanıcıya gönderilen toplam okunmamış mesaj sayısı (genel zili besler).</summary>
     Task<int> GetUnreadCountAsync(Guid currentUserId, CancellationToken cancellationToken = default);
 
-    // ----- Groups -----------------------------------------------------------
+    // ----- Gruplar ----------------------------------------------------------
 
-    /// <summary>Groups the current user actively belongs to (owner or accepted member).</summary>
+    /// <summary>Geçerli kullanıcının aktif olarak üye olduğu gruplar (sahip veya kabul etmiş üye).</summary>
     Task<IReadOnlyList<ChatGroupResponse>> GetGroupsAsync(Guid currentUserId, CancellationToken cancellationToken = default);
 
-    /// <summary>Pending group invitations addressed to the current user.</summary>
+    /// <summary>Geçerli kullanıcıya gönderilmiş bekleyen grup davetleri.</summary>
     Task<IReadOnlyList<ChatGroupInviteResponse>> GetGroupInvitesAsync(Guid currentUserId, CancellationToken cancellationToken = default);
 
-    /// <summary>Creates a group owned by the current user and invites the requested members.</summary>
+    /// <summary>Geçerli kullanıcının sahip olduğu bir grup oluşturur ve istenen üyeleri davet eder.</summary>
     Task<ChatGroupResponse> CreateGroupAsync(Guid ownerId, CreateChatGroupRequest request, CancellationToken cancellationToken = default);
 
-    /// <summary>Invites users to a group the current user is a member of. Returns the invited user ids.</summary>
+    /// <summary>Geçerli kullanıcının üye olduğu bir gruba kullanıcı davet eder. Davet edilen kullanıcı kimliklerini döndürür.</summary>
     Task<IReadOnlyList<Guid>> InviteToGroupAsync(Guid currentUserId, Guid groupId, InviteToGroupRequest request, CancellationToken cancellationToken = default);
 
-    /// <summary>Accepts or declines the current user's pending invitation to a group.</summary>
+    /// <summary>Geçerli kullanıcının bir gruba olan bekleyen davetini kabul eder veya reddeder.</summary>
     Task<bool> RespondInviteAsync(Guid currentUserId, Guid groupId, bool accept, CancellationToken cancellationToken = default);
 
-    /// <summary>Members of a group (current user must be an accepted member).</summary>
+    /// <summary>Bir grubun üyeleri (geçerli kullanıcı kabul etmiş üye olmalıdır).</summary>
     Task<IReadOnlyList<ChatGroupMemberResponse>> GetGroupMembersAsync(Guid currentUserId, Guid groupId, CancellationToken cancellationToken = default);
 
-    /// <summary>Accepted member user ids of a group (used to fan-out realtime delivery).</summary>
+    /// <summary>
+    /// Bir grubu siler (yalnızca sahip veya yönetici). Grubu, üyeliklerini ve
+    /// mesajlarını yumuşak siler. İzin yoksa/bulunamazsa false döner.
+    /// </summary>
+    Task<bool> DeleteGroupAsync(Guid currentUserId, Guid groupId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Bir üyeyi gruptan çıkarır (yalnızca sahip veya yönetici). Sahip asla
+    /// çıkarılamaz. İzin yoksa/bulunamazsa false döner.
+    /// </summary>
+    Task<bool> RemoveMemberAsync(Guid currentUserId, Guid groupId, Guid memberUserId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Bir üyeyi grup yöneticisi yapar veya yöneticilikten alır (yalnızca sahip veya
+    /// yönetici). Sahibin yönetici durumu değiştirilemez. İzin yoksa/bulunamazsa false döner.
+    /// </summary>
+    Task<bool> SetMemberAdminAsync(Guid currentUserId, Guid groupId, Guid memberUserId, bool isAdmin, CancellationToken cancellationToken = default);
+
+    /// <summary>Gerçek zamanlı dağıtımda kullanılmak üzere bir grubun kabul etmiş üye kimlikleri.</summary>
     Task<IReadOnlyList<Guid>> GetGroupMemberIdsAsync(Guid groupId, CancellationToken cancellationToken = default);
 
-    /// <summary>Ordered message history of a group (current user must be an accepted member).</summary>
+    /// <summary>Bir grubun sıralı mesaj geçmişi (geçerli kullanıcı kabul etmiş üye olmalıdır).</summary>
     Task<IReadOnlyList<ChatMessageResponse>> GetGroupConversationAsync(Guid currentUserId, Guid groupId, CancellationToken cancellationToken = default);
 }
-

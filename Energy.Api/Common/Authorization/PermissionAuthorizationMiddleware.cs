@@ -9,18 +9,19 @@ using Microsoft.Extensions.Logging;
 namespace Energy.Api.Common.Authorization;
 
 /// <summary>
-/// Single authorization gate. Flow:
-/// 1. Skip non-API and anonymous-marked routes.
-/// 2. Resolve the endpoint via <see cref="IApiEndpointService"/>.
-/// 3. Default DENY when the route is unknown or inactive.
-/// 4. Allow when the endpoint declares no permission.
-/// 5. Require an authenticated user and a matching permission claim.
+/// Tek yetkilendirme kapısı. Akış:
+/// 1. API olmayan ve anonim işaretli rotaları atla.
+/// 2. Uç noktayı <see cref="IApiEndpointService"/> ile çöz.
+/// 3. Rota bilinmiyorsa veya pasifse varsayılan REDDET.
+/// 4. Uç nokta bir yetki bildirmiyorsa izin ver.
+/// 5. Kimliği doğrulanmış bir kullanıcı ve eşleşen bir yetki talebi (claim) gerektir.
 /// </summary>
 public sealed class PermissionAuthorizationMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<PermissionAuthorizationMiddleware> _logger;
 
+    /// <summary>Sonraki ara katmanı ve günlükleyiciyi enjekte eder.</summary>
     public PermissionAuthorizationMiddleware(
         RequestDelegate next,
         ILogger<PermissionAuthorizationMiddleware> logger)
@@ -29,6 +30,7 @@ public sealed class PermissionAuthorizationMiddleware
         _logger = logger;
     }
 
+    /// <summary>İsteği uç nokta tabanlı yetki kontrolünden geçirir.</summary>
     public async Task InvokeAsync(
         HttpContext context,
         IApiEndpointService endpoints,
@@ -38,7 +40,7 @@ public sealed class PermissionAuthorizationMiddleware
     {
         var path = context.Request.Path.Value ?? string.Empty;
 
-        // Only guard API surface; static, Swagger and non-/api routes pass.
+        // Yalnızca API yüzeyini koru; statik, Swagger ve /api olmayan rotalar geçer.
         if (!path.StartsWith("/api/", StringComparison.OrdinalIgnoreCase))
         {
             await _next(context);
@@ -77,9 +79,9 @@ public sealed class PermissionAuthorizationMiddleware
 
         var required = match.RequiredPermissionCode;
 
-        // Any registered, active endpoint that is not explicitly [AllowAnonymous]
-        // (those returned above) requires an authenticated user — even when no
-        // specific permission is attached (e.g. "my menu").
+        // Açıkça [AllowAnonymous] olmayan (yukarıda dönenler) kayıtlı ve etkin her uç
+        // nokta, belirli bir yetki ekli olmasa bile (örn. "menüm") kimliği doğrulanmış
+        // bir kullanıcı gerektirir.
         if (!currentUser.IsAuthenticated || currentUser.UserId is null)
         {
             _logger.LogWarning(
@@ -109,6 +111,7 @@ public sealed class PermissionAuthorizationMiddleware
         await _next(context);
     }
 
+    /// <summary>Standartlaştırılmış bir reddetme (deny) yanıtı yazar.</summary>
     private static async Task DenyAsync(HttpContext context, int status, string message)
     {
         if (context.Response.HasStarted) return;

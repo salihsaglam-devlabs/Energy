@@ -4,19 +4,21 @@ using Energy.Localization;
 namespace Energy.Web.Clients.Infrastructure;
 
 /// <summary>
-/// Thin base class that exposes JSON HTTP helpers. Client identity, machine
-/// name and authentication headers are added by dedicated DelegatingHandlers,
-/// so this type intentionally does not touch request headers.
+/// JSON HTTP yardımcılarını sunan ince temel sınıf. İstemci kimliği, makine adı ve
+/// kimlik doğrulama başlıkları özel DelegatingHandler'lar tarafından eklenir; bu yüzden
+/// bu tür istek başlıklarına bilinçli olarak dokunmaz.
 /// </summary>
 public abstract class ApiClientBase
 {
     private readonly HttpClient _httpClient;
 
+    /// <summary>Alttaki HttpClient örneğini enjekte eder.</summary>
     protected ApiClientBase(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }
 
+    /// <summary>Bir GET isteği gönderir ve yanıt zarfını çözer.</summary>
     protected async Task<TResponse> GetAsync<TResponse>(
         string requestUri,
         CancellationToken cancellationToken = default)
@@ -25,6 +27,7 @@ public abstract class ApiClientBase
         return await ReadAsync<TResponse>(response, requestUri, cancellationToken);
     }
 
+    /// <summary>Gövdeli bir POST isteği gönderir ve yanıt zarfını çözer.</summary>
     protected async Task<TResponse> PostAsync<TRequest, TResponse>(
         string requestUri,
         TRequest request,
@@ -34,6 +37,7 @@ public abstract class ApiClientBase
         return await ReadAsync<TResponse>(response, requestUri, cancellationToken);
     }
 
+    /// <summary>Gövdesiz bir POST isteği gönderir ve yanıt zarfını çözer.</summary>
     protected async Task<TResponse> PostAsync<TResponse>(
         string requestUri,
         CancellationToken cancellationToken = default)
@@ -42,6 +46,7 @@ public abstract class ApiClientBase
         return await ReadAsync<TResponse>(response, requestUri, cancellationToken);
     }
 
+    /// <summary>Gövdeli bir PUT isteği gönderir ve yanıt zarfını çözer.</summary>
     protected async Task<TResponse> PutAsync<TRequest, TResponse>(
         string requestUri,
         TRequest request,
@@ -51,6 +56,7 @@ public abstract class ApiClientBase
         return await ReadAsync<TResponse>(response, requestUri, cancellationToken);
     }
 
+    /// <summary>Bir DELETE isteği gönderir ve yanıt zarfını çözer.</summary>
     protected async Task<TResponse> DeleteAsync<TResponse>(
         string requestUri,
         CancellationToken cancellationToken = default)
@@ -60,10 +66,10 @@ public abstract class ApiClientBase
     }
 
     /// <summary>
-    /// Fire-style POST that does not parse the response envelope. Returns whether
-    /// the call succeeded (2xx). Used for best-effort calls such as audit-log
-    /// ingestion where the response body is irrelevant and must never surface a
-    /// deserialization error to the caller.
+    /// Yanıt zarfını ayrıştırmayan "ateşle ve unut" tarzı bir POST. Çağrının başarılı
+    /// olup olmadığını (2xx) döndürür. Yanıt gövdesinin önemsiz olduğu ve çağırana asla
+    /// bir seri durumdan çıkarma hatası yansıtmaması gereken denetim günlüğü gönderimi
+    /// gibi en iyi çaba çağrıları için kullanılır.
     /// </summary>
     protected async Task<bool> PostIgnoreResultAsync<TRequest>(
         string requestUri,
@@ -75,9 +81,9 @@ public abstract class ApiClientBase
     }
 
     /// <summary>
-    /// Performs a raw GET request and returns the response body as bytes along with
-    /// the resolved <c>Content-Type</c> header. Used for binary payloads such as
-    /// avatar images that bypass the JSON envelope.
+    /// Ham bir GET isteği yapar ve yanıt gövdesini, çözülen <c>Content-Type</c> başlığıyla
+    /// birlikte bayt olarak döndürür. JSON zarfını atlayan avatar resimleri gibi ikili
+    /// yükler için kullanılır.
     /// </summary>
     protected async Task<(byte[] Content, string ContentType, int StatusCode)> GetRawAsync(
         string requestUri,
@@ -89,14 +95,15 @@ public abstract class ApiClientBase
         return (bytes, contentType, (int)response.StatusCode);
     }
 
+    /// <summary>Yanıt gövdesini BaseResponse zarfı olarak okur ve seri durumdan çıkarır.</summary>
     private static async Task<TResponse> ReadAsync<TResponse>(
         HttpResponseMessage response,
         string requestUri,
         CancellationToken cancellationToken)
     {
-        // The API always returns a BaseResponse<T> envelope – both on success
-        // and on failure – so we deserialize regardless of the HTTP status.
-        // The caller decides how to react to IsSuccess / Errors.
+        // API hem başarıda hem başarısızlıkta her zaman bir BaseResponse<T> zarfı
+        // döndürür; bu yüzden HTTP durumundan bağımsız olarak seri durumdan çıkarırız.
+        // IsSuccess / Errors'a nasıl tepki vereceğine çağıran karar verir.
         TResponse? payload;
 
         try

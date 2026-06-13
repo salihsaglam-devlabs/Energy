@@ -1,9 +1,8 @@
 namespace Energy.Shared.Models.V1.Chat.Requests;
 
-/// <summary>Toggles an emoji reaction by the current user on a message.</summary>
+/// <summary>Geçerli kullanıcının bir mesaj üzerindeki emoji tepkisini açıp kapatır.</summary>
 public sealed class ReactChatMessageRequest
 {
-    /// <summary>The reaction emoji. Sending the same emoji again removes it.</summary>
+    /// <summary>Tepki emojisi. Aynı emoji tekrar gönderildiğinde tepki kaldırılır.</summary>
     public string Emoji { get; set; } = string.Empty;
 }
-

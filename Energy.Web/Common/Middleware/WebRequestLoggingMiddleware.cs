@@ -10,24 +10,24 @@ using Energy.Web.Clients.Logger;
 namespace Energy.Web.Common.Middleware;
 
 /// <summary>
-/// Records every Web-tier request (page navigations and MVC/JSON actions) in
-/// the single audit sink by forwarding a masked request/response entry to the
-/// API. Static assets and SignalR transport are skipped. Requests are ALWAYS
-/// audited: the ingest call authenticates to the API as the non-interactive
-/// system service account (never with the signed-in user's token), so audit
-/// logging can never be blocked by the user's permissions, an expired/invalid
-/// user token, or any other Web-side restriction. The real signed-in actor is
-/// forwarded in the request body so the entry is still attributed correctly.
-/// Logging never breaks the request: every failure is swallowed.
+/// Maskelenmiş bir istek/yanıt kaydını API'ye ileterek her Web katmanı isteğini
+/// (sayfa gezinmeleri ve MVC/JSON eylemleri) tek denetim havuzunda kaydeder. Statik
+/// varlıklar ve SignalR taşıması atlanır. İstekler HER ZAMAN denetlenir: gönderim
+/// çağrısı, API'ye etkileşimsiz sistem servis hesabı olarak kimlik doğrular (asla
+/// oturum açmış kullanıcının jetonuyla değil); böylece denetim günlüğü, kullanıcının
+/// yetkileri, süresi dolmuş/geçersiz bir kullanıcı jetonu veya başka bir Web tarafı
+/// kısıtlamasıyla asla engellenemez. Gerçek oturum açmış aktör, kaydın doğru
+/// ilişkilendirilmesi için istek gövdesinde iletilir. Günlükleme isteği asla bozmaz:
+/// her hata yutulur.
 /// </summary>
 public sealed class WebRequestLoggingMiddleware
 {
     private static readonly string[] SkippedPrefixes =
     [
         "/css", "/js", "/lib", "/images", "/img", "/fonts", "/favicon", "/_", "/health",
-        // SignalR transport: never wrap the response body of hub negotiate /
-        // WebSocket / SSE / long-polling requests — buffering them breaks the
-        // streaming connection so real-time delivery silently fails.
+        // SignalR taşıması: hub negotiate / WebSocket / SSE / uzun yoklama isteklerinin
+        // yanıt gövdesini asla sarma — bunları tamponlamak akış bağlantısını bozar ve
+        // gerçek zamanlı iletim sessizce başarısız olur.
         "/hubs"
     ];
 
@@ -40,20 +40,22 @@ public sealed class WebRequestLoggingMiddleware
     private readonly RequestDelegate _next;
     private readonly ILogger<WebRequestLoggingMiddleware> _logger;
 
+    /// <summary>Sonraki ara katmanı ve günlükleyiciyi enjekte eder.</summary>
     public WebRequestLoggingMiddleware(RequestDelegate next, ILogger<WebRequestLoggingMiddleware> logger)
     {
         _next = next;
         _logger = logger;
     }
 
+    /// <summary>İsteği maskelenmiş denetim günlüğü ve istisna yakalama ile sarmalar.</summary>
     public async Task InvokeAsync(
         HttpContext context,
         IAuditLogIngestClient ingest,
         IUserApiTokenProvider userTokens,
         IServiceApiTokenProvider serviceTokens)
     {
-        // Never buffer streaming/upgrade responses (SignalR WebSocket/SSE):
-        // swapping Response.Body for a MemoryStream would break the connection.
+        // Akış/yükseltme yanıtlarını (SignalR WebSocket/SSE) asla tamponlama:
+        // Response.Body'yi bir MemoryStream ile değiştirmek bağlantıyı bozar.
         if (context.WebSockets.IsWebSocketRequest || ShouldSkip(context.Request.Path))
         {
             await _next(context);
@@ -78,9 +80,8 @@ public sealed class WebRequestLoggingMiddleware
         catch (Exception ex)
         {
             exception = ex;
-            // Log WITH the exception so the full stack trace (the exact method +
-            // line where it was raised) is captured before it bubbles up to the
-            // framework error handler.
+            // İstisnayla BİRLİKTE günlükle; böylece tam yığın izi (hatanın oluştuğu
+            // kesin metot + satır) framework hata işleyicisine yükselmeden önce yakalanır.
             _logger.LogError(ex,
                 "Unhandled exception for {Method} {Path}. CorrelationId: {CorrelationId}.",
                 context.Request.Method, context.Request.Path.Value, correlationId);
@@ -91,8 +92,8 @@ public sealed class WebRequestLoggingMiddleware
             stopwatch.Stop();
             var responseBody = ReadResponseBody(context, buffer);
 
-            // Surface business failures too: a BaseResponse with success=false is a
-            // logical failure even when no exception was thrown.
+            // İş kuralı başarısızlıklarını da yüzeye çıkar: success=false içeren bir
+            // BaseResponse, hiçbir istisna fırlatılmamış olsa bile mantıksal bir başarısızlıktır.
             LogFailedEnvelope(context, correlationId, responseBody, exception);
 
             try
@@ -114,6 +115,7 @@ public sealed class WebRequestLoggingMiddleware
         }
     }
 
+    /// <summary>Denetim kaydını güvenli şekilde (hata fırlatmadan) servis jetonuyla API'ye iletir.</summary>
     private async Task SafeIngestAsync(
         HttpContext context,
         IAuditLogIngestClient ingest,
@@ -128,24 +130,24 @@ public sealed class WebRequestLoggingMiddleware
     {
         try
         {
-            // Audit logging ALWAYS authenticates to the API as the non-interactive
-            // system service account — never with the signed-in user's token. This
-            // guarantees the audit trail can never be blocked by the user's
-            // permissions, an expired/invalid user token, or any other Web-side
-            // restriction: EVERY request (anonymous login attempts included) is
-            // captured. The real actor is forwarded in the request body so the
-            // entry is still attributed to the signed-in user.
+            // Denetim günlüğü API'ye HER ZAMAN etkileşimsiz sistem servis hesabı olarak
+            // kimlik doğrular — asla oturum açmış kullanıcının jetonuyla değil. Bu,
+            // denetim izinin kullanıcının yetkileri, süresi dolmuş/geçersiz bir kullanıcı
+            // jetonu veya başka bir Web tarafı kısıtlamasıyla asla engellenememesini
+            // garanti eder: HER istek (anonim giriş denemeleri dahil) yakalanır. Gerçek
+            // aktör, kaydın yine oturum açmış kullanıcıya ilişkilendirilmesi için istek
+            // gövdesinde iletilir.
             var serviceToken = await serviceTokens.GetAccessTokenAsync(context.RequestAborted);
             if (string.IsNullOrEmpty(serviceToken))
             {
-                // Service token unavailable (e.g. API down). Do not lose the request
-                // silently — record the reason and skip this single entry.
+                // Servis jetonu kullanılamıyor (ör. API kapalı). İsteği sessizce kaybetme
+                // — nedeni kaydet ve yalnızca bu tek girdiyi atla.
                 _logger.LogWarning("Skipping audit for {Path}: no service token available.",
                     context.Request.Path);
                 return;
             }
 
-            // Resolve the real signed-in actor (if any) from the cookie principal.
+            // Gerçek oturum açmış aktörü (varsa) çerez kimliğinden çöz.
             ResolveActor(context, out var actorId, out var actorName);
 
             using (userTokens.UseAccessToken(serviceToken))
@@ -173,16 +175,16 @@ public sealed class WebRequestLoggingMiddleware
         }
         catch (Exception ex)
         {
-            // Auditing must never break the user request.
+            // Denetim, kullanıcı isteğini asla bozmamalıdır.
             _logger.LogWarning(ex, "Failed to forward Web audit log entry for {Path}.", context.Request.Path);
         }
     }
 
     /// <summary>
-    /// Extracts the signed-in user's id and name from the cookie principal so the
-    /// audit entry is attributed correctly even though the ingest call itself is
-    /// authenticated as the system service account. Returns <c>null</c> for
-    /// anonymous requests (e.g. the login POST).
+    /// Oturum açmış kullanıcının kimliğini ve adını çerez kimliğinden çıkarır; böylece
+    /// gönderim çağrısının kendisi sistem servis hesabı olarak kimlik doğrulasa bile
+    /// denetim kaydı doğru ilişkilendirilir. Anonim istekler için (ör. giriş POST'u)
+    /// <c>null</c> döner.
     /// </summary>
     private static void ResolveActor(HttpContext context, out Guid? userId, out string? userName)
     {
@@ -197,13 +199,13 @@ public sealed class WebRequestLoggingMiddleware
     }
 
     /// <summary>
-    /// Inspects the captured response envelope and, if it represents a business
-    /// failure (<c>success:false</c>) that did NOT originate from an exception,
-    /// records it so failed outcomes are never silently lost in the logs.
+    /// Yakalanan yanıt zarfını inceler ve eğer bir istisnadan KAYNAKLANMAYAN bir iş
+    /// kuralı başarısızlığını (<c>success:false</c>) temsil ediyorsa kaydeder; böylece
+    /// başarısız sonuçlar günlüklerde sessizce kaybolmaz.
     /// </summary>
     private void LogFailedEnvelope(HttpContext context, Guid correlationId, string? responseBody, Exception? exception)
     {
-        // Exception paths are already logged above with their full stack trace.
+        // İstisna yolları yukarıda zaten tam yığın iziyle günlüğe yazılmıştır.
         if (exception is not null) return;
         if (string.IsNullOrEmpty(responseBody)) return;
         if (!responseBody.Contains("\"success\"", StringComparison.OrdinalIgnoreCase)) return;
@@ -222,10 +224,11 @@ public sealed class WebRequestLoggingMiddleware
         }
         catch (JsonException)
         {
-            // Non-JSON or partial payload — nothing to extract; ignore.
+            // JSON olmayan veya kısmi yük — çıkarılacak bir şey yok; yok say.
         }
     }
 
+    /// <summary>İstek gövdesini güvenli ve maskelenmiş şekilde yakalar (yeniden okunabilir).</summary>
     private static async Task<string?> CaptureRequestBodyAsync(HttpContext context)
     {
         var request = context.Request;
@@ -240,6 +243,7 @@ public sealed class WebRequestLoggingMiddleware
         return SensitiveDataMasker.MaskBody(raw, request.ContentType);
     }
 
+    /// <summary>Yakalanan yanıt gövdesini okur ve maskeleyerek döndürür.</summary>
     private static string? ReadResponseBody(HttpContext context, MemoryStream buffer)
     {
         if (buffer.Length == 0) return null;
@@ -251,6 +255,7 @@ public sealed class WebRequestLoggingMiddleware
         return SensitiveDataMasker.MaskBody(raw, context.Response.ContentType);
     }
 
+    /// <summary>İçerik türünün metin olarak güvenle yakalanabilir olup olmadığını belirler.</summary>
     private static bool IsTextCapturable(string? contentType)
     {
         if (string.IsNullOrEmpty(contentType)) return true;
@@ -261,6 +266,7 @@ public sealed class WebRequestLoggingMiddleware
                || ct.Contains("x-www-form-urlencoded");
     }
 
+    /// <summary>Yolun, denetimden atlanması gereken bir statik/akış yolu olup olmadığını belirler.</summary>
     private static bool ShouldSkip(PathString path)
     {
         var value = path.Value;

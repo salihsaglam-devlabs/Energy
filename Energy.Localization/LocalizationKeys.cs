@@ -29,11 +29,11 @@ public static class LocalizationKeys
 
 
     /// <summary>
-    /// Display-name localization keys for every permission in
-    /// <c>Energy.Shared.Identity.Permissions.PermissionCatalog</c>. The key
-    /// format mirrors <c>PermissionCatalog.BuildDisplayNameKey</c>
-    /// (<c>Permissions.{Module}.{Action}.Name</c>) so the catalog code and its
-    /// localized label never drift apart.
+    /// <c>Energy.Shared.Identity.Permissions.PermissionCatalog</c> içindeki her
+    /// yetki için görünen ad yerelleştirme anahtarları. Anahtar biçimi,
+    /// <c>PermissionCatalog.BuildDisplayNameKey</c> ile aynıdır
+    /// (<c>Permissions.{Module}.{Action}.Name</c>); böylece katalog kodu ile
+    /// yerelleştirilmiş etiketi asla birbirinden ayrılmaz.
     /// </summary>
     public static class Permissions
     {
@@ -113,9 +113,9 @@ public static class LocalizationKeys
     }
 
     /// <summary>
-    /// Menu <c>NameKey</c> constants. These are the exact keys the system seeder
-    /// writes into <c>Menu.NameKey</c>, and the same keys the menu tree resolves
-    /// against the shared resource when rendering the navigation.
+    /// Menü <c>NameKey</c> sabitleri. Bunlar, sistem tohumlayıcısının
+    /// <c>Menu.NameKey</c> alanına yazdığı tam anahtarlardır ve menü ağacının gezinmeyi
+    /// oluştururken paylaşılan kaynağa karşı çözümlediği aynı anahtarlardır.
     /// </summary>
     public static class Menus
     {
@@ -123,6 +123,7 @@ public static class LocalizationKeys
         public const string System = "Menus.System";
         public const string Profile = "Menus.Profile";
         public const string Chat = "Menus.Chat";
+        public const string Settings = "Menus.Settings";
         public const string Users = "Menus.Users";
         public const string UserAccess = "Menus.UserAccess";
         public const string Roles = "Menus.Roles";
@@ -192,9 +193,9 @@ public static class LocalizationKeys
     }
 
     /// <summary>
-    /// Localization keys for the centrally-seeded role catalog. The database
-    /// stores these KEYS in <c>Role.Description</c>; the values are resolved
-    /// from the shared resource at read time.
+    /// Merkezi olarak seed edilen rol kataloğu için yerelleştirme anahtarları.
+    /// Veritabanı bu ANAHTARLARI <c>Role.Description</c> alanında saklar; değerler
+    /// okuma anında paylaşılan kaynaktan çözümlenir.
     /// </summary>
     public static class RoleSeed
     {
@@ -446,6 +447,25 @@ public static class LocalizationKeys
         public const string RequiredPermission = "ApiEndpointsScreen.RequiredPermission";
         public const string IsActive = "ApiEndpointsScreen.IsActive";
         public const string PopupTitle = "ApiEndpointsScreen.PopupTitle";
+    }
+
+    public static class SettingsScreen
+    {
+        public const string Title = "SettingsScreen.Title";
+        public const string Subtitle = "SettingsScreen.Subtitle";
+        public const string Notifications = "SettingsScreen.Notifications";
+        public const string NotificationSound = "SettingsScreen.NotificationSound";
+        public const string CallSound = "SettingsScreen.CallSound";
+        public const string DesktopNotifications = "SettingsScreen.DesktopNotifications";
+        public const string Privacy = "SettingsScreen.Privacy";
+        public const string ReadReceipts = "SettingsScreen.ReadReceipts";
+        public const string Appearance = "SettingsScreen.Appearance";
+        public const string Theme = "SettingsScreen.Theme";
+        public const string ThemeSystem = "SettingsScreen.ThemeSystem";
+        public const string ThemeLight = "SettingsScreen.ThemeLight";
+        public const string ThemeDark = "SettingsScreen.ThemeDark";
+        public const string Save = "SettingsScreen.Save";
+        public const string Saved = "SettingsScreen.Saved";
     }
 
     public static class ChatScreen

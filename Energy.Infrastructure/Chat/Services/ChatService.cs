@@ -60,8 +60,9 @@ public sealed class ChatService : IChatService
 
     public async Task<IReadOnlyList<ChatMessageResponse>> GetConversationAsync(Guid currentUserId, Guid peerId, CancellationToken ct = default)
     {
-        // Project only metadata (never the attachment bytes) so listing a long
-        // conversation stays cheap; the bytes are streamed on demand via GetAttachmentAsync.
+        // Yalnızca üst veriyi (asla ekin baytları değil) yansıtırız; böylece uzun
+        // bir konuşmayı listelemek ucuz kalır; baytlar GetAttachmentAsync ile
+        // istendiğinde akıtılır.
         var rows = await _db.ChatMessages.AsNoTracking()
             .Where(m => m.GroupId == null
                      && ((m.SenderId == currentUserId && m.RecipientId == peerId)
@@ -117,7 +118,7 @@ public sealed class ChatService : IChatService
             AttachmentData = attachmentData
         };
 
-        // Group messages require an accepted membership; direct messages a recipient.
+        // Grup mesajları kabul edilmiş bir üyelik; doğrudan mesajlar bir alıcı gerektirir.
         if (request.GroupId is { } groupId)
         {
             var isMember = await _db.ChatGroupMembers.AsNoTracking().AnyAsync(
@@ -207,11 +208,14 @@ public sealed class ChatService : IChatService
 
     public async Task<IReadOnlyList<ChatGroupResponse>> GetGroupsAsync(Guid currentUserId, CancellationToken ct = default)
     {
-        var myGroupIds = await _db.ChatGroupMembers.AsNoTracking()
+        var myMemberships = await _db.ChatGroupMembers.AsNoTracking()
             .Where(gm => gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatus.Accepted)
-            .Select(gm => gm.GroupId)
+            .Select(gm => new { gm.GroupId, gm.IsOwner, gm.IsAdmin })
             .ToListAsync(ct);
-        if (myGroupIds.Count == 0) return [];
+        if (myMemberships.Count == 0) return [];
+
+        var myGroupIds = myMemberships.Select(m => m.GroupId).ToList();
+        var manageById = myMemberships.ToDictionary(m => m.GroupId, m => m.IsOwner || m.IsAdmin);
 
         var groups = await _db.ChatGroups.AsNoTracking()
             .Where(g => myGroupIds.Contains(g.Id))
@@ -236,6 +240,7 @@ public sealed class ChatService : IChatService
                 Name = g.Name,
                 OwnerId = g.OwnerId,
                 IsOwner = g.OwnerId == currentUserId,
+                IsAdmin = manageById.GetValueOrDefault(g.Id),
                 MemberCount = memberCounts.GetValueOrDefault(g.Id),
                 UnreadCount = 0,
                 LastMessageAt = lastByGroup.TryGetValue(g.Id, out var at) ? at : null
@@ -294,7 +299,7 @@ public sealed class ChatService : IChatService
             IsOwner = true
         });
 
-        // Invited users get pending memberships (active only after they accept).
+        // Davet edilen kullanıcılar beklemede üyelik alır (yalnızca kabul ettikten sonra etkin olur).
         foreach (var userId in (request.MemberUserIds ?? []).Distinct().Where(id => id != ownerId && id != Guid.Empty))
         {
             _db.ChatGroupMembers.Add(new ChatGroupMember
@@ -323,7 +328,7 @@ public sealed class ChatService : IChatService
 
     public async Task<IReadOnlyList<Guid>> InviteToGroupAsync(Guid currentUserId, Guid groupId, InviteToGroupRequest request, CancellationToken ct = default)
     {
-        // The inviter must be an accepted member of the group.
+        // Davet eden kişi, grubun kabul edilmiş bir üyesi olmalıdır.
         var isMember = await _db.ChatGroupMembers.AsNoTracking().AnyAsync(
             gm => gm.GroupId == groupId && gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatus.Accepted, ct);
         if (!isMember)
@@ -341,7 +346,7 @@ public sealed class ChatService : IChatService
         {
             if (existingByUser.TryGetValue(userId, out var row))
             {
-                // Re-invite a previously declined/removed user.
+                // Daha önce reddetmiş/çıkarılmış bir kullanıcıyı yeniden davet et.
                 if (row.Status == ChatGroupMemberStatus.Declined)
                 {
                     row.Status = ChatGroupMemberStatus.Pending;
@@ -400,6 +405,7 @@ public sealed class ChatService : IChatService
                 UserName = u.UserName,
                 HasProfileImage = u.ProfileImage != null,
                 IsOwner = gm.IsOwner,
+                IsAdmin = gm.IsOwner || gm.IsAdmin,
                 Status = (int)gm.Status
             })
             .ToListAsync(ct);
@@ -443,6 +449,90 @@ public sealed class ChatService : IChatService
 
         await EnrichAsync(rows, currentUserId, ct);
         return rows;
+    }
+
+    // ----- Grup yönetimi (sahip/yönetici) ----------------------------------
+
+    // Kullanıcı, grubun kabul edilmiş sahibi veya yöneticisiyse true döner.
+    private Task<bool> IsManagerAsync(Guid userId, Guid groupId, CancellationToken ct)
+        => _db.ChatGroupMembers.AsNoTracking().AnyAsync(
+            gm => gm.GroupId == groupId
+               && gm.UserId == userId
+               && gm.Status == ChatGroupMemberStatus.Accepted
+               && (gm.IsOwner || gm.IsAdmin), ct);
+
+    public async Task<bool> DeleteGroupAsync(Guid currentUserId, Guid groupId, CancellationToken ct = default)
+    {
+        if (!await IsManagerAsync(currentUserId, groupId, ct))
+        {
+            return false;
+        }
+
+        var group = await _db.ChatGroups.FirstOrDefaultAsync(g => g.Id == groupId, ct);
+        if (group is null)
+        {
+            return false;
+        }
+
+        // Grubu, tüm üyeliklerini ve tüm mesajlarını yumuşak sil (interceptor,
+        // Remove sırasında IsDeleted'i true yapar; sorgu filtreleri de bunları gizler).
+        var members = await _db.ChatGroupMembers.Where(gm => gm.GroupId == groupId).ToListAsync(ct);
+        _db.ChatGroupMembers.RemoveRange(members);
+
+        var messages = await _db.ChatMessages.Where(m => m.GroupId == groupId).ToListAsync(ct);
+        _db.ChatMessages.RemoveRange(messages);
+
+        _db.ChatGroups.Remove(group);
+        await _db.SaveChangesAsync(ct);
+        return true;
+    }
+
+    public async Task<bool> RemoveMemberAsync(Guid currentUserId, Guid groupId, Guid memberUserId, CancellationToken ct = default)
+    {
+        if (!await IsManagerAsync(currentUserId, groupId, ct))
+        {
+            return false;
+        }
+
+        var row = await _db.ChatGroupMembers
+            .FirstOrDefaultAsync(gm => gm.GroupId == groupId && gm.UserId == memberUserId, ct);
+        if (row is null || row.IsOwner)
+        {
+            // Grup sahibi asla çıkarılamaz.
+            return false;
+        }
+
+        _db.ChatGroupMembers.Remove(row);
+        await _db.SaveChangesAsync(ct);
+        return true;
+    }
+
+    public async Task<bool> SetMemberAdminAsync(Guid currentUserId, Guid groupId, Guid memberUserId, bool isAdmin, CancellationToken ct = default)
+    {
+        if (!await IsManagerAsync(currentUserId, groupId, ct))
+        {
+            return false;
+        }
+
+        var row = await _db.ChatGroupMembers
+            .FirstOrDefaultAsync(gm => gm.GroupId == groupId
+                                    && gm.UserId == memberUserId
+                                    && gm.Status == ChatGroupMemberStatus.Accepted, ct);
+        if (row is null || row.IsOwner)
+        {
+            // Grup sahibi her zaman yöneticidir; durumu değiştirilemez.
+            return false;
+        }
+
+        if (row.IsAdmin == isAdmin)
+        {
+            return true;
+        }
+
+        row.IsAdmin = isAdmin;
+        row.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync(ct);
+        return true;
     }
 
     // ----- Delete / Forward / Reactions ------------------------------------
@@ -542,7 +632,7 @@ public sealed class ChatService : IChatService
         }
         else if (string.Equals(existing.Emoji, emoji, StringComparison.Ordinal))
         {
-            _db.ChatMessageReactions.Remove(existing); // toggle the same emoji off
+            _db.ChatMessageReactions.Remove(existing); // aynı emojiyi geri kapat (toggle)
         }
         else
         {
@@ -560,7 +650,7 @@ public sealed class ChatService : IChatService
         return response;
     }
 
-    // True when the user is a participant of the message (direct peer or accepted group member).
+    // Kullanıcı, mesajın bir katılımcısıysa (doğrudan muhatap ya da kabul edilmiş grup üyesi) true döner.
     private async Task<bool> CanAccessMessageAsync(Guid userId, ChatMessage m, CancellationToken ct)
     {
         if (m.SenderId == userId || m.RecipientId == userId)
@@ -571,7 +661,7 @@ public sealed class ChatService : IChatService
             gm => gm.GroupId == m.GroupId && gm.UserId == userId && gm.Status == ChatGroupMemberStatus.Accepted, ct);
     }
 
-    // Fills reply snippets + reaction summaries onto the supplied projections.
+    // Verilen projeksiyonlara yanıt parçacıklarını + tepki özetlerini doldurur.
     private async Task EnrichAsync(IReadOnlyList<ChatMessageResponse> msgs, Guid currentUserId, CancellationToken ct)
     {
         if (msgs.Count == 0)

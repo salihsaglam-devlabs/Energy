@@ -18,8 +18,8 @@ public sealed class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
         builder.Property(l => l.Path).HasMaxLength(500);
         builder.Property(l => l.QueryString).HasMaxLength(2000);
         builder.Property(l => l.Source).HasMaxLength(10);
-        // No explicit column type: unlimited-length strings map to the provider's
-        // large-text type automatically (PostgreSQL "text", SQL Server "nvarchar(max)").
+        // Açık sütun türü yok: sınırsız uzunluktaki dizeler, sağlayıcının büyük metin
+        // türüne otomatik eşlenir (PostgreSQL "text", SQL Server "nvarchar(max)").
         builder.Property(l => l.ExceptionType).HasMaxLength(200);
 
         builder.HasIndex(l => l.OccurredAt).IsDescending();

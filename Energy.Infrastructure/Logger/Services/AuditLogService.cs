@@ -31,9 +31,9 @@ public sealed class AuditLogService : IAuditLogService
         string? ipAddress,
         CancellationToken ct = default)
     {
-        // PostgreSQL "timestamp with time zone" requires DateTimeKind.Utc; a value
-        // deserialized from JSON may arrive as Unspecified/Local and would throw
-        // on save. Normalize defensively.
+        // PostgreSQL "timestamp with time zone" DateTimeKind.Utc gerektirir; JSON'dan
+        // ayrıştırılan bir değer Unspecified/Local olarak gelebilir ve kaydetme
+        // sırasında hata fırlatır. Savunmacı şekilde normalize et.
         var occurredAt = request.OccurredAt == default ? DateTime.UtcNow : request.OccurredAt;
         occurredAt = occurredAt.Kind switch
         {

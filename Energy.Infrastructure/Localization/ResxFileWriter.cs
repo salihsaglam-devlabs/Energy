@@ -6,9 +6,9 @@ using Microsoft.Extensions.Options;
 namespace Energy.Infrastructure.Localization;
 
 /// <summary>
-/// Reads and writes the on-disk .resx files used as the localization fallback.
-/// When <see cref="LocalizationSettings.ResxDirectory"/> is not configured the
-/// writer becomes a no-op and the database remains the only source of truth.
+/// Yerelleştirme yedeği olarak kullanılan disk üzerindeki .resx dosyalarını okur
+/// ve yazar. <see cref="LocalizationSettings.ResxDirectory"/> yapılandırılmadığında
+/// yazıcı işlemsiz (no-op) hâle gelir ve veritabanı tek doğruluk kaynağı olarak kalır.
 /// </summary>
 public sealed class ResxFileWriter
 {
@@ -19,6 +19,7 @@ public sealed class ResxFileWriter
     private readonly object _ioLock = new();
     private readonly string? _resolvedDirectory;
 
+    /// <summary>Ayarları ve günlükleyiciyi enjekte eder, hedef dizini çözümler.</summary>
     public ResxFileWriter(IOptions<LocalizationSettings> settings, ILogger<ResxFileWriter> logger)
     {
         _settings = settings.Value;
@@ -26,10 +27,12 @@ public sealed class ResxFileWriter
         _resolvedDirectory = ResolveDirectory(_settings.ResxDirectory);
     }
 
+    /// <summary>Yazıcının etkin olup olmadığı (dizin yapılandırılmış ve mevcutsa).</summary>
     public bool IsEnabled
         => !string.IsNullOrWhiteSpace(_resolvedDirectory)
            && Directory.Exists(_resolvedDirectory);
 
+    /// <summary>Yapılandırılan yolu mutlak bir dizin yoluna çözümler.</summary>
     private static string? ResolveDirectory(string? configured)
     {
         if (string.IsNullOrWhiteSpace(configured))
@@ -37,17 +40,17 @@ public sealed class ResxFileWriter
             return null;
         }
 
-        // Absolute paths are honoured as-is; relative paths are resolved
-        // against the application base directory so the writer keeps working
-        // regardless of the current working directory at launch time.
+        // Mutlak yollar olduğu gibi kullanılır; göreli yollar uygulama temel
+        // dizinine göre çözümlenir; böylece yazıcı başlatma anındaki geçerli
+        // çalışma dizininden bağımsız olarak çalışmaya devam eder.
         return Path.IsPathRooted(configured)
             ? Path.GetFullPath(configured)
             : Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, configured));
     }
 
     /// <summary>
-    /// Returns every (culture, key, value) tuple stored in any of the
-    /// SharedResource resx files in <see cref="LocalizationSettings.ResxDirectory"/>.
+    /// <see cref="LocalizationSettings.ResxDirectory"/> içindeki herhangi bir
+    /// SharedResource resx dosyasında saklanan her (kültür, anahtar, değer) üçlüsünü döndürür.
     /// </summary>
     public IReadOnlyList<(string Culture, string Key, string Value)> ReadAll()
     {
@@ -76,6 +79,7 @@ public sealed class ResxFileWriter
         return results;
     }
 
+    /// <summary>Verilen kültür/anahtar için resx girdisini ekler veya günceller (upsert).</summary>
     public void Upsert(string culture, string key, string value)
     {
         if (!IsEnabled)
@@ -117,6 +121,7 @@ public sealed class ResxFileWriter
         }
     }
 
+    /// <summary>Verilen anahtarı tüm kültür resx dosyalarından siler.</summary>
     public void Delete(string key)
     {
         if (!IsEnabled)
@@ -148,6 +153,7 @@ public sealed class ResxFileWriter
         }
     }
 
+    /// <summary>Verilen kültür için resx dosya yolunu oluşturur.</summary>
     private string ResolveFilePath(string culture)
     {
         var fileName = string.IsNullOrEmpty(culture)
@@ -157,18 +163,22 @@ public sealed class ResxFileWriter
         return Path.Combine(_resolvedDirectory!, fileName);
     }
 
+    /// <summary>Hedef dizindeki tüm SharedResource resx dosyalarını listeler.</summary>
     private IEnumerable<string> EnumerateFiles()
         => Directory.EnumerateFiles(_resolvedDirectory!, $"{_settings.ResxBaseName}*.resx");
 
+    /// <summary>Kök öğe içinde verilen anahtara sahip <c>data</c> elemanını bulur.</summary>
     private static XElement? FindData(XElement root, string key)
         => root.Elements("data").FirstOrDefault(e => (string?)e.Attribute("name") == key);
 
+    /// <summary>Verilen anahtar/değer için yeni bir <c>data</c> elemanı oluşturur.</summary>
     private static XElement BuildDataElement(string key, string value)
         => new("data",
             new XAttribute("name", key),
             new XAttribute(XmlNs + "space", "preserve"),
             new XElement("value", value));
 
+    /// <summary>Dosya yoksa geçerli bir boş .resx iskeleti oluşturur.</summary>
     private static void EnsureResxFile(string path)
     {
         if (File.Exists(path))
@@ -190,10 +200,11 @@ public sealed class ResxFileWriter
         document.Save(path);
     }
 
+    /// <summary>Dosya adından kültür kodunu ayıklar (ör. "SharedResource.tr-TR.resx" → "tr-TR").</summary>
     private string ExtractCulture(string fileName)
     {
         // "SharedResource.tr-TR.resx" → "tr-TR"
-        // "SharedResource.resx"        → ""        (invariant)
+        // "SharedResource.resx"        → ""        (sabit/invariant)
         var withoutExtension = Path.GetFileNameWithoutExtension(fileName);
         if (!withoutExtension.StartsWith(_settings.ResxBaseName + ".", StringComparison.Ordinal))
         {

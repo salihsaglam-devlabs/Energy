@@ -4,38 +4,38 @@ using FluentFTP;
 // ---------------------------------------------------------------------------
 // Energy.Publish
 // ---------------------------------------------------------------------------
-// For each selected target this tool:
-//   1) Runs the matching publish shell script (shells/publish-<target>.sh),
-//      which builds the Release output via `dotnet publish`.
-//   2) ONLY if the script succeeds (exit code 0), connects to the FTP server
-//      and recursively uploads the published output using SEVERAL PARALLEL
-//      connections, OVERWRITING every existing file. Remote folders are created
-//      on demand. Live progress ([done/total]) is printed to the console.
+// Seçilen her hedef için bu araç:
+//   1) Eşleşen yayınlama shell betiğini (shells/publish-<target>.sh) çalıştırır;
+//      bu betik, `dotnet publish` ile Release çıktısını üretir.
+//   2) YALNIZCA betik başarılı olursa (çıkış kodu 0), FTP sunucusuna bağlanır ve
+//      yayınlanan çıktıyı BİRDEN ÇOK PARALEL bağlantı kullanarak özyinelemeli
+//      şekilde yükler; var olan her dosyanın ÜZERİNE YAZAR. Uzak klasörler gerektikçe
+//      oluşturulur. Canlı ilerleme ([yapılan/toplam]) konsola yazdırılır.
 //
-// Usage:
-//   dotnet run --project Energy.Publish            # publish + upload BOTH api + web
-//   dotnet run --project Energy.Publish -- api     # publish + upload only the API
-//   dotnet run --project Energy.Publish -- web     # publish + upload only the Web
+// Kullanım:
+//   dotnet run --project Energy.Publish            # api + web HER İKİSİNİ yayınla + yükle
+//   dotnet run --project Energy.Publish -- api     # yalnızca API'yi yayınla + yükle
+//   dotnet run --project Energy.Publish -- web     # yalnızca Web'i yayınla + yükle
 //
-// Credentials / host / parallelism can be overridden with environment variables:
+// Kimlik bilgileri / host / paralellik ortam değişkenleriyle geçersiz kılınabilir:
 //   ENERGY_FTP_HOST, ENERGY_FTP_USER, ENERGY_FTP_PASSWORD, ENERGY_FTP_PARALLELISM
 // ---------------------------------------------------------------------------
 
-// FTP connection (override via environment variables in CI / production).
+// FTP bağlantısı (CI / üretimde ortam değişkenleriyle geçersiz kılın).
 var host = Environment.GetEnvironmentVariable("ENERGY_FTP_HOST") ?? "31.186.11.158";
 var user = Environment.GetEnvironmentVariable("ENERGY_FTP_USER") ?? "wat14bcomtr";
 var password = Environment.GetEnvironmentVariable("ENERGY_FTP_PASSWORD") ?? "Wattiw@1";
 
-// Number of parallel FTP connections used for uploading (speeds up transfers).
-// Override with ENERGY_FTP_PARALLELISM. Defaults to 4.
+// Yükleme için kullanılan paralel FTP bağlantısı sayısı (aktarımları hızlandırır).
+// ENERGY_FTP_PARALLELISM ile geçersiz kılın. Varsayılan 4.
 var parallelism = int.TryParse(Environment.GetEnvironmentVariable("ENERGY_FTP_PARALLELISM"), out var p) && p > 0
     ? p
     : 4;
 
-// Repository root: ../ relative to this project's build output folder.
+// Depo kökü: bu projenin derleme çıktısı klasörüne göre ../.
 var repoRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
 
-// Deployment targets: local publish folder -> remote site root on the FTP server.
+// Dağıtım hedefleri: yerel yayınlama klasörü -> FTP sunucusundaki uzak site kökü.
 var allTargets = new[]
 {
     new DeployTarget(
@@ -50,7 +50,7 @@ var allTargets = new[]
         ScriptPath: Path.Combine(repoRoot, "Energy.Publish", "shells", "publish-web.sh")),
 };
 
-// Select which targets to publish based on the first CLI argument.
+// İlk CLI argümanına göre hangi hedeflerin yayınlanacağını seç.
 var selector = args.FirstOrDefault()?.Trim().ToLowerInvariant();
 var targets = selector switch
 {
@@ -81,8 +81,8 @@ foreach (var target in targets)
     Console.WriteLine($"Local : {target.LocalPath}");
     Console.WriteLine($"Remote: {target.RemoteRoot}");
 
-    // 1) Run the publish shell script. Only continue to the FTP upload if it
-    //    completes successfully (exit code 0).
+    // 1) Yayınlama shell betiğini çalıştır. Yalnızca başarıyla tamamlanırsa
+    //    (çıkış kodu 0) FTP yüklemesine devam et.
     var scriptExit = await RunScriptAsync(target.ScriptPath);
     if (scriptExit != 0)
     {
@@ -117,8 +117,8 @@ Console.WriteLine(exitCode == 0 ? "Done." : "Completed with errors.");
 return exitCode;
 
 // ---------------------------------------------------------------------------
-// Runs a shell (.sh) script via zsh and streams its output. Returns the
-// script's exit code (0 = success).
+// Bir shell (.sh) betiğini zsh ile çalıştırır ve çıktısını akıtır. Betiğin çıkış
+// kodunu döndürür (0 = başarı).
 // ---------------------------------------------------------------------------
 static async Task<int> RunScriptAsync(string scriptPath)
 {
@@ -150,10 +150,10 @@ static async Task<int> RunScriptAsync(string scriptPath)
 }
 
 // ---------------------------------------------------------------------------
-// Recursively uploads every file under localRoot to remoteRoot using several
-// parallel FTP connections (one per worker). Files are overwritten and remote
-// directories are created on demand. Reports live progress to the console.
-// Returns (Uploaded, Failed, Total).
+// localRoot altındaki her dosyayı, birden çok paralel FTP bağlantısı (her işçi için
+// bir tane) kullanarak remoteRoot'a özyinelemeli şekilde yükler. Dosyaların üzerine
+// yazılır ve uzak dizinler gerektikçe oluşturulur. Konsola canlı ilerleme raporlar.
+// (Yüklenen, Başarısız, Toplam) döndürür.
 // ---------------------------------------------------------------------------
 static async Task<(int Uploaded, int Failed, int Total)> UploadFolderParallelAsync(
     string host, string user, string password,
@@ -176,7 +176,7 @@ static async Task<(int Uploaded, int Failed, int Total)> UploadFolderParallelAsy
     var processed = 0;
     var consoleLock = new object();
 
-    // Round-robin the files into one bucket per connection.
+    // Dosyaları bağlantı başına bir kovaya round-robin (sırayla) dağıt.
     var buckets = Enumerable.Range(0, parallelism).Select(_ => new List<string>()).ToArray();
     for (var i = 0; i < files.Length; i++)
         buckets[i % parallelism].Add(files[i]);

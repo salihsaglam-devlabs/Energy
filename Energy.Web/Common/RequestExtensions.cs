@@ -1,19 +1,19 @@
 namespace Energy.Web.Common;
 
 /// <summary>
-/// Helpers for distinguishing AJAX/JSON (XHR/fetch) requests from full-page
-/// browser navigations. Auth filters use this to decide whether to emit a
-/// machine-readable JSON envelope (so the client can redirect itself) or a
-/// classic 302 redirect for top-level navigations.
+/// AJAX/JSON (XHR/fetch) isteklerini tam sayfa tarayıcı gezinmelerinden ayırt eden
+/// yardımcılar. Kimlik doğrulama filtreleri, makine tarafından okunabilir bir JSON
+/// zarfı mı (istemcinin kendini yönlendirebilmesi için) yoksa üst seviye gezinmeler
+/// için klasik bir 302 yönlendirmesi mi yayınlayacağına karar vermek için bunu kullanır.
 /// </summary>
 public static class RequestExtensions
 {
     /// <summary>
-    /// True when the request was issued by the in-app HTTP helper / DevExtreme
-    /// (it sets <c>X-Requested-With: XMLHttpRequest</c> and/or
-    /// <c>Accept: application/json</c>). For those, returning HTML redirects is
-    /// useless because <c>fetch</c> follows them transparently and the grid
-    /// then tries to parse an HTML page as JSON.
+    /// İstek, uygulama içi HTTP yardımcısı / DevExtreme tarafından yapıldığında true olur
+    /// (bunlar <c>X-Requested-With: XMLHttpRequest</c> ve/veya
+    /// <c>Accept: application/json</c> ayarlar). Bunlar için HTML yönlendirmesi
+    /// döndürmek işe yaramaz; çünkü <c>fetch</c> bunları şeffaf şekilde izler ve ızgara
+    /// (grid) ardından bir HTML sayfasını JSON olarak ayrıştırmaya çalışır.
     /// </summary>
     public static bool WantsJson(this HttpRequest request)
     {

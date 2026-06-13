@@ -1,43 +1,56 @@
 namespace Energy.Shared.Models.V1.Chat.Responses;
 
-/// <summary>A single chat message projected for the UI / SignalR transport.</summary>
+/// <summary>Kullanıcı arayüzü / SignalR taşıması için izdüşürülmüş tek bir sohbet mesajı.</summary>
 public sealed class ChatMessageResponse
 {
+    /// <summary>Mesajın kimliği.</summary>
     public Guid Id { get; set; }
+
+    /// <summary>Gönderenin kullanıcı kimliği.</summary>
     public Guid SenderId { get; set; }
+
+    /// <summary>Gönderenin ad soyadı.</summary>
     public string SenderName { get; set; } = string.Empty;
 
-    /// <summary>Whether the sender has a profile image (drives the chat avatar).</summary>
+    /// <summary>Gönderenin profil resmi olup olmadığı (sohbet avatarını besler).</summary>
     public bool SenderHasProfileImage { get; set; }
 
-    /// <summary>Target user for a direct message; null for group messages.</summary>
+    /// <summary>Doğrudan mesaj için hedef kullanıcı; grup mesajlarında null.</summary>
     public Guid? RecipientId { get; set; }
 
-    /// <summary>Target group for a group message; null for direct messages.</summary>
+    /// <summary>Grup mesajı için hedef grup; doğrudan mesajlarda null.</summary>
     public Guid? GroupId { get; set; }
 
+    /// <summary>Mesaj metni.</summary>
     public string Text { get; set; } = string.Empty;
+
+    /// <summary>Mesajın gönderildiği zaman.</summary>
     public DateTime SentAt { get; set; }
+
+    /// <summary>Mesajın okunup okunmadığı.</summary>
     public bool IsRead { get; set; }
 
-    /// <summary>True when the message was deleted for everyone.</summary>
+    /// <summary>Mesaj herkesten silindiyse true.</summary>
     public bool IsDeleted { get; set; }
 
-    /// <summary>The message this one replies to, when set.</summary>
+    /// <summary>Ayarlandığında, bu mesajın yanıtladığı mesajın kimliği.</summary>
     public Guid? ReplyToId { get; set; }
+
+    /// <summary>Yanıtlanan mesajın metni.</summary>
     public string? ReplyToText { get; set; }
+
+    /// <summary>Yanıtlanan mesajın gönderen adı.</summary>
     public string? ReplyToSenderName { get; set; }
 
-    /// <summary>Emoji reaction summaries placed on this message.</summary>
+    /// <summary>Bu mesaja konulan emoji tepkisi özetleri.</summary>
     public IReadOnlyList<ChatReactionSummary> Reactions { get; set; } = [];
 
-    /// <summary>True when this message carries a shared file.</summary>
+    /// <summary>Bu mesaj paylaşılan bir dosya taşıyorsa true.</summary>
     public bool HasAttachment { get; set; }
 
-    /// <summary>Original file name of the attachment, when present.</summary>
+    /// <summary>Varsa, ekin orijinal dosya adı.</summary>
     public string? AttachmentFileName { get; set; }
 
-    /// <summary>MIME type of the attachment, when present.</summary>
+    /// <summary>Varsa, ekin MIME türü.</summary>
     public string? AttachmentContentType { get; set; }
 }
-

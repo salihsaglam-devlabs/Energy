@@ -3,23 +3,26 @@ using Energy.Shared.Models.V1.Common.Requests;
 namespace Energy.Web.Common;
 
 /// <summary>
-/// Translates the query string parameters DevExtreme's <c>CustomStore</c> sends
-/// (<c>skip</c>, <c>take</c>, <c>sort</c>, <c>searchValue</c>) into the API's
-/// <see cref="PaginatedRequest"/> shape.
+/// DevExtreme'in <c>CustomStore</c> bileşeninin gönderdiği sorgu dizesi
+/// parametrelerini (<c>skip</c>, <c>take</c>, <c>sort</c>, <c>searchValue</c>)
+/// API'nin <see cref="PaginatedRequest"/> biçimine çevirir.
 /// </summary>
 public sealed class GridLoadOptions
 {
+    /// <summary>Atlanacak kayıt sayısı (sayfalama ofseti).</summary>
     public int Skip { get; set; }
 
+    /// <summary>Alınacak kayıt sayısı (sayfa boyutu).</summary>
     public int Take { get; set; } = 20;
 
     /// <summary>
-    /// DevExtreme sends sort as a JSON array, e.g.
-    /// <c>[{"selector":"name","desc":false}]</c>. We accept the raw string and
-    /// parse the first column.
+    /// DevExtreme sıralamayı bir JSON dizisi olarak gönderir; ör.
+    /// <c>[{"selector":"name","desc":false}]</c>. Ham dizeyi kabul edip ilk sütunu
+    /// ayrıştırırız.
     /// </summary>
     public string? Sort { get; set; }
 
+    /// <summary>Serbest metin arama değeri.</summary>
     public string? SearchValue { get; set; }
 
     public PaginatedRequest ToPaginatedRequest()
@@ -55,7 +58,7 @@ public sealed class GridLoadOptions
             }
             catch (System.Text.Json.JsonException)
             {
-                // Non-JSON sort value (e.g. plain field name) — accept as-is.
+                // JSON olmayan sıralama değeri (örn. düz alan adı) — olduğu gibi kabul et.
                 request.SortBy = Sort;
             }
         }

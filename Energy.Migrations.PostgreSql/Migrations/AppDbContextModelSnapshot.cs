@@ -88,6 +88,9 @@ namespace Energy.Migrations.PostgreSql.Migrations
                     b.Property<Guid?>("InvitedById")
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -450,6 +453,38 @@ namespace Energy.Migrations.PostgreSql.Migrations
                     b.ToTable("UserRoles", (string)null);
                 });
 
+            modelBuilder.Entity("Energy.Domain.Identity.UserSetting", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("CallSound")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("DesktopNotifications")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("NotificationSound")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ReadReceipts")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Theme")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("system");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("UserSettings", (string)null);
+                });
+
             modelBuilder.Entity("Energy.Domain.Localization.Resource", b =>
                 {
                     b.Property<Guid>("Id")
@@ -783,6 +818,15 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Energy.Domain.Identity.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Energy.Domain.Identity.UserSetting", b =>
+                {
                     b.HasOne("Energy.Domain.Identity.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")

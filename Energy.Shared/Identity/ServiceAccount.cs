@@ -1,32 +1,36 @@
 namespace Energy.Shared.Identity;
 
 /// <summary>
-/// Built-in, non-interactive system/service account used for system-to-system
-/// calls — e.g. Web-tier audit ingestion for anonymous/internal requests that
-/// have no signed-in user. It is assigned the <see cref="SystemRoles.SuperAdmin"/>
-/// role so it bypasses every permission check, and it is completely independent
-/// from any human (authenticated) user.
+/// Sistemler arası çağrılar için kullanılan, yerleşik ve etkileşimsiz sistem/servis
+/// hesabı — örn. oturum açmış kullanıcısı olmayan anonim/dahili istekler için Web
+/// katmanı denetim alımı. <see cref="SystemRoles.SuperAdmin"/> rolü atanır; böylece
+/// her yetki kontrolünü atlar ve herhangi bir insan (kimliği doğrulanmış) kullanıcıdan
+/// tamamen bağımsızdır.
 ///
-/// The password is read from configuration ("ServiceAccount:Password" on the API
-/// side, "Api:ServiceAccount:Password" on the Web side) and falls back to
-/// <see cref="DefaultPassword"/> so both tiers agree out of the box.
+/// Parola yapılandırmadan okunur (API tarafında "ServiceAccount:Password", Web
+/// tarafında "Api:ServiceAccount:Password") ve her iki katmanın kutudan çıktığı gibi
+/// uyuşması için <see cref="DefaultPassword"/> değerine geri düşer.
 /// </summary>
 public static class ServiceAccount
 {
+    /// <summary>Servis hesabının kullanıcı adı.</summary>
     public const string UserName = "system";
+    /// <summary>Servis hesabının e-posta adresi.</summary>
     public const string Email = "system@energy.local";
+    /// <summary>Servis hesabının adı.</summary>
     public const string FirstName = "System";
+    /// <summary>Servis hesabının soyadı.</summary>
     public const string LastName = "Service";
 
-    /// <summary>Fallback secret used when no override is configured. Override it
-    /// in production via configuration on BOTH the API and the Web tier.</summary>
+    /// <summary>Hiçbir geçersiz kılma yapılandırılmadığında kullanılan yedek gizli anahtar.
+    /// Üretimde HEM API HEM de Web katmanında yapılandırma ile geçersiz kılınmalıdır.</summary>
     public const string DefaultPassword = "Sys!Service#2024$Energy";
 
-    /// <summary>Configuration key the API reads to override the seeded password.</summary>
+    /// <summary>API'nin tohumlanan parolayı geçersiz kılmak için okuduğu yapılandırma anahtarı.</summary>
     public const string ApiPasswordConfigKey = "ServiceAccount:Password";
 
-    /// <summary>Configuration keys the Web tier reads to override the credentials.</summary>
+    /// <summary>Web katmanının kimlik bilgilerini geçersiz kılmak için okuduğu kullanıcı adı anahtarı.</summary>
     public const string WebUserNameConfigKey = "Api:ServiceAccount:UserNameOrEmail";
+    /// <summary>Web katmanının kimlik bilgilerini geçersiz kılmak için okuduğu parola anahtarı.</summary>
     public const string WebPasswordConfigKey = "Api:ServiceAccount:Password";
 }
-

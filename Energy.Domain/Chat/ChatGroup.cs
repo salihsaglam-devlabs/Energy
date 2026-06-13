@@ -3,15 +3,15 @@ using Energy.Domain.Common;
 namespace Energy.Domain.Chat;
 
 /// <summary>
-/// A named chat group. The owner creates it and invites users; an invited user
-/// only becomes an active participant once they accept (see
-/// <see cref="ChatGroupMember"/>).
+/// Adı olan bir sohbet grubu. Sahibi grubu oluşturur ve kullanıcıları davet eder;
+/// davet edilen kullanıcı yalnızca daveti kabul ettiğinde aktif katılımcı olur
+/// (bkz. <see cref="ChatGroupMember"/>).
 /// </summary>
 public class ChatGroup : AuditableEntity
 {
+    /// <summary>Grup adı.</summary>
     public string Name { get; set; } = string.Empty;
 
-    /// <summary>User who created and owns the group.</summary>
+    /// <summary>Grubu oluşturan ve sahibi olan kullanıcının kimliği.</summary>
     public Guid OwnerId { get; set; }
 }
-

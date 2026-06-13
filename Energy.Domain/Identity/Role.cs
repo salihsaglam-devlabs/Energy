@@ -3,17 +3,20 @@ using Energy.Domain.Common;
 namespace Energy.Domain.Identity;
 
 /// <summary>
-/// Authoritative permission owner. The only entity that maps to permissions.
+/// Yetkilerin asıl sahibi olan rol. Yetkilerle eşleşen tek varlık budur.
 /// </summary>
 public class Role : AuditableEntity
 {
+    /// <summary>Rol adı (benzersiz).</summary>
     public string Name { get; set; } = string.Empty;
+
+    /// <summary>Rol açıklaması (opsiyonel; yerelleştirme anahtarı tutabilir).</summary>
     public string? Description { get; set; }
 
     /// <summary>
-    /// True for built-in roles (e.g. SuperAdmin). System roles cannot be
-    /// renamed or deleted; SuperAdmin additionally bypasses permission checks.
+    /// Yerleşik (built-in) roller için true (ör. SuperAdmin). Sistem rolleri
+    /// yeniden adlandırılamaz veya silinemez; SuperAdmin ayrıca tüm yetki
+    /// denetimlerini atlar (bypass).
     /// </summary>
     public bool IsSystem { get; set; }
 }
-

@@ -5,19 +5,20 @@ using Microsoft.AspNetCore.Mvc.Filters;
 namespace Energy.Web.Common.Filters;
 
 /// <summary>
-/// Many JSON endpoints proxy the API and return the raw <see cref="BaseResponse{T}"/>
-/// envelope via <c>Json(envelope)</c>, which always emits HTTP 200 — even when
-/// <c>IsSuccess</c> is false (e.g. duplicate name, validation error). The
-/// client-side <c>AppHttp</c> layer only treats non-2xx responses as failures,
-/// so a failed mutation was silently reported as "saved".
+/// Birçok JSON uç noktası API'ye vekillik eder ve ham <see cref="BaseResponse{T}"/>
+/// zarfını <c>Json(envelope)</c> ile döndürür; bu her zaman HTTP 200 yayar — <c>IsSuccess</c>
+/// false olsa bile (ör. yinelenen ad, doğrulama hatası). İstemci tarafındaki <c>AppHttp</c>
+/// katmanı yalnızca 2xx olmayan yanıtları başarısızlık olarak değerlendirdiğinden,
+/// başarısız bir değişiklik sessizce "kaydedildi" olarak raporlanıyordu.
 ///
-/// This filter promotes any failed envelope to <c>400 Bad Request</c> while
-/// leaving the body untouched, so the existing <c>.catch(AppNotify.fromHttpError)</c>
-/// handlers surface the real API message. Successful envelopes and non-envelope
-/// payloads (grid <c>{ data, totalCount }</c> shapes, files, ...) are left as-is.
+/// Bu filtre, gövdeye dokunmadan başarısız her zarfı <c>400 Bad Request</c>'e yükseltir;
+/// böylece mevcut <c>.catch(AppNotify.fromHttpError)</c> işleyicileri gerçek API mesajını
+/// yüzeye çıkarır. Başarılı zarflar ve zarf olmayan yükler (grid <c>{ data, totalCount }</c>
+/// biçimleri, dosyalar, ...) olduğu gibi bırakılır.
 /// </summary>
 public sealed class EnvelopeStatusResultFilter : IResultFilter
 {
+    /// <summary>Sonuç yürütülmeden önce başarısız zarfları 400 durum koduna yükseltir.</summary>
     public void OnResultExecuting(ResultExecutingContext context)
     {
         var value = context.Result switch
@@ -51,6 +52,7 @@ public sealed class EnvelopeStatusResultFilter : IResultFilter
         }
     }
 
+    /// <summary>Sonuç yürütüldükten sonra çağrılır (işlem gerektirmez).</summary>
     public void OnResultExecuted(ResultExecutedContext context) { }
 }
 
