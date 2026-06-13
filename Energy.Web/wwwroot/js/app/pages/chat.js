@@ -422,7 +422,9 @@
                     data: JSON.stringify(payload)
                 }).done(function (envelope) {
                     var msg = envelope && (envelope.data || envelope.Data);
-                    var ok = envelope && (envelope.isSuccess || envelope.IsSuccess);
+                    // BaseResponse.IsSuccess JSON'da "success" olarak serileştirilir
+                    // ([JsonPropertyName("success")]); önce onu oku.
+                    var ok = envelope && (envelope.success || envelope.isSuccess || envelope.IsSuccess);
                     if (ok && msg && messageBelongsHere(msg)) {
                         appendMessage(msg);
                     }
@@ -1051,7 +1053,7 @@
             var $callHangup = $("#chat-call-hangup");
             var callAudio = document.getElementById("chat-call-audio");
             var ICE = [{ urls: "stun:stun.l.google.com:19302" }];
-            var call = { pc: null, peerId: null, stream: null, pendingOffer: null };
+            var call = { pc: null, peerId: null, stream: null, pendingOffer: null, pendingCandidates: [], remoteSet: false };
 
             function showCall(name, stateText, incoming) {
                 $callName.text(name || "");
@@ -1065,9 +1067,33 @@
             function cleanupCall() {
                 if (call.pc) { try { call.pc.close(); } catch (e) { /* işlem yok */ } }
                 if (call.stream) { call.stream.getTracks().forEach(function (t) { try { t.stop(); } catch (e) { } }); }
-                call = { pc: null, peerId: null, stream: null, pendingOffer: null };
+                call = { pc: null, peerId: null, stream: null, pendingOffer: null, pendingCandidates: [], remoteSet: false };
                 if (callAudio) { callAudio.srcObject = null; }
                 hideCall();
+            }
+
+            // Uzak açıklama (remote description) henüz ayarlanmadan veya bağlantı (pc)
+            // oluşturulmadan önce gelen ICE adaylarını kuyruğa alır; aksi hâlde erken
+            // (özellikle host) adaylar kaybolur ve aranan tarafta ICE asla tamamlanmaz
+            // ("Bağlanıyor…" durumunda takılı kalır).
+            function addOrQueueIce(candidate) {
+                if (!candidate) { return; }
+                if (call.pc && call.remoteSet) {
+                    call.pc.addIceCandidate(new RTCIceCandidate(candidate)).catch(function () { /* yok say */ });
+                } else {
+                    call.pendingCandidates.push(candidate);
+                }
+            }
+
+            // Uzak açıklama ayarlandıktan sonra kuyruktaki adayları uygula.
+            function flushCandidates() {
+                if (!call.pc || !call.remoteSet) { return; }
+                var pending = call.pendingCandidates || [];
+                call.pendingCandidates = [];
+                pending.forEach(function (c) {
+                    try { call.pc.addIceCandidate(new RTCIceCandidate(c)).catch(function () { /* yok say */ }); }
+                    catch (e) { /* yok say */ }
+                });
             }
 
             function newPeerConnection(otherId) {
@@ -1076,11 +1102,24 @@
                     if (ev.candidate) { ENERGY.sendIce(otherId, ev.candidate); }
                 };
                 pc.ontrack = function (ev) {
-                    if (callAudio) { callAudio.srcObject = ev.streams[0]; }
-                    $callState.text("Bağlandı");
+                    if (callAudio) {
+                        callAudio.srcObject = ev.streams[0];
+                        // Bazı tarayıcılarda otomatik oynatma engeli olabilir; sessizce dene.
+                        if (typeof callAudio.play === "function") { callAudio.play().catch(function () { /* yok say */ }); }
+                    }
                 };
+                // Bağlantı durumunu tek kaynaktan yönet: yalnızca ICE/DTLS gerçekten
+                // kurulduğunda "Bağlandı" yaz; başarısızlıkta aramayı temizle.
                 pc.onconnectionstatechange = function () {
-                    if (pc.connectionState === "failed" || pc.connectionState === "disconnected") { cleanupCall(); }
+                    var st = pc.connectionState;
+                    if (st === "connected") { $callState.text("Bağlandı"); }
+                    else if (st === "failed" || st === "disconnected") { cleanupCall(); }
+                };
+                // connectionState'i desteklemeyen tarayıcılar için ICE durumu yedeği.
+                pc.oniceconnectionstatechange = function () {
+                    var st = pc.iceConnectionState;
+                    if (st === "connected" || st === "completed") { $callState.text("Bağlandı"); }
+                    else if (st === "failed") { cleanupCall(); }
                 };
                 return pc;
             }
@@ -1104,6 +1143,8 @@
                 getMic().then(function (stream) {
                     call.stream = stream;
                     call.peerId = peerId;
+                    call.remoteSet = false;
+                    call.pendingCandidates = [];
                     call.pc = newPeerConnection(peerId);
                     stream.getTracks().forEach(function (t) { call.pc.addTrack(t, stream); });
                     showCall(peerName, "Aranıyor…", false);
@@ -1126,7 +1167,13 @@
                     call.pc = newPeerConnection(call.peerId);
                     stream.getTracks().forEach(function (t) { call.pc.addTrack(t, stream); });
                     return call.pc.setRemoteDescription(new RTCSessionDescription(offer))
-                        .then(function () { return call.pc.createAnswer(); })
+                        .then(function () {
+                            // Teklif (uzak açıklama) ayarlandı: kuyruğa alınmış erken ICE
+                            // adaylarını şimdi uygula.
+                            call.remoteSet = true;
+                            flushCandidates();
+                            return call.pc.createAnswer();
+                        })
                         .then(function (answer) {
                             return call.pc.setLocalDescription(answer).then(function () {
                                 ENERGY.answerCall(call.peerId, answer);
@@ -1164,9 +1211,18 @@
                             window.EnergyUserSettings.beep("call");
                         }
                     } else if (ev.type === "answer") {
-                        if (call.pc) { call.pc.setRemoteDescription(new RTCSessionDescription(d.answer)).catch(function () { }); $callState.text("Bağlanıyor…"); }
+                        if (call.pc) {
+                            $callState.text("Bağlanıyor…");
+                            call.pc.setRemoteDescription(new RTCSessionDescription(d.answer))
+                                .then(function () {
+                                    // Yanıt (uzak açıklama) ayarlandı: bekleyen ICE adaylarını boşalt.
+                                    call.remoteSet = true;
+                                    flushCandidates();
+                                })
+                                .catch(function () { });
+                        }
                     } else if (ev.type === "ice") {
-                        if (call.pc && d.candidate) { call.pc.addIceCandidate(new RTCIceCandidate(d.candidate)).catch(function () { }); }
+                        if (d.candidate) { addOrQueueIce(d.candidate); }
                     } else if (ev.type === "ended") {
                         cleanupCall();
                     }

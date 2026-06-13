@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using FluentFTP;
 
 // ---------------------------------------------------------------------------
@@ -74,6 +75,10 @@ Console.WriteLine();
 
 var exitCode = 0;
 
+// Tüm hedefler boyunca tek denemede + bir kez yeniden denemede de yüklenemeyen
+// dosyalar. En sonda tek bir liste hâlinde raporlanır.
+var allFailures = new List<(string Target, UploadFailure Failure)>();
+
 foreach (var target in targets)
 {
     Console.WriteLine($"===== {target.Name.ToUpperInvariant()} =====");
@@ -101,16 +106,32 @@ foreach (var target in targets)
     // 2) Upload using multiple parallel FTP connections.
     try
     {
-        var (uploaded, failed, total) = await UploadFolderParallelAsync(
+        var (uploaded, failed, total, failures) = await UploadFolderParallelAsync(
             host, user, password, target.LocalPath, target.RemoteRoot, parallelism);
         Console.WriteLine($"  -> {uploaded}/{total} file(s) uploaded, {failed} failed.\n");
-        if (failed > 0) exitCode = 1;
+        if (failed > 0)
+        {
+            exitCode = 1;
+            foreach (var failure in failures)
+                allFailures.Add((target.Name, failure));
+        }
     }
     catch (Exception ex)
     {
         Console.Error.WriteLine($"  ! Upload failed: {ex.Message}\n");
         exitCode = 1;
     }
+}
+
+// Yeniden denemeden sonra da yüklenemeyen dosyaları sonda tek liste hâlinde göster.
+if (allFailures.Count > 0)
+{
+    Console.WriteLine();
+    Console.WriteLine($"===== FAILED TRANSFERS ({allFailures.Count}) =====");
+    Console.WriteLine("Aşağıdaki dosyalar yeniden denemeye rağmen aktarılamadı:");
+    foreach (var (targetName, failure) in allFailures)
+        Console.Error.WriteLine($"  [{targetName}] {failure.LocalFile}  ->  {failure.RemotePath}  ({failure.Reason})");
+    Console.WriteLine();
 }
 
 Console.WriteLine(exitCode == 0 ? "Done." : "Completed with errors.");
@@ -152,10 +173,11 @@ static async Task<int> RunScriptAsync(string scriptPath)
 // ---------------------------------------------------------------------------
 // localRoot altındaki her dosyayı, birden çok paralel FTP bağlantısı (her işçi için
 // bir tane) kullanarak remoteRoot'a özyinelemeli şekilde yükler. Dosyaların üzerine
-// yazılır ve uzak dizinler gerektikçe oluşturulur. Konsola canlı ilerleme raporlar.
-// (Yüklenen, Başarısız, Toplam) döndürür.
+// yazılır ve uzak dizinler gerektikçe oluşturulur. Bir dosya yüklenemezse BİR KEZ
+// DAHA denenir; yine olmazsa başarısız olarak işaretlenir. Konsola canlı ilerleme
+// raporlar. (Yüklenen, Başarısız, Toplam, BaşarısızDosyalar) döndürür.
 // ---------------------------------------------------------------------------
-static async Task<(int Uploaded, int Failed, int Total)> UploadFolderParallelAsync(
+static async Task<(int Uploaded, int Failed, int Total, IReadOnlyList<UploadFailure> Failures)> UploadFolderParallelAsync(
     string host, string user, string password,
     string localRoot, string remoteRoot, int parallelism)
 {
@@ -164,7 +186,7 @@ static async Task<(int Uploaded, int Failed, int Total)> UploadFolderParallelAsy
     if (total == 0)
     {
         Console.WriteLine("  (no files to upload)");
-        return (0, 0, 0);
+        return (0, 0, 0, Array.Empty<UploadFailure>());
     }
 
     // Never open more connections than there are files.
@@ -175,6 +197,7 @@ static async Task<(int Uploaded, int Failed, int Total)> UploadFolderParallelAsy
     var failed = 0;
     var processed = 0;
     var consoleLock = new object();
+    var failures = new ConcurrentBag<UploadFailure>();
 
     // Dosyaları bağlantı başına bir kovaya round-robin (sırayla) dağıt.
     var buckets = Enumerable.Range(0, parallelism).Select(_ => new List<string>()).ToArray();
@@ -193,18 +216,9 @@ static async Task<(int Uploaded, int Failed, int Total)> UploadFolderParallelAsy
             var relative = Path.GetRelativePath(localRoot, localFile).Replace('\\', '/');
             var remotePath = $"{remoteRoot.TrimEnd('/')}/{relative}";
 
-            FtpStatus status;
-            try
-            {
-                status = await client.UploadFile(
-                    localFile, remotePath, FtpRemoteExists.Overwrite, createRemoteDir: true, FtpVerify.None);
-            }
-            catch (Exception ex)
-            {
-                status = FtpStatus.Failed;
-                lock (consoleLock)
-                    Console.Error.WriteLine($"  x {localFile}  ->  {remotePath} ({ex.Message})");
-            }
+            // İlk deneme + başarısız olursa bir kez daha dene (toplam 2 deneme).
+            var (status, reason) = await TryUploadWithRetryAsync(
+                client, localFile, remotePath, attempts: 2, consoleLock);
 
             var done = Interlocked.Increment(ref processed);
             if (status == FtpStatus.Success)
@@ -216,8 +230,9 @@ static async Task<(int Uploaded, int Failed, int Total)> UploadFolderParallelAsy
             else
             {
                 Interlocked.Increment(ref failed);
+                failures.Add(new UploadFailure(localFile, remotePath, reason ?? status.ToString()));
                 lock (consoleLock)
-                    Console.Error.WriteLine($"  [{done}/{total}] x {localFile}  ->  {remotePath} ({status})");
+                    Console.Error.WriteLine($"  [{done}/{total}] x {localFile}  ->  {remotePath} ({reason ?? status.ToString()})");
             }
         }
 
@@ -225,7 +240,56 @@ static async Task<(int Uploaded, int Failed, int Total)> UploadFolderParallelAsy
     });
 
     await Task.WhenAll(tasks);
-    return (uploaded, failed, total);
+
+    // Başarısız dosyaları hedef yoluna göre sıralayıp döndür (deterministik liste).
+    var orderedFailures = failures.OrderBy(f => f.RemotePath, StringComparer.OrdinalIgnoreCase).ToList();
+    return (uploaded, failed, total, orderedFailures);
+}
+
+// ---------------------------------------------------------------------------
+// Tek bir dosyayı en çok `attempts` kez yüklemeyi dener (ilk deneme + yeniden
+// denemeler). Başarılı olursa FtpStatus.Success döner. Bir deneme hata verir veya
+// başarısız statü dönerse kısa bir bekleme sonrası tekrar denenir; bağlantı kopmuşsa
+// yeniden bağlanılır. Tüm denemeler tükenirse son hata nedeniyle Failed döner.
+// ---------------------------------------------------------------------------
+static async Task<(FtpStatus Status, string? Reason)> TryUploadWithRetryAsync(
+    AsyncFtpClient client,
+    string localFile, string remotePath, int attempts, object consoleLock)
+{
+    string? lastReason = null;
+
+    for (var attempt = 1; attempt <= attempts; attempt++)
+    {
+        try
+        {
+            var status = await client.UploadFile(
+                localFile, remotePath, FtpRemoteExists.Overwrite, createRemoteDir: true, FtpVerify.None);
+            if (status == FtpStatus.Success)
+                return (status, null);
+
+            lastReason = status.ToString();
+        }
+        catch (Exception ex)
+        {
+            lastReason = ex.Message;
+            // Bağlantı kopmuş olabilir; yeniden denemeden önce bağlantıyı tazele.
+            try { if (!client.IsConnected) await client.AutoConnect(); }
+            catch { /* yeniden bağlanma başarısız olursa sonraki deneme yine başarısız olur */ }
+        }
+
+        if (attempt < attempts)
+        {
+            lock (consoleLock)
+                Console.Error.WriteLine($"  ~ retry {attempt}/{attempts - 1}: {localFile} ({lastReason})");
+            await Task.Delay(1000);
+        }
+    }
+
+    return (FtpStatus.Failed, lastReason);
 }
 
 internal sealed record DeployTarget(string Name, string LocalPath, string RemoteRoot, string ScriptPath);
+
+// Yeniden denemeye rağmen aktarılamayan bir dosyanın kaydı.
+internal sealed record UploadFailure(string LocalFile, string RemotePath, string? Reason);
+

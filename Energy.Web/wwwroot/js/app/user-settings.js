@@ -27,15 +27,43 @@
 
     var audioCtx = null;
 
+    // İşletim sistemi koyu mod tercihini izleyen medya sorgusu; "system" teması
+    // seçiliyken OS açık/koyu değişimlerine canlı tepki vermek için kullanılır.
+    var darkMql = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+
+    // Kullanıcının ham tema tercihi ("system" | "light" | "dark"). "system"
+    // seçiliyken OS değiştiğinde yeniden uygulayabilmek için ayrıca tutulur.
+    var themePref = "system";
+
+    // Ham tercihi gerçek (somut) temaya çözer: "system" ise OS tercihine bakar.
+    function resolveTheme(pref) {
+        var p = (pref || "system").toLowerCase();
+        if (p === "light" || p === "dark") { return p; }
+        return (darkMql && darkMql.matches) ? "dark" : "light";
+    }
+
+    // Çözülmüş temayı köke uygular. Hem açık hem koyu için data-theme'i AÇIKÇA
+    // yazar; böylece CSS (uygulama kabuğu + DevExtreme koyu geçersiz kılmaları)
+    // her durumda tutarlı şekilde hedeflenebilir.
+    function applyResolved(resolved) {
+        document.documentElement.setAttribute("data-theme", resolved === "dark" ? "dark" : "light");
+    }
+
     function applyTheme(theme) {
-        var t = (theme || "system").toLowerCase();
-        var root = document.documentElement;
-        if (t === "light" || t === "dark") {
-            root.setAttribute("data-theme", t);
-        } else {
-            root.removeAttribute("data-theme");
-        }
-        try { window.localStorage.setItem("energy-theme", t); } catch (e) { /* yok say */ }
+        themePref = (theme || "system").toLowerCase();
+        applyResolved(resolveTheme(themePref));
+        // Yanıp sönmeyi önlemek için bir sonraki yüklemede anında uygulanmak üzere
+        // HAM tercihi sakla (çözülmüş değeri değil).
+        try { window.localStorage.setItem("energy-theme", themePref); } catch (e) { /* yok say */ }
+    }
+
+    // "system" seçiliyken OS açık/koyu modu değişince temayı yeniden uygula.
+    function onSystemThemeChange() {
+        if (themePref === "system") { applyResolved(resolveTheme("system")); }
+    }
+    if (darkMql) {
+        if (typeof darkMql.addEventListener === "function") { darkMql.addEventListener("change", onSystemThemeChange); }
+        else if (typeof darkMql.addListener === "function") { darkMql.addListener(onSystemThemeChange); }
     }
 
     // İkili (binary) bir varlık gerektirmeyen hafif WebAudio sesi. type:
