@@ -77,6 +77,30 @@ public static class DependencyInjection
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<Application.Settings.Services.IUserSettingsService, Infrastructure.Settings.Services.UserSettingsService>();
 
+        // Kurumsal modüllerin ortak CRUD servisi (açık generic kayıt).
+        services.AddScoped(typeof(Application.Common.Crud.IGenericCrudService<>), typeof(Infrastructure.Common.GenericCrudService<>));
+
+        // Ana-detay ekranları için ortak alt-koleksiyon sorgu servisi.
+        services.AddScoped<Application.Common.Crud.IModuleDetailQueryService, Infrastructure.Common.ModuleDetailQueryService>();
+
+        // Ana-detay ekranları için ortak alt-koleksiyon yazma (CRUD) servisi.
+        services.AddScoped<Application.Common.Crud.IModuleDetailCommandService, Infrastructure.Common.ModuleDetailCommandService>();
+
+        // Workflow (onay) motoru + kaynak belge durum güncelleyici.
+        services.AddScoped<Application.Workflow.Services.IApprovalSourceUpdater, Infrastructure.Workflow.Services.ApprovalSourceUpdater>();
+        services.AddScoped<Application.Workflow.Services.IApprovalWorkflowService, Infrastructure.Workflow.Services.ApprovalWorkflowService>();
+
+        // Inventory FIFO çekirdeği + Procurement mal kabul iş kuralı.
+        services.AddScoped<Application.Inventory.Services.IInventoryService, Infrastructure.Inventory.Services.InventoryService>();
+        services.AddScoped<Application.Procurement.Services.IGoodsReceiptService, Infrastructure.Procurement.Services.GoodsReceiptService>();
+
+        // Finance: allocation + puantaj/hakediş/bütçe iş kuralları.
+        services.AddScoped<Application.Finance.Services.IFinanceService, Infrastructure.Finance.Services.FinanceService>();
+
+        // Operations (iş emri) + Catalog (malzeme) iş kuralları.
+        services.AddScoped<Application.Operations.Services.IWorkOrderService, Infrastructure.Operations.Services.WorkOrderService>();
+        services.AddScoped<Application.Catalog.Services.IMaterialService, Infrastructure.Catalog.Services.MaterialService>();
+
         services.AddLocalizationOverrides();
         services.AddScoped<SystemSeeder>();
         services.AddScoped<ISystemSeeder>(sp => sp.GetRequiredService<SystemSeeder>());

@@ -6,4 +6,6 @@ namespace Energy.Web.Clients.Home;
 public interface IHomeApiClient
 {
     Task<BaseResponse<HomeDashboardResponse>> GetDashboardAsync(CancellationToken ct = default);
+
+    Task<BaseResponse<IReadOnlyList<EnterpriseMetricResponse>>> GetEnterpriseMetricsAsync(CancellationToken ct = default);
 }

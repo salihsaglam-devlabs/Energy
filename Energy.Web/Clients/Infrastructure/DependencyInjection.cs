@@ -36,6 +36,7 @@ public static class DependencyInjection
         AddAuthenticated<IAuditLogQueryClient, AuditLogQueryClient>(services);
         AddAuthenticated<IChatApiClient, ChatApiClient>(services);
         AddAuthenticated<ISettingsApiClient, SettingsApiClient>(services);
+        AddAuthenticated<Enterprise.IEnterpriseApiClient, Enterprise.EnterpriseApiClient>(services);
         return services;
     }
 

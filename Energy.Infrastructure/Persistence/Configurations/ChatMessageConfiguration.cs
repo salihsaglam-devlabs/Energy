@@ -25,6 +25,10 @@ public sealed class ChatMessageConfiguration : IEntityTypeConfiguration<ChatMess
         builder.HasOne<User>().WithMany().HasForeignKey(m => m.SenderId).OnDelete(DeleteBehavior.Restrict);
         // RecipientId grup mesajlarında null'dur, bu nedenle yabancı anahtar isteğe bağlıdır.
         builder.HasOne<User>().WithMany().HasForeignKey(m => m.RecipientId).OnDelete(DeleteBehavior.Restrict);
+        // Grup mesajlarında GroupId dolu; doğrudan mesajlarda null. Grup silinince geçmiş bozulmasın diye Restrict.
+        builder.HasOne<ChatGroup>().WithMany().HasForeignKey(m => m.GroupId).OnDelete(DeleteBehavior.Restrict);
+        // Yanıtlanan mesaja self-FK (opsiyonel). Restrict.
+        builder.HasOne<ChatMessage>().WithMany().HasForeignKey(m => m.ReplyToMessageId).OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(m => new { m.SenderId, m.RecipientId });
         builder.HasIndex(m => new { m.RecipientId, m.IsRead });

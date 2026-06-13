@@ -18,4 +18,8 @@ public sealed class HomeController : ControllerBase
     [HttpGet("dashboard")]
     public async Task<ActionResult<BaseResponse<HomeDashboardResponse>>> GetDashboard([FromQuery] GetHomeDashboardRequest request, CancellationToken ct)
         => Ok(BaseResponse<HomeDashboardResponse>.Success(await _home.GetDashboardAsync(request, ct)));
+
+    [HttpGet("enterprise-metrics")]
+    public async Task<ActionResult<BaseResponse<IReadOnlyList<EnterpriseMetricResponse>>>> EnterpriseMetrics(CancellationToken ct)
+        => Ok(BaseResponse<IReadOnlyList<EnterpriseMetricResponse>>.Success(await _home.GetEnterpriseMetricsAsync(ct)));
 }

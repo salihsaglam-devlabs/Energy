@@ -10,4 +10,7 @@ public sealed class HomeApiClient : ApiClientBase, IHomeApiClient
 
     public Task<BaseResponse<HomeDashboardResponse>> GetDashboardAsync(CancellationToken ct = default)
         => GetAsync<BaseResponse<HomeDashboardResponse>>(ApiRoutes.Home.Dashboard, ct);
+
+    public Task<BaseResponse<IReadOnlyList<EnterpriseMetricResponse>>> GetEnterpriseMetricsAsync(CancellationToken ct = default)
+        => GetAsync<BaseResponse<IReadOnlyList<EnterpriseMetricResponse>>>(ApiRoutes.Home.EnterpriseMetrics, ct);
 }

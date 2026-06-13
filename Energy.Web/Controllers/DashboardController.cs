@@ -36,6 +36,7 @@ public sealed class DashboardController : Controller
             ConfiguredAreaCount = 0,
             StatusKey = LocalizationKeys.Dashboard.NeedsAttention,
             Metrics = Array.Empty<DashboardMetricViewModel>(),
+            EnterpriseMetrics = Array.Empty<EnterpriseMetricViewModel>(),
             QuickLinks = Array.Empty<DashboardQuickLinkViewModel>()
         };
 
@@ -46,6 +47,25 @@ public sealed class DashboardController : Controller
         }
 
         var d = envelope.Data;
+
+        // Kurumsal (iş) modül widget'larının canlı metriklerini al; yetki API tarafında
+        // (DashboardRead + her widget'ın gerektirdiği yetki) süzülür. Hata olursa boş geç.
+        var enterpriseMetrics = Array.Empty<EnterpriseMetricViewModel>().AsEnumerable();
+        var metricsEnvelope = await _home.GetEnterpriseMetricsAsync(ct);
+        if (metricsEnvelope.IsSuccess && metricsEnvelope.Data is { Count: > 0 } items)
+        {
+            enterpriseMetrics = items
+                .OrderBy(m => m.DisplayOrder)
+                .Select(m => new EnterpriseMetricViewModel
+                {
+                    NameKey = m.NameKey,
+                    DescriptionKey = m.DescriptionKey,
+                    Module = m.Module,
+                    Value = m.Value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture),
+                    Url = ResolveModuleUrl(m.Module)
+                })
+                .ToList();
+        }
 
         // API'nin döndürdüğü altı sayaç üzerinden basit bir "hazırlık" görünümü oluştur:
         // en az bir yapılandırılmış varlığı olan her alan hazır sayılır.
@@ -68,8 +88,7 @@ public sealed class DashboardController : Controller
             ReadinessScore = score,
             ConfiguredAreaCount = configured,
             StatusKey = statusKey,
-            Metrics = new[]
-            {
+            Metrics = new[]            {
                 new DashboardMetricViewModel
                 {
                     LabelKey = LocalizationKeys.Dashboard.ActiveUsers,
@@ -95,6 +114,7 @@ public sealed class DashboardController : Controller
                     Value = d.TotalMenus.ToString()
                 }
             },
+            EnterpriseMetrics = enterpriseMetrics.ToArray(),
             QuickLinks = new[]
             {
                 new DashboardQuickLinkViewModel { Title = LocalizationKeys.Menus.Users,         Url = "/users",          Icon = "user" },
@@ -108,4 +128,15 @@ public sealed class DashboardController : Controller
 
         return View(model);
     }
+
+    /// <summary>Widget'ın iş modülünü, generic CRUD ekranının rota segmentine eşler.</summary>
+    private static string? ResolveModuleUrl(string module) => module switch
+    {
+        "Inventory" => "/m/inventory",
+        "Workflow" => "/m/workflow",
+        "Budget" => "/m/budget",
+        "Procurement" => "/m/procurement",
+        "Operations" => "/m/operations",
+        _ => null,
+    };
 }

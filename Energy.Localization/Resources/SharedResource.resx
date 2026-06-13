@@ -75,6 +75,9 @@
   <data name="Permissions.Profile.Read.Name" xml:space="preserve"><value>View Profile</value></data>
   <data name="Permissions.Profile.Update.Name" xml:space="preserve"><value>Update Profile</value></data>
 
+  <data name="Permissions.System.Seed.Name" xml:space="preserve"><value>Run System Seed</value></data>
+  <data name="Permissions.Chat.Use.Name" xml:space="preserve"><value>Use Chat</value></data>
+
   <data name="Menus.Dashboard" xml:space="preserve"><value>Dashboard</value></data>
   <data name="Menus.System" xml:space="preserve"><value>System Management</value></data>
   <data name="Menus.Profile" xml:space="preserve"><value>My Profile</value></data>
@@ -371,4 +374,233 @@
   <data name="UserAccessScreen.PermissionsNote" xml:space="preserve"><value>Locked items are inherited from roles. Tick extra permissions to grant them directly.</value></data>
   <data name="UserAccessScreen.Inherited" xml:space="preserve"><value>from role</value></data>
   <data name="UserAccessScreen.Saved" xml:space="preserve"><value>Access updated.</value></data>
+
+  <!-- Enterprise module localization (generated) -->
+  <data name="Permissions.Core.Read.Name" xml:space="preserve"><value>View Core Data</value></data>
+  <data name="Permissions.Core.ReadAll.Name" xml:space="preserve"><value>List Core Data</value></data>
+  <data name="Permissions.Core.Create.Name" xml:space="preserve"><value>Create Core Data</value></data>
+  <data name="Permissions.Core.Update.Name" xml:space="preserve"><value>Update Core Data</value></data>
+  <data name="Permissions.Core.Delete.Name" xml:space="preserve"><value>Delete Core Data</value></data>
+  <data name="Permissions.Organization.Read.Name" xml:space="preserve"><value>View Employee</value></data>
+  <data name="Permissions.Organization.ReadAll.Name" xml:space="preserve"><value>List Employee</value></data>
+  <data name="Permissions.Organization.Create.Name" xml:space="preserve"><value>Create Employee</value></data>
+  <data name="Permissions.Organization.Update.Name" xml:space="preserve"><value>Update Employee</value></data>
+  <data name="Permissions.Organization.Delete.Name" xml:space="preserve"><value>Delete Employee</value></data>
+  <data name="Permissions.BusinessPartners.Read.Name" xml:space="preserve"><value>View Business Partner</value></data>
+  <data name="Permissions.BusinessPartners.ReadAll.Name" xml:space="preserve"><value>List Business Partner</value></data>
+  <data name="Permissions.BusinessPartners.Create.Name" xml:space="preserve"><value>Create Business Partner</value></data>
+  <data name="Permissions.BusinessPartners.Update.Name" xml:space="preserve"><value>Update Business Partner</value></data>
+  <data name="Permissions.BusinessPartners.Delete.Name" xml:space="preserve"><value>Delete Business Partner</value></data>
+  <data name="Permissions.Projects.Read.Name" xml:space="preserve"><value>View Project</value></data>
+  <data name="Permissions.Projects.ReadAll.Name" xml:space="preserve"><value>List Project</value></data>
+  <data name="Permissions.Projects.Create.Name" xml:space="preserve"><value>Create Project</value></data>
+  <data name="Permissions.Projects.Update.Name" xml:space="preserve"><value>Update Project</value></data>
+  <data name="Permissions.Projects.Delete.Name" xml:space="preserve"><value>Delete Project</value></data>
+  <data name="Permissions.Catalog.Read.Name" xml:space="preserve"><value>View Material</value></data>
+  <data name="Permissions.Catalog.ReadAll.Name" xml:space="preserve"><value>List Material</value></data>
+  <data name="Permissions.Catalog.Create.Name" xml:space="preserve"><value>Create Material</value></data>
+  <data name="Permissions.Catalog.Update.Name" xml:space="preserve"><value>Update Material</value></data>
+  <data name="Permissions.Catalog.Delete.Name" xml:space="preserve"><value>Delete Material</value></data>
+  <data name="Permissions.Inventory.Read.Name" xml:space="preserve"><value>View Inventory</value></data>
+  <data name="Permissions.Inventory.ReadAll.Name" xml:space="preserve"><value>List Inventory</value></data>
+  <data name="Permissions.Inventory.Create.Name" xml:space="preserve"><value>Create Inventory</value></data>
+  <data name="Permissions.Inventory.Update.Name" xml:space="preserve"><value>Update Inventory</value></data>
+  <data name="Permissions.Inventory.Delete.Name" xml:space="preserve"><value>Delete Inventory</value></data>
+  <data name="Permissions.Requests.Read.Name" xml:space="preserve"><value>View Request</value></data>
+  <data name="Permissions.Requests.ReadAll.Name" xml:space="preserve"><value>List Request</value></data>
+  <data name="Permissions.Requests.Create.Name" xml:space="preserve"><value>Create Request</value></data>
+  <data name="Permissions.Requests.Update.Name" xml:space="preserve"><value>Update Request</value></data>
+  <data name="Permissions.Requests.Delete.Name" xml:space="preserve"><value>Delete Request</value></data>
+  <data name="Permissions.Procurement.Read.Name" xml:space="preserve"><value>View Purchasing</value></data>
+  <data name="Permissions.Procurement.ReadAll.Name" xml:space="preserve"><value>List Purchasing</value></data>
+  <data name="Permissions.Procurement.Create.Name" xml:space="preserve"><value>Create Purchasing</value></data>
+  <data name="Permissions.Procurement.Update.Name" xml:space="preserve"><value>Update Purchasing</value></data>
+  <data name="Permissions.Procurement.Delete.Name" xml:space="preserve"><value>Delete Purchasing</value></data>
+  <data name="Permissions.Operations.Read.Name" xml:space="preserve"><value>View Work Order</value></data>
+  <data name="Permissions.Operations.ReadAll.Name" xml:space="preserve"><value>List Work Order</value></data>
+  <data name="Permissions.Operations.Create.Name" xml:space="preserve"><value>Create Work Order</value></data>
+  <data name="Permissions.Operations.Update.Name" xml:space="preserve"><value>Update Work Order</value></data>
+  <data name="Permissions.Operations.Delete.Name" xml:space="preserve"><value>Delete Work Order</value></data>
+  <data name="Permissions.FieldOperations.Read.Name" xml:space="preserve"><value>View Site Report</value></data>
+  <data name="Permissions.FieldOperations.ReadAll.Name" xml:space="preserve"><value>List Site Report</value></data>
+  <data name="Permissions.FieldOperations.Create.Name" xml:space="preserve"><value>Create Site Report</value></data>
+  <data name="Permissions.FieldOperations.Update.Name" xml:space="preserve"><value>Update Site Report</value></data>
+  <data name="Permissions.FieldOperations.Delete.Name" xml:space="preserve"><value>Delete Site Report</value></data>
+  <data name="Permissions.HR.Read.Name" xml:space="preserve"><value>View Timesheet</value></data>
+  <data name="Permissions.HR.ReadAll.Name" xml:space="preserve"><value>List Timesheet</value></data>
+  <data name="Permissions.HR.Create.Name" xml:space="preserve"><value>Create Timesheet</value></data>
+  <data name="Permissions.HR.Update.Name" xml:space="preserve"><value>Update Timesheet</value></data>
+  <data name="Permissions.HR.Delete.Name" xml:space="preserve"><value>Delete Timesheet</value></data>
+  <data name="Permissions.Assets.Read.Name" xml:space="preserve"><value>View Equipment</value></data>
+  <data name="Permissions.Assets.ReadAll.Name" xml:space="preserve"><value>List Equipment</value></data>
+  <data name="Permissions.Assets.Create.Name" xml:space="preserve"><value>Create Equipment</value></data>
+  <data name="Permissions.Assets.Update.Name" xml:space="preserve"><value>Update Equipment</value></data>
+  <data name="Permissions.Assets.Delete.Name" xml:space="preserve"><value>Delete Equipment</value></data>
+  <data name="Permissions.Finance.Read.Name" xml:space="preserve"><value>View Finance</value></data>
+  <data name="Permissions.Finance.ReadAll.Name" xml:space="preserve"><value>List Finance</value></data>
+  <data name="Permissions.Finance.Create.Name" xml:space="preserve"><value>Create Finance</value></data>
+  <data name="Permissions.Finance.Update.Name" xml:space="preserve"><value>Update Finance</value></data>
+  <data name="Permissions.Finance.Delete.Name" xml:space="preserve"><value>Delete Finance</value></data>
+  <data name="Permissions.Budget.Read.Name" xml:space="preserve"><value>View Budget</value></data>
+  <data name="Permissions.Budget.ReadAll.Name" xml:space="preserve"><value>List Budget</value></data>
+  <data name="Permissions.Budget.Create.Name" xml:space="preserve"><value>Create Budget</value></data>
+  <data name="Permissions.Budget.Update.Name" xml:space="preserve"><value>Update Budget</value></data>
+  <data name="Permissions.Budget.Delete.Name" xml:space="preserve"><value>Delete Budget</value></data>
+  <data name="Permissions.Contracts.Read.Name" xml:space="preserve"><value>View Contract</value></data>
+  <data name="Permissions.Contracts.ReadAll.Name" xml:space="preserve"><value>List Contract</value></data>
+  <data name="Permissions.Contracts.Create.Name" xml:space="preserve"><value>Create Contract</value></data>
+  <data name="Permissions.Contracts.Update.Name" xml:space="preserve"><value>Update Contract</value></data>
+  <data name="Permissions.Contracts.Delete.Name" xml:space="preserve"><value>Delete Contract</value></data>
+  <data name="Permissions.ProgressPayments.Read.Name" xml:space="preserve"><value>View Progress Payment</value></data>
+  <data name="Permissions.ProgressPayments.ReadAll.Name" xml:space="preserve"><value>List Progress Payment</value></data>
+  <data name="Permissions.ProgressPayments.Create.Name" xml:space="preserve"><value>Create Progress Payment</value></data>
+  <data name="Permissions.ProgressPayments.Update.Name" xml:space="preserve"><value>Update Progress Payment</value></data>
+  <data name="Permissions.ProgressPayments.Delete.Name" xml:space="preserve"><value>Delete Progress Payment</value></data>
+  <data name="Permissions.Documents.Read.Name" xml:space="preserve"><value>View Document</value></data>
+  <data name="Permissions.Documents.ReadAll.Name" xml:space="preserve"><value>List Document</value></data>
+  <data name="Permissions.Documents.Create.Name" xml:space="preserve"><value>Create Document</value></data>
+  <data name="Permissions.Documents.Update.Name" xml:space="preserve"><value>Update Document</value></data>
+  <data name="Permissions.Documents.Delete.Name" xml:space="preserve"><value>Delete Document</value></data>
+  <data name="Permissions.Workflow.Read.Name" xml:space="preserve"><value>View Approval</value></data>
+  <data name="Permissions.Workflow.ReadAll.Name" xml:space="preserve"><value>List Approval</value></data>
+  <data name="Permissions.Workflow.Create.Name" xml:space="preserve"><value>Create Approval</value></data>
+  <data name="Permissions.Workflow.Update.Name" xml:space="preserve"><value>Update Approval</value></data>
+  <data name="Permissions.Workflow.Delete.Name" xml:space="preserve"><value>Delete Approval</value></data>
+  <data name="Permissions.Notifications.Read.Name" xml:space="preserve"><value>View Notification</value></data>
+  <data name="Permissions.Notifications.ReadAll.Name" xml:space="preserve"><value>List Notification</value></data>
+  <data name="Permissions.Notifications.Create.Name" xml:space="preserve"><value>Create Notification</value></data>
+  <data name="Permissions.Notifications.Update.Name" xml:space="preserve"><value>Update Notification</value></data>
+  <data name="Permissions.Notifications.Delete.Name" xml:space="preserve"><value>Delete Notification</value></data>
+  <data name="Permissions.Reporting.Read.Name" xml:space="preserve"><value>View Report</value></data>
+  <data name="Permissions.Reporting.ReadAll.Name" xml:space="preserve"><value>List Report</value></data>
+  <data name="Permissions.Reporting.Create.Name" xml:space="preserve"><value>Create Report</value></data>
+  <data name="Permissions.Reporting.Update.Name" xml:space="preserve"><value>Update Report</value></data>
+  <data name="Permissions.Reporting.Delete.Name" xml:space="preserve"><value>Delete Report</value></data>
+  <data name="Permissions.Default.Read.Name" xml:space="preserve"><value>View</value></data>
+  <data name="Permissions.Default.ReadAll.Name" xml:space="preserve"><value>List</value></data>
+  <data name="Permissions.Default.Create.Name" xml:space="preserve"><value>Create</value></data>
+  <data name="Permissions.Default.Update.Name" xml:space="preserve"><value>Update</value></data>
+  <data name="Permissions.Default.Delete.Name" xml:space="preserve"><value>Delete</value></data>
+  <data name="Permissions.Inventory.Approve.Name" xml:space="preserve"><value>Approve Stock Document</value></data>
+  <data name="Permissions.Inventory.Transfer.Name" xml:space="preserve"><value>Stock Transfer</value></data>
+  <data name="Permissions.Inventory.Count.Name" xml:space="preserve"><value>Stock Count</value></data>
+  <data name="Permissions.Inventory.Reverse.Name" xml:space="preserve"><value>Reverse Stock Document</value></data>
+  <data name="Permissions.Procurement.Approve.Name" xml:space="preserve"><value>Approve Purchase</value></data>
+  <data name="Permissions.Workflow.Approve.Name" xml:space="preserve"><value>Approve</value></data>
+  <data name="Permissions.Workflow.Reject.Name" xml:space="preserve"><value>Reject</value></data>
+  <data name="Permissions.Workflow.Return.Name" xml:space="preserve"><value>Return</value></data>
+  <data name="Permissions.Documents.Upload.Name" xml:space="preserve"><value>Upload Document</value></data>
+  <data name="Permissions.Documents.Download.Name" xml:space="preserve"><value>Download Document</value></data>
+  <data name="Permissions.Documents.Version.Name" xml:space="preserve"><value>Document Version</value></data>
+  <data name="Permissions.Reporting.Export.Name" xml:space="preserve"><value>Export Report</value></data>
+  <data name="Permissions.Chat.GroupManage.Name" xml:space="preserve"><value>Manage Chat Group</value></data>
+  <data name="Permissions.Chat.GroupDelete.Name" xml:space="preserve"><value>Delete Chat Group</value></data>
+  <data name="Permissions.Chat.MemberAdd.Name" xml:space="preserve"><value>Add Member</value></data>
+  <data name="Permissions.Chat.MemberRemove.Name" xml:space="preserve"><value>Remove Member</value></data>
+  <data name="Permissions.Chat.AdminAssign.Name" xml:space="preserve"><value>Assign Admin</value></data>
+  <data name="Menus.ProjectsArea" xml:space="preserve"><value>Projects</value></data>
+  <data name="Menus.Projects" xml:space="preserve"><value>Projects</value></data>
+  <data name="Menus.Operations" xml:space="preserve"><value>Work Orders</value></data>
+  <data name="Menus.FieldOperations" xml:space="preserve"><value>Site Reports</value></data>
+  <data name="Menus.Contracts" xml:space="preserve"><value>Contracts</value></data>
+  <data name="Menus.ProgressPayments" xml:space="preserve"><value>Progress Payments</value></data>
+  <data name="Menus.SupplyArea" xml:space="preserve"><value>Supply Chain</value></data>
+  <data name="Menus.Catalog" xml:space="preserve"><value>Materials</value></data>
+  <data name="Menus.Inventory" xml:space="preserve"><value>Warehouses</value></data>
+  <data name="Menus.Requests" xml:space="preserve"><value>Requests</value></data>
+  <data name="Menus.Procurement" xml:space="preserve"><value>Purchase Orders</value></data>
+  <data name="Menus.FinanceArea" xml:space="preserve"><value>Finance</value></data>
+  <data name="Menus.Finance" xml:space="preserve"><value>Finance</value></data>
+  <data name="Menus.Budget" xml:space="preserve"><value>Budgets</value></data>
+  <data name="Menus.HRArea" xml:space="preserve"><value>HR and Organization</value></data>
+  <data name="Menus.Organization" xml:space="preserve"><value>Employees</value></data>
+  <data name="Menus.HR" xml:space="preserve"><value>Timesheets</value></data>
+  <data name="Menus.Assets" xml:space="preserve"><value>Equipment</value></data>
+  <data name="Menus.CommonArea" xml:space="preserve"><value>Common</value></data>
+  <data name="Menus.BusinessPartners" xml:space="preserve"><value>Business Partners</value></data>
+  <data name="Menus.Documents" xml:space="preserve"><value>Documents</value></data>
+  <data name="Menus.Workflow" xml:space="preserve"><value>Approvals</value></data>
+  <data name="Menus.Notifications" xml:space="preserve"><value>Notifications</value></data>
+  <data name="Menus.Reporting" xml:space="preserve"><value>Reports</value></data>
+  <data name="Menus.CoreData" xml:space="preserve"><value>Core Data</value></data>
+  <data name="DashboardWidgets.LowStock.Name" xml:space="preserve"><value>Low Stock</value></data>
+  <data name="DashboardWidgets.PendingApprovals.Name" xml:space="preserve"><value>Pending Approvals</value></data>
+  <data name="DashboardWidgets.BudgetOverrun.Name" xml:space="preserve"><value>Budget Overrun</value></data>
+  <data name="DashboardWidgets.OrderDelivery.Name" xml:space="preserve"><value>Order Delivery</value></data>
+  <data name="DashboardWidgets.WorkOrderProgress.Name" xml:space="preserve"><value>Work Order Progress</value></data>
+  <data name="DashboardWidgets.LowStock.Description" xml:space="preserve"><value>Stock balances at or below available zero.</value></data>
+  <data name="DashboardWidgets.PendingApprovals.Description" xml:space="preserve"><value>Approval requests awaiting action.</value></data>
+  <data name="DashboardWidgets.BudgetOverrun.Description" xml:space="preserve"><value>Active budgets exceeding their plan.</value></data>
+  <data name="DashboardWidgets.OrderDelivery.Description" xml:space="preserve"><value>Purchase orders awaiting delivery.</value></data>
+  <data name="DashboardWidgets.WorkOrderProgress.Description" xml:space="preserve"><value>Open (not completed) work orders.</value></data>
+  <data name="Currencies.TRY.Name" xml:space="preserve"><value>Turkish Lira</value></data>
+  <data name="Currencies.USD.Name" xml:space="preserve"><value>US Dollar</value></data>
+  <data name="Currencies.EUR.Name" xml:space="preserve"><value>Euro</value></data>
+  <data name="Units.Piece.Name" xml:space="preserve"><value>Piece</value></data>
+  <data name="Units.Meter.Name" xml:space="preserve"><value>Meter</value></data>
+  <data name="Units.Kilogram.Name" xml:space="preserve"><value>Kilogram</value></data>
+  <data name="Units.Ton.Name" xml:space="preserve"><value>Ton</value></data>
+  <data name="Units.Liter.Name" xml:space="preserve"><value>Liter</value></data>
+  <data name="Units.Hour.Name" xml:space="preserve"><value>Hour</value></data>
+  <data name="Units.Day.Name" xml:space="preserve"><value>Day</value></data>
+  <data name="Units.Roll.Name" xml:space="preserve"><value>Roll</value></data>
+  <data name="Units.Package.Name" xml:space="preserve"><value>Package</value></data>
+  <data name="Dashboard.BusinessOverview" xml:space="preserve"><value>Business overview</value></data>
+  <data name="Dashboard.BusinessOverviewDescription" xml:space="preserve"><value>Live metrics across your operational modules.</value></data>
+  <data name="Notifications.PendingApproval.Title" xml:space="preserve"><value>Approval pending</value></data>
+  <data name="Notifications.PendingApproval.Body" xml:space="preserve"><value>An item requires your approval.</value></data>
+  <data name="Notifications.BudgetOverrun.Title" xml:space="preserve"><value>Budget exceeded</value></data>
+  <data name="Notifications.BudgetOverrun.Body" xml:space="preserve"><value>A budget has been exceeded.</value></data>
+  <data name="Roles.Admin.Description" xml:space="preserve"><value>Full business administrator</value></data>
+  <data name="Roles.ProjectManager.Description" xml:space="preserve"><value>Project management role</value></data>
+  <data name="Roles.WarehouseManager.Description" xml:space="preserve"><value>Warehouse management role</value></data>
+  <data name="Roles.PurchaseManager.Description" xml:space="preserve"><value>Purchasing management role</value></data>
+  <data name="Roles.FinanceManager.Description" xml:space="preserve"><value>Finance management role</value></data>
+  <data name="Roles.HRManager.Description" xml:space="preserve"><value>HR management role</value></data>
+  <data name="Roles.SiteSupervisor.Description" xml:space="preserve"><value>Site supervision role</value></data>
+  <data name="ApprovalDefinitions.PurchaseOrderApproval.Name" xml:space="preserve"><value>Purchase Order Approval</value></data>
+  <data name="ApprovalDefinitions.ExpenseClaimApproval.Name" xml:space="preserve"><value>Expense Claim Approval</value></data>
+  <data name="ApprovalSteps.PurchaseOrderApproval.1" xml:space="preserve"><value>Project Manager Approval</value></data>
+  <data name="ApprovalSteps.PurchaseOrderApproval.2" xml:space="preserve"><value>Finance Manager Approval</value></data>
+  <data name="ApprovalSteps.ExpenseClaimApproval.1" xml:space="preserve"><value>Project Manager Approval</value></data>
+  <data name="ApprovalSteps.ExpenseClaimApproval.2" xml:space="preserve"><value>Finance Manager Approval</value></data>
+  <data name="ModuleActions.Column" xml:space="preserve"><value>Actions</value></data>
+  <data name="ModuleActions.Approve" xml:space="preserve"><value>Approve</value></data>
+  <data name="ModuleActions.Reject" xml:space="preserve"><value>Reject</value></data>
+  <data name="ModuleActions.Return" xml:space="preserve"><value>Return</value></data>
+  <data name="ModuleActions.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="ModuleActions.Reverse" xml:space="preserve"><value>Reverse</value></data>
+  <data name="ModuleActions.Receive" xml:space="preserve"><value>Receive Goods</value></data>
+  <data name="ModuleActions.Close" xml:space="preserve"><value>Close</value></data>
+  <data name="ModuleActions.Reopen" xml:space="preserve"><value>Reopen</value></data>
+  <data name="ModuleActions.Activate" xml:space="preserve"><value>Activate</value></data>
+  <data name="ModuleActions.Validate" xml:space="preserve"><value>Validate</value></data>
+  <data name="ModuleActions.ConfirmTitle" xml:space="preserve"><value>Confirm</value></data>
+  <data name="ModuleActions.ConfirmMessage" xml:space="preserve"><value>Are you sure you want to perform this action?</value></data>
+  <data name="ModuleActions.NotePrompt" xml:space="preserve"><value>Note (optional)</value></data>
+  <data name="ModuleActions.Succeeded" xml:space="preserve"><value>The action completed successfully.</value></data>
+  <data name="ModuleActions.ValidationOk" xml:space="preserve"><value>Validation passed; no missing attributes.</value></data>
+  <data name="ModuleActions.ValidationIssues" xml:space="preserve"><value>Missing/invalid attributes were found.</value></data>
+  <data name="ModuleDetails.RequestLines" xml:space="preserve"><value>Request Lines</value></data>
+  <data name="ModuleDetails.PurchaseOrderLines" xml:space="preserve"><value>Purchase Order Lines</value></data>
+  <data name="ModuleDetails.WorkOrderAssignments" xml:space="preserve"><value>Assignments</value></data>
+  <data name="ModuleDetails.WorkOrderMaterialPlans" xml:space="preserve"><value>Material Plan</value></data>
+  <data name="ModuleDetails.WorkOrderChecklists" xml:space="preserve"><value>Checklists</value></data>
+  <data name="ModuleDetails.WorkOrderStatusHistories" xml:space="preserve"><value>Status History</value></data>
+  <data name="ModuleDetails.DailySiteReportWorkers" xml:space="preserve"><value>Workers</value></data>
+  <data name="ModuleDetails.DailySiteReportEquipments" xml:space="preserve"><value>Equipment</value></data>
+  <data name="ModuleDetails.DailySiteReportMaterials" xml:space="preserve"><value>Materials</value></data>
+  <data name="ModuleDetails.TimesheetLines" xml:space="preserve"><value>Timesheet Lines</value></data>
+  <data name="ModuleDetails.EquipmentAssignments" xml:space="preserve"><value>Assignments</value></data>
+  <data name="ModuleDetails.EquipmentMaintenances" xml:space="preserve"><value>Maintenance</value></data>
+  <data name="ModuleDetails.FinancialTransactionLines" xml:space="preserve"><value>Transaction Lines</value></data>
+  <data name="ModuleDetails.BudgetLines" xml:space="preserve"><value>Budget Lines</value></data>
+  <data name="ModuleDetails.ContractLines" xml:space="preserve"><value>Contract Lines</value></data>
+  <data name="ModuleDetails.ContractParties" xml:space="preserve"><value>Parties</value></data>
+  <data name="ModuleDetails.ContractAmendments" xml:space="preserve"><value>Amendments</value></data>
+  <data name="ModuleDetails.ProgressPaymentLines" xml:space="preserve"><value>Progress Payment Lines</value></data>
+  <data name="ModuleDetails.ProgressPaymentDeductions" xml:space="preserve"><value>Deductions</value></data>
+  <data name="ModuleDetails.MaterialAttributeValues" xml:space="preserve"><value>Attribute Values</value></data>
+  <data name="ModuleDetails.MaterialUnitConversions" xml:space="preserve"><value>Unit Conversions</value></data>
+  <data name="ModuleDetails.WarehouseLocations" xml:space="preserve"><value>Locations</value></data>
 </root>

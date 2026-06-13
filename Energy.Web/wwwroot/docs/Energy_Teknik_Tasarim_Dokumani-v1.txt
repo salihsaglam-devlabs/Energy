@@ -1,0 +1,1676 @@
+Sen kıdemli bir .NET Solution Architect, Senior Backend Engineer, Senior Frontend Engineer, Database Designer, IAM Specialist ve Refactoring Engineer olarak davran.
+
+Elinde mevcut çalışan bir .NET solution var. Solution adı Energy.
+
+Bu görevde dokümantasyon üretmek, yalnızca analiz yapmak veya sadece yapılacaklar listesi hazırlamak YASAKTIR. Beklenen çıktı, mevcut solution üzerinde doğrudan yapılan çalışan kod değişiklikleridir.
+
+==================================================
+1. ANA HEDEF
+==================================================
+
+Mevcut Energy solution üzerinde enerji taahhüt işleri yapan bir şirketin proje yaşam döngüsünü uçtan uca yönetecek modüler bir kurumsal uygulama geliştir.
+
+Sistem; proje, saha, insan kaynağı, malzeme, depo, stok, satın alma, talepler, iş emirleri, ekipman, finans, bütçe, sözleşme, hakediş, belge, bildirim, raporlama, chat, IAM, localization ve dinamik onay mekanizmasını eksiksiz kapsamalıdır.
+
+Hiçbir modülü atlama.
+Hiçbir modülü “sonra yapılabilir” diye erteleme.
+Hiçbir tabloyu, ilişkisini veya iş kuralını göz ardı etme.
+Eksik gördüğün yerde varsayım yapmak yerine mevcut tasarım dokümanı ve Excel kataloğundaki yapıyı esas al.
+Eski veritabanı verilerine bağımlı değiliz.
+Migration üretme.
+Migration dosyası yazma.
+Data migration yazma.
+Mevcut migration geçmişini dikkate alma.
+Entity, configuration, service, controller, DTO, view/page, seed, permission, localization ve UI katmanlarını doğrudan tamamla.
+
+==================================================
+2. MEVCUT SOLUTION BAĞLAMI
+==================================================
+
+Solution adı:
+Energy
+
+Beklenen katmanlar:
+- Energy.Domain
+- Energy.Application
+- Energy.Infrastructure
+- Energy.Api
+- Energy.Web
+- Energy.Localization
+- Energy.Shared
+
+Teknoloji yaklaşımı:
+- .NET 10
+- ASP.NET Core Web API
+- ASP.NET Core MVC Web UI
+- PostgreSQL
+- EF Core
+- DevExtreme tabanlı profesyonel yönetim ekranları
+- Resource tabanlı localization
+- IAM / permission tabanlı erişim kontrolü
+- API endpoint permission eşleştirmesi
+- Menü permission görünürlüğü
+- Audit logging
+- Responsive mobil uyumlu UI
+
+Tüm teknik isimler İngilizce olmalıdır.
+Tablo, entity, DTO, servis, controller, enum, permission, namespace ve klasör isimleri İngilizce olmalıdır.
+Kullanıcıya gösterilen metinler localization anahtarları üzerinden Türkçe ve İngilizce desteklemelidir.
+Magic string kullanma.
+
+==================================================
+3. KODLAMA YAKLAŞIMI
+==================================================
+
+Aşağıdaki kurallara kesinlikle uy:
+
+1. Önce solution içindeki mevcut kodu oku.
+2. Mevcut çalışan yapıyı bozma.
+3. İsimlendirmeleri klasör, namespace, entity, DTO, service, controller ve view seviyesinde standardize et.
+4. Modül bazlı klasörleme yap.
+5. Tüm domain modellerini temiz ve anlaşılır kur.
+6. Her tablo için EF Core configuration oluştur.
+7. Tüm foreign key ilişkilerini açıkça tanımla.
+8. Delete behavior’ları bilinçli tanımla.
+9. Varsayılan olarak Restrict kullan.
+10. Yalnızca gerçek parent-child satır ilişkilerinde Cascade kullan.
+11. Onaylanmış işlem kayıtlarını fiziksel silme.
+12. Soft delete gereken tablolarda IsDeleted, DeletedAt, DeletedBy alanlarını koru.
+13. CreatedAt, CreatedBy, UpdatedAt, UpdatedBy alanlarını kritik tablolarda uygula.
+14. Inventory ve finance hareket tablolarını immutable kabul et.
+15. StockBalances gibi özet tabloları hareketlerden yeniden üretilebilir kur.
+16. Tüm kullanıcıya gösterilen sabit metinleri localization anahtarları üzerinden çöz.
+17. Permission kodlarını merkezi katalogda enum veya strongly typed sabit yapı ile tanımla.
+18. Seeder, merkezi katalogdaki tüm permission’ları eksiksiz DB’ye yazsın.
+19. Menü permission eşleştirmelerini seed et.
+20. API endpoint permission eşleştirmelerini seed et.
+21. Her modül için Read, ReadAll, Create, Update, Delete permission’larını oluştur.
+22. Gerekli özel işlemler için özel permission kodları ekle.
+23. Web katmanında tüm sayfalar permission kontrolüyle açılmalı.
+24. API katmanında tüm endpoint’ler permission kontrolüyle korunmalı.
+25. DevExtreme DataGrid, form, modal, toolbar, filter, paging, validation ve CRUD standartlarını ortak bileşen yapısıyla kullan.
+26. Tüm ekranlar responsive olmalı.
+27. Mobil tarayıcıda taşma, gizlenme veya bozuk layout olmamalı.
+28. Kullanıcıya ait ayarlar UserSettings üzerinden kalıcı saklanmalı.
+29. Kodda TODO bırakma.
+30. Sahte implementasyon, boş metod, throw new NotImplementedException, geçici mock veya yorumla geçiştirme kullanma.
+
+==================================================
+4. MODÜLER MİMARİ İLKELERİ
+==================================================
+
+Her modül kendi tablolarına sahip olmalıdır.
+Bir modül başka modülün tablosunu doğrudan güncellememelidir.
+Modüller arası ilişkiler:
+- Sık kullanılan ve açık ilişkilerde direct FK
+- Opsiyonel ilişkilerde nullable FK
+- Çok biçimli esnek ilişkilerde RelatedModule, RelatedEntityType, RelatedEntityId
+- Birden fazla nesneye bağlanan belgelerde relation table
+yaklaşımıyla kurulmalıdır.
+
+Her modül bağımsız tanımlanabilir olmalıdır.
+Proje bağlantısı olmayan merkez depo işlemleri çalışabilmelidir.
+Proje bağlantısı olmayan genel gider ve finans hareketleri çalışabilmelidir.
+İş emri proje bazlı veya bağımsız bakım işi olarak tanımlanabilmelidir.
+Doküman sistemi tüm modüllere bağlanabilmeli ama hiçbir modüle zorunlu bağımlı olmamalıdır.
+Workflow, notification ve reporting tüm modüllere hizmet veren ortak modüller olmalıdır.
+
+==================================================
+5. EKSİKSİZ MODÜL LİSTESİ
+==================================================
+
+Aşağıdaki 22 modülün tamamını uygula:
+
+1. Core
+2. IAM
+3. Chat
+4. Organization
+5. BusinessPartners
+6. Projects
+7. Catalog
+8. Inventory
+9. Requests
+10. Procurement
+11. Operations
+12. FieldOperations
+13. HR
+14. Assets
+15. Finance
+16. Budget
+17. Contracts
+18. ProgressPayments
+19. Documents
+20. Workflow
+21. Notifications
+22. Reporting
+
+Bu modüllerden hiçbirini atlama.
+
+==================================================
+6. CORE MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- Companies
+- Branches
+- Departments
+- Currencies
+- ExchangeRates
+- UnitsOfMeasure
+- UnitConversions
+- SequenceDefinitions
+- SystemSettings
+- LocalizationResources
+- AuditLogs
+
+Temel davranışlar:
+- Company ana organizasyon köküdür.
+- Branch, Company’ye bağlıdır.
+- Department, Company’ye bağlıdır ve hiyerarşik olabilir.
+- Currency ve ExchangeRate finans modülleri tarafından ortak kullanılır.
+- UnitsOfMeasure ve UnitConversions katalog, stok, satın alma ve saha modülleri tarafından ortak kullanılır.
+- LocalizationResources Key + Culture benzersiz olmalıdır.
+- AuditLogs kullanıcı, endpoint, method, path, correlation id, süre, success durumu, exception ve request/response özetlerini tutmalıdır.
+- SequenceDefinitions belge numarası üretimini modül bazlı yönetmelidir.
+
+==================================================
+7. IAM MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula veya mevcut olanları profesyonel şekilde tamamla:
+
+- Users
+- Roles
+- Permissions
+- UserRoles
+- RolePermissions
+- UserPermissions
+- Menus
+- ApiEndpoints
+- UserSettings
+
+Kurallar:
+- Permission kodları merkezi katalogda strongly typed tanımlanmalıdır.
+- Magic string kullanma.
+- Permission seed işlemi merkezi katalogdaki tüm permission’ları eksiksiz insert veya update etmelidir.
+- Default permission’lar:
+  - Default.Read
+  - Default.ReadAll
+  - Default.Create
+  - Default.Update
+  - Default.Delete
+- Her modül için CRUD permission’larını üret.
+- Özel işlemler için özel permission’lar ekle:
+  - Inventory.Approve
+  - Inventory.Transfer
+  - Inventory.Count
+  - Inventory.Reverse
+  - Procurement.Approve
+  - Workflow.Approve
+  - Workflow.Reject
+  - Workflow.Return
+  - Documents.Upload
+  - Documents.Download
+  - Documents.Version
+  - Reporting.Export
+  - Chat.GroupManage
+  - Chat.GroupDelete
+  - Chat.MemberAdd
+  - Chat.MemberRemove
+  - Chat.AdminAssign
+- Menus.RequiredPermissionCode permission kataloguna bağlı olmalıdır.
+- ApiEndpoints.RequiredPermissionCode permission kataloguna bağlı olmalıdır.
+- Kullanıcı hem rollerden hem direct UserPermissions üzerinden yetki alabilir.
+- UserSettings kullanıcıya özel kalıcı tercihleri saklamalıdır.
+- Login olmayan kullanıcı Web UI açtığında login ekranına yönlendirilmelidir.
+- Read yalnızca kullanıcının ilişkili kayıtlarını, ReadAll tüm kayıtları kapsamalıdır.
+
+==================================================
+8. CHAT MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula veya mevcutları tamamla:
+
+- ChatGroups
+- ChatGroupMembers
+- ChatMessages
+- ChatMessageReactions
+
+Kurallar:
+- ChatGroups.OwnerId -> Users.Id foreign key olmalıdır.
+- ChatGroupMembers.GroupId -> ChatGroups.Id cascade olmalıdır.
+- ChatGroupMembers.UserId -> Users.Id olmalıdır.
+- ChatMessages.SenderId -> Users.Id olmalıdır.
+- ChatMessages.RecipientId nullable olmalıdır.
+- ChatMessages.GroupId nullable olmalıdır.
+- ChatMessages.ReplyToMessageId nullable self FK olmalıdır.
+- ChatMessageReactions.MessageId cascade olmalıdır.
+- ChatMessageReactions.UserId foreign key olmalıdır.
+- Grup yöneticisi:
+  - grubu silebilmeli
+  - üye ekleyebilmeli
+  - üye çıkarabilmeli
+  - başka üyeyi admin yapabilmeli
+- Hiçbir sohbet seçili değilken default sohbet listesi ekranı görünmelidir.
+- Mesaj geldiğinde bildirim sesi çalışmalıdır.
+- Arama ve çağrı sesi kullanıcı ayarlarından yönetilmelidir.
+- Kullanıcı ayarları sonraki oturumlarda korunmalıdır.
+- Mobil browser’da chat ekranı sorunsuz çalışmalıdır.
+
+==================================================
+9. ORGANIZATION MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- Employees
+- EmployeePositions
+- EmployeeSkills
+- EmployeeSkillAssignments
+- LeaveRequests
+- ExpenseClaims
+- ExpenseClaimLines
+
+Kurallar:
+- Employee kullanıcı hesabından bağımsız tanımlanabilir.
+- Employee gerektiğinde User ile ilişkilendirilebilir.
+- EmployeePosition lookup veya master tablo olarak yönetilir.
+- EmployeeSkillAssignments N:N bağlantıdır.
+- LeaveRequests workflow onayına bağlanabilmelidir.
+- ExpenseClaims workflow onayına ve finance hareketine bağlanabilmelidir.
+- ExpenseClaimLines başlık-satır yapısında olmalıdır.
+
+==================================================
+10. BUSINESS PARTNERS MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- BusinessPartners
+- BusinessPartnerContacts
+- BusinessPartnerAddresses
+- BusinessPartnerBankAccounts
+
+PartnerType lookup:
+- Customer
+- Supplier
+- Subcontractor
+- Other
+
+Kurallar:
+- Aynı cari kayıt birden fazla rolde kullanılabilecek şekilde tasarlanmalıdır.
+- Müşteri, tedarikçi ve taşeron için ayrı ayrı gereksiz duplicate tablo oluşturma.
+- İletişim, adres ve banka hesapları ayrı alt tablolarda tutulmalıdır.
+- Pasif cari geçmiş işlemlerden silinmemelidir.
+
+==================================================
+11. PROJECTS MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- Projects
+- ProjectTypes
+- ProjectStatuses
+- ProjectLocations
+- ProjectPhases
+- ProjectMembers
+- ProjectNotes
+
+Kurallar:
+- Project, Company’ye bağlı olmalıdır.
+- Branch opsiyonel olabilir.
+- CustomerId opsiyonel BusinessPartners FK olmalıdır.
+- ManagerUserId opsiyonel Users FK olmalıdır.
+- ProjectLocations hiyerarşik olmalıdır.
+- ProjectPhases hiyerarşik olmalıdır.
+- ProjectMembers kullanıcı veya personel ataması desteklemelidir.
+- ProjectPhase WBS benzeri kırılımı desteklemelidir.
+- Tüm operasyonel modüller gerektiğinde ProjectId, ProjectPhaseId ve ProjectLocationId üzerinden bağlanabilmelidir.
+
+==================================================
+12. CATALOG MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- Brands
+- MaterialCategories
+- MaterialAttributeDefinitions
+- MaterialAttributeOptions
+- MaterialCategoryAttributes
+- Materials
+- MaterialAttributeValues
+- MaterialUnitConversions
+
+Kurallar:
+- Malzeme türleri hardcoded kolonlarla çözülmemelidir.
+- Category bazlı dinamik attribute yapısı kurulmalıdır.
+- Örnek:
+  - Cable -> Section, CoreCount, ConductorType, VoltageClass, Color
+  - Breaker -> RatedCurrent, PoleCount, BreakingCapacity, BrandSeries
+- Attribute data type destekleri:
+  - Text
+  - Number
+  - Decimal
+  - Boolean
+  - Date
+  - Option
+- Category’ye bağlı zorunlu attribute tamamlanmadan malzeme active yapılamamalıdır.
+- Stok hareketi görmüş malzemenin BaseUnitOfMeasureId değeri geriye dönük değiştirilememelidir.
+- MaterialUnitConversions malzemeye özel birim dönüşümünü desteklemelidir.
+
+==================================================
+13. INVENTORY MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- Warehouses
+- WarehouseLocations
+- StockDocumentTypes
+- StockDocuments
+- StockDocumentLines
+- StockLots
+- StockIssueAllocations
+- StockTransactions
+- StockBalances
+- StockReservations
+- StockCounts
+- StockCountLines
+- WarehouseTransfers
+- WarehouseTransferLines
+
+Kurallar:
+- Warehouse Company’ye bağlıdır.
+- Branch ve Project nullable olabilir.
+- WarehouseLocation hiyerarşik raf ve alan yapısını desteklemelidir.
+- Stok miktarı doğrudan elle değiştirilmemelidir.
+- Her fiziksel değişiklik StockTransaction oluşturmalıdır.
+- Onaylanmamış StockDocument fiziksel stok bakiyesini değiştiremez.
+- Her depo girişi ayrı StockLot oluşturmalıdır.
+- Aynı malzeme farklı fiyatlarla alınmışsa maliyet katmanları ayrı tutulmalıdır.
+- Çıkış satırı birden fazla lota dağıtılabilir.
+- StockIssueAllocations bu dağılımı kaydetmelidir.
+- Başlangıç maliyet yöntemi FIFO olmalıdır.
+- İleride WeightedAverage ve SpecificLot desteklenebilecek şekilde tasarla.
+- Negatif stok varsayılan olarak engellenmelidir.
+- StockBalances özet tablodur ve StockTransactions üzerinden rebuild edilebilir olmalıdır.
+- Sayım farkı doğrudan stok kolonunu güncellememelidir; düzeltme hareketi üretmelidir.
+- Transfer işlemi kaynak ve hedef depo hareketlerini birlikte üretmelidir.
+- Onaylanmış stok belgesi fiziksel olarak silinmemelidir.
+- İptal veya reverse hareketi oluşturulmalıdır.
+
+Örnek FIFO davranışı:
+- LOT-001: 500 metre x 120 TRY
+- LOT-002: 300 metre x 145 TRY
+- 600 metre çıkışta:
+  - LOT-001’den 500 metre
+  - LOT-002’den 100 metre
+  - toplam maliyet 74.500 TRY
+Bu hesaplama StockIssueAllocations üzerinden izlenebilmelidir.
+
+==================================================
+14. REQUESTS MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- RequestTypes
+- Requests
+- RequestLines
+
+Kurallar:
+- Talep malzeme, hizmet, ekipman, personel veya diğer tiplerde olabilir.
+- Talep başlık-satır yapısında olmalıdır.
+- ProjectId nullable olabilir.
+- MaterialId nullable olabilir.
+- Talep anında katalogda olmayan ürün için RequestedMaterialText desteklenmelidir.
+- Talep workflow onayına gönderilebilmelidir.
+- Onaylanan malzeme talebi procurement modülüne dönüşebilmelidir.
+
+==================================================
+15. PROCUREMENT MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- SupplierQuotes
+- SupplierQuoteLines
+- PurchaseOrders
+- PurchaseOrderLines
+- PurchaseReceipts
+- PurchaseReceiptLines
+- SupplierInvoices
+- SupplierInvoiceLines
+
+Kurallar:
+- Bir RequestLine için birden fazla teklif alınabilmelidir.
+- Teklif karşılaştırma ekranı oluştur.
+- Tekliflerde fiyat, teslim süresi, ödeme şartı, vergi, iskonto ve tedarikçi bilgisi göster.
+- Seçilen teklif siparişe dönüşebilmeli.
+- PurchaseOrder başlık-satır yapısında olmalıdır.
+- PurchaseOrder kısmi teslim alabilmelidir.
+- Aynı sipariş için birden fazla PurchaseReceipt oluşabilmelidir.
+- Mal kabul siparişe bağlı veya istisnai olarak doğrudan yapılabilmelidir.
+- Mal kabul Inventory modülüne stok giriş belgesi üretmelidir.
+- SupplierInvoice teslimat veya siparişle ilişkilendirilebilmelidir.
+- Finansal onay tamamlanmadan ödeme oluşmamalıdır.
+
+==================================================
+16. OPERATIONS MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- WorkOrderTypes
+- WorkOrders
+- WorkOrderAssignments
+- WorkOrderMaterialPlans
+- WorkOrderMaterialUsages
+- WorkOrderChecklists
+- WorkOrderChecklistItems
+- WorkOrderStatusHistories
+
+Kurallar:
+- WorkOrder proje bazlı veya bağımsız olabilir.
+- ProjectPhaseId ve ProjectLocationId nullable olabilir.
+- WorkOrderAssignments kullanıcı veya personel ataması desteklemelidir.
+- Planlanan malzeme ile gerçek tüketim ayrı tutulmalıdır.
+- Gerçek tüketim gerektiğinde StockDocumentLine’a bağlanmalıdır.
+- Zorunlu checklist tamamlanmadan iş emri kapatılamamalıdır.
+- Durum geçmişi WorkOrderStatusHistories tablosunda tutulmalıdır.
+- Kapalı iş emri doğrudan düzenlenmemeli; kontrollü reopen işlemi olmalıdır.
+
+==================================================
+17. FIELD OPERATIONS MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- DailySiteReports
+- DailySiteReportWorkers
+- DailySiteReportEquipments
+- DailySiteReportMaterials
+- ProgressEntries
+- MeasurementSheets
+- MeasurementSheetLines
+
+Kurallar:
+- Günlük saha raporu proje bazlı olmalıdır.
+- İş emri bağlantısı nullable olabilir.
+- Günlük çalışan, ekipman ve malzeme kayıtları alt tablolarda tutulmalıdır.
+- ProgressEntries miktar ve yüzde bazlı ilerlemeyi desteklemelidir.
+- MeasurementSheets ve MeasurementSheetLines metraj sürecini yönetmelidir.
+- Onaylanan metraj hakedişe aktarılabilmelidir.
+- Onaylanan saha kayıtları fiziksel olarak silinmemelidir.
+
+==================================================
+18. HR MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- Timesheets
+- TimesheetLines
+
+Kurallar:
+- Timesheet başlık-satır yapısında olmalıdır.
+- Personel proje olmadan genel gider olarak çalışabilmelidir.
+- ProjectId ve WorkOrderId nullable olabilir.
+- Normal saat, fazla mesai ve maliyet hesapları desteklenmelidir.
+- Onaylanan puantaj finance modülünde maliyet hareketi oluşturabilmelidir.
+- Onaylı puantaj doğrudan düzenlenmemelidir.
+
+==================================================
+19. ASSETS MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- EquipmentAssets
+- EquipmentAssignments
+- EquipmentMaintenances
+
+Kurallar:
+- Araç, makine, cihaz, el aleti ve demirbaş türleri desteklenmelidir.
+- Ekipman proje, çalışan, depo veya lokasyona atanabilmelidir.
+- Bakım kayıtları planlı ve plansız bakım senaryolarını desteklemelidir.
+- Aynı ekipman aynı zaman aralığında çakışan aktif atamaya sahip olmamalıdır.
+
+==================================================
+20. FINANCE MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- FinancialAccounts
+- CostCenters
+- FinancialTransactions
+- FinancialTransactionLines
+- Payables
+- Receivables
+- Payments
+- PaymentAllocations
+- Collections
+- CollectionAllocations
+
+Kurallar:
+- Bu modül tam genel muhasebe değildir; ön muhasebe ve proje maliyet takibidir.
+- FinancialTransactions başlık-satır yapısında olmalıdır.
+- RelatedModule, RelatedEntityType ve RelatedEntityId ile kaynak izlenebilir olmalıdır.
+- ProjectId nullable olabilir.
+- PartnerId nullable olabilir.
+- Bir borç birden fazla ödeme ile kapanabilmelidir.
+- Bir ödeme birden fazla borca dağıtılabilmelidir.
+- Bir alacak birden fazla tahsilat ile kapanabilmelidir.
+- Bir tahsilat birden fazla alacağa dağıtılabilmelidir.
+- Onaylanan finans hareketi doğrudan silinmemelidir.
+- Reverse veya cancel hareketi oluşturulmalıdır.
+- Kur dönüşümü Currency ve ExchangeRate üzerinden yönetilmelidir.
+
+==================================================
+21. BUDGET MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- Budgets
+- BudgetLines
+
+Kurallar:
+- Proje bazlı bütçe başlığı ve satırları olmalıdır.
+- CostCenter bağlantısı desteklenmelidir.
+- Planlanan ve gerçekleşen maliyet karşılaştırılmalıdır.
+- Gerçekleşen maliyet FinancialTransactionLines üzerinden hesaplanmalıdır.
+- Bütçe aşımı dashboard ve notification üretmelidir.
+
+==================================================
+22. CONTRACTS MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- Contracts
+- ContractParties
+- ContractLines
+- ContractAmendments
+
+Kurallar:
+- ContractType:
+  - Customer
+  - Supplier
+  - Subcontractor
+  - Rental
+  - Service
+- ProjectId nullable olabilir.
+- Bir sözleşmenin birden fazla tarafı olabilir.
+- Ek protokoller ContractAmendments ile yönetilmelidir.
+- Sözleşme aktifken kritik alan değişiklikleri kontrollü yapılmalıdır.
+
+==================================================
+23. PROGRESS PAYMENTS MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- ProgressPayments
+- ProgressPaymentLines
+- ProgressPaymentDeductions
+
+Kurallar:
+- Hakediş sözleşmeye bağlı olmalıdır.
+- Müşteri ve taşeron hakedişi desteklenmelidir.
+- MeasurementSheetLine bağlantısı nullable olabilir.
+- Kesintiler ayrı tabloda tutulmalıdır.
+- Onaylanan hakediş finance modülünde alacak veya borç hareketi oluşturmalıdır.
+- Onaylı hakediş fiziksel olarak silinmemelidir.
+
+==================================================
+24. DOCUMENTS MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- DocumentFolders
+- Documents
+- DocumentVersions
+- DocumentRelations
+- DocumentPermissions
+
+Kurallar:
+- Dosya fiziksel olarak tek kez saklanmalıdır.
+- Yeni yükleme eski dosyayı silmemeli; yeni versiyon oluşturmalıdır.
+- Belge birden fazla nesneye bağlanabilmelidir.
+- DocumentRelations:
+  - DocumentId
+  - RelatedModule
+  - RelatedEntityType
+  - RelatedEntityId
+- Belge erişimi role veya user bazlı yönetilebilmelidir.
+- Doküman sistemi bağımsız modül olarak çalışmalıdır.
+
+==================================================
+25. WORKFLOW MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- ApprovalDefinitions
+- ApprovalDefinitionVersions
+- ApprovalStepDefinitions
+- ApprovalStepApprovers
+- ApprovalConditions
+- ApprovalRequests
+- ApprovalRequestSteps
+- ApprovalRequestApprovers
+- ApprovalActions
+- ApprovalDelegations
+
+Bu modül kritik önemdedir. Eksik bırakma.
+
+Desteklenecek onay modelleri:
+- Sequential
+- ParallelAny
+- ParallelAll
+- Quorum
+
+ApproverType:
+- User
+- Role
+- ProjectRole
+- DepartmentManager
+
+ConditionOperator:
+- Equals
+- NotEquals
+- GreaterThan
+- GreaterThanOrEqual
+- LessThan
+- LessThanOrEqual
+- In
+
+ApprovalActionType:
+- Approve
+- Reject
+- Return
+- Cancel
+
+Kurallar:
+- Akışlar versiyonlu olmalıdır.
+- Yeni talep yalnızca yürürlükteki ApprovalDefinitionVersion ile başlamalıdır.
+- Geçmiş onay talepleri eski versiyon üzerinden okunabilir kalmalıdır.
+- Sequential modda önceki zorunlu adım tamamlanmadan sonraki adım aktif olamaz.
+- ParallelAny modda adaylardan birinin onayı yeterlidir.
+- ParallelAll modda listedeki tüm onaycıların onayı gerekir.
+- Quorum modda RequiredApprovalCount kadar olumlu onay gerekir.
+- ApprovalConditions tutar, proje, belge türü, departman veya şirket bazlı farklı akış seçebilmelidir.
+- Gerçek onaycılar talep anında ApprovalRequestApprovers tablosuna snapshot olarak yazılmalıdır.
+- Sonradan rol değişse bile geçmiş kayıt bozulmamalıdır.
+- ApprovalDelegations tarih aralığında geçici yetki devrini desteklemelidir.
+- Ret, iade ve iptal işlemleri kaynak belgenin durumunu doğru değiştirmelidir.
+- Onaylanmış stok, satın alma, finans, hakediş, masraf, izin ve diğer belgeler fiziksel olarak silinmemelidir.
+
+Örnek satın alma onayı:
+- 0 - 50.000 TRY:
+  - ProjectManager
+- 50.000 - 250.000 TRY:
+  - PurchaseManager
+  - FinanceManager
+- 250.000 TRY üzeri:
+  - PurchaseManager
+  - FinanceManager ve ProjectManager ParallelAll
+  - Admin
+
+Örnek masraf onayı:
+- 0 - 5.000 TRY:
+  - ProjectManager veya DepartmentManager ParallelAny
+- 5.000 TRY üzeri:
+  - ProjectManager
+  - FinanceManager
+
+Örnek hakediş onayı:
+- SiteSupervisor
+- ProjectManager
+- FinanceManager ve Admin ParallelAll
+
+==================================================
+26. NOTIFICATIONS MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- Notifications
+- NotificationRecipients
+- NotificationPreferences
+
+Kurallar:
+- Notification başlık kaydı, recipients alt kayıtları ve user preference kayıtları ayrı olmalıdır.
+- Bildirimler ilgili nesneye bağlanabilmelidir.
+- Düşük stok, bütçe aşımı, geciken iş emri, bekleyen onay, yaklaşan ödeme, hakediş durumu ve chat mesajı bildirimleri desteklenmelidir.
+- Kullanıcı bazlı bildirim tercihleri kalıcı saklanmalıdır.
+
+==================================================
+27. REPORTING MODÜLÜ
+==================================================
+
+Aşağıdaki entity ve tabloları uygula:
+
+- ReportDefinitions
+- DashboardWidgets
+
+Kurallar:
+- Dashboard modül bazlı widget yapısını desteklemelidir.
+- Widget permission ile sınırlandırılmalıdır.
+- Raporlar:
+  - proje bütçe - gerçekleşen
+  - depo mevcut stok
+  - stok değerleme
+  - lot bazlı maliyet
+  - stok hareket dökümü
+  - düşük stok
+  - bekleyen satın alma talepleri
+  - sipariş teslim durumu
+  - tedarikçi performansı
+  - iş emri ilerleme
+  - iş emri gecikme
+  - personel puantaj
+  - işçilik maliyeti
+  - borç, alacak, ödeme, tahsilat planı
+  - sözleşme durumu
+  - hakediş durumu
+  - bekleyen onaylar
+  - bildirimler
+- Ağır sorgular için view veya materialized view yaklaşımını kullan.
+- Rapor export permission ile korunmalıdır.
+
+==================================================
+28. LOOKUP VE ENUM KATALOĞU
+==================================================
+
+Aşağıdaki teknik değerleri merkezi enum veya lookup katalogları olarak tanımla.
+Magic string kullanma.
+
+ApprovalMode:
+- Sequential
+- ParallelAny
+- ParallelAll
+- Quorum
+
+ApproverType:
+- User
+- Role
+- ProjectRole
+- DepartmentManager
+
+ConditionOperator:
+- Equals
+- NotEquals
+- GreaterThan
+- GreaterThanOrEqual
+- LessThan
+- LessThanOrEqual
+- In
+
+ApprovalActionType:
+- Approve
+- Reject
+- Return
+- Cancel
+
+ApprovalRequestStatus:
+- Draft
+- Pending
+- Approved
+- Rejected
+- Returned
+- Cancelled
+
+ApprovalStepStatus:
+- Waiting
+- Active
+- Approved
+- Rejected
+- Returned
+- Skipped
+
+ApprovalApproverStatus:
+- Waiting
+- Approved
+- Rejected
+- Delegated
+
+DocumentStatus:
+- Draft
+- PendingApproval
+- Approved
+- Rejected
+- Cancelled
+- Closed
+
+RequestStatus:
+- Draft
+- PendingApproval
+- Approved
+- Rejected
+- Ordered
+- Closed
+
+PurchaseOrderStatus:
+- Draft
+- Approved
+- PartiallyReceived
+- Received
+- Cancelled
+
+WorkOrderStatus:
+- Draft
+- Assigned
+- InProgress
+- OnHold
+- Completed
+- Closed
+
+FinancialTransactionType:
+- Expense
+- Income
+- Payable
+- Receivable
+- Payment
+- Collection
+
+WarehouseType:
+- Central
+- ProjectSite
+- Temporary
+- Vehicle
+- Consignment
+
+PartnerType:
+- Customer
+- Supplier
+- Subcontractor
+- Other
+
+ContractType:
+- Customer
+- Supplier
+- Subcontractor
+- Rental
+- Service
+
+==================================================
+29. LOCALIZATION
+==================================================
+
+Dil desteği eksiksiz uygulanmalıdır.
+
+Kurallar:
+- Teknik kodlar İngilizce ve değişmezdir.
+- Kullanıcıya gösterilen tüm metinler localization key üzerinden çözülür.
+- Türkçe ve İngilizce resource kayıtları bulunmalıdır.
+- LocalizationResources tablosu runtime override desteklemelidir.
+- Culture + Key unique olmalıdır.
+- Menü adları Menus.NameKey üzerinden çözülmelidir.
+- Permission adı ve açıklaması localization key üzerinden çözülmelidir.
+- Validation mesajları localized olmalıdır.
+- DevExtreme grid başlıkları, butonlar, filtreler, modal metinleri ve bildirimler localized olmalıdır.
+- Eksik çeviride fallback:
+  1. kullanıcı kültürü
+  2. varsayılan kültür
+  3. teknik key
+
+==================================================
+30. API VE WEB UI
+==================================================
+
+Her modül için:
+- Application service
+- DTO
+- request model
+- response model
+- validation
+- controller endpoint
+- Web UI sayfası
+- DevExtreme DataGrid
+- CRUD işlemleri
+- permission kontrolü
+- localized metinler
+- responsive tasarım
+oluştur.
+
+API response standardı:
+- BaseResponse<T>
+- Liste endpoint’lerinde BaseResponse<PaginatedResponse<T>>
+- Ortak PaginatedRequest
+- Tutarlı validation error response
+- Global exception handling
+- CorrelationId
+- Audit logging
+
+Web UI kuralları:
+- Yetkisi olmayan kullanıcı sayfayı görememeli.
+- Yetkisi olmayan menü görünmemeli.
+- Yetkisi olmayan CRUD butonu görünmemeli.
+- Yetkisi olmayan endpoint çağrısı API tarafından reddedilmeli.
+- Responsive mobil tasarım zorunlu.
+- DevExtreme bileşenleri ortak stil ve toolbar standardı kullanmalı.
+- Grid filter, search, paging, sorting, column chooser, export ve CRUD davranışları standardize edilmeli.
+- Login olmayan kullanıcı login sayfasına yönlendirilmeli.
+
+==================================================
+31. SEEDER
+==================================================
+
+Energy.Infrastructure.Seed altında profesyonel seed yapısı kur.
+
+Seed sırası:
+1. Localization resources
+2. Core lookups
+3. Currency
+4. Units of measure
+5. Default roles
+6. Permission catalogue
+7. Role permissions
+8. Menus
+9. API endpoints
+10. System settings
+11. Workflow defaults
+12. Dashboard defaults
+
+Seed idempotent olmalıdır.
+Birden fazla kez çalıştığında duplicate oluşturmamalıdır.
+Eksik kayıtları eklemeli.
+Güncellenmesi gereken sistem kayıtlarını update etmelidir.
+Permission enum veya merkezi katalogdaki hiçbir kayıt DB dışında kalmamalıdır.
+Default.ReadAll dahil tüm default permission’lar seed edilmelidir.
+
+==================================================
+32. KLASÖR VE NAMESPACE STANDARDI
+==================================================
+
+Tüm klasör ve namespace’leri modül bazlı standardize et.
+
+Örnek yapı:
+
+Energy.Domain/
+  Common/
+  IAM/
+  Core/
+  Chat/
+  Organization/
+  BusinessPartners/
+  Projects/
+  Catalog/
+  Inventory/
+  Requests/
+  Procurement/
+  Operations/
+  FieldOperations/
+  HR/
+  Assets/
+  Finance/
+  Budget/
+  Contracts/
+  ProgressPayments/
+  Documents/
+  Workflow/
+  Notifications/
+  Reporting/
+
+Energy.Application/
+  Common/
+  <Module>/
+    DTOs/
+    Requests/
+    Validators/
+    Services/
+    Interfaces/
+    Mappings/
+
+Energy.Infrastructure/
+  Persistence/
+    Configurations/
+      <Module>/
+  Seed/
+  Services/
+
+Energy.Api/
+  Controllers/
+    <Module>/
+
+Energy.Web/
+  Controllers/
+    <Module>/
+  Views/
+    <Module>/
+  wwwroot/
+    js/
+      <module>/
+    css/
+
+Namespace klasör yolu ile uyumlu olmalıdır.
+
+==================================================
+33. VERİ BÜTÜNLÜĞÜ VE DELETE BEHAVIOR
+==================================================
+
+Varsayılan delete behavior:
+- Restrict
+
+Cascade yalnızca gerçek parent-child yapılarda kullanılmalı:
+- başlık -> satırlar
+- belge -> versiyonlar
+- grup -> üyeler
+- mesaj -> reactions
+- approval request -> request steps
+- step -> actual approvers
+
+SetNull yalnızca ilişki opsiyonel ve geçmiş kayıt korunacaksa kullanılmalıdır:
+- Menus.RequiredPermissionCode
+- ApiEndpoints.RequiredPermissionCode
+
+Onaylanmış iş kayıtlarında fiziksel silme kullanma.
+Soft delete veya reverse/cancel işlemi kullan.
+StockTransactions immutable olmalıdır.
+FinancialTransactions immutable davranmalıdır.
+Audit trail korunmalıdır.
+
+==================================================
+34. TEST VE DOĞRULAMA
+==================================================
+
+Kodlamayı bitirdikten sonra:
+
+1. Solution build al.
+2. Compile error bırakma.
+3. Tüm dependency injection kayıtlarını doğrula.
+4. Tüm namespace ve using hatalarını temizle.
+5. Tüm EF Core configuration sınıflarını doğrula.
+6. Tüm foreign key ilişkilerini kontrol et.
+7. Tüm enum ve lookup referanslarını kontrol et.
+8. Tüm localization key’lerini kontrol et.
+9. Tüm permission seed kayıtlarını kontrol et.
+10. Tüm menu permission eşleştirmelerini kontrol et.
+11. Tüm endpoint permission eşleştirmelerini kontrol et.
+12. Tüm controller endpoint’lerini kontrol et.
+13. Tüm Web UI sayfalarını kontrol et.
+14. Tüm DevExtreme grid sayfalarını kontrol et.
+15. Mobil responsive layout’u kontrol et.
+16. Workflow senaryolarını kontrol et:
+   - Sequential
+   - ParallelAny
+   - ParallelAll
+   - Quorum
+   - Delegation
+   - Reject
+   - Return
+   - Cancel
+17. Inventory senaryolarını kontrol et:
+   - stock in
+   - stock out
+   - FIFO allocation
+   - transfer
+   - count adjustment
+   - reverse
+18. Procurement senaryolarını kontrol et:
+   - request
+   - quote
+   - quote comparison
+   - purchase order
+   - partial receipt
+   - inventory receipt
+   - supplier invoice
+19. Finance senaryolarını kontrol et:
+   - payable
+   - receivable
+   - payment allocation
+   - collection allocation
+   - reverse
+20. Build başarılı olmadan işi tamamlanmış sayma.
+
+==================================================
+35. ÇIKTI BİÇİMİ
+==================================================
+
+Çalışma sonunda uzun açıklama yazma.
+Mimari rapor üretme.
+Dokümantasyon üretme.
+Sadece kod tabanını doğrudan değiştir.
+
+En sonda yalnızca kısa bir özet ver:
+- tamamlanan modüller
+- build sonucu
+- kalan blocker varsa blocker
+- migration üretilmediği bilgisi
+
+==================================================
+36. ASLA YAPMA
+==================================================
+
+- Modül atlama
+- TODO bırakma
+- Placeholder kod bırakma
+- Sahte implementasyon
+- NotImplementedException
+- Boş service
+- Boş controller
+- Sadece entity yazıp UI bırakma
+- Sadece UI yazıp API bırakma
+- Permission kontrolünü atlama
+- Localization atlama
+- Seeder atlama
+- Workflow’u basitleştirerek tek kişi onayına düşürme
+- Inventory lot maliyetini tek ortalama kolonla geçiştirme
+- Migration oluşturma
+- Data migration yazma
+- Eski DB verisine göre taviz verme
+- Mevcut çalışan kodu gereksiz yere bozma
+- Açıklama üretip kodu değiştirmeden görevi bitirme
+
+Bu görevi tam kapsamlı, profesyonel ve çalışan kod olarak uygula.
+
+==================================================
+37. ZORUNLU KAYNAK DOSYALAR VE ÖNCELİK SIRASI
+==================================================
+Bu görevi uygularken aşağıdaki iki kaynak dosyayı mutlaka birlikte kullan:
+- Energy_Teknik_Tasarim_Dokumani-v1(2).docx
+- Energy_Teknik_Tasarim_Dokumani-v1(2).xlsx
+Excel dosyası teknik sözlük açısından source of truth kabul edilmelidir. Word dokümanı iş davranışını ve akışsal açıklamayı destekler. Çelişki görülürse önce mevcut kodu, sonra Excel Column Catalogue ve Relationship Catalogue sayfalarını, ardından Word dokümanını dikkate al. Eksik veya hatalı tasarım fark edersen mevcut kod bağlamına uygun biçimde düzelt; ancak hiçbir modülü veya iş davranışını atlama.
+Uygulama başlamadan önce Excel dosyasındaki şu sayfaları oku ve kontrol checklistine dahil et:
+- Module Catalogue
+- Table Catalogue
+- Column Catalogue
+- Relationship Catalogue
+- Lookup Catalogue
+- Approval Model
+- Approval Flow Samples
+- Approval Rules
+- Seed Data
+- Coverage Check
+- ER Overview
+
+==================================================
+38. EKSİKSİZ TABLO ENVANTERİ - 134 TABLO
+==================================================
+
+[Assets]
+- EquipmentAssets: Ekipman ve demirbaş kartları
+- EquipmentAssignments: Ekipman atamaları
+- EquipmentMaintenances: Bakım kayıtları
+
+[Budget]
+- Budgets: Bütçe başlıkları
+- BudgetLines: Bütçe satırları
+
+[BusinessPartners]
+- BusinessPartners: Müşteri, tedarikçi, taşeron ve diğer cari taraflar
+- BusinessPartnerContacts: Cari iletişim kişileri
+- BusinessPartnerAddresses: Cari adresleri
+- BusinessPartnerBankAccounts: Cari banka hesapları
+
+[Catalog]
+- Brands: Markalar
+- MaterialCategories: Malzeme kategori ağacı
+- MaterialAttributeDefinitions: Dinamik malzeme öznitelik tanımları
+- MaterialAttributeOptions: Seçimli öznitelik değerleri
+- MaterialCategoryAttributes: Kategori öznitelik bağlantıları
+- Materials: Malzeme kartları
+- MaterialAttributeValues: Malzeme öznitelik değerleri
+- MaterialUnitConversions: Malzemeye özel birim dönüşümleri
+
+[Chat]
+- ChatGroups: Sohbet grupları
+- ChatGroupMembers: Grup üyeleri
+- ChatMessages: Sohbet mesajları
+- ChatMessageReactions: Mesaj tepkileri
+
+[Contracts]
+- Contracts: Sözleşmeler
+- ContractParties: Sözleşme tarafları
+- ContractLines: Sözleşme kalemleri
+- ContractAmendments: Ek protokoller
+
+[Core]
+- Companies: Şirket tanımları
+- Branches: Şube tanımları
+- Departments: Departman hiyerarşisi
+- Currencies: Para birimleri
+- ExchangeRates: Kur kayıtları
+- UnitsOfMeasure: Ölçü birimleri
+- UnitConversions: Birim dönüşümleri
+- SequenceDefinitions: Belge numarası üretim tanımları
+- SystemSettings: Sistem genel ayarları
+- LocalizationResources: Çok dilli metin kaynakları
+- AuditLogs: İstek, yanıt ve kritik işlem audit kayıtları
+
+[Documents]
+- DocumentFolders: Belge klasörleri
+- Documents: Belge kayıtları
+- DocumentVersions: Belge versiyonları
+- DocumentRelations: Belge ve iş nesnesi bağlantıları
+- DocumentPermissions: Belge erişim yetkileri
+
+[FieldOperations]
+- DailySiteReports: Günlük saha raporları
+- DailySiteReportWorkers: Günlük saha personelleri
+- DailySiteReportEquipments: Günlük saha ekipmanları
+- DailySiteReportMaterials: Günlük saha malzemeleri
+- ProgressEntries: Proje ilerleme kayıtları
+- MeasurementSheets: Metraj başlıkları
+- MeasurementSheetLines: Metraj satırları
+
+[Finance]
+- FinancialAccounts: Finans hesapları
+- CostCenters: Maliyet merkezleri
+- FinancialTransactions: Ön muhasebe hareket başlıkları
+- FinancialTransactionLines: Ön muhasebe hareket satırları
+- Payables: Borç kayıtları
+- Receivables: Alacak kayıtları
+- Payments: Ödeme başlıkları
+- PaymentAllocations: Ödemelerin borçlara dağılımları
+- Collections: Tahsilat başlıkları
+- CollectionAllocations: Tahsilatların alacaklara dağılımları
+
+[HR]
+- Timesheets: Puantaj başlıkları
+- TimesheetLines: Puantaj satırları
+
+[IAM]
+- Users: Kullanıcı hesapları
+- Roles: Roller
+- Permissions: Permission kataloğu
+- UserRoles: Kullanıcı rol bağlantıları
+- RolePermissions: Rol permission bağlantıları
+- UserPermissions: Kullanıcı bazlı permission istisnaları
+- Menus: Menü ağacı
+- ApiEndpoints: API endpoint permission eşleştirmeleri
+- UserSettings: Kullanıcı tercihleri
+
+[Inventory]
+- Warehouses: Depolar
+- WarehouseLocations: Raf, alan ve lokasyon hiyerarşisi
+- StockDocumentTypes: Stok belge türleri
+- StockDocuments: Stok hareket belgeleri
+- StockDocumentLines: Stok belge satırları
+- StockLots: Lot ve maliyet katmanları
+- StockIssueAllocations: Çıkış satırı ile lot maliyet dağılımı
+- StockTransactions: Değiştirilemez stok hareketleri
+- StockBalances: Özet stok bakiyeleri
+- StockReservations: Stok rezervasyonları
+- StockCounts: Depo sayım başlıkları
+- StockCountLines: Depo sayım satırları
+- WarehouseTransfers: Depolar arası transfer başlıkları
+- WarehouseTransferLines: Depolar arası transfer satırları
+
+[Notifications]
+- Notifications: Bildirim başlıkları
+- NotificationRecipients: Bildirim alıcıları
+- NotificationPreferences: Bildirim tercihleri
+
+[Operations]
+- WorkOrderTypes: İş emri türleri
+- WorkOrders: İş emirleri
+- WorkOrderAssignments: İş emri görev atamaları
+- WorkOrderMaterialPlans: Planlanan iş emri malzemeleri
+- WorkOrderMaterialUsages: Gerçekleşen iş emri malzeme kullanımları
+- WorkOrderChecklists: İş emri kontrol listeleri
+- WorkOrderChecklistItems: Kontrol listesi satırları
+- WorkOrderStatusHistories: İş emri durum geçmişi
+
+[Organization]
+- Employees: Personel kartları
+- EmployeePositions: Pozisyon tanımları
+- EmployeeSkills: Yetkinlik tanımları
+- EmployeeSkillAssignments: Personel yetkinlik bağlantıları
+- LeaveRequests: İzin talepleri
+- ExpenseClaims: Personel masraf talepleri
+- ExpenseClaimLines: Personel masraf satırları
+
+[Procurement]
+- SupplierQuotes: Tedarikçi teklif başlıkları
+- SupplierQuoteLines: Tedarikçi teklif satırları
+- PurchaseOrders: Satın alma sipariş başlıkları
+- PurchaseOrderLines: Satın alma sipariş satırları
+- PurchaseReceipts: Mal kabul başlıkları
+- PurchaseReceiptLines: Mal kabul satırları
+- SupplierInvoices: Tedarikçi faturaları
+- SupplierInvoiceLines: Tedarikçi fatura satırları
+
+[ProgressPayments]
+- ProgressPayments: Hakediş başlıkları
+- ProgressPaymentLines: Hakediş satırları
+- ProgressPaymentDeductions: Hakediş kesintileri
+
+[Projects]
+- Projects: Proje ana kartları
+- ProjectTypes: Proje türleri
+- ProjectStatuses: Proje durumları
+- ProjectLocations: Proje lokasyon hiyerarşisi
+- ProjectPhases: Proje fazları ve WBS benzeri kırılım
+- ProjectMembers: Proje kullanıcı ve personel atamaları
+- ProjectNotes: Proje notları
+
+[Reporting]
+- ReportDefinitions: Rapor tanımları
+- DashboardWidgets: Dashboard widget tanımları
+
+[Requests]
+- RequestTypes: Talep türleri
+- Requests: Genel talep başlıkları
+- RequestLines: Talep satırları
+
+[Workflow]
+- ApprovalDefinitions: Onay akışı tanımları
+- ApprovalDefinitionVersions: Onay akışı versiyonları
+- ApprovalStepDefinitions: Onay adımı tanımları
+- ApprovalStepApprovers: Adım bazlı kişi, rol veya grup onaycıları
+- ApprovalConditions: Tutar, proje, belge türü ve benzeri koşullar
+- ApprovalRequests: Çalışan onay talepleri
+- ApprovalRequestSteps: Talebe bağlı adım örnekleri
+- ApprovalRequestApprovers: Adımın gerçek onaycıları
+- ApprovalActions: Onay, ret, iade ve iptal hareketleri
+- ApprovalDelegations: Geçici onay yetkisi devri
+
+==================================================
+39. KOLON KATALOĞU UYGULAMA KURALI
+==================================================
+Excel dosyasındaki Column Catalogue sayfası her tablo için uygulanacak kesin kolon sözlüğüdür. Her tablo için entity property, DTO alanı, EF Core configuration, nullable kararı, key bilgisi, default değer ve lookup source kontrol edilmelidir. Aşağıdaki kuralları uygula:
+- Column Catalogue içindeki her satırı tek tek checklist olarak işle.
+- Auditable tablolarda Id, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy, IsDeleted, DeletedAt ve DeletedBy alanlarını ortak base entity veya interface ile uygula.
+- LookupSource doluysa ilgili direct FK veya enum/lookup bağlantısını uygula.
+- Nullable=No alanlarını validation ve DB constraint ile zorunlu yap.
+- Default değeri olan alanları EF Core default veya application default olarak tutarlı uygula.
+- Excel kataloğunda bulunan herhangi bir iş kolonunu yalnızca isim olarak eklemekle yetinme; iş davranışı gerekiyorsa service ve validator katmanında uygula.
+- Excel kataloğundaki tabloları ve kolonları migration üretmeden entity/configuration katmanına ekle.
+
+==================================================
+40. TÜM İŞSEL FOREIGN KEY İLİŞKİLERİ - ZORUNLU UYGULAMA LİSTESİ
+==================================================
+Aşağıdaki ilişkiler Excel Relationship Catalogue sayfasından alınmıştır. Her satırı EF Core configuration içinde açıkça uygula. Required, Cardinality ve OnDelete değerlerini aynen dikkate al. Audit ilişkileri sonraki bölümde ortak kural olarak uygulanacaktır.
+
+- Branches.CompanyId -> Companies.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Departments.CompanyId -> Companies.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Departments.ParentDepartmentId -> Departments.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- UserRoles.UserId -> Users.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- UserRoles.RoleId -> Roles.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- RolePermissions.RoleId -> Roles.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- RolePermissions.PermissionCode -> Permissions.Code | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- UserPermissions.UserId -> Users.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- UserPermissions.PermissionCode -> Permissions.Code | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Menus.ParentId -> Menus.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Menus.RequiredPermissionCode -> Permissions.Code | Required=No | Cardinality=N:1 | OnDelete=SetNull | RelationType=FK
+- ApiEndpoints.RequiredPermissionCode -> Permissions.Code | Required=No | Cardinality=N:1 | OnDelete=SetNull | RelationType=FK
+- ChatGroups.OwnerId -> Users.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ChatGroupMembers.GroupId -> ChatGroups.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- ChatGroupMembers.UserId -> Users.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ChatMessages.SenderId -> Users.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ChatMessages.RecipientId -> Users.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ChatMessages.GroupId -> ChatGroups.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ChatMessages.ReplyToMessageId -> ChatMessages.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ChatMessageReactions.MessageId -> ChatMessages.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- ChatMessageReactions.UserId -> Users.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Companies.BaseCurrencyId -> Currencies.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Menus.NameKey -> LocalizationResources.Key | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Projects.CompanyId -> Companies.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Projects.BranchId -> Branches.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Projects.ProjectTypeId -> ProjectTypes.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Projects.StatusId -> ProjectStatuses.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Projects.CustomerId -> BusinessPartners.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Projects.ManagerUserId -> Users.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ProjectLocations.ProjectId -> Projects.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ProjectLocations.ParentLocationId -> ProjectLocations.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ProjectPhases.ProjectId -> Projects.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ProjectPhases.ParentPhaseId -> ProjectPhases.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Materials.MaterialCategoryId -> MaterialCategories.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Materials.BrandId -> Brands.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Materials.BaseUnitOfMeasureId -> UnitsOfMeasure.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- MaterialAttributeValues.MaterialId -> Materials.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- MaterialAttributeValues.MaterialAttributeDefinitionId -> MaterialAttributeDefinitions.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- MaterialAttributeValues.OptionId -> MaterialAttributeOptions.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Warehouses.CompanyId -> Companies.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Warehouses.BranchId -> Branches.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Warehouses.ProjectId -> Projects.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- StockDocuments.DocumentTypeId -> StockDocumentTypes.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- StockDocuments.SourceWarehouseId -> Warehouses.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- StockDocuments.TargetWarehouseId -> Warehouses.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- StockDocuments.ProjectId -> Projects.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- StockDocumentLines.StockDocumentId -> StockDocuments.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- StockDocumentLines.MaterialId -> Materials.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- StockDocumentLines.UnitOfMeasureId -> UnitsOfMeasure.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- StockDocumentLines.CurrencyId -> Currencies.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- StockLots.WarehouseId -> Warehouses.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- StockLots.MaterialId -> Materials.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- StockLots.SourceStockDocumentLineId -> StockDocumentLines.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- StockIssueAllocations.StockDocumentLineId -> StockDocumentLines.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- StockIssueAllocations.StockLotId -> StockLots.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Requests.RequestTypeId -> RequestTypes.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Requests.ProjectId -> Projects.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Requests.RequestedByUserId -> Users.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- RequestLines.RequestId -> Requests.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- RequestLines.MaterialId -> Materials.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- RequestLines.UnitOfMeasureId -> UnitsOfMeasure.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- PurchaseOrders.SupplierId -> BusinessPartners.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- PurchaseOrders.ProjectId -> Projects.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- PurchaseOrderLines.PurchaseOrderId -> PurchaseOrders.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- PurchaseOrderLines.RequestLineId -> RequestLines.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- PurchaseOrderLines.MaterialId -> Materials.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- PurchaseOrderLines.CurrencyId -> Currencies.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- WorkOrders.WorkOrderTypeId -> WorkOrderTypes.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- WorkOrders.ProjectId -> Projects.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- WorkOrders.ProjectPhaseId -> ProjectPhases.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- WorkOrders.ProjectLocationId -> ProjectLocations.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- FinancialTransactions.ProjectId -> Projects.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- FinancialTransactions.PartnerId -> BusinessPartners.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- FinancialTransactions.CurrencyId -> Currencies.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Contracts.ProjectId -> Projects.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- Contracts.CurrencyId -> Currencies.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ApprovalDefinitionVersions.ApprovalDefinitionId -> ApprovalDefinitions.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ApprovalStepDefinitions.ApprovalDefinitionVersionId -> ApprovalDefinitionVersions.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ApprovalStepApprovers.ApprovalStepDefinitionId -> ApprovalStepDefinitions.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ApprovalStepApprovers.ApproverUserId -> Users.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ApprovalStepApprovers.ApproverRoleId -> Roles.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ApprovalStepApprovers.ApproverDepartmentId -> Departments.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ApprovalConditions.ApprovalDefinitionVersionId -> ApprovalDefinitionVersions.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ApprovalRequests.ApprovalDefinitionVersionId -> ApprovalDefinitionVersions.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ApprovalRequests.RequestedByUserId -> Users.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ApprovalRequestSteps.ApprovalRequestId -> ApprovalRequests.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ApprovalRequestSteps.ApprovalStepDefinitionId -> ApprovalStepDefinitions.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ApprovalRequestApprovers.ApprovalRequestStepId -> ApprovalRequestSteps.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ApprovalRequestApprovers.UserId -> Users.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ApprovalActions.ApprovalRequestId -> ApprovalRequests.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ApprovalActions.ApprovalRequestStepId -> ApprovalRequestSteps.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ApprovalActions.UserId -> Users.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ProjectMembers.ProjectId -> Projects.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- ProjectMembers.UserId -> Users.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ProjectMembers.EmployeeId -> Employees.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- MaterialCategoryAttributes.MaterialCategoryId -> MaterialCategories.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- MaterialCategoryAttributes.MaterialAttributeDefinitionId -> MaterialAttributeDefinitions.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- MaterialAttributeOptions.MaterialAttributeDefinitionId -> MaterialAttributeDefinitions.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- WarehouseLocations.WarehouseId -> Warehouses.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- WarehouseLocations.ParentLocationId -> WarehouseLocations.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- StockTransactions.StockDocumentId -> StockDocuments.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- StockTransactions.StockDocumentLineId -> StockDocumentLines.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- StockTransactions.StockLotId -> StockLots.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- StockTransactions.WarehouseId -> Warehouses.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- StockTransactions.MaterialId -> Materials.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- WarehouseTransferLines.WarehouseTransferId -> WarehouseTransfers.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- WarehouseTransferLines.MaterialId -> Materials.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- StockCountLines.StockCountId -> StockCounts.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- StockCountLines.MaterialId -> Materials.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- SupplierQuoteLines.SupplierQuoteId -> SupplierQuotes.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- SupplierQuoteLines.RequestLineId -> RequestLines.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- SupplierQuoteLines.MaterialId -> Materials.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- PurchaseReceiptLines.PurchaseReceiptId -> PurchaseReceipts.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- PurchaseReceiptLines.PurchaseOrderLineId -> PurchaseOrderLines.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- PurchaseReceiptLines.MaterialId -> Materials.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- WorkOrderAssignments.WorkOrderId -> WorkOrders.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- WorkOrderAssignments.EmployeeId -> Employees.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- WorkOrderAssignments.UserId -> Users.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- WorkOrderMaterialPlans.WorkOrderId -> WorkOrders.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- WorkOrderMaterialPlans.MaterialId -> Materials.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- WorkOrderMaterialUsages.WorkOrderId -> WorkOrders.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- WorkOrderMaterialUsages.StockDocumentLineId -> StockDocumentLines.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- DailySiteReports.ProjectId -> Projects.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- DailySiteReportWorkers.DailySiteReportId -> DailySiteReports.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- DailySiteReportWorkers.EmployeeId -> Employees.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- DailySiteReportMaterials.DailySiteReportId -> DailySiteReports.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- DailySiteReportMaterials.MaterialId -> Materials.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- TimesheetLines.TimesheetId -> Timesheets.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- TimesheetLines.EmployeeId -> Employees.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- TimesheetLines.ProjectId -> Projects.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- BudgetLines.BudgetId -> Budgets.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- BudgetLines.ProjectId -> Projects.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ContractParties.ContractId -> Contracts.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- ContractParties.BusinessPartnerId -> BusinessPartners.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- ProgressPaymentLines.ProgressPaymentId -> ProgressPayments.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- ProgressPaymentLines.ContractLineId -> ContractLines.Id | Required=No | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+- DocumentVersions.DocumentId -> Documents.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- DocumentRelations.DocumentId -> Documents.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- NotificationRecipients.NotificationId -> Notifications.Id | Required=Yes | Cardinality=N:1 | OnDelete=Cascade | RelationType=FK
+- NotificationRecipients.UserId -> Users.Id | Required=Yes | Cardinality=N:1 | OnDelete=Restrict | RelationType=FK
+
+==================================================
+41. AUDIT FOREIGN KEY İLİŞKİLERİ
+==================================================
+Excel Relationship Catalogue içindeki CreatedBy, UpdatedBy ve DeletedBy alanlarının tamamı Users.Id ile nullable N:1 Restrict ilişkisi olarak uygulanmalıdır. Bu kural audit ilişkisinin tanımlandığı tüm tablolar için geçerlidir. Bu audit FK ilişkilerini atlama. Audit kullanıcı kaydı silinirse geçmiş iş kaydının bozulmaması için Restrict kullan.
+
+==================================================
+42. LOOKUP KATALOĞU - KAYNAK VE KULLANIM
+==================================================
+Aşağıdaki lookup grupları Excel Lookup Catalogue sayfasından alınmıştır. Teknik değerleri merkezi enum veya strongly typed lookup sabiti olarak tanımla. UI dropdown listelerini, validation kurallarını ve localization key üretimini bu katalogdan besle. Magic string kullanma.
+
+- ApprovalActionType: Approve, Reject, Return, Cancel
+- ApprovalApproverStatus: Waiting, Approved, Rejected, Delegated
+- ApprovalMode: Sequential, ParallelAny, ParallelAll, Quorum
+- ApprovalRequestStatus: Draft, Pending, Approved, Rejected, Returned, Cancelled
+- ApprovalStepStatus: Waiting, Active, Approved, Rejected, Returned, Skipped
+- ApproverType: User, Role, ProjectRole, DepartmentManager
+- ConditionOperator: Equals, NotEquals, GreaterThan, GreaterThanOrEqual, LessThan, LessThanOrEqual, In
+- ContractType: Customer, Supplier, Subcontractor, Rental, Service
+- DocumentStatus: Draft, PendingApproval, Approved, Rejected, Cancelled, Closed
+- FinancialTransactionType: Expense, Income, Payable, Receivable, Payment, Collection
+- PartnerType: Customer, Supplier, Subcontractor, Other
+- PurchaseOrderStatus: Draft, Approved, PartiallyReceived, Received, Cancelled
+- RequestStatus: Draft, PendingApproval, Approved, Rejected, Ordered, Closed
+- WarehouseType: Central, ProjectSite, Temporary, Vehicle, Consignment
+- WorkOrderStatus: Draft, Assigned, InProgress, OnHold, Completed, Closed
+
+Lookup kaynağı kuralları:
+- Column Catalogue içinde LookupSource değeri Lookup:<Name> olan alanlar ilgili lookup grubu ile bağlanmalıdır.
+- Master tablo lookup kullanılıyorsa FK master tabloya kurulmalıdır.
+- Lookup değerlerinin kullanıcıya gösterilen adları localization key ile çözülmelidir.
+- Seed Data sayfasındaki lookup kayıtları idempotent seed edilmelidir.
+
+==================================================
+43. MODÜL BAZLI UYGULAMA MATRİSİ
+==================================================
+Her modül için aşağıdaki teslimleri ayrı ayrı tamamla. Bir modülü yalnızca entity yazarak tamamlanmış sayma.
+Her modül için zorunlu teslimler:
+- Domain entities
+- EF Core configurations
+- DbSet kayıtları
+- DTO modelleri
+- Create/Update/Delete/Read/ReadAll request modelleri
+- Validation
+- Application service interface ve gerçek implementasyon
+- API controller endpointleri
+- Permission katalog kayıtları
+- API endpoint permission mapping seedleri
+- Menu seedleri
+- Localization keyleri tr-TR ve en-US
+- Web controller ve DevExtreme UI ekranları
+- Responsive mobil düzen
+- Audit log entegrasyonu
+- İlgili onay akışı entegrasyonu
+- Gerekli notification üretimi
+- Build kontrolü
+
+==================================================
+44. ONAY MEKANİZMASI İÇİN EKSİKSİZ UYGULAMA KONTROLÜ
+==================================================
+Workflow modülünü yalnızca entity düzeyinde bırakma. Gerçek workflow engine davranışı uygula. Aşağıdaki servis davranışlarını tamamla:
+- Approval definition seçimi: RelatedModule, RelatedEntityType ve ApprovalConditions üzerinden yürürlükteki ApprovalDefinitionVersion bulunmalı.
+- Approval request başlatma: kaynak nesne, talep eden kullanıcı, akış versiyonu ve snapshot onaycılar kaydedilmeli.
+- Adım aktivasyonu: Sequential, ParallelAny, ParallelAll ve Quorum kurallarına göre bir sonraki adım veya paralel onaycılar aktive edilmeli.
+- Approve: kişisel onay kaydı, ApprovalActions kaydı, request step durumu ve kaynak belge durumu atomik güncellenmeli.
+- Reject: talep reddedilmeli, açık adımlar kapatılmalı, kaynak belge reddedilmiş duruma dönmeli.
+- Return: belge düzenleme için önceki duruma dönebilmeli; geçmiş action kayıtları korunmalı.
+- Cancel: yetkili kullanıcı veya kaynak belge sahibi kurallarıyla iptal edilebilmeli.
+- Delegation: ApprovalDelegations tarih aralığı ve delege kullanıcı kontrol edilerek gerçek onaycı çözülmeli.
+- Snapshot: rol veya departman sonradan değişse bile ApprovalRequestApprovers geçmiş kaydı korunmalı.
+- Concurrency: aynı adımın eşzamanlı iki onayı durumunda idempotent ve transaction-safe davranılmalı.
+- Notification: aktif hale gelen her adımın gerçek onaycılarına bildirim üretmeli.
+- Audit: başlatma, onay, ret, iade, iptal ve delegation kullanımı audit edilmelidir.
+Workflow entegrasyonu zorunlu olan minimum süreçler:
+- Requests
+- PurchaseOrders
+- StockDocuments
+- ExpenseClaims
+- LeaveRequests
+- Timesheets
+- ProgressPayments
+- Payments
+- Collections
+- Contracts için kritik değişiklikler
+
+==================================================
+45. VERİTABANI VE EF CORE DOĞRULAMA RAPORU
+==================================================
+Kodlamayı tamamlamadan önce otomatik kontrol yap ve kısa sonuç özetine aşağıdaki sayıları ekle:
+- Tasarımdaki toplam modül sayısı: 22
+- Tasarımdaki toplam tablo sayısı: 134
+- Tasarımdaki Column Catalogue satırı: 1247
+- Tasarımdaki Relationship Catalogue satırı: 539
+- Tasarımdaki lookup grubu: 15
+- Workflow tablo sayısı: 10
+Kontrol sırasında entity, DbSet, configuration, relation, lookup, seed, API endpoint, Web UI, permission ve localization kapsam matrisini oluştur. Eksik kalan kalem varsa işi bitirme.
+
+==================================================
+46. ATOMİK İŞLEM VE TRANSACTION KURALLARI
+==================================================
+- Stok girişi, stok çıkışı, transfer, sayım düzeltmesi ve reverse işlemleri transaction içinde çalışmalıdır.
+- PurchaseReceipt onayı ile StockDocument, StockDocumentLines, StockLots, StockTransactions ve StockBalances güncellemeleri atomik olmalıdır.
+- FIFO çıkışında StockIssueAllocations ve StockLots.RemainingQuantity güncellemeleri transaction-safe olmalıdır.
+- Ödeme ile PaymentAllocations; tahsilat ile CollectionAllocations transaction içinde kaydedilmelidir.
+- Hakediş onayı ile Receivable veya Payable üretimi atomik olmalıdır.
+- Timesheet onayı ile proje maliyet hareketi üretimi atomik olmalıdır.
+- Workflow action ile kaynak belge status değişimi aynı transaction içinde gerçekleşmelidir.
+- StockBalances ve bütçe özetleri yeniden üretilebilir olmalı; tutarsızlık kontrol komutu veya servis metodu bulunmalıdır.
+
+==================================================
+47. TEST KAPSAMI
+==================================================
+Sadece build almakla yetinme. Mevcut test altyapısı varsa genişlet; yoksa uygun test projesi ekle. Migration üretme. Minimum test senaryoları:
+- Permission seed idempotency ve Default.ReadAll varlığı
+- Localization fallback: user culture -> default culture -> technical key
+- Chat grup yöneticisi yetkileri ve mobil ekran davranışına ait temel UI kontrolü
+- Dinamik material attribute validation
+- FIFO lot allocation
+- Negatif stok engeli
+- Depo transferi ve sayım düzeltmesi
+- Talep -> teklif -> sipariş -> kısmi teslim -> mal kabul -> stok lotu akışı
+- WorkOrder checklist tamamlanmadan kapatma engeli
+- Timesheet approval -> finance cost transaction
+- Payment allocation ve collection allocation parçalı kapama
+- Budget overrun notification
+- Contract amendment davranışı
+- Progress payment approval -> receivable/payable
+- Document versioning ve relation table
+- Workflow Sequential, ParallelAny, ParallelAll, Quorum, Reject, Return, Cancel, Delegation, snapshot ve concurrency
+- API permission enforcement ve Web menu/button görünürlüğü
+
+==================================================
+48. SON TESLİM KURALI
+==================================================
+Bu promptun hiçbir bölümünü atlama. Kaynak Excel dosyasındaki Table Catalogue, Column Catalogue, Relationship Catalogue, Lookup Catalogue, Seed Data ve Approval Rules sayfalarını doğrudan teknik checklist olarak kullan. Kodlama sırasında eksik gördüğün satırları tamamla. Son özetinde yalnızca:
+- uygulanan 22 modül
+- doğrulanan tablo/entity/configuration sayıları
+- doğrulanan ilişki sayısı
+- permission/localization/seed sonucu
+- test ve build sonucu
+- migration üretilmediği bilgisi
+- gerçek blocker varsa blocker
+bilgilerini ver.
+

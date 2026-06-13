@@ -1,4 +1,5 @@
 using Energy.Domain.Chat;
+using Energy.Domain.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -19,6 +20,8 @@ public sealed class ChatMessageReactionConfiguration : IEntityTypeConfiguration<
         builder.HasIndex(r => new { r.MessageId, r.UserId }).IsUnique();
 
         builder.HasOne<ChatMessage>().WithMany().HasForeignKey(r => r.MessageId).OnDelete(DeleteBehavior.Cascade);
+        // Tepkiyi veren kullanıcı. Geçmiş kaydın bozulmaması için Restrict.
+        builder.HasOne<User>().WithMany().HasForeignKey(r => r.UserId).OnDelete(DeleteBehavior.Restrict);
 
         builder.HasQueryFilter(r => !r.IsDeleted);
     }

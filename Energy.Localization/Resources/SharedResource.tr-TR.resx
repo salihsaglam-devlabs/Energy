@@ -75,9 +75,14 @@
   <data name="Permissions.Profile.Read.Name" xml:space="preserve"><value>Profil Görüntüleme</value></data>
   <data name="Permissions.Profile.Update.Name" xml:space="preserve"><value>Profil Güncelleme</value></data>
 
+  <data name="Permissions.System.Seed.Name" xml:space="preserve"><value>Sistem Tohumlama</value></data>
+  <data name="Permissions.Chat.Use.Name" xml:space="preserve"><value>Sohbeti Kullanma</value></data>
+
   <data name="Menus.Dashboard" xml:space="preserve"><value>Gösterge Paneli</value></data>
   <data name="Menus.System" xml:space="preserve"><value>Sistem Yönetimi</value></data>
   <data name="Menus.Profile" xml:space="preserve"><value>Profilim</value></data>
+  <data name="Menus.Identity.Profile" xml:space="preserve"><value>Profilim</value></data>
+  <data name="Menus.Identity.Sessions" xml:space="preserve"><value>Oturumlar</value></data>
   <data name="Menus.Chat" xml:space="preserve"><value>Sohbet</value></data>
   <data name="Menus.Settings" xml:space="preserve"><value>Ayarlar</value></data>
   <data name="SettingsScreen.Title" xml:space="preserve"><value>Ayarlar</value></data>
@@ -269,6 +274,45 @@
   <data name="Grid.NoData" xml:space="preserve"><value>Görüntülenecek kayıt yok</value></data>
   <data name="Grid.ConfirmDelete" xml:space="preserve"><value>Bu kaydı silmek istediğinize emin misiniz?</value></data>
   <data name="Grid.Actions" xml:space="preserve"><value>İşlemler</value></data>
+  <data name="ModuleActions.Column" xml:space="preserve"><value>İşlemler</value></data>
+  <data name="ModuleActions.Approve" xml:space="preserve"><value>Onayla</value></data>
+  <data name="ModuleActions.Reject" xml:space="preserve"><value>Reddet</value></data>
+  <data name="ModuleActions.Return" xml:space="preserve"><value>İade Et</value></data>
+  <data name="ModuleActions.Cancel" xml:space="preserve"><value>İptal Et</value></data>
+  <data name="ModuleActions.Reverse" xml:space="preserve"><value>Ters Kayıt</value></data>
+  <data name="ModuleActions.Receive" xml:space="preserve"><value>Mal Kabul</value></data>
+  <data name="ModuleActions.Close" xml:space="preserve"><value>Kapat</value></data>
+  <data name="ModuleActions.Reopen" xml:space="preserve"><value>Yeniden Aç</value></data>
+  <data name="ModuleActions.Activate" xml:space="preserve"><value>Aktifleştir</value></data>
+  <data name="ModuleActions.Validate" xml:space="preserve"><value>Doğrula</value></data>
+  <data name="ModuleActions.ConfirmTitle" xml:space="preserve"><value>Onay</value></data>
+  <data name="ModuleActions.ConfirmMessage" xml:space="preserve"><value>Bu işlemi gerçekleştirmek istediğinizden emin misiniz?</value></data>
+  <data name="ModuleActions.NotePrompt" xml:space="preserve"><value>Açıklama (opsiyonel)</value></data>
+  <data name="ModuleActions.Succeeded" xml:space="preserve"><value>İşlem başarıyla tamamlandı.</value></data>
+  <data name="ModuleActions.ValidationOk" xml:space="preserve"><value>Doğrulama başarılı; eksik öznitelik yok.</value></data>
+  <data name="ModuleActions.ValidationIssues" xml:space="preserve"><value>Eksik/geçersiz öznitelikler bulundu.</value></data>
+  <data name="ModuleDetails.RequestLines" xml:space="preserve"><value>Talep Kalemleri</value></data>
+  <data name="ModuleDetails.PurchaseOrderLines" xml:space="preserve"><value>Sipariş Kalemleri</value></data>
+  <data name="ModuleDetails.WorkOrderAssignments" xml:space="preserve"><value>Atamalar</value></data>
+  <data name="ModuleDetails.WorkOrderMaterialPlans" xml:space="preserve"><value>Malzeme Planı</value></data>
+  <data name="ModuleDetails.WorkOrderChecklists" xml:space="preserve"><value>Kontrol Listeleri</value></data>
+  <data name="ModuleDetails.WorkOrderStatusHistories" xml:space="preserve"><value>Durum Geçmişi</value></data>
+  <data name="ModuleDetails.DailySiteReportWorkers" xml:space="preserve"><value>İşçiler</value></data>
+  <data name="ModuleDetails.DailySiteReportEquipments" xml:space="preserve"><value>Ekipmanlar</value></data>
+  <data name="ModuleDetails.DailySiteReportMaterials" xml:space="preserve"><value>Malzemeler</value></data>
+  <data name="ModuleDetails.TimesheetLines" xml:space="preserve"><value>Puantaj Satırları</value></data>
+  <data name="ModuleDetails.EquipmentAssignments" xml:space="preserve"><value>Zimmetler</value></data>
+  <data name="ModuleDetails.EquipmentMaintenances" xml:space="preserve"><value>Bakımlar</value></data>
+  <data name="ModuleDetails.FinancialTransactionLines" xml:space="preserve"><value>Hareket Satırları</value></data>
+  <data name="ModuleDetails.BudgetLines" xml:space="preserve"><value>Bütçe Kalemleri</value></data>
+  <data name="ModuleDetails.ContractLines" xml:space="preserve"><value>Sözleşme Kalemleri</value></data>
+  <data name="ModuleDetails.ContractParties" xml:space="preserve"><value>Taraflar</value></data>
+  <data name="ModuleDetails.ContractAmendments" xml:space="preserve"><value>Zeyilnameler</value></data>
+  <data name="ModuleDetails.ProgressPaymentLines" xml:space="preserve"><value>Hakediş Satırları</value></data>
+  <data name="ModuleDetails.ProgressPaymentDeductions" xml:space="preserve"><value>Kesintiler</value></data>
+  <data name="ModuleDetails.MaterialAttributeValues" xml:space="preserve"><value>Nitelik Değerleri</value></data>
+  <data name="ModuleDetails.MaterialUnitConversions" xml:space="preserve"><value>Birim Dönüşümleri</value></data>
+  <data name="ModuleDetails.WarehouseLocations" xml:space="preserve"><value>Lokasyonlar</value></data>
   <data name="Grid.Loading" xml:space="preserve"><value>Yükleniyor...</value></data>
   <data name="Grid.Yes" xml:space="preserve"><value>Evet</value></data>
   <data name="Grid.No" xml:space="preserve"><value>Hayır</value></data>
@@ -517,4 +561,198 @@
   <data name="UserAccessScreen.PermissionsNote" xml:space="preserve"><value>Kilitli kayıtlar rollerden gelir. Doğrudan vermek istediğiniz ek izinleri işaretleyin.</value></data>
   <data name="UserAccessScreen.Inherited" xml:space="preserve"><value>rolden</value></data>
   <data name="UserAccessScreen.Saved" xml:space="preserve"><value>Erişim güncellendi.</value></data>
+
+  <!-- Enterprise module localization (generated) -->
+  <data name="Permissions.Core.Read.Name" xml:space="preserve"><value>Temel Veri Görüntüle</value></data>
+  <data name="Permissions.Core.ReadAll.Name" xml:space="preserve"><value>Temel Veri Listele</value></data>
+  <data name="Permissions.Core.Create.Name" xml:space="preserve"><value>Temel Veri Oluştur</value></data>
+  <data name="Permissions.Core.Update.Name" xml:space="preserve"><value>Temel Veri Güncelle</value></data>
+  <data name="Permissions.Core.Delete.Name" xml:space="preserve"><value>Temel Veri Sil</value></data>
+  <data name="Permissions.Organization.Read.Name" xml:space="preserve"><value>Personel Görüntüle</value></data>
+  <data name="Permissions.Organization.ReadAll.Name" xml:space="preserve"><value>Personel Listele</value></data>
+  <data name="Permissions.Organization.Create.Name" xml:space="preserve"><value>Personel Oluştur</value></data>
+  <data name="Permissions.Organization.Update.Name" xml:space="preserve"><value>Personel Güncelle</value></data>
+  <data name="Permissions.Organization.Delete.Name" xml:space="preserve"><value>Personel Sil</value></data>
+  <data name="Permissions.BusinessPartners.Read.Name" xml:space="preserve"><value>Cari Görüntüle</value></data>
+  <data name="Permissions.BusinessPartners.ReadAll.Name" xml:space="preserve"><value>Cari Listele</value></data>
+  <data name="Permissions.BusinessPartners.Create.Name" xml:space="preserve"><value>Cari Oluştur</value></data>
+  <data name="Permissions.BusinessPartners.Update.Name" xml:space="preserve"><value>Cari Güncelle</value></data>
+  <data name="Permissions.BusinessPartners.Delete.Name" xml:space="preserve"><value>Cari Sil</value></data>
+  <data name="Permissions.Projects.Read.Name" xml:space="preserve"><value>Proje Görüntüle</value></data>
+  <data name="Permissions.Projects.ReadAll.Name" xml:space="preserve"><value>Proje Listele</value></data>
+  <data name="Permissions.Projects.Create.Name" xml:space="preserve"><value>Proje Oluştur</value></data>
+  <data name="Permissions.Projects.Update.Name" xml:space="preserve"><value>Proje Güncelle</value></data>
+  <data name="Permissions.Projects.Delete.Name" xml:space="preserve"><value>Proje Sil</value></data>
+  <data name="Permissions.Catalog.Read.Name" xml:space="preserve"><value>Malzeme Görüntüle</value></data>
+  <data name="Permissions.Catalog.ReadAll.Name" xml:space="preserve"><value>Malzeme Listele</value></data>
+  <data name="Permissions.Catalog.Create.Name" xml:space="preserve"><value>Malzeme Oluştur</value></data>
+  <data name="Permissions.Catalog.Update.Name" xml:space="preserve"><value>Malzeme Güncelle</value></data>
+  <data name="Permissions.Catalog.Delete.Name" xml:space="preserve"><value>Malzeme Sil</value></data>
+  <data name="Permissions.Inventory.Read.Name" xml:space="preserve"><value>Stok Görüntüle</value></data>
+  <data name="Permissions.Inventory.ReadAll.Name" xml:space="preserve"><value>Stok Listele</value></data>
+  <data name="Permissions.Inventory.Create.Name" xml:space="preserve"><value>Stok Oluştur</value></data>
+  <data name="Permissions.Inventory.Update.Name" xml:space="preserve"><value>Stok Güncelle</value></data>
+  <data name="Permissions.Inventory.Delete.Name" xml:space="preserve"><value>Stok Sil</value></data>
+  <data name="Permissions.Requests.Read.Name" xml:space="preserve"><value>Talep Görüntüle</value></data>
+  <data name="Permissions.Requests.ReadAll.Name" xml:space="preserve"><value>Talep Listele</value></data>
+  <data name="Permissions.Requests.Create.Name" xml:space="preserve"><value>Talep Oluştur</value></data>
+  <data name="Permissions.Requests.Update.Name" xml:space="preserve"><value>Talep Güncelle</value></data>
+  <data name="Permissions.Requests.Delete.Name" xml:space="preserve"><value>Talep Sil</value></data>
+  <data name="Permissions.Procurement.Read.Name" xml:space="preserve"><value>Satın Alma Görüntüle</value></data>
+  <data name="Permissions.Procurement.ReadAll.Name" xml:space="preserve"><value>Satın Alma Listele</value></data>
+  <data name="Permissions.Procurement.Create.Name" xml:space="preserve"><value>Satın Alma Oluştur</value></data>
+  <data name="Permissions.Procurement.Update.Name" xml:space="preserve"><value>Satın Alma Güncelle</value></data>
+  <data name="Permissions.Procurement.Delete.Name" xml:space="preserve"><value>Satın Alma Sil</value></data>
+  <data name="Permissions.Operations.Read.Name" xml:space="preserve"><value>İş Emri Görüntüle</value></data>
+  <data name="Permissions.Operations.ReadAll.Name" xml:space="preserve"><value>İş Emri Listele</value></data>
+  <data name="Permissions.Operations.Create.Name" xml:space="preserve"><value>İş Emri Oluştur</value></data>
+  <data name="Permissions.Operations.Update.Name" xml:space="preserve"><value>İş Emri Güncelle</value></data>
+  <data name="Permissions.Operations.Delete.Name" xml:space="preserve"><value>İş Emri Sil</value></data>
+  <data name="Permissions.FieldOperations.Read.Name" xml:space="preserve"><value>Saha Raporu Görüntüle</value></data>
+  <data name="Permissions.FieldOperations.ReadAll.Name" xml:space="preserve"><value>Saha Raporu Listele</value></data>
+  <data name="Permissions.FieldOperations.Create.Name" xml:space="preserve"><value>Saha Raporu Oluştur</value></data>
+  <data name="Permissions.FieldOperations.Update.Name" xml:space="preserve"><value>Saha Raporu Güncelle</value></data>
+  <data name="Permissions.FieldOperations.Delete.Name" xml:space="preserve"><value>Saha Raporu Sil</value></data>
+  <data name="Permissions.HR.Read.Name" xml:space="preserve"><value>Puantaj Görüntüle</value></data>
+  <data name="Permissions.HR.ReadAll.Name" xml:space="preserve"><value>Puantaj Listele</value></data>
+  <data name="Permissions.HR.Create.Name" xml:space="preserve"><value>Puantaj Oluştur</value></data>
+  <data name="Permissions.HR.Update.Name" xml:space="preserve"><value>Puantaj Güncelle</value></data>
+  <data name="Permissions.HR.Delete.Name" xml:space="preserve"><value>Puantaj Sil</value></data>
+  <data name="Permissions.Assets.Read.Name" xml:space="preserve"><value>Ekipman Görüntüle</value></data>
+  <data name="Permissions.Assets.ReadAll.Name" xml:space="preserve"><value>Ekipman Listele</value></data>
+  <data name="Permissions.Assets.Create.Name" xml:space="preserve"><value>Ekipman Oluştur</value></data>
+  <data name="Permissions.Assets.Update.Name" xml:space="preserve"><value>Ekipman Güncelle</value></data>
+  <data name="Permissions.Assets.Delete.Name" xml:space="preserve"><value>Ekipman Sil</value></data>
+  <data name="Permissions.Finance.Read.Name" xml:space="preserve"><value>Finans Görüntüle</value></data>
+  <data name="Permissions.Finance.ReadAll.Name" xml:space="preserve"><value>Finans Listele</value></data>
+  <data name="Permissions.Finance.Create.Name" xml:space="preserve"><value>Finans Oluştur</value></data>
+  <data name="Permissions.Finance.Update.Name" xml:space="preserve"><value>Finans Güncelle</value></data>
+  <data name="Permissions.Finance.Delete.Name" xml:space="preserve"><value>Finans Sil</value></data>
+  <data name="Permissions.Budget.Read.Name" xml:space="preserve"><value>Bütçe Görüntüle</value></data>
+  <data name="Permissions.Budget.ReadAll.Name" xml:space="preserve"><value>Bütçe Listele</value></data>
+  <data name="Permissions.Budget.Create.Name" xml:space="preserve"><value>Bütçe Oluştur</value></data>
+  <data name="Permissions.Budget.Update.Name" xml:space="preserve"><value>Bütçe Güncelle</value></data>
+  <data name="Permissions.Budget.Delete.Name" xml:space="preserve"><value>Bütçe Sil</value></data>
+  <data name="Permissions.Contracts.Read.Name" xml:space="preserve"><value>Sözleşme Görüntüle</value></data>
+  <data name="Permissions.Contracts.ReadAll.Name" xml:space="preserve"><value>Sözleşme Listele</value></data>
+  <data name="Permissions.Contracts.Create.Name" xml:space="preserve"><value>Sözleşme Oluştur</value></data>
+  <data name="Permissions.Contracts.Update.Name" xml:space="preserve"><value>Sözleşme Güncelle</value></data>
+  <data name="Permissions.Contracts.Delete.Name" xml:space="preserve"><value>Sözleşme Sil</value></data>
+  <data name="Permissions.ProgressPayments.Read.Name" xml:space="preserve"><value>Hakediş Görüntüle</value></data>
+  <data name="Permissions.ProgressPayments.ReadAll.Name" xml:space="preserve"><value>Hakediş Listele</value></data>
+  <data name="Permissions.ProgressPayments.Create.Name" xml:space="preserve"><value>Hakediş Oluştur</value></data>
+  <data name="Permissions.ProgressPayments.Update.Name" xml:space="preserve"><value>Hakediş Güncelle</value></data>
+  <data name="Permissions.ProgressPayments.Delete.Name" xml:space="preserve"><value>Hakediş Sil</value></data>
+  <data name="Permissions.Documents.Read.Name" xml:space="preserve"><value>Belge Görüntüle</value></data>
+  <data name="Permissions.Documents.ReadAll.Name" xml:space="preserve"><value>Belge Listele</value></data>
+  <data name="Permissions.Documents.Create.Name" xml:space="preserve"><value>Belge Oluştur</value></data>
+  <data name="Permissions.Documents.Update.Name" xml:space="preserve"><value>Belge Güncelle</value></data>
+  <data name="Permissions.Documents.Delete.Name" xml:space="preserve"><value>Belge Sil</value></data>
+  <data name="Permissions.Workflow.Read.Name" xml:space="preserve"><value>Onay Görüntüle</value></data>
+  <data name="Permissions.Workflow.ReadAll.Name" xml:space="preserve"><value>Onay Listele</value></data>
+  <data name="Permissions.Workflow.Create.Name" xml:space="preserve"><value>Onay Oluştur</value></data>
+  <data name="Permissions.Workflow.Update.Name" xml:space="preserve"><value>Onay Güncelle</value></data>
+  <data name="Permissions.Workflow.Delete.Name" xml:space="preserve"><value>Onay Sil</value></data>
+  <data name="Permissions.Notifications.Read.Name" xml:space="preserve"><value>Bildirim Görüntüle</value></data>
+  <data name="Permissions.Notifications.ReadAll.Name" xml:space="preserve"><value>Bildirim Listele</value></data>
+  <data name="Permissions.Notifications.Create.Name" xml:space="preserve"><value>Bildirim Oluştur</value></data>
+  <data name="Permissions.Notifications.Update.Name" xml:space="preserve"><value>Bildirim Güncelle</value></data>
+  <data name="Permissions.Notifications.Delete.Name" xml:space="preserve"><value>Bildirim Sil</value></data>
+  <data name="Permissions.Reporting.Read.Name" xml:space="preserve"><value>Rapor Görüntüle</value></data>
+  <data name="Permissions.Reporting.ReadAll.Name" xml:space="preserve"><value>Rapor Listele</value></data>
+  <data name="Permissions.Reporting.Create.Name" xml:space="preserve"><value>Rapor Oluştur</value></data>
+  <data name="Permissions.Reporting.Update.Name" xml:space="preserve"><value>Rapor Güncelle</value></data>
+  <data name="Permissions.Reporting.Delete.Name" xml:space="preserve"><value>Rapor Sil</value></data>
+  <data name="Permissions.Default.Read.Name" xml:space="preserve"><value>Görüntüle</value></data>
+  <data name="Permissions.Default.ReadAll.Name" xml:space="preserve"><value>Listele</value></data>
+  <data name="Permissions.Default.Create.Name" xml:space="preserve"><value>Oluştur</value></data>
+  <data name="Permissions.Default.Update.Name" xml:space="preserve"><value>Güncelle</value></data>
+  <data name="Permissions.Default.Delete.Name" xml:space="preserve"><value>Sil</value></data>
+  <data name="Permissions.Inventory.Approve.Name" xml:space="preserve"><value>Stok Belgesi Onayla</value></data>
+  <data name="Permissions.Inventory.Transfer.Name" xml:space="preserve"><value>Stok Transferi</value></data>
+  <data name="Permissions.Inventory.Count.Name" xml:space="preserve"><value>Stok Sayımı</value></data>
+  <data name="Permissions.Inventory.Reverse.Name" xml:space="preserve"><value>Stok Belgesi İptal</value></data>
+  <data name="Permissions.Procurement.Approve.Name" xml:space="preserve"><value>Satın Alma Onayla</value></data>
+  <data name="Permissions.Workflow.Approve.Name" xml:space="preserve"><value>Onayla</value></data>
+  <data name="Permissions.Workflow.Reject.Name" xml:space="preserve"><value>Reddet</value></data>
+  <data name="Permissions.Workflow.Return.Name" xml:space="preserve"><value>İade Et</value></data>
+  <data name="Permissions.Documents.Upload.Name" xml:space="preserve"><value>Belge Yükle</value></data>
+  <data name="Permissions.Documents.Download.Name" xml:space="preserve"><value>Belge İndir</value></data>
+  <data name="Permissions.Documents.Version.Name" xml:space="preserve"><value>Belge Versiyonu</value></data>
+  <data name="Permissions.Reporting.Export.Name" xml:space="preserve"><value>Rapor Dışa Aktar</value></data>
+  <data name="Permissions.Chat.GroupManage.Name" xml:space="preserve"><value>Sohbet Grubu Yönet</value></data>
+  <data name="Permissions.Chat.GroupDelete.Name" xml:space="preserve"><value>Sohbet Grubu Sil</value></data>
+  <data name="Permissions.Chat.MemberAdd.Name" xml:space="preserve"><value>Üye Ekle</value></data>
+  <data name="Permissions.Chat.MemberRemove.Name" xml:space="preserve"><value>Üye Çıkar</value></data>
+  <data name="Permissions.Chat.AdminAssign.Name" xml:space="preserve"><value>Yönetici Ata</value></data>
+  <data name="Menus.ProjectsArea" xml:space="preserve"><value>Projeler</value></data>
+  <data name="Menus.Projects" xml:space="preserve"><value>Projeler</value></data>
+  <data name="Menus.Operations" xml:space="preserve"><value>İş Emirleri</value></data>
+  <data name="Menus.FieldOperations" xml:space="preserve"><value>Saha Raporları</value></data>
+  <data name="Menus.Contracts" xml:space="preserve"><value>Sözleşmeler</value></data>
+  <data name="Menus.ProgressPayments" xml:space="preserve"><value>Hakedişler</value></data>
+  <data name="Menus.SupplyArea" xml:space="preserve"><value>Tedarik Zinciri</value></data>
+  <data name="Menus.Catalog" xml:space="preserve"><value>Malzemeler</value></data>
+  <data name="Menus.Inventory" xml:space="preserve"><value>Depolar</value></data>
+  <data name="Menus.Inventory.Projects" xml:space="preserve"><value>Projeler</value></data>
+  <data name="Menus.Inventory.Warehouses" xml:space="preserve"><value>Ambarlar</value></data>
+  <data name="Menus.Reports.Projects" xml:space="preserve"><value>Proje Raporları</value></data>
+  <data name="Menus.Reports.Warehouses" xml:space="preserve"><value>Ambar Raporları</value></data>
+  <data name="Menus.Requests" xml:space="preserve"><value>Talepler</value></data>
+  <data name="Menus.Procurement" xml:space="preserve"><value>Satın Alma</value></data>
+  <data name="Menus.FinanceArea" xml:space="preserve"><value>Finans</value></data>
+  <data name="Menus.Finance" xml:space="preserve"><value>Finans</value></data>
+  <data name="Menus.Budget" xml:space="preserve"><value>Bütçeler</value></data>
+  <data name="Menus.HRArea" xml:space="preserve"><value>İK ve Organizasyon</value></data>
+  <data name="Menus.Organization" xml:space="preserve"><value>Personeller</value></data>
+  <data name="Menus.HR" xml:space="preserve"><value>Puantajlar</value></data>
+  <data name="Menus.Assets" xml:space="preserve"><value>Ekipmanlar</value></data>
+  <data name="Menus.CommonArea" xml:space="preserve"><value>Genel</value></data>
+  <data name="Menus.BusinessPartners" xml:space="preserve"><value>Cariler</value></data>
+  <data name="Menus.Documents" xml:space="preserve"><value>Belgeler</value></data>
+  <data name="Menus.Workflow" xml:space="preserve"><value>Onaylar</value></data>
+  <data name="Menus.Notifications" xml:space="preserve"><value>Bildirimler</value></data>
+  <data name="Menus.Reporting" xml:space="preserve"><value>Raporlar</value></data>
+  <data name="Menus.CoreData" xml:space="preserve"><value>Temel Veriler</value></data>
+  <data name="DashboardWidgets.LowStock.Name" xml:space="preserve"><value>Düşük Stok</value></data>
+  <data name="DashboardWidgets.PendingApprovals.Name" xml:space="preserve"><value>Bekleyen Onaylar</value></data>
+  <data name="DashboardWidgets.BudgetOverrun.Name" xml:space="preserve"><value>Bütçe Aşımı</value></data>
+  <data name="DashboardWidgets.OrderDelivery.Name" xml:space="preserve"><value>Sipariş Teslim</value></data>
+  <data name="DashboardWidgets.WorkOrderProgress.Name" xml:space="preserve"><value>İş Emri İlerlemesi</value></data>
+  <data name="DashboardWidgets.LowStock.Description" xml:space="preserve"><value>Kullanılabilir miktarı sıfır ve altındaki stok bakiyeleri.</value></data>
+  <data name="DashboardWidgets.PendingApprovals.Description" xml:space="preserve"><value>İşlem bekleyen onay talepleri.</value></data>
+  <data name="DashboardWidgets.BudgetOverrun.Description" xml:space="preserve"><value>Planını aşan etkin bütçeler.</value></data>
+  <data name="DashboardWidgets.OrderDelivery.Description" xml:space="preserve"><value>Teslim bekleyen satın alma siparişleri.</value></data>
+  <data name="DashboardWidgets.WorkOrderProgress.Description" xml:space="preserve"><value>Açık (tamamlanmamış) iş emirleri.</value></data>
+  <data name="Currencies.TRY.Name" xml:space="preserve"><value>Türk Lirası</value></data>
+  <data name="Currencies.USD.Name" xml:space="preserve"><value>ABD Doları</value></data>
+  <data name="Currencies.EUR.Name" xml:space="preserve"><value>Euro</value></data>
+  <data name="Units.Piece.Name" xml:space="preserve"><value>Adet</value></data>
+  <data name="Units.Meter.Name" xml:space="preserve"><value>Metre</value></data>
+  <data name="Units.Kilogram.Name" xml:space="preserve"><value>Kilogram</value></data>
+  <data name="Units.Ton.Name" xml:space="preserve"><value>Ton</value></data>
+  <data name="Units.Liter.Name" xml:space="preserve"><value>Litre</value></data>
+  <data name="Units.Hour.Name" xml:space="preserve"><value>Saat</value></data>
+  <data name="Units.Day.Name" xml:space="preserve"><value>Gün</value></data>
+  <data name="Units.Roll.Name" xml:space="preserve"><value>Rulo</value></data>
+  <data name="Units.Package.Name" xml:space="preserve"><value>Paket</value></data>
+  <data name="Dashboard.BusinessOverview" xml:space="preserve"><value>İş Genel Görünümü</value></data>
+  <data name="Dashboard.BusinessOverviewDescription" xml:space="preserve"><value>Operasyonel modüllerinizdeki canlı metrikler.</value></data>
+  <data name="Notifications.PendingApproval.Title" xml:space="preserve"><value>Onay bekliyor</value></data>
+  <data name="Notifications.PendingApproval.Body" xml:space="preserve"><value>Onayınızı bekleyen bir kayıt var.</value></data>
+  <data name="Notifications.BudgetOverrun.Title" xml:space="preserve"><value>Bütçe aşıldı</value></data>
+  <data name="Notifications.BudgetOverrun.Body" xml:space="preserve"><value>Bir bütçe aşıldı.</value></data>
+  <data name="Roles.Admin.Description" xml:space="preserve"><value>Tam iş yöneticisi</value></data>
+  <data name="Roles.ProjectManager.Description" xml:space="preserve"><value>Proje yönetimi rolü</value></data>
+  <data name="Roles.WarehouseManager.Description" xml:space="preserve"><value>Depo yönetimi rolü</value></data>
+  <data name="Roles.PurchaseManager.Description" xml:space="preserve"><value>Satın alma yönetimi rolü</value></data>
+  <data name="Roles.FinanceManager.Description" xml:space="preserve"><value>Finans yönetimi rolü</value></data>
+  <data name="Roles.HRManager.Description" xml:space="preserve"><value>İK yönetimi rolü</value></data>
+  <data name="Roles.SiteSupervisor.Description" xml:space="preserve"><value>Saha şefi rolü</value></data>
+  <data name="ApprovalDefinitions.PurchaseOrderApproval.Name" xml:space="preserve"><value>Satın Alma Onayı</value></data>
+  <data name="ApprovalDefinitions.ExpenseClaimApproval.Name" xml:space="preserve"><value>Masraf Onayı</value></data>
+  <data name="ApprovalSteps.PurchaseOrderApproval.1" xml:space="preserve"><value>Proje Müdürü Onayı</value></data>
+  <data name="ApprovalSteps.PurchaseOrderApproval.2" xml:space="preserve"><value>Finans Müdürü Onayı</value></data>
+  <data name="ApprovalSteps.ExpenseClaimApproval.1" xml:space="preserve"><value>Proje Müdürü Onayı</value></data>
+  <data name="ApprovalSteps.ExpenseClaimApproval.2" xml:space="preserve"><value>Finans Müdürü Onayı</value></data>
 </root>

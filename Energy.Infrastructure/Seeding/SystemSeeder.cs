@@ -195,6 +195,11 @@ public sealed partial class SystemSeeder : ISystemSeeder
         //    olarak kalır.
         await EnsureSchemaAsync(ct);
 
+        // 1b) KURUMSAL ŞEMA — 134 kurumsal tabloyu (yoksa) modelden üretilen betikle
+        //     idempotent sağlar. Taze SQL Server veritabanında EnsureCreated zaten
+        //     oluşturduğu için bu adım no-op olur.
+        await EnsureEnterpriseSchemaAsync(ct);
+
         // 2) YETKİLER — merkezi, tip güvenli PermissionCatalog'u veritabanına yansıtır.
         //    Yalnızca veritabanında eksik olan kodlar eklenir (mevcut satırlar
         //    yenilenir, asla silinmez); böylece uygulamanın herhangi bir yerinde
@@ -223,6 +228,11 @@ public sealed partial class SystemSeeder : ISystemSeeder
 
         _logger.LogInformation("Seeding: default permission grants for every role");
         await EnsureDefaultPermissionsForAllRolesAsync(ct);
+
+        // 5b) KURUMSAL VERİ — referans veriler, iş rolleri, modül menüleri, dashboard
+        //     widget'ları ve varsayılan onay akışları (yetkiler senkronlandıktan sonra).
+        _logger.LogInformation("Seeding: enterprise data (reference, roles, menus, widgets, approvals)");
+        await SeedEnterpriseDataAsync(ct);
 
         // 6) YERELLEŞTİRME — resx (geliştirme) + gömülü kaynaklar (üretim) veritabanına.
         _logger.LogInformation("Seeding: localization resources (resx → DB)");
