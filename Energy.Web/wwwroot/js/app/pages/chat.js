@@ -275,6 +275,16 @@
                     .removeClass("is-typing")
                     .toggleClass("is-online", online)
                     .toggleClass("is-offline", !online);
+                updateCallAvailability(online);
+            }
+
+            // Arama butonunu yalnızca karşı taraf çevrimiçiyse etkin tutar.
+            function updateCallAvailability(online) {
+                if (state.mode !== "direct") { return; }
+                $callBtn
+                    .prop("disabled", !online)
+                    .toggleClass("is-disabled", !online)
+                    .attr("title", online ? "Sesli ara" : "Kullanıcı çevrimdışı");
             }
 
             function renderPeer() {
@@ -1085,6 +1095,11 @@
             function startCall() {
                 if (state.mode !== "direct" || !state.peerId) { return; }
                 var peerId = state.peerId;
+                // Arama yalnızca karşı taraf çevrimiçiyse başlatılabilir.
+                if (!isOnline(peerId)) {
+                    if (window.AppNotify) { window.AppNotify.warning("Arama yapabilmek için kullanıcının çevrimiçi olması gerekir."); }
+                    return;
+                }
                 var peerName = (state.peer && (state.peer.fullName || state.peer.userName)) || "";
                 getMic().then(function (stream) {
                     call.stream = stream;

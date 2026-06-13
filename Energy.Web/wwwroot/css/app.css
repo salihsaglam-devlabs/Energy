@@ -730,6 +730,10 @@ body.energy-nav-closed .energy-toolbar__menu {
 .energy-chat__icon-btn.is-primary { color: var(--energy-primary, #2563eb); }
 .energy-chat__icon-btn.is-danger { color: var(--energy-danger, #dc2626); }
 .energy-chat__icon-btn.is-recording { color: var(--energy-danger, #dc2626); }
+.energy-chat__icon-btn.is-disabled,
+.energy-chat__icon-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.energy-chat__icon-btn.is-disabled:hover,
+.energy-chat__icon-btn:disabled:hover { background: transparent; }
 
 /* Recording bar (shown while capturing a voice message). */
 .energy-chat__recorder {
@@ -1150,6 +1154,7 @@ body.energy-nav-closed .energy-toolbar__menu {
     top: 110%;
     right: 0;
     width: 220px;
+    max-width: calc(100vw - 24px);
     background: #fff;
     border: 1px solid var(--energy-border, #e2e8f0);
     border-radius: 10px;
@@ -1179,6 +1184,7 @@ body.energy-nav-closed .energy-toolbar__menu {
     top: 110%;
     right: 0;
     width: 320px;
+    max-width: calc(100vw - 24px);
     max-height: 420px;
     overflow: auto;
     background: #fff;
@@ -1211,6 +1217,20 @@ body.energy-nav-closed .energy-toolbar__menu {
     white-space: nowrap;
 }
 
+/* Dar ekranlarda açılır panelleri ekrana sığacak şekilde sabitle; ikona göre
+   sola doğru açılan panellerin ekran kenarından (özellikle sol) taşmasını önler. */
+@media (max-width: 767.98px) {
+    .energy-toolbar__conn-panel,
+    .energy-toolbar__notify-panel {
+        position: fixed;
+        top: calc(var(--energy-toolbar-h) + 4px);
+        right: 8px;
+        left: 8px;
+        width: auto;
+        max-width: none;
+    }
+}
+
 /* ===== Chat default "Sohbetler" welcome screen ===== */
 .energy-chat__welcome {
     flex: 1 1 auto;
@@ -1222,7 +1242,7 @@ body.energy-nav-closed .energy-toolbar__menu {
     text-align: center;
 }
 .energy-chat__welcome-menu {
-    position: absolute; top: 12px; left: 12px; display: none;
+    position: absolute; top: 12px; left: 12px; z-index: 2;
 }
 .energy-chat__welcome-card { max-width: 360px; width: 100%; }
 .energy-chat__welcome-icon {
