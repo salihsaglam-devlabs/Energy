@@ -113,6 +113,7 @@
 
     <!-- Loaded AFTER AppContext is defined so the chat realtime client can read
          AppContext.chat.hubUrl; otherwise it falls back to the disabled no-op. -->
+    <script src="~/js/app/user-settings.js" asp-append-version="true"></script>
     <script src="~/js/app/chat-realtime.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)

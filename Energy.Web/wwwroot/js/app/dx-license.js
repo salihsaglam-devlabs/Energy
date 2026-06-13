@@ -1,23 +1,34 @@
+/*
+ * dx-license — DevExtreme deneme/lisans filigranını otomatik gizler.
+ *
+ * Sorumluluk:
+ *   - <dx-license> banner'ı DOM'a enjekte edilir edilmez kapatma düğmesine tıklar ve
+ *     yedek olarak öğeyi kaldırır.
+ *   - Banner data-permanent olarak işaretli olup yeniden enjekte edilebildiğinden, bir
+ *     MutationObserver ile DOM'u sürekli izleyip yeni eklenen filigranları da gizler.
+ *
+ * Not: Yalnızca görsel bir temizliktir; lisans durumunu değiştirmez.
+ */
 (function (window, document) {
     "use strict";
 
-    // Auto-dismiss the DevExtreme trial/license watermark (<dx-license>) as soon
-    // as it is injected into the DOM. We click its close affordance (the X) and,
-    // as a fallback, remove the element. Because the banner is marked
-    // data-permanent it can be re-injected, so a MutationObserver keeps watching.
+    // DevExtreme deneme/lisans filigranını (<dx-license>) DOM'a enjekte edilir
+    // edilmez otomatik olarak kapat. Kapatma düğmesine (X) tıklarız ve yedek olarak
+    // öğeyi kaldırırız. Banner data-permanent olarak işaretli olduğundan yeniden
+    // enjekte edilebilir; bu yüzden bir MutationObserver izlemeyi sürdürür.
     function dismiss(el) {
         if (!el || el.nodeType !== 1) {
             return;
         }
 
-        // The close button is the last <div> in the banner (the one with the X svg).
+        // Kapatma düğmesi, banner'daki son <div>'dir (X svg'sini içeren).
         var closer = el.querySelector("div:last-child");
         if (closer) {
-            try { closer.click(); } catch (e) { /* ignore */ }
+            try { closer.click(); } catch (e) { /* yok say */ }
         }
 
         if (el.parentNode) {
-            try { el.parentNode.removeChild(el); } catch (e) { /* ignore */ }
+            try { el.parentNode.removeChild(el); } catch (e) { /* yok say */ }
         }
     }
 
@@ -38,7 +49,7 @@
     }
 
     function start() {
-        // Handle anything already present.
+        // Zaten mevcut olan her şeyi işle.
         dismissWithin(document.body || document.documentElement);
 
         var observer = new MutationObserver(function (mutations) {

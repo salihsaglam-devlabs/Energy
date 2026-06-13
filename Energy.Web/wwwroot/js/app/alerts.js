@@ -1,23 +1,24 @@
 /*
- * AppAlert — unified DevExtreme alert / notification surface.
+ * AppAlert — birleşik DevExtreme uyarı / bildirim yüzeyi.
  *
- * Three presentation modes, one API:
- *   - "toast"  : auto-dismissing notification that slides in at the bottom and
- *                disappears on its own (stacks upward when several fire).
- *   - "popup"  : modal dialog (dxPopup) with an icon, title, message and
- *                action buttons; supports confirm() returning a Promise<bool>.
- *   - "embed"  : inline banner rendered into a page container; optionally
- *                dismissible and/or auto-dismissing.
+ * Üç sunum modu, tek API:
+ *   - "toast"  : alttan kayarak gelen ve kendiliğinden kaybolan, otomatik kapanan
+ *                bildirim (birkaçı tetiklendiğinde yukarı doğru yığılır).
+ *   - "popup"  : ikon, başlık, mesaj ve eylem düğmeleri içeren modal iletişim kutusu
+ *                (dxPopup); Promise<bool> döndüren confirm() destekler.
+ *   - "embed"  : bir sayfa kapsayıcısına gömülen satır içi banner; isteğe bağlı olarak
+ *                kapatılabilir ve/veya otomatik kapanır.
  *
- * Severity helpers (success/info/warning/error) default to "toast" but accept
- * { mode: "popup" | "embed" } to switch surface without changing call sites.
+ * Önem derecesi yardımcıları (success/info/warning/error) varsayılan olarak "toast"
+ * kullanır ancak çağrı yerlerini değiştirmeden yüzeyi değiştirmek için
+ * { mode: "popup" | "embed" } kabul eder.
  */
 (function (window, $) {
     "use strict";
 
     var dx = window.DevExpress;
 
-    // --- severity → visual mapping -----------------------------------------
+    // --- önem derecesi → görsel eşlemesi -----------------------------------------
     var TYPES = {
         success: { dx: "success", icon: "check",       css: "is-success" },
         info:    { dx: "info",    icon: "info",        css: "is-info" },
@@ -43,7 +44,7 @@
         }
     }
 
-    // --- toast (bottom, self-dismissing) ------------------------------------
+    // --- toast (alt, kendiliğinden kapanan) ------------------------------------
     var bottomStack = {
         position: { my: "bottom center", at: "bottom center", of: window, offset: "0 -24" },
         direction: "up-push"
@@ -69,7 +70,7 @@
         }, stack);
     }
 
-    // --- popup (modal dialog) -----------------------------------------------
+    // --- popup (modal iletişim kutusu) -----------------------------------------------
     function popup(options) {
         options = options || {};
         var type = options.type || "info";
@@ -146,7 +147,7 @@
         return popup(options);
     }
 
-    // --- embed (inline banner) ----------------------------------------------
+    // --- embed (satır içi banner) ----------------------------------------------
     function embed(target, message, options) {
         options = options || {};
         var type = options.type || "info";
@@ -184,7 +185,7 @@
         return { close: close, element: $alert };
     }
 
-    // --- unified entry + severity helpers -----------------------------------
+    // --- birleşik giriş + önem derecesi yardımcıları -----------------------------------
     function show(options) {
         options = options || {};
         var mode = options.mode || "toast";

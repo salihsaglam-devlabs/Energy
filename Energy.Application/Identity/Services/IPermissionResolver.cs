@@ -1,19 +1,21 @@
 namespace Energy.Application.Identity.Services;
 
 /// <summary>
-/// Resolves the effective permission set for a user through the
-/// User → Role → Permission chain. Implementations must cache and invalidate
-/// per <c>userId</c>.
+/// Bir kullanıcının etkin (effective) yetki kümesini Kullanıcı → Rol → Yetki
+/// zinciri üzerinden çözümler. Uygulamalar <c>userId</c> bazında önbellekleme
+/// (cache) ve geçersiz kılma (invalidation) yapmalıdır.
 /// </summary>
 public interface IPermissionResolver
 {
+    /// <summary>Kullanıcının sahip olduğu tüm etkin yetki kodlarını döndürür.</summary>
     Task<IReadOnlySet<string>> GetPermissionsAsync(Guid userId, CancellationToken cancellationToken = default);
 
+    /// <summary>Kullanıcının belirtilen yetki koduna sahip olup olmadığını döndürür.</summary>
     Task<bool> HasPermissionAsync(Guid userId, string permissionCode, CancellationToken cancellationToken = default);
 
-    /// <summary>Drops the cached set for the supplied user.</summary>
+    /// <summary>Belirtilen kullanıcı için önbelleğe alınmış yetki kümesini düşürür (temizler).</summary>
     void InvalidateUser(Guid userId);
 
-    /// <summary>Drops cached sets for every user that holds the supplied role.</summary>
+    /// <summary>Belirtilen role sahip her kullanıcının önbelleğe alınmış kümelerini düşürür.</summary>
     Task InvalidateRoleAsync(Guid roleId, CancellationToken cancellationToken = default);
 }

@@ -208,7 +208,7 @@ public sealed class UserService : IUserService
             .Join(_db.Roles.AsNoTracking(), ur => ur.RoleId, r => r.Id, (_, r) => r.Name)
             .AnyAsync(name => name == SystemRoles.SuperAdmin, ct);
 
-        // Permissions inherited through roles are read-only on the screen.
+        // Roller aracılığıyla devralınan yetkiler ekranda salt okunurdur.
         IReadOnlyList<string> rolePermissionCodes = isSuperAdmin
             ? PermissionCatalog.AllCodes.ToList()
             : await _db.UserRoles.AsNoTracking()
@@ -241,7 +241,7 @@ public sealed class UserService : IUserService
 
         var changed = false;
 
-        // --- Roles: additive/removal diff against the desired set ---
+        // --- Roller: istenen kümeye göre ekleme/kaldırma farkı ---
         var desiredRoles = request.RoleIds.Distinct().ToHashSet();
         var existingRoles = await _db.UserRoles.Where(ur => ur.UserId == id).ToListAsync(ct);
         var currentRoles = existingRoles.Select(ur => ur.RoleId).ToHashSet();
@@ -256,7 +256,7 @@ public sealed class UserService : IUserService
             changed = true;
         }
 
-        // --- Direct permissions: keep only valid catalog codes; diff against current ---
+        // --- Doğrudan yetkiler: yalnızca geçerli katalog kodlarını tut; mevcutla karşılaştır ---
         var desiredDirect = request.DirectPermissionCodes
             .Where(code => PermissionCatalog.AllCodes.Contains(code))
             .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -290,8 +290,9 @@ public sealed class UserService : IUserService
 
         if (user is null)
         {
-            // Diagnostic only — never logs the password. Helps pinpoint why login
-            // fails in a specific environment (e.g. user missing on that database).
+            // Yalnızca tanılama amaçlı — parolayı asla günlüğe yazmaz. Belirli bir
+            // ortamda oturum açmanın neden başarısız olduğunu (ör. kullanıcının o
+            // veritabanında bulunmaması) tespit etmeye yardımcı olur.
             _logger.LogWarning("[Login] FAILED: no user matches identifier '{Identifier}'.", identifier);
             return null;
         }
@@ -326,8 +327,8 @@ public sealed class UserService : IUserService
 
         var token = _tokens.Issue(user);
 
-        // Surface the effective permission set and role names so the Web layer
-        // can drive menu / page / action authorization without an extra call.
+        // Etkin yetki kümesini ve rol adlarını döndür; böylece Web katmanı menü /
+        // sayfa / eylem yetkilendirmesini ek bir çağrı yapmadan yürütebilir.
         var roleNames = await _db.UserRoles.AsNoTracking()
             .Where(ur => ur.UserId == user.Id)
             .Join(_db.Roles.AsNoTracking(), ur => ur.RoleId, r => r.Id, (_, r) => r.Name)

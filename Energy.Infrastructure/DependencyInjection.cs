@@ -26,14 +26,14 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        // Database provider is selectable via "Database:Provider"
-        // (PostgreSql | SqlServer). Defaults to PostgreSQL for backwards
-        // compatibility with existing deployments.
+        // Veritabanı sağlayıcısı "Database:Provider" ile seçilebilir
+        // (PostgreSql | SqlServer). Mevcut dağıtımlarla geriye dönük uyumluluk
+        // için varsayılan olarak PostgreSQL kullanılır.
         var useSqlServer = IsSqlServerProvider(configuration["Database:Provider"]);
 
-        // Pick the connection string that matches the chosen provider so the user
-        // only flips "Database:Provider" — both strings are pre-configured. Falls
-        // back to "DefaultConnection" when the provider-specific key is absent.
+        // Seçilen sağlayıcıyla eşleşen bağlantı dizesini seç; böylece kullanıcı yalnızca
+        // "Database:Provider" değerini değiştirir — her iki dize de önceden yapılandırılmıştır.
+        // Sağlayıcıya özel anahtar yoksa "DefaultConnection"a geri düşer.
         var providerKey = useSqlServer ? "SqlServer" : "PostgreSql";
         var connectionString = configuration.GetConnectionString(providerKey)
             ?? configuration.GetConnectionString("DefaultConnection")
@@ -48,13 +48,13 @@ public static class DependencyInjection
         {
             if (useSqlServer)
             {
-                // SQL Server migrations live in their own assembly.
+                // SQL Server migration'ları kendi derlemesinde yer alır.
                 options.UseSqlServer(connectionString, sql => sql.MigrationsAssembly("Energy.Migrations.SqlServer"));
             }
             else
             {
-                // PostgreSQL migrations live in their own assembly so the two
-                // providers don't share a single ModelSnapshot.
+                // PostgreSQL migration'ları kendi derlemesinde yer alır; böylece iki
+                // sağlayıcı tek bir ModelSnapshot'ı paylaşmaz.
                 options.UseNpgsql(connectionString, npg => npg.MigrationsAssembly("Energy.Migrations.PostgreSql"));
             }
             options.AddInterceptors(sp.GetRequiredService<AuditingSaveChangesInterceptor>());
@@ -75,6 +75,7 @@ public static class DependencyInjection
         services.AddScoped<IAuditLogService, AuditLogService>();
         services.AddScoped<IHomeService, HomeService>();
         services.AddScoped<IChatService, ChatService>();
+        services.AddScoped<Application.Settings.Services.IUserSettingsService, Infrastructure.Settings.Services.UserSettingsService>();
 
         services.AddLocalizationOverrides();
         services.AddScoped<SystemSeeder>();
@@ -84,9 +85,9 @@ public static class DependencyInjection
     }
 
     /// <summary>
-    /// Recognises the SQL Server provider from the configured value. Accepts the
-    /// common aliases so "SqlServer", "MsSql", "SQL Server" all select SQL Server;
-    /// anything else (including null/empty) falls back to PostgreSQL.
+    /// Yapılandırılan değerden SQL Server sağlayıcısını tanır. Yaygın takma adları
+    /// kabul eder; böylece "SqlServer", "MsSql", "SQL Server" hepsi SQL Server'ı seçer;
+    /// başka her şey (null/boş dahil) PostgreSQL'e geri düşer.
     /// </summary>
     internal static bool IsSqlServerProvider(string? provider)
     {

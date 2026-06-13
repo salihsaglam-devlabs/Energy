@@ -1,15 +1,14 @@
 namespace Energy.Domain.Chat;
 
-/// <summary>Membership state of a user within a chat group.</summary>
+/// <summary>Bir kullanıcının bir sohbet grubundaki üyelik durumu.</summary>
 public enum ChatGroupMemberStatus
 {
-    /// <summary>Invited but has not yet responded.</summary>
+    /// <summary>Davet edildi ancak henüz yanıt vermedi.</summary>
     Pending = 0,
 
-    /// <summary>Accepted the invitation and participates in the group.</summary>
+    /// <summary>Daveti kabul etti ve gruba katılıyor.</summary>
     Accepted = 1,
 
-    /// <summary>Declined the invitation.</summary>
+    /// <summary>Daveti reddetti.</summary>
     Declined = 2
 }
-

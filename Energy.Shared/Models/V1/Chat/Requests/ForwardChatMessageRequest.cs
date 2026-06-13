@@ -1,14 +1,14 @@
 namespace Energy.Shared.Models.V1.Chat.Requests;
 
-/// <summary>Forwards an existing message (its text + attachment) to a new target.</summary>
+/// <summary>Var olan bir mesajı (metni + ekini) yeni bir hedefe iletir.</summary>
 public sealed class ForwardChatMessageRequest
 {
+    /// <summary>İletilecek kaynak mesajın kimliği.</summary>
     public Guid MessageId { get; set; }
 
-    /// <summary>Target user for a direct forward. Null when forwarding to a group.</summary>
+    /// <summary>Doğrudan iletim için hedef kullanıcı. Gruba iletilirken null olur.</summary>
     public Guid? RecipientId { get; set; }
 
-    /// <summary>Target group. Null when forwarding to a user.</summary>
+    /// <summary>Hedef grup. Bir kullanıcıya iletilirken null olur.</summary>
     public Guid? GroupId { get; set; }
 }
-

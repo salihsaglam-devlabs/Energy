@@ -10,9 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace Energy.Web.Controllers;
 
 /// <summary>
-/// Users page is a thin DevExtreme dxDataGrid shell. The Index action returns
-/// the empty view; the grid pulls its data from the JSON endpoints exposed by
-/// the action methods below. All requests are proxied to the API.
+/// Kullanıcılar sayfası ince bir DevExtreme dxDataGrid kabuğudur. Index aksiyonu boş
+/// görünümü döndürür; ızgara verisini, aşağıdaki aksiyon metotlarının sunduğu JSON
+/// uç noktalarından çeker. Tüm istekler API'ye vekillenir.
 /// </summary>
 [Authorize]
 [PagePermission(PermissionCatalog.UserReadAll)]
@@ -69,7 +69,7 @@ public sealed class UsersController : Controller
         return Json(new { data = items, totalCount = page?.TotalCount ?? 0 });
     }
 
-    /// <summary>Lookup feed for the roles tag-box.</summary>
+    /// <summary>Roller etiket kutusu için arama (lookup) beslemesi.</summary>
     [HttpGet("roles-lookup")]
     public async Task<IActionResult> RolesLookup(CancellationToken ct)
     {
@@ -146,9 +146,8 @@ public sealed class UsersController : Controller
     [IgnoreAntiforgeryToken]
     public async Task<IActionResult> Update(Guid id, [FromBody] UserUpdateInput input, CancellationToken ct)
     {
-        // Preserve the user's current role assignments since the per-page
-        // edit form does not expose them (the dedicated "Manage roles" popup
-        // is responsible for that).
+        // Sayfa içi düzenleme formu rolleri göstermediğinden kullanıcının mevcut rol
+        // atamalarını koru (bundan özel "Rolleri yönet" açılır penceresi sorumludur).
         var existing = (await _users.GetByIdAsync(id, ct)).Data;
         var roleIds = existing?.Roles.Select(r => r.Id).ToArray() ?? Array.Empty<Guid>();
 

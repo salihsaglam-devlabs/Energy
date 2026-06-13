@@ -23,9 +23,9 @@ public sealed class AuthCookieFactory : IAuthCookieFactory
         identity.AddClaim(new Claim(EnergyClaimTypes.FullName, token.DisplayName));
         identity.AddClaim(new Claim("display_name", token.DisplayName));
 
-        // Mirror the effective permission set and role names into the cookie so
-        // page-level filters, view helpers and DevExtreme action gating can make
-        // authorization decisions without round-tripping to the API.
+        // Etkin yetki kümesini ve rol adlarını çereze yansıt; böylece sayfa düzeyi
+        // filtreler, görünüm yardımcıları ve DevExtreme aksiyon kısıtlaması, API'ye
+        // gidip gelmeden yetkilendirme kararları verebilir.
         foreach (var role in token.Roles)
         {
             identity.AddClaim(new Claim(ClaimTypes.Role, role));
@@ -46,6 +46,7 @@ public sealed class AuthCookieFactory : IAuthCookieFactory
         await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, properties);
     }
 
+    /// <inheritdoc />
     public Task SignOutAsync(HttpContext httpContext)
         => httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 }

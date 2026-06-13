@@ -4,15 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace Energy.Web.Common;
 
 /// <summary>
-/// Bridges <see cref="BaseResponse{T}"/> envelopes returned by the API into
-/// shapes the DevExtreme client expects.
+/// API tarafından döndürülen <see cref="BaseResponse{T}"/> zarflarını, DevExtreme
+/// istemcisinin beklediği biçimlere köprüler.
 /// </summary>
 public static class ApiResponseExtensions
 {
     /// <summary>
-    /// Returns the <c>{ data, totalCount }</c> shape consumed by
-    /// <c>dxDataGrid</c> with <c>CustomStore</c>. On failure, returns a 400
-    /// JSON response carrying the API error message.
+    /// <c>CustomStore</c> ile <c>dxDataGrid</c>'in tükettiği <c>{ data, totalCount }</c>
+    /// biçimini döndürür. Başarısızlıkta, API hata mesajını taşıyan 400 JSON yanıtı döndürür.
     /// </summary>
     public static IActionResult ToGridResult<T>(
         this BaseResponse<PaginatedResponse<T>> envelope)
@@ -34,8 +33,8 @@ public static class ApiResponseExtensions
     }
 
     /// <summary>
-    /// Returns the API payload as JSON or, on failure, a 400 with the API
-    /// error message — independent of the HTTP status the API itself returned.
+    /// API yükünü JSON olarak veya başarısızlıkta API hata mesajıyla bir 400 olarak
+    /// döndürür — API'nin döndürdüğü HTTP durumundan bağımsızdır.
     /// </summary>
     public static IActionResult ToJsonResult<T>(this BaseResponse<T> envelope)
     {

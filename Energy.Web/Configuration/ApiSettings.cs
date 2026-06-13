@@ -1,16 +1,19 @@
 namespace Energy.Web.Configuration;
 
+/// <summary>Web katmanının arka uç API'ye bağlanması için ayarlar.</summary>
 public sealed class ApiSettings
 {
+    /// <summary>Yapılandırma bölümünün adı.</summary>
     public const string SectionName = "Api";
 
+    /// <summary>API'nin temel adresi (base URL).</summary>
     public string BaseUrl { get; set; } = string.Empty;
 
     /// <summary>
-    /// When true, the HTTP client accepts the API server's TLS certificate even
-    /// if it is invalid (name mismatch / untrusted chain / self-signed).
-    /// Intended ONLY for local/dev or temporary setups where the server cert
-    /// cannot be trusted. Leave false in real production.
+    /// True olduğunda, HTTP istemcisi API sunucusunun TLS sertifikasını geçersiz olsa
+    /// bile (ad uyuşmazlığı / güvenilmeyen zincir / kendinden imzalı) kabul eder.
+    /// YALNIZCA sunucu sertifikasının güvenilemediği yerel/geliştirme veya geçici
+    /// kurulumlar içindir. Gerçek üretimde false bırakın.
     /// </summary>
     public bool AllowInvalidCertificate { get; set; }
 }

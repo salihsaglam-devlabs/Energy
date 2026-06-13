@@ -10,12 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 namespace Energy.Web.Controllers;
 
 /// <summary>
-/// Roles management DevExtreme grid + JSON adapter. Permission "ids" exposed
-/// to the front-end are actually permission codes — the JS only needs a
-/// stable key/value pair for the tag-box, and the new API consumes codes
-/// directly via <c>SetPermissionsAsync</c>. Role↔menu visibility is implicit:
-/// a role sees a menu when it owns that menu's <c>RequiredPermissionCode</c>,
-/// so there is no separate role-menu mapping to manage here.
+/// Rol yönetimi DevExtreme ızgarası + JSON adaptörü. Ön yüze sunulan yetki "id"leri
+/// aslında yetki kodlarıdır — JS yalnızca tag-box için kararlı bir anahtar/değer çiftine
+/// ihtiyaç duyar ve yeni API kodları doğrudan <c>SetPermissionsAsync</c> ile tüketir.
+/// Rol↔menü görünürlüğü örtüktür: bir rol, bir menünün <c>RequiredPermissionCode</c>'una
+/// sahipse o menüyü görür; bu yüzden burada yönetilecek ayrı bir rol-menü eşlemesi yoktur.
 /// </summary>
 [Authorize]
 [PagePermission(PermissionCatalog.RoleReadAll)]

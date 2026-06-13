@@ -4,8 +4,10 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energy.Infrastructure.Persistence.Configurations;
 
+/// <summary>Sohbet mesajı tepkileri (emoji) için EF Core eşleme yapılandırması.</summary>
 public sealed class ChatMessageReactionConfiguration : IEntityTypeConfiguration<ChatMessageReaction>
 {
+    /// <summary>Tablo, anahtar, kısıtlar ve ilişkileri yapılandırır.</summary>
     public void Configure(EntityTypeBuilder<ChatMessageReaction> builder)
     {
         builder.ToTable("ChatMessageReactions");
@@ -13,7 +15,7 @@ public sealed class ChatMessageReactionConfiguration : IEntityTypeConfiguration<
 
         builder.Property(r => r.Emoji).IsRequired().HasMaxLength(16);
 
-        // One reaction row per (message, user).
+        // (mesaj, kullanıcı) ikilisi başına tek tepki satırı.
         builder.HasIndex(r => new { r.MessageId, r.UserId }).IsUnique();
 
         builder.HasOne<ChatMessage>().WithMany().HasForeignKey(r => r.MessageId).OnDelete(DeleteBehavior.Cascade);

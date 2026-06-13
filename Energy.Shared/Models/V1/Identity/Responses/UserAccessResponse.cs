@@ -1,24 +1,30 @@
 namespace Energy.Shared.Models.V1.Identity.Responses;
 
 /// <summary>
-/// A complete picture of a single user's access for the dedicated access
-/// management screen: assigned roles, permissions inherited through those roles
-/// (read-only), and direct per-user grants layered on top.
+/// Özel erişim yönetimi ekranı için tek bir kullanıcının erişiminin tam görünümü:
+/// atanmış roller, bu roller aracılığıyla miras alınan yetkiler (salt okunur) ve
+/// üzerine eklenen doğrudan (kullanıcıya özel) tanımlar.
 /// </summary>
 public sealed class UserAccessResponse
 {
+    /// <summary>Kullanıcının kimliği.</summary>
     public Guid UserId { get; init; }
+
+    /// <summary>Kullanıcı adı.</summary>
     public string UserName { get; init; } = string.Empty;
+
+    /// <summary>Kullanıcının ad soyadı.</summary>
     public string FullName { get; init; } = string.Empty;
+
+    /// <summary>Kullanıcının etkin olup olmadığı.</summary>
     public bool IsActive { get; init; }
 
-    /// <summary>Roles currently assigned to the user.</summary>
+    /// <summary>Kullanıcıya şu anda atanmış roller.</summary>
     public IReadOnlyList<Guid> RoleIds { get; init; } = Array.Empty<Guid>();
 
-    /// <summary>Permission codes the user owns through their roles (inherited, read-only).</summary>
+    /// <summary>Kullanıcının rolleri aracılığıyla sahip olduğu yetki kodları (miras, salt okunur).</summary>
     public IReadOnlyList<string> RolePermissionCodes { get; init; } = Array.Empty<string>();
 
-    /// <summary>Permission codes granted directly to the user, on top of role permissions.</summary>
+    /// <summary>Rol yetkilerine ek olarak kullanıcıya doğrudan verilen yetki kodları.</summary>
     public IReadOnlyList<string> DirectPermissionCodes { get; init; } = Array.Empty<string>();
 }
-

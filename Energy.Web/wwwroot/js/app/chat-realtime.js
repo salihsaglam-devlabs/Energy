@@ -1,13 +1,35 @@
+/*
+ * EnergyChat — uygulama genelinde gerçek zamanlı sohbet istemcisi (SignalR).
+ *
+ * Sorumluluk:
+ *   - Kimliği doğrulanmış her sayfada yüklenir; böylece bildirim zili, okunmamış sayacı
+ *     ve toast bildirimleri geçerli ekrandan bağımsız olarak canlı kalır.
+ *   - SignalR hub bağlantısını kurar ve otomatik yeniden bağlanmayı (kademeli geri çekilme)
+ *     ile tüm oturum boyunca dirençli tutar; araç çubuğunda bağlantı durumunu gösterir.
+ *   - Sunucu olaylarını dağıtır: yeni mesaj, çevrimiçi durum (anlık görüntü/değişim),
+ *     yazıyor göstergesi, grup davet/değişiklik/silme, mesaj silme/tepki/okundu bilgisi
+ *     ve sesli arama (WebRTC) sinyalleşmesi.
+ *   - Abone (subscriber) tabanlı bir API sunar; sohbet sayfası ve diğer bileşenler
+ *     bu olaylara abone olabilir.
+ *   - Kimlik doğrulanmamış sayfalarda (zil yoksa) tam bir işlemsiz (no-op) yüzey sunar;
+ *     böylece tüketiciler özellik tespiti yapmak zorunda kalmaz.
+ *
+ * Genel API (window.EnergyChat): subscribe, refreshUnread, onPresence, onTyping,
+ *   onStatus, onGroupInvite, onGroupChanged, onMessageDeleted, onMessageReacted,
+ *   onMessagesRead, onCall, callUser, answerCall, sendIce, endCall, sendTyping,
+ *   isOnline, getOnlineUsers, status, connectionState, debug.
+ */
 (function (window, $) {
     "use strict";
 
-    // Global, app-wide chat realtime client. Loaded on every authenticated page
-    // so the notification bell stays live regardless of the current screen.
+    // Genel, uygulama genelinde sohbet gerçek zamanlı istemcisi. Kimliği doğrulanmış
+    // her sayfada yüklenir; böylece bildirim zili geçerli ekrandan bağımsız olarak canlı kalır.
     var cfg = (window.AppContext && window.AppContext.chat) || {};
     var $bell = $("#energy-notify");
     if ($bell.length === 0 || !cfg.hubUrl) {
-        // Not authenticated / no bell rendered -> nothing to wire. Expose a
-        // complete no-op surface so consumers never have to feature-detect.
+        // Kimliği doğrulanmamış / zil oluşturulmamış -> bağlanacak bir şey yok. Tüketiciler
+        // hiçbir zaman özellik tespiti yapmak zorunda kalmasın diye tam bir işlemsiz (no-op)
+        // yüzey sun.
         window.EnergyChat = window.EnergyChat || {
             subscribe: function () { },
             refreshUnread: function () { },
@@ -39,22 +61,22 @@
     var subscribers = [];
     var unread = 0;
 
-    // Presence + typing + connection state.
-    var onlineUsers = {};          // map: userId(lowercase) -> true
-    var presenceSubscribers = [];  // notified on every presence change/snapshot
-    var typingSubscribers = [];    // notified on incoming typing indicators
-    var statusSubscribers = [];    // notified on connection status changes
-    var groupInviteSubscribers = [];  // notified when invited to a group
-    var groupChangedSubscribers = []; // notified when a group's roster changes
+    // Çevrimiçi durum + yazıyor + bağlantı durumu.
+    var onlineUsers = {};          // eşleme: userId(küçük harf) -> true
+    var presenceSubscribers = [];  // her çevrimiçi durum değişiminde/anlık görüntüsünde bilgilendirilir
+    var typingSubscribers = [];    // gelen yazıyor göstergelerinde bilgilendirilir
+    var statusSubscribers = [];    // bağlantı durumu değişimlerinde bilgilendirilir
+    var groupInviteSubscribers = [];  // bir gruba davet edildiğinde bilgilendirilir
+    var groupChangedSubscribers = []; // bir grubun üye listesi değiştiğinde bilgilendirilir
     var msgDeletedSubscribers = [];
     var msgReactedSubscribers = [];
     var msgReadSubscribers = [];
-    var callSubscribers = [];          // notified on call signaling events
+    var callSubscribers = [];          // arama sinyalleşme olaylarında bilgilendirilir
     var connection = null;
     var status = "disconnected";
     var lastStatusAt = Date.now();
 
-    // Toolbar connection indicator.
+    // Araç çubuğu bağlantı göstergesi.
     var $conn = $("#energy-conn");
     var $connDot = $("#energy-conn-dot");
     var $connPanel = $("#energy-conn-panel");
@@ -161,7 +183,7 @@
         $("<span>").addClass("energy-toolbar__notify-item-text").text(message.text || "").appendTo($item);
         $item.on("click", function () { window.location.href = cfg.pageUrl; });
         $list.prepend($item);
-        // Cap the list to the 20 most recent.
+        // Listeyi en güncel 20 öğeyle sınırla.
         $list.children().slice(20).remove();
     }
 
@@ -171,7 +193,7 @@
         $panel.prop("hidden", !next);
     }
 
-    // Bottom-center, auto-dismissing toast shown when a new message arrives.
+    // Yeni bir mesaj geldiğinde gösterilen, ekranın alt-ortasında otomatik kapanan bildirim (toast).
     var $toastHost = null;
     function ensureToastHost() {
         if ($toastHost && $toastHost.length) { return $toastHost; }
@@ -198,7 +220,7 @@
         $toast.on("click", function () { window.location.href = cfg.pageUrl; });
         host.append($toast);
 
-        // Animate in, then auto-dismiss after a few seconds.
+        // İçeri doğru animasyon yap, ardından birkaç saniye sonra otomatik kapat.
         requestAnimationFrame(function () { $toast.addClass("is-visible"); });
         var hide = function () {
             $toast.removeClass("is-visible");
@@ -208,7 +230,7 @@
         $toast.on("mouseenter", function () { clearTimeout(timer); });
         $toast.on("mouseleave", function () { timer = setTimeout(hide, 2500); });
 
-        // Keep at most 3 stacked toasts.
+        // En fazla 3 yığılmış bildirim tut.
         host.children().slice(0, -3).remove();
     }
 
@@ -222,7 +244,7 @@
     });
     $panel.on("click", function (e) { e.stopPropagation(); });
 
-    // Connection status indicator: click toggles a small details popover.
+    // Bağlantı durumu göstergesi: tıklama, küçük bir ayrıntı açılır penceresini açıp kapatır.
     $conn.on("click", function (e) {
         e.stopPropagation();
         if ($connPanel.length === 0) { return; }
@@ -243,9 +265,9 @@
         var args = Array.prototype.slice.call(arguments);
         try {
             if (connection && connection.state === "Connected") {
-                return connection.invoke.apply(connection, args).catch(function () { /* best effort */ });
+                return connection.invoke.apply(connection, args).catch(function () { /* en iyi çaba */ });
             }
-        } catch (e) { /* never break the UI */ }
+        } catch (e) { /* arayüzü asla bozma */ }
         return Promise.resolve();
     }
 
@@ -257,15 +279,20 @@
         if (!message) { return; }
         var fromMe = (String(message.senderId || "").toLowerCase() === me);
 
-        // Let any open chat page react first (it may append + mark read).
+        // Açık olan herhangi bir sohbet sayfasının önce tepki vermesine izin ver
+        // (mesajı ekleyip okundu işaretleyebilir).
         dispatch(message);
 
         if (fromMe) { return; }
 
-        // Incoming message: bump the bell, drop a notification entry + toast.
+        // Gelen mesaj: zili artır, bir bildirim girdisi + toast ekle.
         setBadge(unread + 1);
         addNotification(message);
         showCenterToast(message);
+        // Sesli uyarı (kullanıcının hesap bazlı bildirim sesi tercihine uyar).
+        if (window.EnergyUserSettings && typeof window.EnergyUserSettings.beep === "function") {
+            window.EnergyUserSettings.beep("message");
+        }
     }
 
     window.EnergyChat = {
@@ -286,9 +313,9 @@
         sendTyping: function (recipientId, isTyping) {
             try {
                 if (connection && connection.state === "Connected" && recipientId) {
-                    connection.invoke("Typing", String(recipientId), !!isTyping).catch(function () { /* best effort */ });
+                    connection.invoke("Typing", String(recipientId), !!isTyping).catch(function () { /* en iyi çaba */ });
                 }
-            } catch (e) { /* never break the UI on a transport hiccup */ }
+            } catch (e) { /* taşıma aksaklığında arayüzü asla bozma */ }
         },
         isOnline: function (userId) { return !!onlineUsers[String(userId || "").toLowerCase()]; },
         getOnlineUsers: function () { return Object.keys(onlineUsers); },
@@ -299,10 +326,10 @@
             }
         },
         status: function () { return status; },
-        // Raw SignalR connection state ("Connected", "Connecting", "Reconnecting",
-        // "Disconnected", "Disconnecting") for console diagnostics.
+        // Konsol tanılaması için ham SignalR bağlantı durumu ("Connected", "Connecting",
+        // "Reconnecting", "Disconnected", "Disconnecting").
         connectionState: function () { return connection ? connection.state : "None"; },
-        // One-shot snapshot of everything useful for debugging from the console.
+        // Konsoldan hata ayıklama için yararlı her şeyin tek seferlik anlık görüntüsü.
         debug: function () {
             return {
                 status: status,
@@ -320,9 +347,9 @@
         if (!window.signalR) { log("signalr-missing"); return; }
         connection = new signalR.HubConnectionBuilder()
             .withUrl(cfg.hubUrl)
-            // Retry quickly at first, then back off. When automatic reconnect
-            // ultimately gives up, onclose() restarts the whole cycle, so the
-            // client keeps trying to connect for the entire session.
+            // Önce hızlı yeniden dene, sonra aralığı kademeli artır. Otomatik yeniden
+            // bağlanma sonunda vazgeçtiğinde onclose() tüm döngüyü yeniden başlatır;
+            // böylece istemci tüm oturum boyunca bağlanmayı denemeye devam eder.
             .withAutomaticReconnect([0, 2000, 5000, 10000, 15000, 30000])
             .configureLogging(signalR.LogLevel.Warning)
             .build();
@@ -331,7 +358,7 @@
         connection.on("PresenceSnapshot", applySnapshot);
         connection.on("PresenceChanged", function (p) {
             if (!p) { return; }
-            // Tolerate either camelCase or PascalCase payloads.
+            // Hem camelCase hem PascalCase yüklere tolerans göster.
             var uid = (p.userId != null) ? p.userId : p.UserId;
             var on = (p.isOnline != null) ? p.isOnline : p.IsOnline;
             setOnline(uid, on);
@@ -351,13 +378,18 @@
                 groupName: (p.groupName != null) ? p.groupName : p.GroupName
             };
             groupInviteSubscribers.forEach(function (cb) { try { cb(norm); } catch (e) { /* ignore */ } });
-            // Surface a toast so the user notices even when not on the chat page.
+            // Kullanıcı sohbet sayfasında olmasa bile fark etsin diye bir toast göster.
             showCenterToast({ senderName: norm.groupName || "Grup", text: "Yeni grup daveti" });
         });
         connection.on("GroupChanged", function (p) {
             if (!p) { return; }
             var norm = { groupId: (p.groupId != null) ? p.groupId : p.GroupId };
             groupChangedSubscribers.forEach(function (cb) { try { cb(norm); } catch (e) { /* ignore */ } });
+        });
+        connection.on("GroupDeleted", function (p) {
+            if (!p) { return; }
+            var norm = { groupId: (p.groupId != null) ? p.groupId : p.GroupId };
+            groupDeletedSubscribers.forEach(function (cb) { try { cb(norm); } catch (e) { /* ignore */ } });
         });
         connection.on("MessageDeleted", function (p) { fire(msgDeletedSubscribers, p || {}); });
         connection.on("MessageReacted", function (p) { fire(msgReactedSubscribers, p || {}); });
@@ -381,8 +413,8 @@
             clearPresence();
             setStatus("closed");
             log("closed", err && err.message);
-            // Automatic reconnect exhausted (or start() failed): keep trying so a
-            // dropped backend eventually heals without a page reload.
+            // Otomatik yeniden bağlanma tükendi (veya start() başarısız oldu): denemeye
+            // devam et; böylece kopan bir arka uç, sayfa yenilemeden zamanla kendini onarır.
             setTimeout(start, 5000);
         });
 
@@ -392,9 +424,9 @@
     function requestPresence() {
         try {
             if (connection && connection.state === "Connected") {
-                connection.invoke("RequestPresence").catch(function () { /* best effort */ });
+                connection.invoke("RequestPresence").catch(function () { /* en iyi çaba */ });
             }
-        } catch (e) { /* never break the page */ }
+        } catch (e) { /* sayfayı asla bozma */ }
     }
 
     function start() {
@@ -405,7 +437,7 @@
             .catch(function (err) {
                 setStatus("error");
                 log("connect-failed", err && err.message);
-                // A failed connect must never bubble up and disturb the page.
+                // Başarısız bir bağlantı asla yükselip sayfayı rahatsız etmemelidir.
                 setTimeout(start, 5000);
             });
     }

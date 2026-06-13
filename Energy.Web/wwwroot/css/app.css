@@ -692,7 +692,7 @@ body.energy-nav-closed .energy-toolbar__menu {
     border: 1px solid var(--energy-border, #e2e8f0);
     border-radius: 10px;
     overflow: hidden;
-    background: #fff;
+    background: var(--energy-surface, #fff);
 }
 .energy-chat__window { flex: 1 1 auto; min-height: 60vh; }
 .energy-chat__window-wrap {
@@ -730,6 +730,10 @@ body.energy-nav-closed .energy-toolbar__menu {
 .energy-chat__icon-btn.is-primary { color: var(--energy-primary, #2563eb); }
 .energy-chat__icon-btn.is-danger { color: var(--energy-danger, #dc2626); }
 .energy-chat__icon-btn.is-recording { color: var(--energy-danger, #dc2626); }
+.energy-chat__icon-btn.is-disabled,
+.energy-chat__icon-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.energy-chat__icon-btn.is-disabled:hover,
+.energy-chat__icon-btn:disabled:hover { background: transparent; }
 
 /* Recording bar (shown while capturing a voice message). */
 .energy-chat__recorder {
@@ -813,6 +817,17 @@ body.energy-nav-closed .energy-toolbar__menu {
 .energy-chat__invite-actions { display: inline-flex; gap: 2px; flex: 0 0 auto; }
 .energy-chat__field-label { display: block; font-size: 12px; font-weight: 600; margin: 10px 0 4px; color: var(--energy-text-muted, #475569); }
 .energy-chat__group-manage { margin-left: auto; }
+
+/* Group members manager rows (admin promote/demote + remove). */
+.energy-chat__members { display: flex; flex-direction: column; gap: 2px; max-height: 200px; overflow-y: auto; }
+.energy-chat__member-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 8px; border-radius: 8px;
+}
+.energy-chat__member-row:hover { background: rgba(148,163,184,0.12); }
+.energy-chat__member-name { font-size: 13px; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 1 auto; }
+.energy-chat__member-role { font-size: 11px; color: var(--energy-text-muted, #64748b); flex: 0 0 auto; }
+.energy-chat__member-actions { display: inline-flex; gap: 2px; flex: 0 0 auto; }
 
 /* Reply quote inside a bubble. */
 .energy-chat__msg { position: relative; }
@@ -1098,6 +1113,7 @@ body.energy-nav-closed .energy-toolbar__menu {
     }
     .energy-chat__main { width: 100%; flex: 1 1 auto; }
     .energy-chat__drawer-toggle { display: inline-flex; }
+    .energy-chat__welcome-menu { display: inline-flex; }
 }
 @media (min-width: 769px) {
     .energy-chat__backdrop { display: none !important; }
@@ -1138,6 +1154,7 @@ body.energy-nav-closed .energy-toolbar__menu {
     top: 110%;
     right: 0;
     width: 220px;
+    max-width: calc(100vw - 24px);
     background: #fff;
     border: 1px solid var(--energy-border, #e2e8f0);
     border-radius: 10px;
@@ -1167,6 +1184,7 @@ body.energy-nav-closed .energy-toolbar__menu {
     top: 110%;
     right: 0;
     width: 320px;
+    max-width: calc(100vw - 24px);
     max-height: 420px;
     overflow: auto;
     background: #fff;
@@ -1198,4 +1216,136 @@ body.energy-nav-closed .energy-toolbar__menu {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+/* Dar ekranlarda açılır panelleri ekrana sığacak şekilde sabitle; ikona göre
+   sola doğru açılan panellerin ekran kenarından (özellikle sol) taşmasını önler. */
+@media (max-width: 767.98px) {
+    .energy-toolbar__conn-panel,
+    .energy-toolbar__notify-panel {
+        position: fixed;
+        top: calc(var(--energy-toolbar-h) + 4px);
+        right: 8px;
+        left: 8px;
+        width: auto;
+        max-width: none;
+    }
+}
+
+/* ===== Chat default "Sohbetler" welcome screen ===== */
+.energy-chat__welcome {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    position: relative;
+    text-align: center;
+}
+.energy-chat__welcome-menu {
+    position: absolute; top: 12px; left: 12px; z-index: 2;
+}
+.energy-chat__welcome-card { max-width: 360px; width: 100%; }
+.energy-chat__welcome-icon {
+    width: 72px; height: 72px; margin: 0 auto 16px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: var(--energy-primary-soft, rgba(11,95,255,0.08));
+    color: var(--energy-primary, #2563eb); font-size: 30px;
+}
+.energy-chat__welcome-title { margin: 0 0 6px; font-size: 20px; color: var(--energy-text, #1f2733); }
+.energy-chat__welcome-text { margin: 0 0 18px; color: var(--energy-text-muted, #64748b); font-size: 14px; }
+.energy-chat__welcome-recent { display: flex; flex-direction: column; gap: 4px; text-align: left; }
+.energy-chat__welcome-recent-title {
+    font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--energy-text-muted, #94a3b8); margin: 8px 4px 2px;
+}
+.energy-chat__welcome-recent-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border: 1px solid var(--energy-border, #e2e8f0);
+    border-radius: 10px; background: var(--energy-surface, #fff);
+    cursor: pointer; font: inherit; color: inherit; text-align: left; width: 100%;
+}
+.energy-chat__welcome-recent-item:hover { background: var(--energy-surface-muted, #f8fafc); }
+.energy-chat__welcome-recent-name { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ===== Settings screen ===== */
+.energy-settings { display: block; }
+.energy-settings__subtitle { margin: 0 0 16px; color: var(--energy-text-muted, #64748b); }
+.energy-settings__grid {
+    display: grid; gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.energy-settings__card {
+    background: var(--energy-surface, #fff);
+    border: 1px solid var(--energy-border, #e2e8f0);
+    border-radius: 12px; padding: 16px 18px;
+}
+.energy-settings__group-title { margin: 0 0 10px; font-size: 15px; color: var(--energy-text, #1f2733); }
+.energy-settings__row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 10px 0; border-top: 1px solid var(--energy-border, #f1f5f9);
+}
+.energy-settings__card .energy-settings__row:first-of-type { border-top: none; }
+.energy-settings__row-label { font-size: 14px; color: var(--energy-text, #334155); }
+.energy-settings__select {
+    padding: 8px 10px; border: 1px solid var(--energy-border, #cbd5e1);
+    border-radius: 8px; background: var(--energy-surface, #fff); color: var(--energy-text, #1f2733);
+    font: inherit; min-width: 140px;
+}
+/* Toggle switch built from a checkbox. */
+.energy-settings__switch {
+    appearance: none; -webkit-appearance: none;
+    position: relative; width: 42px; height: 24px; flex: 0 0 auto;
+    border-radius: 999px; background: #cbd5e1; cursor: pointer; transition: background .2s;
+}
+.energy-settings__switch::after {
+    content: ""; position: absolute; top: 2px; left: 2px;
+    width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.25);
+}
+.energy-settings__switch:checked { background: var(--energy-primary, #2563eb); }
+.energy-settings__switch:checked::after { transform: translateX(18px); }
+.energy-settings__actions { margin-top: 20px; }
+.energy-settings__save {
+    padding: 10px 22px; border: none; border-radius: 8px;
+    background: var(--energy-primary, #2563eb); color: #fff; font: inherit; font-weight: 600; cursor: pointer;
+}
+.energy-settings__save:hover { filter: brightness(1.05); }
+
+/* ===== Dark theme (opt-in via user setting) ===== */
+html[data-theme="dark"] {
+    --energy-bg: #0f141b;
+    --energy-surface: #1b2330;
+    --energy-surface-muted: #232c3a;
+    --energy-border: #2c3645;
+    --energy-text: #e5e9f0;
+    --energy-text-muted: #94a3b8;
+    --energy-primary-soft: rgba(56,132,255,0.16);
+}
+html[data-theme="dark"] body { background: var(--energy-bg); color: var(--energy-text); }
+
+/* ===== Global responsive hardening (phones & tablets) ===== */
+img, video, canvas, svg { max-width: 100%; }
+
+@media (max-width: 768px) {
+    /* Keep DevExtreme popups (group/members/forward, edit forms, ...) inside the
+       viewport instead of overflowing and forcing horizontal scroll. */
+    .dx-overlay-wrapper .dx-popup-normal,
+    .dx-overlay-wrapper .dx-overlay-content {
+        max-width: 96vw !important;
+        max-height: 92vh !important;
+    }
+
+    /* Content padding tightened so grids/cards never spill past the screen. */
+    .energy-content { padding-left: 12px; padding-right: 12px; overflow-x: hidden; }
+    .energy-page-header { padding-left: 12px; padding-right: 12px; }
+
+    /* Settings cards stack in a single column on phones. */
+    .energy-settings__grid { grid-template-columns: 1fr; }
+
+    /* Forms/inputs go full width so labels and fields don't clip. */
+    .dx-field, .dx-texteditor, .energy-settings__select { width: 100%; }
+}
+
+/* Prevent the whole shell from ever scrolling sideways. */
+body, #energy-app { max-width: 100%; overflow-x: hidden; }
 

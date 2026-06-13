@@ -4,52 +4,65 @@ using Microsoft.AspNetCore.SignalR;
 namespace Energy.Web.Hubs;
 
 /// <summary>
-/// Real-time chat transport. The MVC <c>ChatController</c> persists messages via
-/// the API and then pushes them to the relevant users through this hub using
-/// <see cref="IHubContext{ChatHub}"/>. Connections are grouped per user by the
-/// default <see cref="IUserIdProvider"/> (NameIdentifier claim), so a user
-/// receives notifications on every open tab regardless of the current page.
-/// On top of message delivery the hub also tracks online/offline presence and
-/// relays typing indicators between conversation peers.
+/// Gerçek zamanlı sohbet taşıma katmanı. MVC <c>ChatController</c> mesajları API
+/// üzerinden kalıcılaştırır ve ardından bunları <see cref="IHubContext{ChatHub}"/>
+/// kullanarak bu hub aracılığıyla ilgili kullanıcılara iletir. Bağlantılar, varsayılan
+/// <see cref="IUserIdProvider"/> (NameIdentifier claim) ile kullanıcı bazında gruplanır;
+/// böylece kullanıcı, geçerli sayfadan bağımsız olarak her açık sekmede bildirim alır.
+/// Mesaj iletiminin yanı sıra hub, çevrimiçi/çevrimdışı durumunu izler ve konuşma
+/// tarafları arasında yazıyor göstergelerini aktarır.
 /// </summary>
 [Authorize]
 public sealed class ChatHub : Hub
 {
-    /// <summary>Server → client event names.</summary>
+    /// <summary>Sunucu → istemci olay adları.</summary>
     public const string ReceiveMessage = "ReceiveMessage";
+    /// <summary>Okunmamış mesaj sayısı değişti olayı.</summary>
     public const string UnreadCountChanged = "UnreadCountChanged";
+    /// <summary>Bir kullanıcının çevrimiçi durumu değişti olayı.</summary>
     public const string PresenceChanged = "PresenceChanged";
+    /// <summary>Tüm çevrimiçi kullanıcı listesinin anlık görüntüsü olayı.</summary>
     public const string PresenceSnapshot = "PresenceSnapshot";
+    /// <summary>Yazıyor göstergesi değişti olayı.</summary>
     public const string TypingChanged = "TypingChanged";
 
-    /// <summary>A user was invited to a group (delivered to the invitee).</summary>
+    /// <summary>Bir kullanıcı bir gruba davet edildi (davet edilene iletilir).</summary>
     public const string GroupInvite = "GroupInvite";
 
-    /// <summary>A group's membership/state changed (delivered to members).</summary>
+    /// <summary>Bir grubun üyeliği/durumu değişti (üyelere iletilir).</summary>
     public const string GroupChanged = "GroupChanged";
 
-    /// <summary>A message was deleted for everyone.</summary>
+    /// <summary>Bir grup silindi (eski üyelerine iletilir).</summary>
+    public const string GroupDeleted = "GroupDeleted";
+
+    /// <summary>Bir mesaj herkes için silindi.</summary>
     public const string MessageDeleted = "MessageDeleted";
 
-    /// <summary>A message's reactions changed.</summary>
+    /// <summary>Bir mesajın tepkileri değişti.</summary>
     public const string MessageReacted = "MessageReacted";
 
-    /// <summary>The peer read the current user's messages (read receipts).</summary>
+    /// <summary>Karşı taraf, geçerli kullanıcının mesajlarını okudu (okundu bilgisi).</summary>
     public const string MessagesRead = "MessagesRead";
 
-    // Voice-call (WebRTC) signaling events (server → client).
+    // Sesli arama (WebRTC) sinyalleşme olayları (sunucu → istemci).
+    /// <summary>Gelen arama teklifi (offer) olayı.</summary>
     public const string CallOffer = "CallOffer";
+    /// <summary>Arama yanıtlandı (answer) olayı.</summary>
     public const string CallAnswered = "CallAnswered";
+    /// <summary>WebRTC ICE adayı (candidate) olayı.</summary>
     public const string CallIce = "CallIce";
+    /// <summary>Arama sonlandı olayı.</summary>
     public const string CallEnded = "CallEnded";
 
     private readonly IChatPresenceTracker _presence;
 
+    /// <summary>Çevrimiçi durum izleyicisini enjekte eder.</summary>
     public ChatHub(IChatPresenceTracker presence)
     {
         _presence = presence;
     }
 
+    /// <summary>Bağlantı kurulduğunda kullanıcıyı çevrimiçi işaretler ve durumu yayınlar.</summary>
     public override async Task OnConnectedAsync()
     {
         var userId = CurrentUserId;
@@ -57,8 +70,8 @@ public sealed class ChatHub : Hub
         {
             var becameOnline = _presence.Add(id, Context.ConnectionId);
 
-            // Give the freshly connected client the full online roster so it can
-            // paint presence tags immediately.
+            // Yeni bağlanan istemciye tüm çevrimiçi listesini ver; böylece durum
+            // etiketlerini hemen çizebilir.
             await Clients.Caller.SendAsync(
                 PresenceSnapshot,
                 _presence.OnlineUsers.Select(u => u.ToString()).ToArray());
@@ -74,6 +87,7 @@ public sealed class ChatHub : Hub
         await base.OnConnectedAsync();
     }
 
+    /// <summary>Bağlantı koptuğunda kullanıcıyı (son bağlantıysa) çevrimdışı işaretler ve yayınlar.</summary>
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         var userId = CurrentUserId;
@@ -91,7 +105,7 @@ public sealed class ChatHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
-    /// <summary>Relays a typing indicator from the current user to a single peer.</summary>
+    /// <summary>Geçerli kullanıcıdan tek bir tarafa yazıyor göstergesini iletir.</summary>
     public Task Typing(string recipientId, bool isTyping)
     {
         var userId = CurrentUserId;
@@ -106,18 +120,19 @@ public sealed class ChatHub : Hub
     }
 
     /// <summary>
-    /// Lets a client (re)request the current online roster — used right after
-    /// (re)connecting so presence is always fresh without waiting for the next
-    /// connect/disconnect event.
+    /// Bir istemcinin geçerli çevrimiçi listesini yeniden istemesini sağlar — sonraki
+    /// bağlan/bağlantı kes olayını beklemeden durumun her zaman güncel olması için
+    /// (yeniden) bağlanmanın hemen ardından kullanılır.
     /// </summary>
     public Task RequestPresence()
         => Clients.Caller.SendAsync(
             PresenceSnapshot,
             _presence.OnlineUsers.Select(u => u.ToString()).ToArray());
 
-    // ----- Voice call (WebRTC) signaling. Each method relays the SDP/ICE to the
-    // target user, tagging the payload with the caller's identity. -------------
+    // ----- Sesli arama (WebRTC) sinyalleşmesi. Her metot, SDP/ICE bilgisini hedef
+    // kullanıcıya aktarır ve yükü, arayanın kimliğiyle etiketler. -------------
 
+    /// <summary>Hedef kullanıcıya bir arama teklifi (offer) gönderir.</summary>
     public Task CallUser(string targetUserId, string callerName, object offer)
     {
         var userId = CurrentUserId;
@@ -126,6 +141,7 @@ public sealed class ChatHub : Hub
             new { fromUserId = userId.Value.ToString(), callerName, offer });
     }
 
+    /// <summary>Hedef kullanıcıya bir arama yanıtı (answer) gönderir.</summary>
     public Task AnswerCall(string targetUserId, object answer)
     {
         var userId = CurrentUserId;
@@ -134,6 +150,7 @@ public sealed class ChatHub : Hub
             new { fromUserId = userId.Value.ToString(), answer });
     }
 
+    /// <summary>Hedef kullanıcıya bir WebRTC ICE adayı gönderir.</summary>
     public Task SendIce(string targetUserId, object candidate)
     {
         var userId = CurrentUserId;
@@ -142,6 +159,7 @@ public sealed class ChatHub : Hub
             new { fromUserId = userId.Value.ToString(), candidate });
     }
 
+    /// <summary>Hedef kullanıcıya aramanın sonlandığını iletir.</summary>
     public Task EndCall(string targetUserId)
     {
         var userId = CurrentUserId;
@@ -150,6 +168,7 @@ public sealed class ChatHub : Hub
             new { fromUserId = userId.Value.ToString() });
     }
 
+    /// <summary>Bağlam kullanıcı kimliğini Guid olarak çözer (ayrıştırılamazsa null).</summary>
     private Guid? CurrentUserId
         => Guid.TryParse(Context.UserIdentifier, out var id) ? id : null;
 }

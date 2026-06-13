@@ -1,12 +1,26 @@
+/*
+ * Users sayfası — kullanıcı yönetimi ekranı.
+ *
+ * Sorumluluk:
+ *   - DevExtreme dxDataGrid ile kullanıcıları listeler, oluşturur, düzenler ve siler
+ *     (CRUD); satır eylemleri kullanıcının yetkisine (User.Create/Update/Delete) göre koşullanır.
+ *   - Rol atamaları için bir arama (lookup) beslemesini önceden yükler.
+ *   - Grid içeriğini ExcelJS + FileSaver ile .xlsx olarak dışa aktarır.
+ *
+ * Genel API: window.AppPages.Users.init().
+ */
 (function (window, $) {
     "use strict";
 
+    // Yerelleştirme sözlüğü kısayolları (kullanıcılar / grid / bildirimler).
     var L = function () { return window.AppL10n.users; };
     var LG = function () { return window.AppL10n.grid; };
     var LN = function () { return window.AppL10n.notifications; };
 
+    // Grid örneği ve rol atamaları için arama verisi.
     var gridInstance, rolesLookup = [];
 
+    // Grid'i ExcelJS ile bir .xlsx çalışma kitabına aktarır ve indirilmesini sağlar.
     function exportGrid(e, fileName) {
         if (typeof ExcelJS === "undefined" || typeof saveAs === "undefined" ||
             !DevExpress.excelExporter || !DevExpress.excelExporter.exportDataGrid) { return; }
@@ -21,16 +35,19 @@
         e.cancel = true;
     }
 
+    // Sayfayı başlatır: rol aramasını yükler, ardından grid'i kurar.
     function init() {
         loadRolesLookup().then(function () { buildGrid(); });
     }
 
+    // Rol açılır listesi için arama verisini sunucudan çeker (hata olursa boş dizi).
     function loadRolesLookup() {
         return window.AppHttp.get("/users/roles-lookup").then(function (data) {
             rolesLookup = data || [];
         }).catch(function () { rolesLookup = []; });
     }
 
+    // Kullanıcı veri grid'ini, yetki tabanlı satır eylemleriyle oluşturur.
     function buildGrid() {
         var auth = window.AppAuth || { can: function () { return true; } };
         var canCreate = auth.can("User.Create");

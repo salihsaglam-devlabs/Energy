@@ -1,18 +1,36 @@
+/*
+ * AppShell — ana yerleşim (layout) kabuğu: kenar gezinme menüsü + kullanıcı menüsü.
+ *
+ * Sorumluluk:
+ *   - Sunucudan gelen düz (flat) menü öğelerinden DevExtreme dxTreeView gezinme
+ *     ağacını kurar; aktif sayfaya giden dalı otomatik açar ve seçer.
+ *   - Gezinme çekmecesinin (drawer) açık/kapalı durumunu yönetir ve localStorage'da
+ *     kalıcılaştırır; görünüm alanı (viewport) değişimlerine duyarlıdır
+ *     (masaüstünde varsayılan açık, mobilde kapalı).
+ *   - Araç çubuğundaki kullanıcı menüsünü (profil / çıkış) kurar; çıkış, CSRF jetonlu
+ *     gizli bir form ile POST edilir.
+ *
+ * Genel API (window.AppShell): init().
+ */
 (function (window, $) {
     "use strict";
 
+    // localStorage anahtarı ve masaüstü görünüm alanı eşiği.
     var NAV_STATE_KEY = "energy.nav.open";
     var DESKTOP_MEDIA_QUERY = "(min-width: 992px)";
 
+    // Bir data-* özniteliğindeki JSON dizisini güvenli şekilde ayrıştırır (hata olursa boş dizi).
     function readJson(attr) {
         try { return JSON.parse(attr || "[]"); }
         catch (e) { return []; }
     }
 
+    // Geçerli görünüm alanının masaüstü genişliğinde olup olmadığını döndürür.
     function isDesktop() {
         return window.matchMedia(DESKTOP_MEDIA_QUERY).matches;
     }
 
+    // URL'i karşılaştırma için normalize eder (sondaki "/" karakterini kaldırır).
     function normalizeUrl(url) {
         if (!url) { return ""; }
         return url.length > 1 && url.charAt(url.length - 1) === "/"
@@ -20,26 +38,29 @@
             : url;
     }
 
+    // Çekmecenin başlangıç durumunu çözer: kayıtlı tercih varsa onu, yoksa masaüstü/mobil varsayılanını kullanır.
     function readInitialNavState() {
         try {
             var saved = window.localStorage.getItem(NAV_STATE_KEY);
             if (saved === "open") { return true; }
             if (saved === "closed") { return false; }
         } catch (e) {
-            // Ignore storage access issues and fall back to viewport defaults.
+            // Depolama erişim sorunlarını yok say ve görünüm alanı varsayılanlarına geri dön.
         }
 
         return isDesktop();
     }
 
+    // Çekmece durumunu localStorage'a yazar (güvenli, hata fırlatmaz).
     function persistNavState(isOpen) {
         try {
             window.localStorage.setItem(NAV_STATE_KEY, isOpen ? "open" : "closed");
         } catch (e) {
-            // Ignore storage access issues.
+            // Depolama erişim sorunlarını yok say.
         }
     }
 
+    // Çekmece durumunu gövdeye CSS sınıfı olarak uygular ve kalıcılaştırır.
     function applyNavState(isOpen) {
         $(document.body)
             .toggleClass("energy-nav-open", isOpen)
@@ -48,6 +69,7 @@
         persistNavState(isOpen);
     }
 
+    // Geçerli URL'e en iyi eşleşen menü öğesini bulur (en uzun önek eşleşmesini tercih eder).
     function findActiveItem(items, activeUrl) {
         var normalizedActiveUrl = normalizeUrl(activeUrl);
         var matches = items.filter(function (item) {
@@ -63,6 +85,7 @@
         return matches.length > 0 ? matches[0] : null;
     }
 
+    // Aktif öğeden köke doğru ilerleyerek açık tutulması gereken üst düğüm kimliklerini toplar.
     function collectExpandedIds(items, activeItem) {
         if (!activeItem) {
             return {};
@@ -84,6 +107,8 @@
         return expandedIds;
     }
 
+    // Gezinme çekmecesini kurar: ağaç görünümünü oluşturur, aç/kapa düğmesini ve
+    // görünüm alanı değişikliklerini bağlar.
     function setupDrawer(items, activeUrl) {
         var isOpen = readInitialNavState();
         var $tree = $("#energy-navigation-tree");
@@ -177,6 +202,7 @@
         return treeInstance;
     }
 
+    // Araç çubuğundaki kullanıcı menüsünü kurar (profil bağlantısı + CSRF korumalı çıkış).
     function setupUserMenu() {
         var $btn = $("#energy-user-menu");
         if ($btn.length === 0) return;
@@ -216,6 +242,7 @@
     }
 
     window.AppShell = {
+        // Kabuğu başlatır: gezinme ağacını (varsa) ve kullanıcı menüsünü kurar.
         init: function () {
             var $nav = $("#energy-navigation");
             var items = readJson($nav.attr("data-items"));

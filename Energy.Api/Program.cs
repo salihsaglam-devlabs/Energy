@@ -18,25 +18,25 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 
-// Disable the legacy inbound claim mapping that rewrites "sub" → ClaimTypes.NameIdentifier,
-// "unique_name" → ClaimTypes.Name, etc. We rely on the raw JWT claim names (sub, sst, ...)
-// inside OnTokenValidated and CurrentUser, so the mapping must be turned off
-// BEFORE the JwtBearer handler is constructed.
+// "sub" → ClaimTypes.NameIdentifier, "unique_name" → ClaimTypes.Name vb. yeniden
+// yazan eski gelen claim eşlemesini devre dışı bırak. OnTokenValidated ve CurrentUser
+// içinde ham JWT claim adlarına (sub, sst, ...) güveniyoruz; bu nedenle eşleme,
+// JwtBearer işleyicisi oluşturulmadan ÖNCE kapatılmalıdır.
 System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // --------------------------------------------------------------------
-// Single appsettings.json with per-environment sections.
-// The active environment is taken from the top-level "Environment" key in
-// appsettings.json (set manually, e.g. "Development" / "Production"), NOT from
-// ASPNETCORE_ENVIRONMENT. We flatten the matching section onto the configuration
-// root so the rest of the app keeps reading "Jwt", "ConnectionStrings",
-// "Logging", ... as usual. Added last => highest precedence.
+// Ortam bazlı bölümler içeren tek bir appsettings.json.
+// Aktif ortam, appsettings.json içindeki üst düzey "Environment" anahtarından
+// alınır (elle ayarlanır, ör. "Development" / "Production"); ASPNETCORE_ENVIRONMENT'tan
+// DEĞİL. Eşleşen bölümü yapılandırma köküne düzleştiririz; böylece uygulamanın geri
+// kalanı "Jwt", "ConnectionStrings", "Logging", ... değerlerini her zamanki gibi okur.
+// En son eklenir => en yüksek öncelik.
 // --------------------------------------------------------------------
 var selectedEnvironment = builder.Configuration["Environment"] ?? builder.Environment.EnvironmentName;
-// Drive the host environment from the manual key too, so IsDevelopment()/
-// IsProduction() checks (PortGuard, etc.) follow the same selection.
+// Host ortamını da elle ayarlanan anahtardan yönet; böylece IsDevelopment()/
+// IsProduction() kontrolleri (PortGuard vb.) aynı seçimi izler.
 builder.Environment.EnvironmentName = selectedEnvironment;
 var environmentSection = builder.Configuration.GetSection(selectedEnvironment);
 if (environmentSection.Exists())
@@ -56,16 +56,16 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddEnergyLocalization();
 
 // --------------------------------------------------------------------
-// Reverse proxy / TLS termination (production: nginx -> Kestrel over HTTP)
-// The proxy forwards the original scheme & client IP via X-Forwarded-* headers.
-// Without this the API would see "http" + the proxy IP instead of the real
-// "https" + client IP, breaking IP-based audit logs and absolute URL building.
+// Ters proxy / TLS sonlandırma (üretim: nginx -> HTTP üzerinden Kestrel)
+// Proxy, orijinal şemayı ve istemci IP'sini X-Forwarded-* başlıklarıyla iletir.
+// Bu olmadan API, gerçek "https" + istemci IP yerine "http" + proxy IP görür ve
+// IP tabanlı denetim günlükleri ile mutlak URL oluşturma bozulur.
 // --------------------------------------------------------------------
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-    // Trust the local reverse proxy. Cleared because the proxy runs on the same
-    // host / private network and is not in the default loopback known-proxy list.
+    // Yerel ters proxy'ye güven. Proxy aynı host / özel ağda çalıştığı ve varsayılan
+    // loopback bilinen-proxy listesinde olmadığı için liste temizlenir.
     options.KnownIPNetworks.Clear();
     options.KnownProxies.Clear();
 });
@@ -88,7 +88,7 @@ builder.Services
     });
 
 // --------------------------------------------------------------------
-// JWT bearer with security-stamp validation
+// Güvenlik damgası doğrulamalı JWT bearer
 // --------------------------------------------------------------------
 var jwt = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>()
           ?? throw new InvalidOperationException("Jwt configuration is missing.");
@@ -219,21 +219,21 @@ var app = builder.Build();
 
 await app.RunSystemSeedingAsync();
 
-// Must run before any middleware that inspects the request scheme / remote IP
-// so they observe the original values forwarded by the reverse proxy.
+// İstek şemasını / uzak IP'yi inceleyen herhangi bir ara katmandan ÖNCE çalışmalıdır;
+// böylece ters proxy tarafından iletilen orijinal değerleri görürler.
 app.UseForwardedHeaders();
 
-// Swagger is intentionally enabled in ALL environments (including Production)
-// so the API can be explored at /swagger regardless of ASPNETCORE_ENVIRONMENT.
+// Swagger, ASPNETCORE_ENVIRONMENT'tan bağımsız olarak API'nin /swagger üzerinden
+// keşfedilebilmesi için bilinçli olarak TÜM ortamlarda (Üretim dahil) etkindir.
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseEnergyRequestLocalization();
-// NOTE: HTTPS redirection is intentionally NOT enabled here. This is an internal
-// API consumed by Energy.Web over HttpClient; a 307 to HTTPS would cause .NET's
-// HttpClient to follow the redirect and strip the Authorization header, which
-// then surfaces as a spurious 401 in AuthHeaderHandler. TLS termination should
-// be handled by the reverse proxy / ingress in production.
+// NOT: HTTPS yönlendirmesi burada bilinçli olarak etkinleştirilmemiştir. Bu, Energy.Web
+// tarafından HttpClient üzerinden tüketilen dahili bir API'dir; HTTPS'e 307 yönlendirmesi,
+// .NET HttpClient'ın yönlendirmeyi izleyip Authorization başlığını düşürmesine neden olur
+// ve bu da AuthHeaderHandler'da sahte bir 401 olarak görünür. TLS sonlandırması, üretimde
+// ters proxy / ingress tarafından yapılmalıdır.
 app.UseRequestLogging();
 app.UseRouting();
 app.UseAuthentication();
@@ -242,9 +242,9 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// In development, free the configured ports first: if a previous instance is
-// still holding the port, kill it so we can bind instead of crashing with
-// "address already in use".
+// Geliştirmede, yapılandırılan portları önce serbest bırak: önceki bir örnek portu
+// hâlâ tutuyorsa, "address already in use" hatasıyla çökmek yerine bağlanabilmemiz
+// için o süreci sonlandır.
 if (app.Environment.IsDevelopment())
 {
     Energy.Api.Common.Hosting.PortGuard.FreeConfiguredPorts(app.Configuration, app.Logger);

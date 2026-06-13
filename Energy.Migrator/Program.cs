@@ -4,39 +4,38 @@ using System.Text.Json;
 // ---------------------------------------------------------------------------
 // Energy.Migrator
 // ---------------------------------------------------------------------------
-// Interactive EF Core migration manager (companion to Energy.Publish).
+// Etkileşimli EF Core migration yöneticisi (Energy.Publish'in tamamlayıcısı).
 //
-// On launch it detects the ACTIVE database provider from
-// Energy.Api/appsettings.json ("Environment" + the matching "Database:Provider")
-// and routes every `dotnet ef` command to that provider's dedicated migrations
-// project:
+// Başlangıçta, Energy.Api/appsettings.json içinden AKTİF veritabanı sağlayıcısını
+// ("Environment" + eşleşen "Database:Provider") tespit eder ve her `dotnet ef`
+// komutunu o sağlayıcının kendine ait migrations projesine yönlendirir:
 //     PostgreSql  -> Energy.Migrations.PostgreSql
 //     SqlServer   -> Energy.Migrations.SqlServer
 //
-// Then it shows an interactive menu and keeps asking what you want to do:
-//   1) Add migration       (auto timestamp name: M<yyyyMMddHHmm>, optional suffix)
-//   2) Update database      (to latest, or to a migration you pick from the list)
-//   3) List migrations
-//   4) Remove last migration
-//   5) Generate SQL script
-//   6) Switch provider (override just for this session)
-//   0) Exit
+// Ardından etkileşimli bir menü gösterir ve ne yapmak istediğinizi sürekli sorar:
+//   1) Migration ekle      (otomatik tarih-saat adı: M<yyyyMMddHHmm>, opsiyonel ek)
+//   2) Veritabanını güncelle (en sona veya listeden seçtiğiniz bir migration'a)
+//   3) Migration'ları listele
+//   4) Son migration'ı kaldır
+//   5) SQL script üret
+//   6) Sağlayıcı değiştir (yalnızca bu oturum için geçersiz kıl)
+//   0) Çıkış
 //
-// Overrides (env vars):
-//   ENERGY_DB_PROVIDER=SqlServer    force a provider regardless of appsettings
-//   DOTNET=/path/to/dotnet          use a specific dotnet executable
+// Geçersiz kılmalar (ortam değişkenleri):
+//   ENERGY_DB_PROVIDER=SqlServer    appsettings'ten bağımsız bir sağlayıcıyı zorla
+//   DOTNET=/path/to/dotnet          belirli bir dotnet çalıştırılabilirini kullan
 // ---------------------------------------------------------------------------
 
 const string contextName = "Energy.Infrastructure.Persistence.AppDbContext";
 
-// Repository root: ../ relative to this project's build output folder
-// (Energy.Migrator/bin/Debug/net10.0 -> four levels up = repo root).
+// Depo kökü: bu projenin derleme çıktısı klasörüne göre ../ 
+// (Energy.Migrator/bin/Debug/net10.0 -> dört seviye yukarı = depo kökü).
 var repoRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
 var appSettingsPath = Path.Combine(repoRoot, "Energy.Api", "appsettings.json");
 var startupProject = Path.Combine(repoRoot, "Energy.Api", "Energy.Api.csproj");
 var dotnet = Environment.GetEnvironmentVariable("DOTNET") ?? "dotnet";
 
-// Resolve the active provider (env override wins over appsettings).
+// Aktif sağlayıcıyı çöz (ortam değişkeni appsettings'e göre önceliklidir).
 var provider = ResolveProvider(appSettingsPath);
 
 Console.WriteLine("==================================================");
@@ -111,9 +110,9 @@ while (true)
 
 async Task AddMigrationAsync(ProviderInfo p)
 {
-    // Systematic timestamp name: M<yyyyMMddHHmm>. Prefixed with a letter so the
-    // generated migration CLASS name is a valid C# identifier (can't start with
-    // a digit). Optionally append a human-readable suffix.
+    // Sistematik tarih-saat adı: M<yyyyMMddHHmm>. Üretilen migration SINIF adının
+    // geçerli bir C# tanımlayıcısı olması için bir harfle ön ek alır (rakamla
+    // başlayamaz). İsteğe bağlı olarak okunabilir bir son ek eklenir.
     var timestamp = DateTime.Now.ToString("yyyyMMddHHmm");
     var defaultName = $"M{timestamp}";
 
@@ -228,8 +227,8 @@ ProviderInfo SwitchProvider()
 // Helpers
 // ---------------------------------------------------------------------------
 
-// Runs `dotnet ef <args...>` against the provider's migrations project and the
-// shared startup project, streaming output live. Returns the process exit code.
+// `dotnet ef <args...>` komutunu sağlayıcının migrations projesine ve paylaşılan
+// başlangıç projesine karşı çalıştırır, çıktıyı canlı akıtır. Sürecin çıkış kodunu döndürür.
 async Task<int> RunEfAsync(ProviderInfo p, params string[] efArgs)
 {
     var projectPath = Path.Combine(repoRoot, p.MigrationsProject, $"{p.MigrationsProject}.csproj");
@@ -249,8 +248,8 @@ async Task<int> RunEfAsync(ProviderInfo p, params string[] efArgs)
     psi.ArgumentList.Add("--context");
     psi.ArgumentList.Add(contextName);
 
-    // Force the startup app onto the provider we picked, so the connection
-    // string and DbContext options match the migrations project.
+    // Başlangıç uygulamasını seçtiğimiz sağlayıcıya zorla; böylece bağlantı dizesi
+    // ve DbContext seçenekleri migrations projesiyle eşleşir.
     psi.Environment["ENERGY_DB_PROVIDER"] = p.ConfigValue;
 
     try
@@ -267,7 +266,7 @@ async Task<int> RunEfAsync(ProviderInfo p, params string[] efArgs)
     }
 }
 
-// Confirms the `dotnet ef` tool is installed (clear early error otherwise).
+// `dotnet ef` aracının kurulu olduğunu doğrular (aksi hâlde erken ve açık bir hata verir).
 async Task<bool> EnsureEfToolAsync(string dotnetExe)
 {
     try
@@ -299,7 +298,7 @@ bool Confirm()
     return answer is "e" or "evet" or "y" or "yes";
 }
 
-// Keeps only identifier-safe characters for the optional migration name suffix.
+// İsteğe bağlı migration adı son eki için yalnızca tanımlayıcı-güvenli karakterleri tutar.
 static string Sanitize(string input)
 {
     var chars = input.Select(c => char.IsLetterOrDigit(c) || c == '_' ? c : '_').ToArray();
@@ -310,8 +309,8 @@ static string Sanitize(string input)
 void PrintProvider(ProviderInfo p) =>
     Console.WriteLine($"Sağlayıcı     : {p.Label}  ->  {p.MigrationsProject}");
 
-// Reads the active provider from appsettings.json honoring the env override.
-// Mirrors ef.sh / DependencyInjection.IsSqlServerProvider semantics.
+// Aktif sağlayıcıyı appsettings.json'dan okur, ortam değişkeni geçersiz kılmasını dikkate alır.
+// ef.sh / DependencyInjection.IsSqlServerProvider semantiğini yansıtır.
 static ProviderInfo ResolveProvider(string appSettingsPath)
 {
     var forced = Environment.GetEnvironmentVariable("ENERGY_DB_PROVIDER");
@@ -346,7 +345,7 @@ static ProviderInfo ResolveProvider(string appSettingsPath)
     }
     catch
     {
-        // If appsettings can't be read, default to PostgreSQL (project default).
+        // appsettings okunamazsa varsayılan olarak PostgreSQL kullan (proje varsayılanı).
         return ProviderInfo.PostgreSql;
     }
 }
@@ -359,7 +358,7 @@ static bool IsSqlServer(string? provider)
 }
 
 // ---------------------------------------------------------------------------
-// Provider descriptor: maps a provider to its dedicated migrations project.
+// Sağlayıcı tanımlayıcısı: bir sağlayıcıyı kendine ait migrations projesine eşler.
 // ---------------------------------------------------------------------------
 internal sealed record ProviderInfo(string Label, string MigrationsProject, string ConfigValue)
 {

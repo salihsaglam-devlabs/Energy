@@ -1,13 +1,15 @@
 namespace Energy.Domain.Identity;
 
 /// <summary>
-/// A direct user→permission grant that is layered ON TOP of the permissions a
-/// user already inherits through their roles. Removing the row revokes the
-/// direct grant; permissions still owned through a role are unaffected.
+/// Doğrudan kullanıcı→yetki ataması. Kullanıcının rolleri üzerinden zaten
+/// devraldığı yetkilerin ÜZERİNE eklenir. Satır silindiğinde yalnızca bu
+/// doğrudan atama kaldırılır; rol üzerinden gelen yetkiler etkilenmez.
 /// </summary>
 public class UserPermission
 {
+    /// <summary>Yetkinin doğrudan atandığı kullanıcının kimliği.</summary>
     public Guid UserId { get; set; }
+
+    /// <summary>Kullanıcıya doğrudan atanan yetki kodu.</summary>
     public string PermissionCode { get; set; } = string.Empty;
 }
-

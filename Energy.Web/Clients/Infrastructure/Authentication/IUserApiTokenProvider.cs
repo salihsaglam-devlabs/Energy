@@ -1,18 +1,19 @@
 namespace Energy.Web.Clients.Infrastructure.Authentication;
 
 /// <summary>
-/// Returns the bearer access token of the currently signed-in user (read from
-/// the cookie auth ticket). Returns <c>null</c> for anonymous requests.
+/// O an oturum açmış kullanıcının bearer erişim jetonunu döndürür (çerez kimlik doğrulama
+/// biletinden okunur). Anonim istekler için <c>null</c> döndürür.
 /// </summary>
 public interface IUserApiTokenProvider
 {
+    /// <summary>O an oturum açmış kullanıcının erişim jetonunu döndürür (anonimse null).</summary>
     Task<string?> GetAccessTokenAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Sets an explicit access token that overrides the cookie-based lookup
-    /// for the lifetime of the returned scope. Useful during sign-in, when
-    /// the auth cookie has not been written yet but downstream API calls
-    /// (e.g. role/permission lookups) still need a bearer token.
+    /// Döndürülen kapsamın (scope) ömrü boyunca çerez tabanlı aramayı geçersiz kılan
+    /// açık bir erişim jetonu ayarlar. Kimlik doğrulama çerezi henüz yazılmamışken ancak
+    /// alt API çağrılarının (örn. rol/yetki aramaları) yine de bir bearer jetona ihtiyaç
+    /// duyduğu giriş sırasında kullanışlıdır.
     /// </summary>
     IDisposable UseAccessToken(string accessToken);
 }

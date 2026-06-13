@@ -11,9 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace Energy.Web.Controllers;
 
 /// <summary>
-/// Menus DevExtreme grid + JSON adapter. The new API allows a single
-/// <c>RequiredPermissionCode</c> per menu, so the "menu permissions" popup
-/// exposes a degenerate multi-select that only persists the first code.
+/// Menüler DevExtreme ızgarası + JSON adaptörü. Yeni API menü başına tek bir
+/// <c>RequiredPermissionCode</c> izin verir; bu yüzden "menü yetkileri" açılır penceresi,
+/// yalnızca ilk kodu saklayan dejenere bir çoklu seçim sunar.
 /// </summary>
 [Authorize]
 [PagePermission(PermissionCatalog.MenuReadAll)]

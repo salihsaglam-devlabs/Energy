@@ -5,15 +5,17 @@ using Microsoft.Extensions.Options;
 
 namespace Energy.Localization;
 
+/// <summary>Yerelleştirme altyapısını DI ve istek hattına bağlayan uzantı (extension) metotları.</summary>
 public static class LocalizationServiceExtensions
 {
+    /// <summary>Yerelleştirme servislerini ve istek kültürü (request culture) seçeneklerini kaydeder.</summary>
     public static IServiceCollection AddEnergyLocalization(this IServiceCollection services)
     {
-        // SharedResource type lives in the Energy.Localization namespace while
-        // the .resx files live in the Resources/ subfolder. ResourcesPath tells
-        // the IStringLocalizer infrastructure to look at
-        // "Energy.Localization.Resources.SharedResource.{culture}" — which is
-        // exactly the embedded resource manifest name produced by the .csproj.
+        // SharedResource tipi Energy.Localization ad alanında, .resx dosyaları ise
+        // Resources/ alt klasöründe yer alır. ResourcesPath, IStringLocalizer
+        // altyapısına "Energy.Localization.Resources.SharedResource.{culture}"
+        // konumuna bakmasını söyler — bu da .csproj tarafından üretilen gömülü
+        // kaynak manifest adının tam karşılığıdır.
         services.AddLocalization(options => options.ResourcesPath = "Resources");
 
         services.Configure<RequestLocalizationOptions>(options =>
@@ -33,6 +35,7 @@ public static class LocalizationServiceExtensions
         return services;
     }
 
+    /// <summary>MVC için görünüm (view) ve veri açıklaması (data annotations) yerelleştirmesini ekler.</summary>
     public static IMvcBuilder AddEnergyMvcLocalization(this IMvcBuilder builder)
     {
         return builder
@@ -40,6 +43,7 @@ public static class LocalizationServiceExtensions
             .AddEnergyDataAnnotationsLocalization();
     }
 
+    /// <summary>Veri açıklaması (data annotations) hatalarını SharedResource üzerinden yerelleştirir.</summary>
     public static IMvcBuilder AddEnergyDataAnnotationsLocalization(this IMvcBuilder builder)
     {
         return builder.AddDataAnnotationsLocalization(options =>
@@ -48,6 +52,7 @@ public static class LocalizationServiceExtensions
         });
     }
 
+    /// <summary>İstek kültürü ara katmanını (middleware) yapılandırılmış seçeneklerle hatta ekler.</summary>
     public static IApplicationBuilder UseEnergyRequestLocalization(this IApplicationBuilder app)
     {
         var options = app.ApplicationServices

@@ -63,5 +63,14 @@ public sealed class ChatApiClient : ApiClientBase, IChatApiClient
 
     public Task<BaseResponse<IReadOnlyList<ChatMessageResponse>>> GetGroupConversationAsync(Guid groupId, CancellationToken ct = default)
         => GetAsync<BaseResponse<IReadOnlyList<ChatMessageResponse>>>(ApiRoutes.Chat.GroupConversation(groupId), ct);
+
+    public Task<BaseResponse<bool>> DeleteGroupAsync(Guid groupId, CancellationToken ct = default)
+        => DeleteAsync<BaseResponse<bool>>(ApiRoutes.Chat.GroupDelete(groupId), ct);
+
+    public Task<BaseResponse<bool>> RemoveMemberAsync(Guid groupId, Guid userId, CancellationToken ct = default)
+        => DeleteAsync<BaseResponse<bool>>(ApiRoutes.Chat.GroupRemoveMember(groupId, userId), ct);
+
+    public Task<BaseResponse<bool>> SetGroupAdminAsync(Guid groupId, Guid userId, SetGroupAdminRequest request, CancellationToken ct = default)
+        => PostAsync<SetGroupAdminRequest, BaseResponse<bool>>(ApiRoutes.Chat.GroupSetAdmin(groupId, userId), request, ct);
 }
 

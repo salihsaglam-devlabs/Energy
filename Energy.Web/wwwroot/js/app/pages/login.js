@@ -1,6 +1,17 @@
+/*
+ * Login sayfası — oturum açma ekranı.
+ *
+ * Sorumluluk:
+ *   - DevExtreme dxForm ile kullanıcı adı/parola giriş formunu kurar (doğrulama dahil).
+ *   - Geliştirme ortamında hızlı giriş hazır ayarlarını (demo hesaplar) sunabilir.
+ *   - Enter tuşuyla gönderimi destekler.
+ *
+ * Genel API: window.AppPages.Login.init(options).
+ */
 (function (window, $) {
     "use strict";
 
+    // Giriş formunu oluşturur ve gönderim davranışını bağlar.
     function init(options) {
         options = options || {};
         var l = window.AppL10n.auth;
@@ -92,7 +103,7 @@
                 .finally(function () { window.AppLoading && window.AppLoading.end(); });
         }
 
-        // Enter to submit
+        // Göndermek için Enter
         $("#energy-login-form-host").on("keydown", function (e) {
             if (e.key === "Enter") {
                 e.preventDefault();

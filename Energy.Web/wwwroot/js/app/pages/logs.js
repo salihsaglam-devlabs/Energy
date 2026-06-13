@@ -1,10 +1,24 @@
+/*
+ * Logs sayfası — denetim günlüğü (audit log) görüntüleme ekranı.
+ *
+ * Sorumluluk:
+ *   - DevExtreme dxDataGrid ile API'ye vekillenen denetim kayıtlarını sunucu tarafı
+ *     sayfalama/filtreleme/sıralama ile salt okunur olarak listeler.
+ *   - Kayıt ayrıntılarını (istek/yanıt gövdeleri, istisna, ilişkilendirme kimliği) gösterir.
+ *   - Grid içeriğini ExcelJS + FileSaver ile .xlsx olarak dışa aktarır.
+ *
+ * Genel API: window.AppPages.Logs.init().
+ */
 (function (window, $) {
     "use strict";
+    // Yerelleştirme sözlüğü kısayolları (günlükler / grid).
     var LL = function () { return window.AppL10n.logs; };
     var LG = function () { return window.AppL10n.grid; };
 
+    // Grid örneği.
     var gridInstance;
 
+    // Grid'i ExcelJS ile bir .xlsx çalışma kitabına aktarır ve indirilmesini sağlar.
     function exportGrid(e, fileName) {
         if (typeof ExcelJS === "undefined" || typeof saveAs === "undefined" ||
             !DevExpress.excelExporter || !DevExpress.excelExporter.exportDataGrid) { return; }

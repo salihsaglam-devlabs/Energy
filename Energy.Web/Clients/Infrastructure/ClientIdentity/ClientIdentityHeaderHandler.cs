@@ -3,9 +3,9 @@ using System.Globalization;
 namespace Energy.Web.Clients.Infrastructure.ClientIdentity;
 
 /// <summary>
-/// Adds <c>X-Client-Id</c>, <c>X-Client-Machine-Name</c> and forwards the
-/// browser's <c>User-Agent</c> to every outbound API request, so the API can
-/// audit calls per browser session and per Web server instance.
+/// Her giden API isteğine <c>X-Client-Id</c>, <c>X-Client-Machine-Name</c> başlıklarını
+/// ekler ve tarayıcının <c>User-Agent</c> bilgisini iletir; böylece API, çağrıları
+/// tarayıcı oturumu ve Web sunucusu örneği başına denetleyebilir.
 /// </summary>
 public sealed class ClientIdentityHeaderHandler : DelegatingHandler
 {
@@ -17,6 +17,7 @@ public sealed class ClientIdentityHeaderHandler : DelegatingHandler
     private readonly BrowserClientIdService _clientIdService;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
+    /// <summary>İstemci kimliği servisi ve HTTP bağlam erişimcisi ile işleyiciyi başlatır.</summary>
     public ClientIdentityHeaderHandler(
         BrowserClientIdService clientIdService,
         IHttpContextAccessor httpContextAccessor)

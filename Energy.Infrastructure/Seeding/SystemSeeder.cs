@@ -16,18 +16,43 @@ using Microsoft.Extensions.Logging;
 namespace Energy.Infrastructure.Seeding;
 
 /// <summary>
-/// Idempotent startup seeder. Brings the database to a fully usable state:
-/// permission catalog, SuperAdmin + admin user, baseline menu tree, API
-/// endpoint catalog with default permission mapping, localization import,
-/// and a curated catalog of sample roles + demo users covering the common
-/// usage patterns the new architecture supports. Every step is safe to re-run.
+/// Idempotent başlangıç tohumlayıcısı. Veritabanını tamamen kullanılabilir bir
+/// duruma getirir: yetki kataloğu, SuperAdmin + admin kullanıcısı, temel menü ağacı,
+/// varsayılan yetki eşlemesiyle API uç noktası kataloğu, yerelleştirme içe aktarımı
+/// ve yeni mimarinin desteklediği yaygın kullanım kalıplarını kapsayan, özenle
+/// hazırlanmış örnek roller + demo kullanıcılar kataloğu. Her adım yeniden
+/// çalıştırılmaya güvenlidir.
+///
+/// <para>
+/// <see cref="SeedAllAsync"/>'i yukarıdan aşağıya okuyun: sistemin ilişki sırasını
+/// izler; böylece bir geliştirici, verilerin birbirine bağımlı olduğu sırayla, ilgili
+/// aşamaya ekleme yaparak onu genişletebilir:
+/// </para>
+/// <list type="number">
+///   <item>Şema tamamlamaları (önceden var olan veritabanları için geçiş içermeyen DDL).</item>
+///   <item>Yetki kataloğu senkronizasyonu — merkezi, tip güvenli
+///         <see cref="PermissionCatalog"/>'u okur ve veritabanında henüz olmayan her
+///         kodu ekler (mevcut satırlar yenilenir, asla silinmez); böylece uygulamada
+///         herhangi bir yerde kullanılan hiçbir yetki eksik kalmaz.</item>
+///   <item>Roller (SuperAdmin + <see cref="SampleRoles"/> şablonları).</item>
+///   <item>Rol → yetki eşlemeleri (şablon başına + varsayılan taban).</item>
+///   <item>Menüler + API uç noktası kataloğu (her biri bir katalog yetkisiyle korunur).</item>
+///   <item>Varsayılan kullanıcılar (admin, servis hesabı, şablon başına demo kullanıcılar).</item>
+///   <item>Yerelleştirme içe aktarımı.</item>
+/// </list>
+/// <para>
+/// Yeni bir yetenek eklemek için: yetkilerini <see cref="PermissionCatalog"/> içinde
+/// tanımlayın, isteğe bağlı olarak <see cref="SampleRoles"/> içindeki bir rol şablonuna
+/// ve bir menü/uç noktaya eşleyin — tohumlamanın geri kalanı bir sonraki başlangıçta
+/// otomatik çalışır.
+/// </para>
 /// </summary>
-public sealed class SystemSeeder : ISystemSeeder
+public sealed partial class SystemSeeder : ISystemSeeder
 {
     /// <summary>
-    /// Reference catalog of user archetypes. Each entry maps a role to the
-    /// exact set of permission codes it owns and the demo user that wears it.
-    /// Admins can copy these as templates from the Roles screen.
+    /// Kullanıcı arketiplerinin referans kataloğu. Her girdi bir rolü, sahip olduğu
+    /// tam yetki kodu kümesine ve bu rolü taşıyan demo kullanıcıya eşler. Yöneticiler
+    /// bunları Roller ekranından şablon olarak kopyalayabilir.
     /// </summary>
     private sealed record SampleRole(
         string RoleName,
@@ -35,6 +60,7 @@ public sealed class SystemSeeder : ISystemSeeder
         IReadOnlyList<string> PermissionCodes,
         SampleUser? DemoUser);
 
+    /// <summary>Bir demo kullanıcısının tohumlama bilgilerini taşıyan kayıt.</summary>
     private sealed record SampleUser(
         string UserName,
         string Email,
@@ -43,23 +69,23 @@ public sealed class SystemSeeder : ISystemSeeder
         string Password);
 
     /// <summary>
-    /// Built-in role templates. SuperAdmin is handled separately because it
-    /// bypasses permission checks; it does not appear here.
+    /// Yerleşik rol şablonları. SuperAdmin ayrı ele alınır; çünkü yetki kontrollerini
+    /// atlar ve burada görünmez.
     /// </summary>
     private static readonly IReadOnlyList<SampleRole> SampleRoles =
     [
-        // ---------------- IT / Platform administration ----------------
-        // Permission-based full administrator: owns EVERY catalog permission.
-        // Distinct from SuperAdmin (which bypasses checks and is system-locked);
-        // SystemAdmin is fully manageable from the Roles screen yet covers every
-        // module — so the catalog has no orphaned permission left unassigned.
+        // ---------------- BT / Platform yönetimi ----------------
+        // Yetki tabanlı tam yönetici: katalogdaki HER yetkiye sahiptir.
+        // SuperAdmin'den farklıdır (o, kontrolleri atlar ve sisteme kilitlidir);
+        // SystemAdmin, Roller ekranından tamamen yönetilebilir olmasına rağmen her
+        // modülü kapsar — böylece katalogda atanmamış başıboş yetki kalmaz.
         new(
             RoleName: "SystemAdmin",
             RoleDescription: LocalizationKeys.RoleSeed.SystemAdminDescription,
             PermissionCodes: [.. PermissionCatalog.All.Select(p => p.Code)],
             DemoUser: new SampleUser("system.admin", "system.admin@energy.local", "Selin", "Aydın", "SysAdmin123!")),
 
-        // ---------------- Operational management (no security ops) ----------------
+        // ---------------- Operasyonel yönetim (güvenlik işlemleri yok) ----------------
         new(
             RoleName: "OperationsManager",
             RoleDescription: LocalizationKeys.RoleSeed.OperationsManagerDescription,
@@ -75,7 +101,7 @@ public sealed class SystemSeeder : ISystemSeeder
             ],
             DemoUser: new SampleUser("ops.manager", "ops.manager@energy.local", "Mert", "Yıldız", "OpsMgr123!")),
 
-        // ---------------- Security / compliance ----------------
+        // ---------------- Güvenlik / uyumluluk ----------------
         new(
             RoleName: "SecurityAuditor",
             RoleDescription: LocalizationKeys.RoleSeed.SecurityAuditorDescription,
@@ -91,7 +117,7 @@ public sealed class SystemSeeder : ISystemSeeder
             ],
             DemoUser: new SampleUser("security.auditor", "security.auditor@energy.local", "Deniz", "Kaya", "Auditor123!")),
 
-        // ---------------- Translation / content ----------------
+        // ---------------- Çeviri / içerik ----------------
         new(
             RoleName: "LocalizationEditor",
             RoleDescription: LocalizationKeys.RoleSeed.LocalizationEditorDescription,
@@ -103,7 +129,7 @@ public sealed class SystemSeeder : ISystemSeeder
             ],
             DemoUser: new SampleUser("localization.editor", "localization.editor@energy.local", "Elif", "Demir", "Editor123!")),
 
-        // ---------------- Reporting / view-only ----------------
+        // ---------------- Raporlama / yalnızca görüntüleme ----------------
         new(
             RoleName: "ReadOnlyViewer",
             RoleDescription: LocalizationKeys.RoleSeed.ReadOnlyViewerDescription,
@@ -160,71 +186,53 @@ public sealed class SystemSeeder : ISystemSeeder
         _logger = logger;
     }
 
+    /// <summary>Tüm tohumlama adımlarını yukarıdan aşağıya doğru sırayla çalıştırır.</summary>
     public async Task SeedAllAsync(CancellationToken ct = default)
     {
-        if (_db.Database.IsSqlServer())
-        {
-            // SQL Server deployments have no migration history; build the full
-            // schema from the current model in one shot. No-op if it already exists.
-            _logger.LogInformation("Seeding: ensuring SQL Server schema (EnsureCreated)");
-            await _db.Database.EnsureCreatedAsync(ct);
-        }
-        else
-        {
-            // PostgreSQL: migration-free top-ups that add columns/tables introduced
-            // after the initial schema to pre-existing databases. Each is idempotent.
-            _logger.LogInformation("Seeding: audit log schema (request/response columns)");
-            await EnsureAuditSchemaAsync(ct);
+        // 1) ŞEMA — veritabanını (yeni veya mevcut) güncel modele taşır. Tüm
+        //    idempotent, geçiş içermeyen DDL, SystemSeeder.Schema.cs partial dosyasında
+        //    yer alır; böylece bu metot okunabilir, yukarıdan aşağıya bir VERİ anlatısı
+        //    olarak kalır.
+        await EnsureSchemaAsync(ct);
 
-            _logger.LogInformation("Seeding: direct user-permission table");
-            await EnsureUserPermissionSchemaAsync(ct);
-
-            _logger.LogInformation("Seeding: profile-image columns");
-            await EnsureProfileImageSchemaAsync(ct);
-
-            _logger.LogInformation("Seeding: chat message table");
-            await EnsureChatSchemaAsync(ct);
-        }
-
-        // Chat groups (works on both providers; new tables are not added by
-        // EnsureCreated on an already-existing SQL Server database).
-        _logger.LogInformation("Seeding: chat group tables + message GroupId column");
-        await EnsureChatGroupSchemaAsync(ct);
-
-        // Chat extras: reply column + reactions table (WhatsApp-like features).
-        _logger.LogInformation("Seeding: chat reply column + reactions table");
-        await EnsureChatExtrasSchemaAsync(ct);
-
+        // 2) YETKİLER — merkezi, tip güvenli PermissionCatalog'u veritabanına yansıtır.
+        //    Yalnızca veritabanında eksik olan kodlar eklenir (mevcut satırlar
+        //    yenilenir, asla silinmez); böylece uygulamanın herhangi bir yerinde
+        //    kullanılan her yetki her zaman mevcut ve yönetilebilir olur.
         _logger.LogInformation("Seeding: permission catalog");
         var permissionsAdded = await _permissions.SyncCatalogAsync(ct);
         _logger.LogInformation("Seeding: {Added} permission(s) added to catalog", permissionsAdded);
 
+        // 3) ROLLER + kullanıcıları — SuperAdmin (sistem) ve servis hesabı.
         _logger.LogInformation("Seeding: SuperAdmin role + admin user");
         await EnsureSuperAdminAsync(ct);
 
         _logger.LogInformation("Seeding: non-interactive system service account");
         await EnsureSystemServiceAccountAsync(ct);
 
+        // 4) MENÜLER + API UÇ NOKTALARI — her biri bir katalog yetki koduyla korunur.
         _logger.LogInformation("Seeding: baseline menu tree");
         await EnsureBaselineMenusAsync(ct);
 
         _logger.LogInformation("Seeding: API endpoint discovery + default permission mapping");
         await _endpointSync.SyncAsync(ct);
 
+        // 5) ROL → YETKİ eşlemeleri + örnek rol/kullanıcı şablonları.
         _logger.LogInformation("Seeding: sample role templates + demo users");
         await EnsureSampleRolesAndUsersAsync(ct);
 
         _logger.LogInformation("Seeding: default permission grants for every role");
         await EnsureDefaultPermissionsForAllRolesAsync(ct);
 
+        // 6) YERELLEŞTİRME — resx (geliştirme) + gömülü kaynaklar (üretim) veritabanına.
         _logger.LogInformation("Seeding: localization resources (resx → DB)");
         var localizationResult = await _localization.ImportFromResxAsync(ct);
         _logger.LogInformation(
             "Localization (resx): {Added} added, {Updated} updated, {Total} total entries.",
             localizationResult.Added, localizationResult.Updated, localizationResult.Total);
 
-        // Embedded-resource seed runs unconditionally so the database is populated
-        // even in production where the source .resx files are not on disk.
+        // Gömülü kaynak tohumlaması koşulsuz çalışır; böylece kaynak .resx dosyaları
+        // diskte bulunmasa bile (üretimde olduğu gibi) veritabanı doldurulur.
         _logger.LogInformation("Seeding: localization resources (embedded → DB)");
         var embeddedResult = await _localization.SeedFromResourcesAsync(ct);
         _logger.LogInformation(
@@ -232,276 +240,7 @@ public sealed class SystemSeeder : ISystemSeeder
             embeddedResult.Added, embeddedResult.Updated, embeddedResult.Total);
     }
 
-    /// <summary>
-    /// Idempotently adds the request/response audit columns. The project has no
-    /// migration history, so this guarantees existing databases gain the new
-    /// columns before any audit insert runs. Safe and no-op on fresh databases.
-    /// </summary>
-    private async Task EnsureAuditSchemaAsync(CancellationToken ct)
-    {
-        const string sql = """
-            ALTER TABLE "AuditLogs" ADD COLUMN IF NOT EXISTS "QueryString" character varying(2000);
-            ALTER TABLE "AuditLogs" ADD COLUMN IF NOT EXISTS "Source" character varying(10);
-            ALTER TABLE "AuditLogs" ADD COLUMN IF NOT EXISTS "RequestBody" text;
-            ALTER TABLE "AuditLogs" ADD COLUMN IF NOT EXISTS "ResponseBody" text;
-            """;
-        try
-        {
-            await _db.Database.ExecuteSqlRawAsync(sql, ct);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Could not ensure AuditLogs request/response columns; they may already exist or the table is not yet created.");
-        }
-    }
-
-    /// <summary>
-    /// Idempotently creates the <c>UserPermissions</c> table that backs direct,
-    /// per-user permission grants (managed from the User Access screen). Mirrors
-    /// the migration-free approach used for the audit columns.
-    /// </summary>
-    private async Task EnsureUserPermissionSchemaAsync(CancellationToken ct)
-    {
-        const string sql = """
-            CREATE TABLE IF NOT EXISTS "UserPermissions" (
-                "UserId" uuid NOT NULL,
-                "PermissionCode" character varying(150) NOT NULL,
-                CONSTRAINT "PK_UserPermissions" PRIMARY KEY ("UserId", "PermissionCode"),
-                CONSTRAINT "FK_UserPermissions_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE,
-                CONSTRAINT "FK_UserPermissions_Permissions_PermissionCode" FOREIGN KEY ("PermissionCode") REFERENCES "Permissions" ("Code") ON DELETE RESTRICT
-            );
-            CREATE INDEX IF NOT EXISTS "IX_UserPermissions_PermissionCode" ON "UserPermissions" ("PermissionCode");
-            """;
-        try
-        {
-            await _db.Database.ExecuteSqlRawAsync(sql, ct);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Could not ensure the UserPermissions table; it may already exist or a referenced table is not yet created.");
-        }
-    }
-
-    /// <summary>
-    /// Idempotently adds the binary profile-image columns to <c>Users</c>.
-    /// Safe and no-op when they already exist (migration-free convention).
-    /// </summary>
-    private async Task EnsureProfileImageSchemaAsync(CancellationToken ct)
-    {
-        const string sql = """
-            ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "ProfileImage" bytea;
-            ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "ProfileImageContentType" character varying(100);
-            """;
-        try
-        {
-            await _db.Database.ExecuteSqlRawAsync(sql, ct);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Could not ensure the Users profile-image columns; they may already exist.");
-        }
-    }
-
-    /// <summary>
-    /// Idempotently creates the <c>ChatMessages</c> table backing the direct
-    /// messaging feature. Mirrors the migration-free DDL approach.
-    /// </summary>
-    private async Task EnsureChatSchemaAsync(CancellationToken ct)
-    {
-        const string sql = """
-            CREATE TABLE IF NOT EXISTS "ChatMessages" (
-                "Id" uuid NOT NULL,
-                "SenderId" uuid NOT NULL,
-                "RecipientId" uuid NOT NULL,
-                "Text" character varying(4000) NOT NULL,
-                "IsRead" boolean NOT NULL DEFAULT FALSE,
-                "ReadAt" timestamp with time zone,
-                "CreatedAt" timestamp with time zone NOT NULL,
-                "CreatedBy" uuid,
-                "UpdatedAt" timestamp with time zone,
-                "UpdatedBy" uuid,
-                "IsDeleted" boolean NOT NULL DEFAULT FALSE,
-                "DeletedAt" timestamp with time zone,
-                "DeletedBy" uuid,
-                CONSTRAINT "PK_ChatMessages" PRIMARY KEY ("Id"),
-                CONSTRAINT "FK_ChatMessages_Users_SenderId" FOREIGN KEY ("SenderId") REFERENCES "Users" ("Id") ON DELETE CASCADE,
-                CONSTRAINT "FK_ChatMessages_Users_RecipientId" FOREIGN KEY ("RecipientId") REFERENCES "Users" ("Id") ON DELETE CASCADE
-            );
-            CREATE INDEX IF NOT EXISTS "IX_ChatMessages_SenderId_RecipientId" ON "ChatMessages" ("SenderId", "RecipientId");
-            CREATE INDEX IF NOT EXISTS "IX_ChatMessages_RecipientId_IsRead" ON "ChatMessages" ("RecipientId", "IsRead");
-            """;
-        try
-        {
-            await _db.Database.ExecuteSqlRawAsync(sql, ct);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Could not ensure the ChatMessages table; it may already exist or a referenced table is not yet created.");
-        }
-    }
-
-    /// <summary>
-    /// Idempotently creates the <c>ChatGroups</c> / <c>ChatGroupMembers</c> tables
-    /// and the <c>ChatMessages.GroupId</c> column, and relaxes
-    /// <c>ChatMessages.RecipientId</c> to NULL (group messages have no single
-    /// recipient). Provider-specific but idempotent on PostgreSQL and SQL Server.
-    /// </summary>
-    private async Task EnsureChatGroupSchemaAsync(CancellationToken ct)
-    {
-        var sql = _db.Database.IsSqlServer()
-            ? """
-              IF OBJECT_ID(N'[ChatGroups]', N'U') IS NULL
-              CREATE TABLE [ChatGroups] (
-                  [Id] uniqueidentifier NOT NULL,
-                  [Name] nvarchar(150) NOT NULL,
-                  [OwnerId] uniqueidentifier NOT NULL,
-                  [CreatedAt] datetime2 NOT NULL,
-                  [CreatedBy] uniqueidentifier NULL,
-                  [UpdatedAt] datetime2 NULL,
-                  [UpdatedBy] uniqueidentifier NULL,
-                  [IsDeleted] bit NOT NULL CONSTRAINT [DF_ChatGroups_IsDeleted] DEFAULT(0),
-                  [DeletedAt] datetime2 NULL,
-                  [DeletedBy] uniqueidentifier NULL,
-                  CONSTRAINT [PK_ChatGroups] PRIMARY KEY ([Id])
-              );
-              IF OBJECT_ID(N'[ChatGroupMembers]', N'U') IS NULL
-              CREATE TABLE [ChatGroupMembers] (
-                  [Id] uniqueidentifier NOT NULL,
-                  [GroupId] uniqueidentifier NOT NULL,
-                  [UserId] uniqueidentifier NOT NULL,
-                  [Status] int NOT NULL,
-                  [IsOwner] bit NOT NULL CONSTRAINT [DF_ChatGroupMembers_IsOwner] DEFAULT(0),
-                  [InvitedById] uniqueidentifier NULL,
-                  [CreatedAt] datetime2 NOT NULL,
-                  [CreatedBy] uniqueidentifier NULL,
-                  [UpdatedAt] datetime2 NULL,
-                  [UpdatedBy] uniqueidentifier NULL,
-                  [IsDeleted] bit NOT NULL CONSTRAINT [DF_ChatGroupMembers_IsDeleted] DEFAULT(0),
-                  [DeletedAt] datetime2 NULL,
-                  [DeletedBy] uniqueidentifier NULL,
-                  CONSTRAINT [PK_ChatGroupMembers] PRIMARY KEY ([Id]),
-                  CONSTRAINT [FK_ChatGroupMembers_ChatGroups_GroupId] FOREIGN KEY ([GroupId]) REFERENCES [ChatGroups]([Id]) ON DELETE CASCADE
-              );
-              IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChatGroupMembers_GroupId_UserId')
-              CREATE UNIQUE INDEX [IX_ChatGroupMembers_GroupId_UserId] ON [ChatGroupMembers]([GroupId],[UserId]);
-              IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChatGroupMembers_UserId_Status')
-              CREATE INDEX [IX_ChatGroupMembers_UserId_Status] ON [ChatGroupMembers]([UserId],[Status]);
-              IF COL_LENGTH('ChatMessages','GroupId') IS NULL ALTER TABLE [ChatMessages] ADD [GroupId] uniqueidentifier NULL;
-              IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChatMessages_GroupId')
-              CREATE INDEX [IX_ChatMessages_GroupId] ON [ChatMessages]([GroupId]);
-              IF EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('ChatMessages') AND name = 'RecipientId' AND is_nullable = 0)
-              BEGIN
-                  IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChatMessages_SenderId_RecipientId') DROP INDEX [IX_ChatMessages_SenderId_RecipientId] ON [ChatMessages];
-                  IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChatMessages_RecipientId_IsRead') DROP INDEX [IX_ChatMessages_RecipientId_IsRead] ON [ChatMessages];
-                  ALTER TABLE [ChatMessages] ALTER COLUMN [RecipientId] uniqueidentifier NULL;
-                  CREATE INDEX [IX_ChatMessages_SenderId_RecipientId] ON [ChatMessages]([SenderId],[RecipientId]);
-                  CREATE INDEX [IX_ChatMessages_RecipientId_IsRead] ON [ChatMessages]([RecipientId],[IsRead]);
-              END
-              """
-            : """
-              CREATE TABLE IF NOT EXISTS "ChatGroups" (
-                  "Id" uuid NOT NULL,
-                  "Name" character varying(150) NOT NULL,
-                  "OwnerId" uuid NOT NULL,
-                  "CreatedAt" timestamp with time zone NOT NULL,
-                  "CreatedBy" uuid,
-                  "UpdatedAt" timestamp with time zone,
-                  "UpdatedBy" uuid,
-                  "IsDeleted" boolean NOT NULL DEFAULT FALSE,
-                  "DeletedAt" timestamp with time zone,
-                  "DeletedBy" uuid,
-                  CONSTRAINT "PK_ChatGroups" PRIMARY KEY ("Id")
-              );
-              CREATE TABLE IF NOT EXISTS "ChatGroupMembers" (
-                  "Id" uuid NOT NULL,
-                  "GroupId" uuid NOT NULL,
-                  "UserId" uuid NOT NULL,
-                  "Status" integer NOT NULL,
-                  "IsOwner" boolean NOT NULL DEFAULT FALSE,
-                  "InvitedById" uuid,
-                  "CreatedAt" timestamp with time zone NOT NULL,
-                  "CreatedBy" uuid,
-                  "UpdatedAt" timestamp with time zone,
-                  "UpdatedBy" uuid,
-                  "IsDeleted" boolean NOT NULL DEFAULT FALSE,
-                  "DeletedAt" timestamp with time zone,
-                  "DeletedBy" uuid,
-                  CONSTRAINT "PK_ChatGroupMembers" PRIMARY KEY ("Id"),
-                  CONSTRAINT "FK_ChatGroupMembers_ChatGroups_GroupId" FOREIGN KEY ("GroupId") REFERENCES "ChatGroups" ("Id") ON DELETE CASCADE
-              );
-              CREATE UNIQUE INDEX IF NOT EXISTS "IX_ChatGroupMembers_GroupId_UserId" ON "ChatGroupMembers" ("GroupId","UserId");
-              CREATE INDEX IF NOT EXISTS "IX_ChatGroupMembers_UserId_Status" ON "ChatGroupMembers" ("UserId","Status");
-              ALTER TABLE "ChatMessages" ADD COLUMN IF NOT EXISTS "GroupId" uuid;
-              CREATE INDEX IF NOT EXISTS "IX_ChatMessages_GroupId" ON "ChatMessages" ("GroupId");
-              ALTER TABLE "ChatMessages" ALTER COLUMN "RecipientId" DROP NOT NULL;
-              """;
-        try
-        {
-            await _db.Database.ExecuteSqlRawAsync(sql, ct);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Could not ensure the chat group schema; parts may already exist.");
-        }
-    }
-
-    /// <summary>
-    /// Idempotently adds <c>ChatMessages.ReplyToMessageId</c> and creates the
-    /// <c>ChatMessageReactions</c> table (emoji reactions). Idempotent on both providers.
-    /// </summary>
-    private async Task EnsureChatExtrasSchemaAsync(CancellationToken ct)
-    {
-        var sql = _db.Database.IsSqlServer()
-            ? """
-              IF COL_LENGTH('ChatMessages','ReplyToMessageId') IS NULL ALTER TABLE [ChatMessages] ADD [ReplyToMessageId] uniqueidentifier NULL;
-              IF OBJECT_ID(N'[ChatMessageReactions]', N'U') IS NULL
-              CREATE TABLE [ChatMessageReactions] (
-                  [Id] uniqueidentifier NOT NULL,
-                  [MessageId] uniqueidentifier NOT NULL,
-                  [UserId] uniqueidentifier NOT NULL,
-                  [Emoji] nvarchar(16) NOT NULL,
-                  [CreatedAt] datetime2 NOT NULL,
-                  [CreatedBy] uniqueidentifier NULL,
-                  [UpdatedAt] datetime2 NULL,
-                  [UpdatedBy] uniqueidentifier NULL,
-                  [IsDeleted] bit NOT NULL CONSTRAINT [DF_ChatMessageReactions_IsDeleted] DEFAULT(0),
-                  [DeletedAt] datetime2 NULL,
-                  [DeletedBy] uniqueidentifier NULL,
-                  CONSTRAINT [PK_ChatMessageReactions] PRIMARY KEY ([Id]),
-                  CONSTRAINT [FK_ChatMessageReactions_ChatMessages_MessageId] FOREIGN KEY ([MessageId]) REFERENCES [ChatMessages]([Id]) ON DELETE CASCADE
-              );
-              IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_ChatMessageReactions_MessageId_UserId')
-              CREATE UNIQUE INDEX [IX_ChatMessageReactions_MessageId_UserId] ON [ChatMessageReactions]([MessageId],[UserId]);
-              """
-            : """
-              ALTER TABLE "ChatMessages" ADD COLUMN IF NOT EXISTS "ReplyToMessageId" uuid;
-              CREATE TABLE IF NOT EXISTS "ChatMessageReactions" (
-                  "Id" uuid NOT NULL,
-                  "MessageId" uuid NOT NULL,
-                  "UserId" uuid NOT NULL,
-                  "Emoji" character varying(16) NOT NULL,
-                  "CreatedAt" timestamp with time zone NOT NULL,
-                  "CreatedBy" uuid,
-                  "UpdatedAt" timestamp with time zone,
-                  "UpdatedBy" uuid,
-                  "IsDeleted" boolean NOT NULL DEFAULT FALSE,
-                  "DeletedAt" timestamp with time zone,
-                  "DeletedBy" uuid,
-                  CONSTRAINT "PK_ChatMessageReactions" PRIMARY KEY ("Id"),
-                  CONSTRAINT "FK_ChatMessageReactions_ChatMessages_MessageId" FOREIGN KEY ("MessageId") REFERENCES "ChatMessages" ("Id") ON DELETE CASCADE
-              );
-              CREATE UNIQUE INDEX IF NOT EXISTS "IX_ChatMessageReactions_MessageId_UserId" ON "ChatMessageReactions" ("MessageId","UserId");
-              """;
-        try
-        {
-            await _db.Database.ExecuteSqlRawAsync(sql, ct);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Could not ensure the chat extras schema; parts may already exist.");
-        }
-    }
-
+    /// <summary>SuperAdmin rolünün ve varsayılan yönetici kullanıcısının var olmasını sağlar.</summary>
     private async Task EnsureSuperAdminAsync(CancellationToken ct)
     {
         var role = await _db.Roles.FirstOrDefaultAsync(r => r.Name == SystemRoles.SuperAdmin, ct);
@@ -545,19 +284,20 @@ public sealed class SystemSeeder : ISystemSeeder
     }
 
     /// <summary>
-    /// Ensures a non-interactive system/service account exists and is assigned the
-    /// SuperAdmin role (so it bypasses every permission check). Internal/system
-    /// processes (e.g. the Web tier auditing anonymous requests) authenticate as
-    /// this account to reach API endpoints independently of any signed-in user.
-    /// The password is taken from configuration ("ServiceAccount:Password") and
-    /// always re-asserted so the API and Web tiers stay in sync after a rotation.
+    /// Etkileşimsiz bir sistem/servis hesabının var olmasını ve SuperAdmin rolünün
+    /// atanmasını (böylece her yetki kontrolünü atlamasını) sağlar. Dahili/sistem
+    /// süreçleri (ör. anonim istekleri denetleyen Web katmanı), oturum açmış herhangi
+    /// bir kullanıcıdan bağımsız olarak API uç noktalarına ulaşmak için bu hesapla
+    /// kimlik doğrular. Parola yapılandırmadan ("ServiceAccount:Password") alınır ve
+    /// her zaman yeniden uygulanır; böylece bir rotasyondan sonra API ve Web katmanları
+    /// senkronize kalır.
     /// </summary>
     private async Task EnsureSystemServiceAccountAsync(CancellationToken ct)
     {
         var role = await _db.Roles.FirstOrDefaultAsync(r => r.Name == SystemRoles.SuperAdmin, ct);
         if (role is null)
         {
-            // EnsureSuperAdminAsync runs first, so this should never happen.
+            // EnsureSuperAdminAsync önce çalışır, bu yüzden bu durum asla oluşmamalıdır.
             _logger.LogWarning("Service account seeding skipped: SuperAdmin role is missing.");
             return;
         }
@@ -585,8 +325,8 @@ public sealed class SystemSeeder : ISystemSeeder
         }
         else
         {
-            // Re-assert the configured password / active state so the Web tier can
-            // always log in even after the secret is rotated or the account locked.
+            // Yapılandırılmış parolayı / etkin durumu yeniden uygula; böylece gizli
+            // anahtar değiştirilse veya hesap kilitlense bile Web katmanı her zaman giriş yapabilir.
             var changed = false;
             if (!_passwords.Verify(password, user.PasswordHash))
             {
@@ -612,22 +352,24 @@ public sealed class SystemSeeder : ISystemSeeder
         }
     }
 
+    /// <summary>Temel menü ağacını idempotent şekilde oluşturur/günceller.</summary>
     private async Task EnsureBaselineMenusAsync(CancellationToken ct)
     {
-        // Idempotent per-node upsert keyed by NameKey. Newly introduced screens
-        // (e.g. Profile) are added on a later run without wiping admin edits or
-        // re-ordering an existing tree.
+        // NameKey anahtarıyla düğüm bazlı idempotent upsert. Yeni eklenen ekranlar
+        // (ör. Profil), yönetici düzenlemelerini silmeden veya mevcut ağacı yeniden
+        // sıralamadan sonraki bir çalıştırmada eklenir.
         var system = await EnsureMenuAsync(LocalizationKeys.Menus.System, null, null, "preferences", 10, null, ct);
 
-        // Per-user pages every authenticated user reaches (permissions are part
-        // of the DefaultGrants set so the menu is always visible).
+        // Kimliği doğrulanmış her kullanıcının eriştiği kullanıcı bazlı sayfalar
+        // (yetkiler DefaultGrants kümesinin parçasıdır; böylece menü her zaman görünür).
         await EnsureMenuAsync(LocalizationKeys.Menus.Dashboard, null, "/dashboard", "home", 1, PermissionCatalog.DashboardRead, ct);
         await EnsureMenuAsync(LocalizationKeys.Menus.Profile, null, "/profile", "user", 2, PermissionCatalog.ProfileRead, ct);
         await EnsureMenuAsync(LocalizationKeys.Menus.Chat, null, "/chat", "message", 3, PermissionCatalog.ChatUse, ct);
+        await EnsureMenuAsync(LocalizationKeys.Menus.Settings, null, "/settings", "preferences", 4, PermissionCatalog.UserSettingsRead, ct);
 
-        // System administration submenu — mirrors the reference project's
-        // hierarchy (one entry per admin screen), each gated by the same
-        // permission code the page/endpoint require.
+        // Sistem yönetimi alt menüsü — referans projenin hiyerarşisini yansıtır
+        // (her yönetici ekranı için bir girdi); her biri ilgili sayfanın/uç noktanın
+        // gerektirdiği aynı yetki koduyla korunur.
         await EnsureMenuAsync(LocalizationKeys.Menus.Users, system.Id, "/users", "group", 11, PermissionCatalog.UserReadAll, ct);
         await EnsureMenuAsync(LocalizationKeys.Menus.UserAccess, system.Id, "/user-access", "card", 12, PermissionCatalog.UserUpdate, ct);
         await EnsureMenuAsync(LocalizationKeys.Menus.Roles, system.Id, "/roles", "accountbox", 13, PermissionCatalog.RoleReadAll, ct);
@@ -638,15 +380,16 @@ public sealed class SystemSeeder : ISystemSeeder
         await EnsureMenuAsync(LocalizationKeys.Menus.Logs, system.Id, "/logs", "clock", 18, PermissionCatalog.LogReadAll, ct);
     }
 
+    /// <summary>Verilen anahtara göre bir menü düğümünü idempotent şekilde oluşturur/günceller.</summary>
     private async Task<Menu> EnsureMenuAsync(
         string nameKey, Guid? parentId, string? url, string? icon, int order, string? requiredPermission, CancellationToken ct)
     {
         var menu = await _db.Menus.FirstOrDefaultAsync(m => m.NameKey == nameKey, ct);
         if (menu is not null)
         {
-            // Converge the baseline structure (hierarchy, link, icon, order and
-            // permission) to the current definition so existing databases adopt
-            // the up-to-date menu tree without losing the node's identity/key.
+            // Temel yapıyı (hiyerarşi, bağlantı, ikon, sıra ve yetki) güncel tanıma
+            // yakınsa; böylece mevcut veritabanları, düğümün kimliğini/anahtarını
+            // kaybetmeden güncel menü ağacını benimser.
             var changed =
                 menu.ParentId != parentId ||
                 menu.Url != url ||
@@ -686,10 +429,10 @@ public sealed class SystemSeeder : ISystemSeeder
     }
 
     /// <summary>
-    /// Grants the <see cref="PermissionCatalog.DefaultGrants"/> floor (dashboard
-    /// + self-service profile) to every role except SuperAdmin (which bypasses
-    /// permission checks). Guarantees that any user holding any role can always
-    /// reach the dashboard and their own profile without explicit assignment.
+    /// <see cref="PermissionCatalog.DefaultGrants"/> tabanını (gösterge panosu +
+    /// self servis profil), SuperAdmin dışındaki her role verir (SuperAdmin yetki
+    /// kontrollerini atlar). Herhangi bir role sahip her kullanıcının, açık atama
+    /// olmadan gösterge panosuna ve kendi profiline her zaman ulaşabilmesini garanti eder.
     /// </summary>
     private async Task EnsureDefaultPermissionsForAllRolesAsync(CancellationToken ct)
     {
@@ -748,7 +491,8 @@ public sealed class SystemSeeder : ISystemSeeder
                 rolesAdded += 1;
             }
 
-            // Sync the permission set additively — never remove permissions an admin may have added.
+            // Yetki kümesini ekleyerek senkronize et — bir yöneticinin eklemiş
+            // olabileceği yetkileri asla kaldırma.
             var existing = await _db.RolePermissions
                 .Where(rp => rp.RoleId == role.Id)
                 .Select(rp => rp.PermissionCode)
@@ -763,7 +507,7 @@ public sealed class SystemSeeder : ISystemSeeder
             }
             if (permissionLinks > 0) await _db.SaveChangesAsync(ct);
 
-            // Provision the demo user once and bind it to the role.
+            // Demo kullanıcıyı bir kez sağla ve role bağla.
             if (sample.DemoUser is { } demo)
             {
                 var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == demo.Email, ct);

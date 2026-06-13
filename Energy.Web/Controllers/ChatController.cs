@@ -13,10 +13,10 @@ using Microsoft.Extensions.Localization;
 namespace Energy.Web.Controllers;
 
 /// <summary>
-/// Chat page is a DevExtreme dxChat shell. Data is proxied to the API (which
-/// persists every message), and real-time delivery is layered on top via the
-/// SignalR <see cref="ChatHub"/>: after a message is stored it is pushed to the
-/// recipient (and the sender's other tabs) so the bell/badge updates live.
+/// Sohbet sayfası bir DevExtreme dxChat kabuğudur. Veri API'ye vekillenir (her mesajı
+/// kalıcı hale getiren) ve gerçek zamanlı teslimat üstüne SignalR <see cref="ChatHub"/>
+/// ile eklenir: bir mesaj saklandıktan sonra alıcıya (ve gönderenin diğer sekmelerine)
+/// gönderilir; böylece zil/rozet canlı güncellenir.
 /// </summary>
 [Authorize]
 [PagePermission(PermissionCatalog.ChatUse)]
@@ -40,9 +40,9 @@ public sealed class ChatController : Controller
     {
         ViewData["Title"] = _localizer.GetText(LocalizationKeys.ChatScreen.Title);
 
-        // Whether the signed-in user has a profile image, so their own messages
-        // also render with an avatar in the chat window. Uses the chat-scoped
-        // avatar endpoint so no profile/user-management permission is needed.
+        // Oturum açmış kullanıcının profil resmi olup olmadığı; böylece kendi mesajları
+        // da sohbet penceresinde bir avatarla görüntülenir. Profil/kullanıcı yönetimi
+        // yetkisi gerekmemesi için sohbet kapsamlı avatar uç noktasını kullanır.
         var userId = User.GetUserId();
         var hasImage = false;
         if (userId is { } id)
@@ -69,12 +69,13 @@ public sealed class ChatController : Controller
         return Json(envelope.Data ?? Array.Empty<Shared.Models.V1.Chat.Responses.ChatMessageResponse>());
     }
 
-    /// <summary>Streams a user's profile image so the chat can render it as an avatar.</summary>
+    /// <summary>Sohbetin avatar olarak gösterebilmesi için bir kullanıcının profil resmini akıtır.</summary>
     [HttpGet("avatar/{userId:guid}")]
     public async Task<IActionResult> Avatar(Guid userId, CancellationToken ct)
     {
-        // Served via the chat-scoped API endpoint (ChatUse) so peers' avatars
-        // load even for users without the user-management/profile permissions.
+        // Sohbet kapsamlı API uç noktası (ChatUse) üzerinden sunulur; böylece
+        // kullanıcı yönetimi/profil yetkisi olmayan kullanıcılar için bile karşı
+        // tarafların avatarları yüklenir.
         var (content, contentType, status) = await _chat.GetUserAvatarAsync(userId, ct);
         if (status != 200 || content.Length == 0)
         {
@@ -83,7 +84,7 @@ public sealed class ChatController : Controller
         return File(content, string.IsNullOrWhiteSpace(contentType) ? "image/png" : contentType);
     }
 
-    /// <summary>Streams the file shared inside a chat message (participants only; enforced by the API).</summary>
+    /// <summary>Bir sohbet mesajı içinde paylaşılan dosyayı akıtır (yalnızca katılımcılar; API tarafından uygulanır).</summary>
     [HttpGet("messages/{messageId:guid}/attachment")]
     public async Task<IActionResult> Attachment(Guid messageId, CancellationToken ct)
     {
@@ -124,7 +125,7 @@ public sealed class ChatController : Controller
         {
             if (message.GroupId is { } groupId)
             {
-                // Fan-out to every accepted group member (including the sender's tabs).
+                // Kabul edilmiş her grup üyesine dağıt (gönderenin sekmeleri dahil).
                 var memberEnvelope = await _chat.GetGroupMemberIdsAsync(groupId, ct);
                 var memberIds = (memberEnvelope.Data ?? Array.Empty<Guid>())
                     .Select(id => id.ToString())
@@ -136,8 +137,8 @@ public sealed class ChatController : Controller
             }
             else if (message.RecipientId is { } recipientId)
             {
-                // Deliver to the recipient (live append + bell) and echo to the
-                // sender's other open tabs so every surface stays in sync.
+                // Alıcıya ilet (canlı ekleme + zil) ve her yüzeyin senkronize kalması
+                // için gönderenin diğer açık sekmelerine de yansıt.
                 await _hub.Clients.User(recipientId.ToString()).SendAsync(ChatHub.ReceiveMessage, message, ct);
                 await _hub.Clients.User(message.SenderId.ToString()).SendAsync(ChatHub.ReceiveMessage, message, ct);
             }
@@ -152,8 +153,8 @@ public sealed class ChatController : Controller
     {
         var envelope = await _chat.MarkReadAsync(peerId, ct);
 
-        // Read receipt: tell the peer (the original sender) that we read their
-        // messages so their ticks turn to "read".
+        // Okundu bilgisi: karşı tarafa (asıl gönderene) mesajlarını okuduğumuzu
+        // bildir; böylece tik işaretleri "okundu"ya döner.
         var me = User.GetUserId();
         if (envelope.IsSuccess && me is { } readerId)
         {
@@ -222,7 +223,7 @@ public sealed class ChatController : Controller
         return Json(envelope);
     }
 
-    // Delivers a (just-created) message to its recipient/group + sender tabs.
+    // (Yeni oluşturulan) bir mesajı alıcısına/grubuna + gönderenin sekmelerine iletir.
     private async Task DeliverMessageAsync(Shared.Models.V1.Chat.Responses.ChatMessageResponse message, CancellationToken ct)
     {
         if (message.GroupId is { } groupId)
@@ -241,7 +242,7 @@ public sealed class ChatController : Controller
         }
     }
 
-    // Sends an arbitrary event/payload to every participant of a message.
+    // Bir mesajın her katılımcısına rastgele bir olay/yük gönderir.
     private async Task BroadcastToParticipantsAsync(
         Shared.Models.V1.Chat.Responses.ChatMessageResponse message, string eventName, object payload, CancellationToken ct)
     {
@@ -296,6 +297,63 @@ public sealed class ChatController : Controller
     {
         var envelope = await _chat.GetGroupConversationAsync(groupId, ct);
         return Json(envelope.Data ?? Array.Empty<Shared.Models.V1.Chat.Responses.ChatMessageResponse>());
+    }
+
+    [HttpDelete("groups/{groupId:guid}")]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> DeleteGroup(Guid groupId, CancellationToken ct)
+    {
+        // Silmeden ÖNCE üye listesini yakala; böylece yine herkese bildirim gönderebiliriz.
+        var memberEnvelope = await _chat.GetGroupMemberIdsAsync(groupId, ct);
+        var memberIds = (memberEnvelope.Data ?? Array.Empty<Guid>()).Select(id => id.ToString()).ToArray();
+
+        var envelope = await _chat.DeleteGroupAsync(groupId, ct);
+        if (envelope.IsSuccess && envelope.Data && memberIds.Length > 0)
+        {
+            await _hub.Clients.Users(memberIds).SendAsync(ChatHub.GroupDeleted, new { groupId = groupId.ToString() }, ct);
+        }
+        return Json(envelope);
+    }
+
+    [HttpDelete("groups/{groupId:guid}/members/{userId:guid}")]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> RemoveMember(Guid groupId, Guid userId, CancellationToken ct)
+    {
+        // Çıkarmadan önce üye listesinin (çıkmak üzere olan kullanıcı dahil) anlık görüntüsünü al.
+        var beforeEnvelope = await _chat.GetGroupMemberIdsAsync(groupId, ct);
+        var beforeIds = (beforeEnvelope.Data ?? Array.Empty<Guid>()).Select(id => id.ToString()).ToHashSet();
+        beforeIds.Add(userId.ToString());
+
+        var envelope = await _chat.RemoveMemberAsync(groupId, userId, ct);
+        if (envelope.IsSuccess && envelope.Data && beforeIds.Count > 0)
+        {
+            await _hub.Clients.Users(beforeIds.ToArray()).SendAsync(ChatHub.GroupChanged, new { groupId = groupId.ToString() }, ct);
+        }
+        return Json(envelope);
+    }
+
+    public sealed class SetAdminInput
+    {
+        public bool IsAdmin { get; set; }
+    }
+
+    [HttpPost("groups/{groupId:guid}/members/{userId:guid}/admin")]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> SetGroupAdmin(Guid groupId, Guid userId, [FromBody] SetAdminInput input, CancellationToken ct)
+    {
+        var envelope = await _chat.SetGroupAdminAsync(groupId, userId,
+            new Shared.Models.V1.Chat.Requests.SetGroupAdminRequest { IsAdmin = input.IsAdmin }, ct);
+
+        if (envelope.IsSuccess && envelope.Data)
+        {
+            var memberEnvelope = await _chat.GetGroupMemberIdsAsync(groupId, ct);
+            var memberIds = (memberEnvelope.Data ?? Array.Empty<Guid>()).Select(id => id.ToString()).ToArray();
+            if (memberIds.Length > 0)
+            {
+                await _hub.Clients.Users(memberIds).SendAsync(ChatHub.GroupChanged, new { groupId = groupId.ToString() }, ct);
+            }
+        }
+        return Json(envelope);
     }
 
     public sealed class CreateGroupInput
@@ -360,7 +418,7 @@ public sealed class ChatController : Controller
 
         if (envelope.IsSuccess && envelope.Data)
         {
-            // Tell existing members the roster changed (refresh members/groups).
+            // Mevcut üyelere listenin değiştiğini bildir (üyeleri/grupları yenile).
             var memberEnvelope = await _chat.GetGroupMemberIdsAsync(groupId, ct);
             var memberIds = (memberEnvelope.Data ?? Array.Empty<Guid>()).Select(id => id.ToString()).ToArray();
             if (memberIds.Length > 0)
@@ -372,7 +430,7 @@ public sealed class ChatController : Controller
         return Json(envelope);
     }
 
-    // Pushes a "you've been invited" event to each invitee's open tabs.
+    // Her davet edilen kişinin açık sekmelerine bir "davet edildiniz" olayı gönderir.
     private async Task NotifyInviteesAsync(IEnumerable<Guid> userIds, Guid groupId, string groupName, CancellationToken ct)
     {
         var ids = userIds.Select(id => id.ToString()).ToArray();

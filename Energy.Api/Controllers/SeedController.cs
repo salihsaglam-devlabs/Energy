@@ -7,10 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace Energy.Api.Controllers;
 
 /// <summary>
-/// Central place for all on-demand data seeding operations. Every action is
-/// idempotent and safe to re-run. The full seed brings the database to a usable
-/// baseline (schema, permissions, roles, users, menus, endpoints, localization);
-/// the granular actions re-seed a single concern.
+/// İsteğe bağlı tüm veri tohumlama işlemleri için merkezi yer. Her eylem idempotenttir
+/// ve güvenle yeniden çalıştırılabilir. Tam tohumlama, veritabanını kullanılabilir bir
+/// temele getirir (şema, yetkiler, roller, kullanıcılar, menüler, uç noktalar,
+/// yerelleştirme); ayrıntılı eylemler ise tek bir konuyu yeniden tohumlar.
 /// </summary>
 [ApiController]
 [ApiVersion("1.0")]
@@ -27,8 +27,8 @@ public sealed class SeedController : ControllerBase
     }
 
     /// <summary>
-    /// Runs every seeding step (schema top-ups, permission catalog, roles, demo
-    /// users, baseline menus, API endpoint catalog and localization). Idempotent.
+    /// Tüm tohumlama adımlarını çalıştırır (şema tamamlamaları, yetki kataloğu, roller,
+    /// demo kullanıcılar, temel menüler, API uç nokta kataloğu ve yerelleştirme). İdempotenttir.
     /// </summary>
     [HttpPost]
     public async Task<ActionResult<BaseResponse<bool>>> SeedAll(CancellationToken ct)
@@ -38,17 +38,17 @@ public sealed class SeedController : ControllerBase
     }
 
     /// <summary>
-    /// Seeds the database with every localization entry from the application's
-    /// embedded resources. Existing (key, culture) rows are overwritten; missing
-    /// rows are inserted. Works in production without source .resx files on disk.
+    /// Veritabanını, uygulamanın gömülü kaynaklarındaki her yerelleştirme girdisiyle
+    /// tohumlar. Mevcut (anahtar, kültür) satırları üzerine yazılır; eksik satırlar
+    /// eklenir. Diskte kaynak .resx dosyaları olmadan üretimde de çalışır.
     /// </summary>
     [HttpPost("localization")]
     public async Task<ActionResult<BaseResponse<SeedResultResponse>>> SeedLocalization(CancellationToken ct)
         => Ok(BaseResponse<SeedResultResponse>.Success(await _localization.SeedFromResourcesAsync(ct)));
 
     /// <summary>
-    /// Imports localization entries from the on-disk .resx files (development
-    /// convenience; no-op when <c>Localization:ResxDirectory</c> is not set).
+    /// Yerelleştirme girdilerini diskteki .resx dosyalarından içe aktarır (geliştirme
+    /// kolaylığı; <c>Localization:ResxDirectory</c> ayarlı değilse hiçbir şey yapmaz).
     /// </summary>
     [HttpPost("localization/resx")]
     public async Task<ActionResult<BaseResponse<SeedResultResponse>>> SeedLocalizationFromResx(CancellationToken ct)

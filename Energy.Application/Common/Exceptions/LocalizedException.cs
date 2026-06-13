@@ -1,12 +1,13 @@
 namespace Energy.Application.Common.Exceptions;
 
 /// <summary>
-/// Base class for application exceptions whose user-facing message is a
-/// localization KEY (resolved at the API boundary), never a hard-coded string.
-/// Optional <see cref="Arguments"/> feed the resource's <c>{0}</c> placeholders.
+/// Kullanıcıya gösterilen mesajı sabit metin yerine bir yerelleştirme ANAHTARI
+/// olan uygulama istisnalarının temel sınıfı (anahtar, API sınırında çözümlenir).
+/// Opsiyonel <see cref="Arguments"/>, kaynaktaki <c>{0}</c> yer tutucularını besler.
 /// </summary>
 public abstract class LocalizedException : Exception
 {
+    /// <summary>Verilen yerelleştirme anahtarı ve opsiyonel argümanlarla istisnayı oluşturur.</summary>
     protected LocalizedException(string messageKey, object[]? arguments = null)
         : base(messageKey)
     {
@@ -14,10 +15,9 @@ public abstract class LocalizedException : Exception
         Arguments = arguments ?? Array.Empty<object>();
     }
 
-    /// <summary>Localization key resolved against the shared resource.</summary>
+    /// <summary>Paylaşılan kaynağa (shared resource) karşı çözümlenecek yerelleştirme anahtarı.</summary>
     public string MessageKey { get; }
 
-    /// <summary>Arguments for the resource's composite-format placeholders.</summary>
+    /// <summary>Kaynağın bileşik biçim (composite-format) yer tutucuları için argümanlar.</summary>
     public object[] Arguments { get; }
 }
-

@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energy.Infrastructure.Persistence.Configurations;
 
+/// <summary>Sohbet mesajları için EF Core eşleme yapılandırması.</summary>
 public sealed class ChatMessageConfiguration : IEntityTypeConfiguration<ChatMessage>
 {
+    /// <summary>Tablo, anahtar, sütun kısıtları, ilişkiler ve dizinleri yapılandırır.</summary>
     public void Configure(EntityTypeBuilder<ChatMessage> builder)
     {
         builder.ToTable("ChatMessages");
@@ -21,7 +23,7 @@ public sealed class ChatMessageConfiguration : IEntityTypeConfiguration<ChatMess
         // Restrict kullanılıyor çünkü SenderId ve RecipientId aynı Users tablosuna işaret ediyor.
         // Her ikisi de Cascade olursa SQL Server "çoklu cascade yolu" hatası verir (Error 1785).
         builder.HasOne<User>().WithMany().HasForeignKey(m => m.SenderId).OnDelete(DeleteBehavior.Restrict);
-        // RecipientId is null for group messages, so the FK is optional.
+        // RecipientId grup mesajlarında null'dur, bu nedenle yabancı anahtar isteğe bağlıdır.
         builder.HasOne<User>().WithMany().HasForeignKey(m => m.RecipientId).OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(m => new { m.SenderId, m.RecipientId });

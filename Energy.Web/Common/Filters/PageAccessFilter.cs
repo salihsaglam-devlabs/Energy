@@ -6,19 +6,20 @@ using Microsoft.AspNetCore.Mvc.Filters;
 namespace Energy.Web.Common.Filters;
 
 /// <summary>
-/// Enforces page-level access for HTML screens. A controller/action decorated
-/// with <see cref="PagePermissionAttribute"/> is only reachable when the signed
-/// in user holds the matching permission claim. Authentication itself is handled
-/// by the cookie fallback policy; this filter only adds the permission gate so
-/// an unauthorized user is redirected to the access-denied page instead of
-/// seeing an empty screen whose data calls later fail with 403. API-side
-/// authorization remains the source of truth for every actual data operation.
+/// HTML ekranları için sayfa düzeyinde erişimi uygular. <see cref="PagePermissionAttribute"/>
+/// ile işaretlenmiş bir controller/eylem, yalnızca oturum açmış kullanıcı eşleşen yetki
+/// talebine (claim) sahipse erişilebilir. Kimlik doğrulamanın kendisi çerez yedek
+/// politikasıyla yönetilir; bu filtre yalnızca yetki kapısını ekler; böylece yetkisiz
+/// bir kullanıcı, veri çağrıları sonradan 403 ile başarısız olan boş bir ekran görmek
+/// yerine erişim reddedildi sayfasına yönlendirilir. Her gerçek veri işlemi için API
+/// tarafı yetkilendirme doğruluk kaynağı olmaya devam eder.
 /// </summary>
 public sealed class PageAccessFilter : IAsyncAuthorizationFilter
 {
+    /// <summary>Sayfa yetki kapısını uygular; yetkisizleri erişim reddedildi sayfasına yönlendirir.</summary>
     public Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
-        // Anonymous pages (login, access-denied, ...) are never gated.
+        // Anonim sayfalar (giriş, erişim reddedildi, ...) asla kapı altına alınmaz.
         if (context.ActionDescriptor.EndpointMetadata.OfType<IAllowAnonymous>().Any())
         {
             return Task.CompletedTask;
@@ -35,9 +36,9 @@ public sealed class PageAccessFilter : IAsyncAuthorizationFilter
 
         var user = context.HttpContext.User;
 
-        // Unauthenticated requests are left for the cookie challenge to handle
-        // (redirect to /account/login); we only add the permission gate once a
-        // user is actually present.
+        // Kimliği doğrulanmamış istekler çerez sınamasına (challenge) bırakılır
+        // (/account/login'e yönlendirme); biz yalnızca gerçekten bir kullanıcı
+        // mevcut olduğunda yetki kapısını ekleriz.
         if (user.Identity?.IsAuthenticated != true)
         {
             return Task.CompletedTask;
@@ -45,16 +46,16 @@ public sealed class PageAccessFilter : IAsyncAuthorizationFilter
 
         if (!user.HasPermission(attribute.Permission))
         {
-            // Carry the real requested path + permission code into the
-            // access-denied screen so it can show actionable "request access"
-            // details instead of placeholder defaults.
+            // Gerçek istenen yolu + yetki kodunu erişim reddedildi ekranına taşı;
+            // böylece yer tutucu varsayılanlar yerine eyleme dönük "erişim talep et"
+            // ayrıntılarını gösterebilir.
             var request = context.HttpContext.Request;
             var deniedUrl = "/account/access-denied"
                 + "?path=" + Uri.EscapeDataString(request.Path + request.QueryString)
                 + "&permission=" + Uri.EscapeDataString(attribute.Permission);
 
-            // AJAX/JSON callers get a machine-readable redirect envelope; full
-            // page navigations get a classic 302 to the access-denied screen.
+            // AJAX/JSON çağıranlar makine tarafından okunabilir bir yönlendirme zarfı
+            // alır; tam sayfa gezinmeleri erişim reddedildi ekranına klasik bir 302 alır.
             context.Result = request.WantsJson()
                 ? new JsonResult(new { redirect = deniedUrl }) { StatusCode = StatusCodes.Status403Forbidden }
                 : new RedirectToActionResult("AccessDenied", "Account", new

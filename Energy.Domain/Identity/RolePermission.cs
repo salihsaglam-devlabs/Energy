@@ -1,12 +1,14 @@
 namespace Energy.Domain.Identity;
 
 /// <summary>
-/// THE single source of truth for "who can do what". No other table maps
-/// permissions to principals.
+/// "Kim neyi yapabilir" sorusunun TEK doğruluk kaynağı. Başka hiçbir tablo
+/// yetkileri rollere/kullanıcılara eşlemez.
 /// </summary>
 public class RolePermission
 {
+    /// <summary>Yetkinin atandığı rolün kimliği.</summary>
     public Guid RoleId { get; set; }
+
+    /// <summary>Role atanan yetki kodu (ör. <c>User.Read</c>).</summary>
     public string PermissionCode { get; set; } = string.Empty;
 }
-

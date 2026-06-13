@@ -6,9 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Energy.Infrastructure.Localization;
 
 /// <summary>
-/// In-memory cache of database-backed localization overrides. Loaded lazily
-/// on first access and kept up to date by <see cref="DatabaseLocalizationService"/>
-/// whenever entries are upserted or deleted.
+/// Veritabanı destekli yerelleştirme geçersiz kılmalarının bellek içi önbelleği.
+/// İlk erişimde tembel (lazy) olarak yüklenir ve girdiler eklendiğinde/silindiğinde
+/// <see cref="DatabaseLocalizationService"/> tarafından güncel tutulur.
 /// </summary>
 public sealed class LocalizationCache
 {
@@ -16,30 +16,34 @@ public sealed class LocalizationCache
     private readonly SemaphoreSlim _initLock = new(1, 1);
     private ConcurrentDictionary<string, string>? _entries;
 
+    /// <summary>Önbelleği, bir DI kapsam fabrikası ile başlatır.</summary>
     public LocalizationCache(IServiceScopeFactory scopeFactory)
     {
         _scopeFactory = scopeFactory;
     }
 
+    /// <summary>Verilen kültür ve anahtar için önbellekteki değeri almaya çalışır.</summary>
     public bool TryGet(string culture, string key, out string? value)
     {
         EnsureLoaded();
         return _entries!.TryGetValue(MakeKey(culture, key), out value);
     }
 
+    /// <summary>Verilen kültür ve anahtar için önbellek değerini ekler veya günceller.</summary>
     public void Set(string culture, string key, string value)
     {
         EnsureLoaded();
         _entries![MakeKey(culture, key)] = value;
     }
 
+    /// <summary>Verilen kültür ve anahtara ait girdiyi önbellekten kaldırır.</summary>
     public void Remove(string culture, string key)
     {
         _entries?.TryRemove(MakeKey(culture, key), out _);
     }
 
     /// <summary>
-    /// Drops the in-memory snapshot so the next access reloads it from the database.
+    /// Bellek içi anlık görüntüyü düşürür; böylece sonraki erişim onu veritabanından yeniden yükler.
     /// </summary>
     public void Invalidate()
     {

@@ -4,8 +4,8 @@ using Energy.Shared.Identity;
 namespace Energy.Web.Common;
 
 /// <summary>
-/// Custom claim types written to the cookie principal by the auth pipeline.
-/// Mirrors the JWT claims emitted by the API.
+/// Kimlik doğrulama hattının çerez kimliğine (cookie principal) yazdığı özel talep
+/// (claim) türleri. API'nin yaydığı JWT taleplerini yansıtır.
 /// </summary>
 public static class EnergyClaimTypes
 {
@@ -56,6 +56,7 @@ public static class ClaimsPrincipalExtensions
             .ToArray();
     }
 
+    /// <summary>Kimliğe atanmış rol anahtarlarını döndürür.</summary>
     public static IReadOnlyList<string> GetRoleKeys(this ClaimsPrincipal? principal)
     {
         if (principal is null) return Array.Empty<string>();
@@ -65,6 +66,7 @@ public static class ClaimsPrincipalExtensions
             .ToArray();
     }
 
+    /// <summary>Kimliğin verilen rol anahtarına sahip olup olmadığını döndürür.</summary>
     public static bool HasRoleKey(this ClaimsPrincipal? principal, string roleKey)
     {
         if (principal is null || string.IsNullOrWhiteSpace(roleKey)) return false;

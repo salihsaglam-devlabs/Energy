@@ -5,20 +5,21 @@ using Energy.Web.Clients.Identity;
 namespace Energy.Web.Clients.Infrastructure.Authentication;
 
 /// <summary>
-/// Obtains and caches a bearer token for the non-interactive system/service
-/// account. Used by internal/system flows (e.g. auditing anonymous requests)
-/// that must call the API independently of any signed-in user.
+/// Etkileşimsiz sistem/servis hesabı için bir bearer token alır ve önbelleğe alır.
+/// Oturum açmış herhangi bir kullanıcıdan bağımsız olarak API'yi çağırması gereken
+/// dahili/sistem akışları (ör. anonim isteklerin denetlenmesi) tarafından kullanılır.
 /// </summary>
 public interface IServiceApiTokenProvider
 {
+    /// <summary>Geçerli bir servis erişim jetonunu döndürür (gerekirse yeniler).</summary>
     Task<string?> GetAccessTokenAsync(CancellationToken cancellationToken = default);
 }
 
 /// <summary>
-/// Singleton provider that logs the configured service account into the API and
-/// caches the JWT until shortly before it expires, refreshing on demand. Logging
-/// must never break the request, so failures return <c>null</c> instead of
-/// throwing.
+/// Yapılandırılan servis hesabıyla API'ye giriş yapan ve JWT'yi süresi dolmadan kısa
+/// bir süre öncesine kadar önbellekte tutan, istendiğinde yenileyen singleton sağlayıcı.
+/// Günlükleme isteği asla bozmamalıdır; bu yüzden hatalar istisna fırlatmak yerine
+/// <c>null</c> döndürür.
 /// </summary>
 public sealed class ServiceApiTokenProvider : IServiceApiTokenProvider
 {
@@ -32,6 +33,7 @@ public sealed class ServiceApiTokenProvider : IServiceApiTokenProvider
     private string? _token;
     private DateTime _expiresAtUtc;
 
+    /// <summary>Kapsam fabrikasını, yapılandırmayı ve günlükleyiciyi enjekte eder.</summary>
     public ServiceApiTokenProvider(
         IServiceScopeFactory scopeFactory,
         IConfiguration configuration,
@@ -42,6 +44,7 @@ public sealed class ServiceApiTokenProvider : IServiceApiTokenProvider
         _logger = logger;
     }
 
+    /// <summary>Önbellekteki jetonu döndürür veya süresi dolmuşsa yeniden alır.</summary>
     public async Task<string?> GetAccessTokenAsync(CancellationToken cancellationToken = default)
     {
         if (IsTokenUsable()) return _token;
@@ -56,8 +59,8 @@ public sealed class ServiceApiTokenProvider : IServiceApiTokenProvider
             var password = _configuration[ServiceAccount.WebPasswordConfigKey];
             if (string.IsNullOrWhiteSpace(password)) password = ServiceAccount.DefaultPassword;
 
-            // The auth client is registered as a scoped, anonymous typed client;
-            // resolve it inside a short-lived scope since this provider is a singleton.
+            // Auth istemcisi scoped, anonim tipli bir istemci olarak kayıtlıdır; bu
+            // sağlayıcı singleton olduğundan onu kısa ömürlü bir kapsam içinde çöz.
             using var scope = _scopeFactory.CreateScope();
             var auth = scope.ServiceProvider.GetRequiredService<IAuthApiClient>();
 
@@ -89,6 +92,7 @@ public sealed class ServiceApiTokenProvider : IServiceApiTokenProvider
         }
     }
 
+    /// <summary>Önbellekteki jetonun hâlâ kullanılabilir (süresi yakında dolmayan) olup olmadığını belirler.</summary>
     private bool IsTokenUsable()
         => !string.IsNullOrEmpty(_token) && DateTime.UtcNow < _expiresAtUtc - ExpiryMargin;
 }

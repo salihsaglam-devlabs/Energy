@@ -1,10 +1,23 @@
+/*
+ * Permissions sayfası — yetki kataloğu görüntüleme ekranı.
+ *
+ * Sorumluluk:
+ *   - DevExtreme dxDataGrid ile merkezi, derleme zamanına ait salt okunur yetki
+ *     kataloğunu (modül/eylem/kod/ad) istemci tarafında listeler.
+ *   - Grid içeriğini ExcelJS + FileSaver ile .xlsx olarak dışa aktarır.
+ *
+ * Genel API: window.AppPages.Permissions.init().
+ */
 (function (window, $) {
     "use strict";
+    // Yerelleştirme sözlüğü kısayolları (yetkiler / grid / bildirimler).
     var L = function () { return window.AppL10n.permissions; };
     var LG = function () { return window.AppL10n.grid; };
     var LN = function () { return window.AppL10n.notifications; };
+    // Grid örneği.
     var gridInstance;
 
+    // Grid'i ExcelJS ile bir .xlsx çalışma kitabına aktarır ve indirilmesini sağlar.
     function exportGrid(e, fileName) {
         if (typeof ExcelJS === "undefined" || typeof saveAs === "undefined" ||
             !DevExpress.excelExporter || !DevExpress.excelExporter.exportDataGrid) { return; }
@@ -20,8 +33,8 @@
     }
 
     function init() {
-        // The permission catalog is a compile-time, read-only list. The endpoint
-        // returns the full set as a plain array, so the grid runs client-side.
+        // Yetki kataloğu derleme zamanına ait, salt okunur bir listedir. Uç nokta tüm
+        // kümeyi düz bir dizi olarak döndürür; bu yüzden grid istemci tarafında çalışır.
         var store = new DevExpress.data.CustomStore({
             key: "code",
             loadMode: "raw",

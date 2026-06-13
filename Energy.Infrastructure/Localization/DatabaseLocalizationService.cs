@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Localization;
 
+/// <summary>Yerelleştirme girdilerini veritabanı üzerinden yöneten servis (önbellek ve .resx senkronizasyonu ile).</summary>
 public sealed class DatabaseLocalizationService : ILocalizationService
 {
     private readonly AppDbContext _dbContext;
@@ -134,17 +135,16 @@ public sealed class DatabaseLocalizationService : ILocalizationService
 
     public async Task<SeedResultResponse> SeedFromResourcesAsync(CancellationToken cancellationToken = default)
     {
-        // Reads from the EMBEDDED resources, so it works in production even when
-        // the source .resx files are not present on disk. Existing rows are
-        // overwritten with the embedded value.
+        // GÖMÜLÜ kaynaklardan okur; böylece kaynak .resx dosyaları diskte olmasa bile
+        // üretimde çalışır. Mevcut satırlar gömülü değerle üzerine yazılır.
         var embeddedEntries = _embeddedReader.ReadAll();
         return await SeedEntriesAsync(embeddedEntries, forceOverwrite: true, cancellationToken);
     }
 
     /// <summary>
-    /// Inserts/updates the supplied (culture, key, value) tuples into the
-    /// database. When <paramref name="forceOverwrite"/> is true an existing row
-    /// is always re-stamped even if the value is unchanged.
+    /// Verilen (kültür, anahtar, değer) üçlülerini veritabanına ekler/günceller.
+    /// <paramref name="forceOverwrite"/> true olduğunda mevcut bir satır, değeri
+    /// değişmemiş olsa bile her zaman yeniden damgalanır.
     /// </summary>
     private async Task<SeedResultResponse> SeedEntriesAsync(
         IReadOnlyList<(string Culture, string Key, string Value)> entries,

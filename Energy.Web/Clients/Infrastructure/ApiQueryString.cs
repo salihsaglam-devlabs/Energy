@@ -39,6 +39,7 @@ internal static class ApiQueryString
         return builder.ToString();
     }
 
+    /// <summary>Temel yola serbest biçimli anahtar/değer parametreleri ekler.</summary>
     public static string Append(string basePath, params (string Key, object? Value)[] parameters)
     {
         var builder = new Builder(basePath);

@@ -57,6 +57,17 @@
         </div>
     </div>
     <div class="energy-chat__main">
+        <div class="energy-chat__welcome" id="chat-welcome">
+            <button type="button" class="energy-chat__icon-btn energy-chat__drawer-toggle energy-chat__welcome-menu" id="chat-welcome-toggle" aria-label="Sohbetler">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="energy-chat__welcome-card">
+                <div class="energy-chat__welcome-icon"><i class="fa-solid fa-comments"></i></div>
+                <h2 class="energy-chat__welcome-title">@T[LocalizationKeys.ChatScreen.Title]</h2>
+                <p class="energy-chat__welcome-text">Mesajlaşmaya başlamak için soldan bir kişi ya da grup seçin.</p>
+                <div class="energy-chat__welcome-recent" id="chat-welcome-recent"></div>
+            </div>
+        </div>
         <div class="energy-chat__window-wrap" hidden>
             <header id="chat-peer" class="energy-chat__peer">
                 <button type="button" class="energy-chat__icon-btn energy-chat__drawer-toggle" id="chat-drawer-toggle" aria-label="Contacts">

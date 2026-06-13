@@ -1,16 +1,15 @@
 namespace Energy.Application.System.Services;
 
 /// <summary>
-/// Runs the idempotent system seeders that bring the database to a fully usable
-/// state (schema top-ups, permission catalog, roles, users, menus, API endpoint
-/// catalog and localization). Safe to invoke repeatedly.
+/// Veritabanını tamamen kullanılabilir bir duruma getiren idempotent sistem
+/// seeder'larını çalıştırır (şema top-up'ları, yetki kataloğu, roller, kullanıcılar,
+/// menüler, API endpoint kataloğu ve yerelleştirme). Tekrar tekrar çağrılması güvenlidir.
 /// </summary>
 public interface ISystemSeeder
 {
     /// <summary>
-    /// Executes every seeding step in order. Existing data is preserved; only
-    /// missing rows are added and convergent values are updated.
+    /// Tüm seed adımlarını sırayla çalıştırır. Mevcut veriler korunur; yalnızca
+    /// eksik satırlar eklenir ve yakınsayan (convergent) değerler güncellenir.
     /// </summary>
     Task SeedAllAsync(CancellationToken cancellationToken = default);
 }
-

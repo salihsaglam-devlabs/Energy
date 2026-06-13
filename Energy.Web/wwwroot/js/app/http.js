@@ -1,15 +1,32 @@
+/*
+ * AppHttp — fetch tabanlı, uygulama geneli ince HTTP istemcisi.
+ *
+ * Sorumluluk:
+ *   - Tüm AJAX çağrıları için tek ve tutarlı bir yüzey sunar (GET/POST/PUT/DELETE + form gönderimi).
+ *   - Güvenli varsayılanlar ekler: aynı köken (same-origin) çerezleri, JSON "Accept",
+ *     "X-Requested-With" başlığı ve değiştiren (mutating) istekler için CSRF anti-forgery jetonu.
+ *   - Yanıtı normalize eder: JSON gövdesini ayrıştırır ve hataları tek tip bir
+ *     { status, message, payload } nesnesiyle reddeder (reject).
+ *   - Kimlik doğrulama yönlendirmelerini ele alır: 401/403 + { redirect } gelirse
+ *     kullanıcıyı ilgili sayfaya yönlendirir ve { handled: true } ile sessizce reddeder.
+ *
+ * Genel API (window.AppHttp): get, post, put, del, postForm.
+ */
 (function (window) {
     "use strict";
 
+    // Sayfadaki <meta name="csrf-token"> etiketinden anti-forgery jetonunu okur.
     function getCsrfToken() {
         var meta = document.querySelector('meta[name="csrf-token"]');
         return meta ? meta.getAttribute("content") : "";
     }
 
+    // Yükün, sunucudan gelen bir kimlik doğrulama yönlendirmesi (redirect) olup olmadığını belirler.
     function isAuthRedirect(payload) {
         return payload && typeof payload.redirect === "string" && payload.redirect.length > 0;
     }
 
+    // İstek başlıklarını oluşturur; değiştiren metotlar için CSRF jetonunu ekler.
     function buildHeaders(method, custom) {
         var headers = Object.assign({
             "Accept": "application/json",
@@ -23,6 +40,7 @@
         return headers;
     }
 
+    // Çekirdek istek gönderici: gövdeyi türüne göre kodlar, yanıtı ayrıştırır ve hataları normalize eder.
     function send(method, url, body, options) {
         options = options || {};
         var init = {
@@ -33,7 +51,7 @@
 
         if (body !== undefined && body !== null) {
             if (body instanceof FormData) {
-                // FormData adds its own multipart Content-Type with boundary.
+                // FormData, sınır (boundary) içeren kendi multipart Content-Type'ını ekler.
                 init.body = body;
             } else if (typeof body === "string") {
                 init.body = body;
@@ -75,16 +93,21 @@
             if (err && err.status) {
                 return Promise.reject(err);
             }
-            // Network or CORS failure.
+            // Ağ veya CORS hatası.
             return Promise.reject({ status: 0, message: window.AppL10n.notifications.networkError });
         });
     }
 
     window.AppHttp = {
+        // GET isteği gönderir.
         get: function (url, options) { return send("GET", url, null, options); },
+        // POST isteği gönderir (JSON / metin / FormData gövdesi).
         post: function (url, body, options) { return send("POST", url, body, options); },
+        // PUT isteği gönderir.
         put: function (url, body, options) { return send("PUT", url, body, options); },
+        // DELETE isteği gönderir.
         del: function (url, options) { return send("DELETE", url, null, options); },
+        // Bir <form> öğesini FormData olarak POST eder (dosya yüklemeleri dahil).
         postForm: function (url, formElement) {
             var form = new FormData(formElement);
             return send("POST", url, form);

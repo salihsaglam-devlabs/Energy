@@ -9,16 +9,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Energy.Web.Services.Navigation;
 
+/// <summary>Oturum açmış kullanıcının gezinme (menü) öğelerini sağlayan servis sözleşmesi.</summary>
 public interface INavigationService
 {
+    /// <summary>Geçerli kullanıcının yetkiye göre filtrelenmiş gezinme öğelerini döndürür.</summary>
     Task<IReadOnlyList<NavigationItem>> GetMyNavigationAsync(CancellationToken ct = default);
 }
 
 /// <summary>
-/// Loads the per-user menu tree from the API (already permission-filtered on
-/// the server side) and always pins the per-user defaults (Dashboard +
-/// Profile) on top so every authenticated user has somewhere to go even when
-/// no menus are assigned to their roles.
+/// Kullanıcı bazlı menü ağacını API'den yükler (sunucu tarafında zaten yetkiye göre
+/// filtrelenmiştir) ve kullanıcı bazlı varsayılanları (Gösterge Panosu + Profil) her zaman
+/// en üste sabitler; böylece rollerine hiç menü atanmamış olsa bile kimliği doğrulanmış her
+/// kullanıcının gidebileceği bir yer olur.
 /// </summary>
 public sealed class NavigationService : INavigationService
 {

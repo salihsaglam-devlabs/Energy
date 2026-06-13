@@ -169,9 +169,9 @@ public sealed class RoleService : IRoleService
     }
 
     /// <summary>
-    /// Seeded roles store a localization KEY in <c>Description</c>; user-created
-    /// roles store free text. Resolve the key when present, otherwise return the
-    /// text unchanged.
+    /// Tohumlanan roller <c>Description</c> içinde bir yerelleştirme ANAHTARI saklar;
+    /// kullanıcı tarafından oluşturulan roller serbest metin saklar. Anahtar varsa
+    /// çözümle, aksi halde metni olduğu gibi döndür.
     /// </summary>
     private string? LocalizeDescription(string? value)
         => string.IsNullOrWhiteSpace(value) ? value : _localizer.GetText(value, value);

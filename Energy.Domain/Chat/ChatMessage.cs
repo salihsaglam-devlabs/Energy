@@ -3,38 +3,43 @@ using Energy.Domain.Common;
 namespace Energy.Domain.Chat;
 
 /// <summary>
-/// A single direct message exchanged between two users. The conversation
-/// between any pair of users is the ordered set of messages where they are
-/// sender/recipient in either direction. <see cref="AuditableEntity.CreatedAt"/>
-/// is the authoritative send timestamp.
+/// İki kullanıcı arasında gönderilen tek bir mesaj. Herhangi bir kullanıcı çifti
+/// arasındaki sohbet, iki yönde de gönderen/alıcı oldukları mesajların sıralı
+/// kümesidir. <see cref="AuditableEntity.CreatedAt"/> mesajın gönderim zamanını
+/// (asıl referans zaman damgası) tutar.
 /// </summary>
 public class ChatMessage : AuditableEntity
 {
+    /// <summary>Mesajı gönderen kullanıcının kimliği.</summary>
     public Guid SenderId { get; set; }
 
     /// <summary>
-    /// Target user for a direct (1-to-1) message. Null when the message is
-    /// addressed to a group (see <see cref="GroupId"/>).
+    /// Birebir (1-1) mesajın hedef kullanıcısı. Mesaj bir gruba gönderildiğinde
+    /// null olur (bkz. <see cref="GroupId"/>).
     /// </summary>
     public Guid? RecipientId { get; set; }
 
-    /// <summary>Target group for a group message. Null for direct messages.</summary>
+    /// <summary>Grup mesajının hedef grubu. Birebir mesajlarda null'dır.</summary>
     public Guid? GroupId { get; set; }
 
+    /// <summary>Mesaj metni.</summary>
     public string Text { get; set; } = string.Empty;
+
+    /// <summary>Mesajın okunup okunmadığı.</summary>
     public bool IsRead { get; set; }
+
+    /// <summary>Mesajın okunduğu UTC zaman damgası (okunmadıysa null).</summary>
     public DateTime? ReadAt { get; set; }
 
-    /// <summary>The message this one replies to (quote), when set.</summary>
+    /// <summary>Bu mesajın yanıt verdiği (alıntıladığı) mesaj; varsa.</summary>
     public Guid? ReplyToMessageId { get; set; }
 
-    /// <summary>Original file name of an attached file, when the message carries one.</summary>
+    /// <summary>Mesaj bir dosya taşıyorsa, ekli dosyanın özgün adı.</summary>
     public string? AttachmentFileName { get; set; }
 
-    /// <summary>MIME type of the attached file (e.g. image/png, application/pdf).</summary>
+    /// <summary>Ekli dosyanın MIME türü (ör. image/png, application/pdf).</summary>
     public string? AttachmentContentType { get; set; }
 
-    /// <summary>Raw bytes of the attached file. Stored alongside the message.</summary>
+    /// <summary>Ekli dosyanın ham byte içeriği. Mesajla birlikte saklanır.</summary>
     public byte[]? AttachmentData { get; set; }
 }
-

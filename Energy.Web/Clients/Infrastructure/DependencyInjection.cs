@@ -5,6 +5,7 @@ using Energy.Web.Clients.Infrastructure.Authentication;
 using Energy.Web.Clients.Infrastructure.ClientIdentity;
 using Energy.Web.Clients.Localization;
 using Energy.Web.Clients.Logger;
+using Energy.Web.Clients.Settings;
 using Energy.Web.Configuration;
 using Microsoft.Extensions.Options;
 using SystemClients = Energy.Web.Clients.System;
@@ -17,7 +18,7 @@ public static class DependencyInjection
     {
         services.AddHttpContextAccessor();
         services.AddScoped<IUserApiTokenProvider, UserApiTokenProvider>();
-        // Singleton: caches the system/service account token across requests.
+        // Singleton: sistem/servis hesabı jetonunu istekler arasında önbelleğe alır.
         services.AddSingleton<IServiceApiTokenProvider, ServiceApiTokenProvider>();
         services.AddTransient<AuthHeaderHandler>();
         services.AddScoped<BrowserClientIdService>();
@@ -34,6 +35,7 @@ public static class DependencyInjection
         AddAuthenticated<IAuditLogIngestClient, AuditLogIngestClient>(services);
         AddAuthenticated<IAuditLogQueryClient, AuditLogQueryClient>(services);
         AddAuthenticated<IChatApiClient, ChatApiClient>(services);
+        AddAuthenticated<ISettingsApiClient, SettingsApiClient>(services);
         return services;
     }
 
@@ -67,8 +69,8 @@ public static class DependencyInjection
         var settings = sp.GetRequiredService<IOptions<ApiSettings>>().Value;
         var handler = new HttpClientHandler();
 
-        // Opt-in bypass for invalid/self-signed API TLS certificates. Only the
-        // configured API host is exempted; everything else keeps default checks.
+        // Geçersiz/kendinden imzalı API TLS sertifikaları için isteğe bağlı atlama. Yalnızca
+        // yapılandırılan API sunucusu muaf tutulur; diğer her şey varsayılan kontrolleri korur.
         if (settings.AllowInvalidCertificate)
         {
             handler.ServerCertificateCustomValidationCallback =

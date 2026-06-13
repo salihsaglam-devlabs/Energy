@@ -1,11 +1,24 @@
+/*
+ * Roles sayfası — rol yönetimi ekranı.
+ *
+ * Sorumluluk:
+ *   - DevExtreme dxDataGrid ile rolleri listeler, oluşturur, düzenler ve siler (CRUD).
+ *   - Her role atanacak yetkiler için merkezi yetki kataloğunu arama (lookup) olarak yükler.
+ *   - Grid içeriğini ExcelJS + FileSaver ile .xlsx olarak dışa aktarır.
+ *
+ * Genel API: window.AppPages.Roles.init().
+ */
 (function (window, $) {
     "use strict";
+    // Yerelleştirme sözlüğü kısayolları (roller / grid / bildirimler).
     var L = function () { return window.AppL10n.roles; };
     var LG = function () { return window.AppL10n.grid; };
     var LN = function () { return window.AppL10n.notifications; };
 
+    // Grid örneği ve rol-yetki ataması için arama verisi.
     var gridInstance, permissionsLookup = [];
 
+    // Grid'i ExcelJS ile bir .xlsx çalışma kitabına aktarır ve indirilmesini sağlar.
     function exportGrid(e, fileName) {
         if (typeof ExcelJS === "undefined" || typeof saveAs === "undefined" ||
             !DevExpress.excelExporter || !DevExpress.excelExporter.exportDataGrid) { return; }
@@ -20,10 +33,12 @@
         e.cancel = true;
     }
 
+    // Sayfayı başlatır: yetki aramasını yükler, ardından grid'i kurar.
     function init() {
         loadPermissionsLookup().then(function () { buildGrid(); });
     }
 
+    // Rol-yetki seçimi için yetki kataloğunu sunucudan çeker (hata olursa boş dizi).
     function loadPermissionsLookup() {
         return window.AppHttp.get("/roles/permissions-lookup")
             .then(function (data) { permissionsLookup = data || []; })

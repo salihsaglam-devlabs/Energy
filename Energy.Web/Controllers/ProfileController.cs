@@ -41,8 +41,9 @@ public sealed class ProfileController : Controller
         var userId = User.GetUserId();
         var model = BuildFromClaims(userId);
 
-        // Best-effort enrichment with the API's per-user record. Failures fall
-        // back to the claims-only view so the page is always renderable.
+        // API'nin kullanıcı bazlı kaydıyla en iyi çaba zenginleştirme. Hatalarda,
+        // sayfanın her zaman görüntülenebilir olması için yalnızca claim'lere dayalı
+        // görünüme geri düşülür.
         if (userId is Guid id)
         {
             try
@@ -156,8 +157,8 @@ public sealed class ProfileController : Controller
         };
     }
 
-    // Local "with"-friendly clone helper. The view model is built with init-only
-    // properties so we mirror them via a record for incremental updates.
+    // Yerel "with" dostu kopyalama yardımcısı. Görünüm modeli yalnızca init özellikleriyle
+    // oluşturulur; bu yüzden artımlı güncellemeler için onları bir record üzerinden yansıtırız.
     private sealed record ProfileViewModelRecord
     {
         public Guid UserId { get; init; }

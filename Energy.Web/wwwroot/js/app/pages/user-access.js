@@ -1,9 +1,19 @@
+/*
+ * UserAccess sayfası — kullanıcı bazlı erişim (rol + doğrudan yetki) yönetim ekranı.
+ *
+ * Sorumluluk:
+ *   - Solda bir kullanıcı seçici grid (DevExtreme dxDataGrid), sağda o kullanıcı için
+ *     rolleri ve yetkileri tamamen onay kutularıyla yöneten bir ayrıntı paneli sunar.
+ *   - Rollerden devralınan (salt okunur) yetkileri ile doğrudan atanan yetkileri ayırt eder.
+ *   - Tüm değişiklikleri (roller + doğrudan yetkiler) tek bir kaydetme işleminde gönderir.
+ *   - Paylaşılan bileşen fabrikaları kullanmaz; kendi kendine yeten bir ekrandır.
+ *
+ * Genel API: window.AppPages.UserAccess.init().
+ */
 (function (window, $) {
     "use strict";
 
-    // Self-contained DevExtreme screen: pick a user on the left, manage every
-    // role and permission for that user on the right — entirely with check
-    // boxes — and save it all in one shot. No shared component factories.
+    // Yerelleştirme sözlüğü kısayolları (kullanıcı erişimi / grid / bildirimler / kullanıcılar).
     var UA = function () { return (window.AppL10n && window.AppL10n.userAccess) || {}; };
     var LG = function () { return window.AppL10n.grid; };
     var LN = function () { return window.AppL10n.notifications; };
@@ -12,8 +22,8 @@
     var usersGrid;
     var rolesLookup = [];          // [{ id, name, description, isSystem }]
     var permissionsCatalog = [];   // [{ code, name, module, action }]
-    var selectedUser = null;       // currently edited user row
-    var detail = null;             // handles to live detail-pane widgets
+    var selectedUser = null;       // o anda düzenlenen kullanıcı satırı
+    var detail = null;             // canlı ayrıntı paneli bileşenlerine tutamaçlar
 
     function init() {
         Promise.all([loadRolesLookup(), loadPermissionsCatalog()])
@@ -35,7 +45,7 @@
             .catch(function () { permissionsCatalog = []; });
     }
 
-    // ---------------------------------------------------------------- Users grid
+    // ---------------------------------------------------------------- Kullanıcılar grid'i
     function buildUsersGrid() {
         var store = new DevExpress.data.CustomStore({
             key: "id",
@@ -82,7 +92,7 @@
         }).dxDataGrid("instance");
     }
 
-    // ---------------------------------------------------------------- Detail pane
+    // ---------------------------------------------------------------- Ayrıntı paneli
     function renderEmptyDetail() {
         detail = null;
         $("#user-access-detail").empty().append(
@@ -108,7 +118,7 @@
 
         var $host = $("#user-access-detail").empty();
 
-        // --- Header toolbar: who + save -------------------------------------
+        // --- Başlık araç çubuğu: kim + kaydet -------------------------------------
         var $toolbar = $("<div>").appendTo($host);
         $toolbar.dxToolbar({
             items: [
@@ -138,10 +148,10 @@
             ]
         });
 
-        // --- Tab panel: Roles + Permissions ---------------------------------
-        // Initialise the detail handle BEFORE building the tab panel: with
-        // deferRendering:false the tab templates run during construction, so
-        // they must be able to assign detail.roleList / detail.permTree.
+        // --- Sekme paneli: Roller + Yetkiler ---------------------------------
+        // Ayrıntı tutamacını sekme panelini oluşturmadan ÖNCE başlat: deferRendering:false
+        // ile sekme şablonları yapım sırasında çalışır; bu yüzden detail.roleList /
+        // detail.permTree'yi atayabilmeleri gerekir.
         detail = { roleList: null, permTree: null, inheritedSet: inheritedSet };
 
         var $tabs = $("<div>").appendTo($host);
@@ -233,7 +243,7 @@
         return items;
     }
 
-    // ---------------------------------------------------------------- Save
+    // ---------------------------------------------------------------- Kaydet
     function save(userId) {
         if (!detail) return;
 
@@ -253,7 +263,7 @@
         window.AppLoading.wrap(window.AppHttp.put("/user-access/" + userId + "/access", payload))
             .then(function () {
                 window.AppNotify.success(UA().saved || LN().saved);
-                loadUserAccess(selectedUser); // refresh inherited/direct state after role changes
+                loadUserAccess(selectedUser); // rol değişikliklerinden sonra devralınan/doğrudan durumu yenile
             })
             .catch(window.AppNotify.fromHttpError);
     }

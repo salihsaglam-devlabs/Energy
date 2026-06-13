@@ -10,8 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Energy.Web.Controllers;
 
 /// <summary>
-/// Localization grid + JSON adapter. The new API stores a (key → culture →
-/// value) map; the grid flattens it into per-culture columns for editing.
+/// Yerelleştirme ızgarası + JSON adaptörü. Yeni API bir (anahtar → kültür → değer)
+/// haritası saklar; ızgara bunu düzenleme için kültür başına sütunlara düzleştirir.
 /// </summary>
 [Authorize]
 [PagePermission(PermissionCatalog.LocalizationReadAll)]
@@ -85,9 +85,9 @@ public sealed class LocalizationController : Controller
         => Json(await _client.DeleteAsync(key, ct));
 
     /// <summary>
-    /// Placeholder for the legacy "import from .resx" toolbar action. The new
-    /// API does not expose a resx-import endpoint so we always reply success
-    /// with a zero counter to keep the UI from displaying an error.
+    /// Eski "resx'ten içe aktar" araç çubuğu aksiyonu için yer tutucu. Yeni API bir
+    /// resx içe aktarma uç noktası sunmaz; bu yüzden arayüzün bir hata göstermemesi için
+    /// her zaman sıfır sayaçla başarı yanıtı veririz.
     /// </summary>
     [HttpPost("import-from-resx")]
     [IgnoreAntiforgeryToken]

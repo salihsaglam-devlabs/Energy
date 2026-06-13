@@ -36,7 +36,7 @@ public sealed class AccountController : Controller
     private LoginViewModel BuildLoginModel(string? returnUrl) => new()
     {
         ReturnUrl = returnUrl,
-        // Only expose the seeded quick-login presets while developing.
+        // Tohumlanan hızlı giriş hazır ayarlarını yalnızca geliştirme sırasında göster.
         DevAccounts = _env.IsDevelopment() ? DevLoginAccounts.All : Array.Empty<DevAccount>()
     };
 
@@ -61,11 +61,11 @@ public sealed class AccountController : Controller
         }
         catch (Exception ex)
         {
-            // Any failure talking to the API (network error, non-JSON body from a
-            // proxy, deserialization issue, 401 surfaced as an exception, ...) must
-            // NOT bubble up to the global exception handler — that would bounce the
-            // user to /Home/Error instead of keeping them on the login screen. Stay
-            // on the page and show a friendly message.
+            // API ile konuşurken oluşan herhangi bir hata (ağ hatası, bir proxy'den
+            // gelen JSON olmayan gövde, seri durumdan çıkarma sorunu, istisna olarak
+            // yüzeye çıkan 401, ...) global istisna işleyicisine YÜKSELMEMELİDİR — bu,
+            // kullanıcıyı giriş ekranında tutmak yerine /Home/Error'a fırlatırdı.
+            // Sayfada kal ve anlaşılır bir mesaj göster.
             _logger.LogWarning(ex, "Login API call failed for {User}.", input.UserNameOrEmail);
             ModelState.AddModelError(string.Empty, _localizer[LocalizationKeys.Auth.InvalidCredentials].Value);
             return View(BuildLoginModel(input.ReturnUrl));
@@ -73,8 +73,9 @@ public sealed class AccountController : Controller
 
         if (!response.IsSuccess || response.Data is null)
         {
-            // Prefer the API-provided message, but always guarantee a non-empty,
-            // localized warning so the user sees why the login was rejected.
+            // API'nin sağladığı mesajı tercih et, ancak kullanıcının girişin neden
+            // reddedildiğini görmesi için her zaman boş olmayan, yerelleştirilmiş bir
+            // uyarı garanti et.
             var message = string.IsNullOrWhiteSpace(response.Message)
                 ? _localizer[LocalizationKeys.Auth.InvalidCredentials].Value
                 : response.Message;
@@ -83,8 +84,9 @@ public sealed class AccountController : Controller
         }
 
         await _cookies.SignInAsync(HttpContext, response.Data);
-        // Validate the user-supplied returnUrl to avoid open-redirect abuse:
-        // only same-site local paths are honoured, otherwise fall back to root.
+        // Açık yönlendirme (open-redirect) istismarını önlemek için kullanıcının
+        // sağladığı returnUrl'i doğrula: yalnızca aynı siteye ait yerel yollar kabul
+        // edilir, aksi hâlde köke geri dönülür.
         return Redirect(Url.GetLocalReturnUrl(input.ReturnUrl, "/"));
     }
 
@@ -100,6 +102,8 @@ public sealed class AccountController : Controller
         => View(new AccessDeniedViewModel
         {
             RequestedPath = string.IsNullOrWhiteSpace(path) ? "/" : path,
-            RequestedPermission = string.IsNullOrWhiteSpace(permission) ? "Default.ReadAll" : permission
+            // Gerçek gereken yetkiyi olduğu gibi geçir; hiçbiri verilmediyse katalog dışı
+            // bir kod uydurmak yerine null bırak.
+            RequestedPermission = string.IsNullOrWhiteSpace(permission) ? null : permission
         });
 }

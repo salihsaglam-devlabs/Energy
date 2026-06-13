@@ -7,21 +7,23 @@ using Energy.Web.Common.Exceptions;
 namespace Energy.Web.Clients.Infrastructure.Authentication;
 
 /// <summary>
-/// Outgoing HttpClient handler that attaches the signed-in user's JWT to every
-/// authenticated API call and converts auth-related status codes into
-/// dedicated exceptions handled by <c>ApiExceptionFilter</c>.
+/// Oturum açmış kullanıcının JWT'sini kimliği doğrulanmış her API çağrısına ekleyen
+/// ve kimlik doğrulamayla ilgili durum kodlarını <c>ApiExceptionFilter</c> tarafından
+/// işlenen özel istisnalara dönüştüren giden HttpClient işleyicisi.
 /// </summary>
 public sealed class AuthHeaderHandler : DelegatingHandler
 {
     private readonly IUserApiTokenProvider _tokenProvider;
     private readonly ILogger<AuthHeaderHandler> _logger;
 
+    /// <summary>Token sağlayıcısını ve günlükleyiciyi enjekte eder.</summary>
     public AuthHeaderHandler(IUserApiTokenProvider tokenProvider, ILogger<AuthHeaderHandler> logger)
     {
         _tokenProvider = tokenProvider;
         _logger = logger;
     }
 
+    /// <summary>İsteğe yetkilendirme başlığı ekler ve auth durum kodlarını istisnaya dönüştürür.</summary>
     protected override async Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request,
         CancellationToken cancellationToken)
@@ -35,8 +37,8 @@ public sealed class AuthHeaderHandler : DelegatingHandler
             throw new ApiUnauthorizedException("No access token for current user.");
         }
 
-        // Diagnostic: decode the JWT payload (NO signature verification — just so we
-        // can see in the Web console exactly what we send to the API).
+        // Tanılama: JWT yükünü çöz (İMZA DOĞRULAMASI YOK — yalnızca API'ye tam olarak
+        // ne gönderdiğimizi Web konsolunda görebilmek için).
         LogTokenSummary(request, token);
 
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -70,6 +72,7 @@ public sealed class AuthHeaderHandler : DelegatingHandler
         }
     }
 
+    /// <summary>Tanılama amacıyla JWT yükünün bir özetini günlüğe yazar (imza doğrulamaz).</summary>
     private void LogTokenSummary(HttpRequestMessage request, string token)
     {
         try
@@ -109,6 +112,7 @@ public sealed class AuthHeaderHandler : DelegatingHandler
         }
     }
 
+    /// <summary>Base64Url kodlu bir dizeyi çözerek UTF-8 metne dönüştürür.</summary>
     private static string DecodeBase64UrlToUtf8(string base64Url)
     {
         var s = base64Url.Replace('-', '+').Replace('_', '/');
@@ -120,6 +124,7 @@ public sealed class AuthHeaderHandler : DelegatingHandler
         return Encoding.UTF8.GetString(Convert.FromBase64String(s));
     }
 
+    /// <summary>Yanıt gövdesini güvenli şekilde (hata fırlatmadan) metin olarak okur.</summary>
     private static async Task<string> SafeReadBodyAsync(HttpResponseMessage response, CancellationToken ct)
     {
         try

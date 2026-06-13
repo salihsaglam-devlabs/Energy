@@ -121,5 +121,32 @@ public sealed class ChatController : ControllerBase
     [HttpGet("groups/{groupId:guid}/conversation")]
     public async Task<ActionResult<BaseResponse<IReadOnlyList<ChatMessageResponse>>>> GetGroupConversation(Guid groupId, CancellationToken ct)
         => Ok(BaseResponse<IReadOnlyList<ChatMessageResponse>>.Success(await _chat.GetGroupConversationAsync(CurrentUserId, groupId, ct)));
+
+    [HttpDelete("groups/{groupId:guid}")]
+    public async Task<ActionResult<BaseResponse<bool>>> DeleteGroup(Guid groupId, CancellationToken ct)
+    {
+        var ok = await _chat.DeleteGroupAsync(CurrentUserId, groupId, ct);
+        return ok
+            ? Ok(BaseResponse<bool>.Success(true))
+            : NotFound(BaseResponse<bool>.Failure("Group not found or not permitted."));
+    }
+
+    [HttpDelete("groups/{groupId:guid}/members/{userId:guid}")]
+    public async Task<ActionResult<BaseResponse<bool>>> RemoveMember(Guid groupId, Guid userId, CancellationToken ct)
+    {
+        var ok = await _chat.RemoveMemberAsync(CurrentUserId, groupId, userId, ct);
+        return ok
+            ? Ok(BaseResponse<bool>.Success(true))
+            : NotFound(BaseResponse<bool>.Failure("Member not found or not permitted."));
+    }
+
+    [HttpPost("groups/{groupId:guid}/members/{userId:guid}/admin")]
+    public async Task<ActionResult<BaseResponse<bool>>> SetGroupAdmin(Guid groupId, Guid userId, SetGroupAdminRequest request, CancellationToken ct)
+    {
+        var ok = await _chat.SetMemberAdminAsync(CurrentUserId, groupId, userId, request.IsAdmin, ct);
+        return ok
+            ? Ok(BaseResponse<bool>.Success(true))
+            : NotFound(BaseResponse<bool>.Failure("Member not found or not permitted."));
+    }
 }
 

@@ -16,7 +16,7 @@ public sealed class CultureController : Controller
             CookieRequestCultureProvider.DefaultCookieName,
             CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture, uiCulture)),
             new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) });
-        // Guard against open-redirect: only honour same-site local return URLs.
+        // Açık yönlendirmeye karşı koru: yalnızca aynı siteye ait yerel dönüş URL'lerini kabul et.
         return Redirect(Url.GetLocalReturnUrl(returnUrl, "/"));
     }
 }

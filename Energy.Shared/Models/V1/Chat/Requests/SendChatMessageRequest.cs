@@ -1,26 +1,26 @@
 namespace Energy.Shared.Models.V1.Chat.Requests;
 
-/// <summary>Payload sent by a user to deliver a message to another user or group.</summary>
+/// <summary>Bir kullanıcının başka bir kullanıcıya veya gruba mesaj göndermek için ilettiği veri.</summary>
 public sealed class SendChatMessageRequest
 {
-    /// <summary>Target user for a direct message. Null/empty when sending to a group.</summary>
+    /// <summary>Doğrudan mesaj için hedef kullanıcı. Gruba gönderilirken null/boş olur.</summary>
     public Guid? RecipientId { get; set; }
 
-    /// <summary>Target group. Null when sending a direct message.</summary>
+    /// <summary>Hedef grup. Doğrudan mesaj gönderilirken null olur.</summary>
     public Guid? GroupId { get; set; }
 
+    /// <summary>Mesaj metni.</summary>
     public string Text { get; set; } = string.Empty;
 
-    /// <summary>Optional id of the message being replied to (quote).</summary>
+    /// <summary>Yanıtlanan mesajın isteğe bağlı kimliği (alıntı).</summary>
     public Guid? ReplyToMessageId { get; set; }
 
-    /// <summary>Optional attached file name (when sharing a file).</summary>
+    /// <summary>İsteğe bağlı ekli dosya adı (dosya paylaşılırken).</summary>
     public string? AttachmentFileName { get; set; }
 
-    /// <summary>Optional attached file MIME type.</summary>
+    /// <summary>İsteğe bağlı ekli dosyanın MIME türü.</summary>
     public string? AttachmentContentType { get; set; }
 
-    /// <summary>Optional attached file content, Base64 encoded.</summary>
+    /// <summary>İsteğe bağlı ekli dosya içeriği, Base64 olarak kodlanmış.</summary>
     public string? AttachmentContentBase64 { get; set; }
 }
-
