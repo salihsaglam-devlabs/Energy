@@ -364,7 +364,7 @@ public sealed partial class SystemSeeder : ISystemSeeder
         // (yetkiler DefaultGrants kümesinin parçasıdır; böylece menü her zaman görünür).
         await EnsureMenuAsync(LocalizationKeys.Menus.Dashboard, null, "/dashboard", "home", 1, PermissionCatalog.DashboardRead, ct);
         await EnsureMenuAsync(LocalizationKeys.Menus.Profile, null, "/profile", "user", 2, PermissionCatalog.ProfileRead, ct);
-        await EnsureMenuAsync(LocalizationKeys.Menus.Chat, null, "/chat", "message", 3, PermissionCatalog.ChatUse, ct);
+        await EnsureMenuAsync(LocalizationKeys.Menus.Chat, null, "/chat", "chat", 3, PermissionCatalog.ChatUse, ct);
         await EnsureMenuAsync(LocalizationKeys.Menus.Settings, null, "/settings", "preferences", 4, PermissionCatalog.UserSettingsRead, ct);
 
         // Sistem yönetimi alt menüsü — referans projenin hiyerarşisini yansıtır
