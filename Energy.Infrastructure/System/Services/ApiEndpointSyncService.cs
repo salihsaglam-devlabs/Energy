@@ -117,9 +117,25 @@ public sealed class ApiEndpointSyncService
             ["Chat.React"]                = PermissionCatalog.ChatUse,
 
             // Self servis kullanıcı ayarları — kimliği doğrulanmış her kullanıcı için varsayılan yetki.
+            // Hem okuma hem güncelleme aynı self servis yetkisine (UserSettingsRead) bağlıdır:
+            // ayarlar ekranı bu yetkiyle korunduğundan, onu görebilen kullanıcı kendi
+            // tercihlerini KAYDEDEBİLMELİDİR. Ayrı bir "update" yetkisi gerektirmek, kullanıcının
+            // ekranı açıp kaydederken 403 almasına yol açan kırılgan bir duruma neden oluyordu.
             ["Settings.GetMine"]    = PermissionCatalog.UserSettingsRead,
-            ["Settings.UpdateMine"] = PermissionCatalog.UserSettingsUpdate,
+            ["Settings.UpdateMine"] = PermissionCatalog.UserSettingsRead,
         };
+
+    /// <summary>
+    /// Varsayılan haritada kullanılan tüm (null olmayan) yetki kodlarının kümesi.
+    /// Mevcut bir uç noktanın yetki kodunun, önceki bir sürümün senkronizasyonu
+    /// tarafından mı atandığını (yani sistem-yönetimli olduğunu) yoksa yöneticinin
+    /// özel seçimi mi olduğunu ayırt etmek için kullanılır.
+    /// </summary>
+    private static readonly IReadOnlySet<string> DefaultMappedPermissionCodes =
+        DefaultEndpointPermissionMap.Values
+            .Where(value => !string.IsNullOrEmpty(value))
+            .Select(value => value!)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
     private readonly AppDbContext _db;
     private readonly IApiDescriptionGroupCollectionProvider _descriptions;
@@ -159,6 +175,7 @@ public sealed class ApiEndpointSyncService
 
         var added = 0;
         var activated = 0;
+        var reconciled = 0;
 
         foreach (var d in discovered)
         {
@@ -175,6 +192,23 @@ public sealed class ApiEndpointSyncService
                     row.RequiredPermissionCode = defaultPermission;
                     activated += 1;
                 }
+                // Sistem-yönetimli bir uç noktanın yetki kodu, önceki bir sürümün varsayılan
+                // haritasından kaldıysa kaynak-doğruluk (koddaki varsayılan) ile yeniden
+                // hizala. GÜVENLİ koşul: mevcut kod hâlâ bilinen bir varsayılan harita
+                // değeri olmalı; böylece yöneticinin arayüzden seçtiği ÖZEL (haritada
+                // olmayan) yetkilere asla dokunulmaz. Bu, ör. "Settings.UpdateMine"
+                // eski UserSettings.Update'ten yeni UserSettings.Read'e taşındığında
+                // mevcut veritabanlarının yeniden tohumlamada kendiliğinden düzelmesini sağlar.
+                else if (hasDefault
+                         && defaultPermission is not null
+                         && row.IsActive
+                         && row.RequiredPermissionCode is { } current
+                         && !string.Equals(current, defaultPermission, StringComparison.OrdinalIgnoreCase)
+                         && DefaultMappedPermissionCodes.Contains(current))
+                {
+                    row.RequiredPermissionCode = defaultPermission;
+                    reconciled += 1;
+                }
                 continue;
             }
 
@@ -190,12 +224,12 @@ public sealed class ApiEndpointSyncService
             added += 1;
         }
 
-        if (added > 0 || activated > 0)
+        if (added > 0 || activated > 0 || reconciled > 0)
         {
             await _db.SaveChangesAsync(ct);
             _logger.LogInformation(
-                "ApiEndpoint sync: {Added} new endpoint(s), {Activated} auto-activated from defaults.",
-                added, activated);
+                "ApiEndpoint sync: {Added} new endpoint(s), {Activated} auto-activated, {Reconciled} permission(s) realigned from defaults.",
+                added, activated, reconciled);
         }
     }
 

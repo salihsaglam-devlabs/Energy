@@ -1323,8 +1323,105 @@ html[data-theme="dark"] {
 }
 html[data-theme="dark"] body { background: var(--energy-bg); color: var(--energy-text); }
 
+/* --- Uygulama kabuğu: sabit (hardcoded) beyaz yüzeyleri koyulaştır --- */
+html[data-theme="dark"] .energy-toolbar {
+    background: rgba(20, 27, 38, 0.88);
+    border-bottom-color: var(--energy-border);
+}
+html[data-theme="dark"] .energy-chat__sidebar,
+html[data-theme="dark"] .energy-chat__composer,
+html[data-theme="dark"] .energy-chat__peer,
+html[data-theme="dark"] .energy-chat__reaction,
+html[data-theme="dark"] .energy-chat__msg-tools,
+html[data-theme="dark"] .energy-chat__palette {
+    background: var(--energy-surface);
+    color: var(--energy-text);
+}
+html[data-theme="dark"] .energy-chat__new-group { background: var(--energy-surface-muted); }
+html[data-theme="dark"] .energy-toolbar__conn-panel,
+html[data-theme="dark"] .energy-toolbar__notify-panel {
+    background: var(--energy-surface);
+    color: var(--energy-text);
+}
+html[data-theme="dark"] .energy-settings__select { background: var(--energy-surface); color: var(--energy-text); }
+
+/* --- DevExtreme bileşenleri: koyu temada açık (light) Fluent swatch tutarlı
+   olmadığından ana yüzeyleri uygulama koyu değişkenleriyle hizala. Yalnızca
+   [data-theme="dark"] altında geçerli; açık tema swatch'ı değişmez. --- */
+html[data-theme="dark"] .dx-widget { color: var(--energy-text); }
+
+html[data-theme="dark"] .dx-datagrid,
+html[data-theme="dark"] .dx-datagrid-rowsview,
+html[data-theme="dark"] .dx-datagrid-headers,
+html[data-theme="dark"] .dx-datagrid-pager,
+html[data-theme="dark"] .dx-datagrid .dx-datagrid-table,
+html[data-theme="dark"] .dx-datagrid .dx-row > td,
+html[data-theme="dark"] .dx-datagrid-filter-row,
+html[data-theme="dark"] .dx-pager {
+    background-color: var(--energy-surface);
+    color: var(--energy-text);
+    border-color: var(--energy-border);
+}
+html[data-theme="dark"] .dx-datagrid .dx-row-alt > td,
+html[data-theme="dark"] .dx-datagrid-rowsview .dx-row-alt > td { background-color: var(--energy-surface-muted); }
+html[data-theme="dark"] .dx-datagrid-rowsview .dx-data-row.dx-state-hover > td { background-color: rgba(255,255,255,0.04); }
+html[data-theme="dark"] .dx-datagrid .dx-header-row > td { color: var(--energy-text); }
+
+/* Metin editörleri (TextBox/SelectBox/TagBox/NumberBox …) + arama panelleri. */
+html[data-theme="dark"] .dx-texteditor.dx-editor-outlined,
+html[data-theme="dark"] .dx-texteditor.dx-editor-filled,
+html[data-theme="dark"] .dx-texteditor.dx-editor-underlined {
+    background-color: var(--energy-surface-muted);
+    border-color: var(--energy-border);
+}
+html[data-theme="dark"] .dx-texteditor-input { color: var(--energy-text); }
+html[data-theme="dark"] .dx-placeholder { color: var(--energy-text-muted); }
+
+/* Açılır yüzeyler: Popup, açılır listeler, listeler, araç çubuğu, ağaç görünümü. */
+html[data-theme="dark"] .dx-overlay-content,
+html[data-theme="dark"] .dx-popup-normal,
+html[data-theme="dark"] .dx-popup-title,
+html[data-theme="dark"] .dx-toolbar,
+html[data-theme="dark"] .dx-list,
+html[data-theme="dark"] .dx-treeview,
+html[data-theme="dark"] .dx-dropdowneditor-overlay .dx-list,
+html[data-theme="dark"] .dx-scrollview-content {
+    background-color: var(--energy-surface);
+    color: var(--energy-text);
+    border-color: var(--energy-border);
+}
+html[data-theme="dark"] .dx-list-item { color: var(--energy-text); border-color: var(--energy-border); }
+html[data-theme="dark"] .dx-list-item.dx-state-hover { background-color: var(--energy-surface-muted); }
+html[data-theme="dark"] .dx-popup-title.dx-toolbar { border-bottom-color: var(--energy-border); }
+
+/* Normal (kontur) butonlar koyu yüzeyde okunur kalsın. */
+html[data-theme="dark"] .dx-button-mode-contained.dx-button-normal,
+html[data-theme="dark"] .dx-button-mode-outlined.dx-button-normal {
+    background-color: var(--energy-surface-muted);
+    border-color: var(--energy-border);
+    color: var(--energy-text);
+}
+html[data-theme="dark"] .dx-checkbox-icon { border-color: var(--energy-border); }
+
 /* ===== Global responsive hardening (phones & tablets) ===== */
 img, video, canvas, svg { max-width: 100%; }
+
+/* İçeriği kırpmak yerine kaydırılabilir yap: ekrana sığmayan herhangi bir
+   bileşen (DevExtreme DataGrid/TreeList/Scheduler/Chart, geniş araç çubukları,
+   formlar vb.) otomatik olarak sağa-sola pan'lenebilsin. Kaydırma, dış kabuk
+   yerine ana içerik bölgesinin (.energy-main) içinde gerçekleşir; böylece sayfa
+   düzeni bozulmadan tüm bileşenlere erişilebilir kalır. */
+.energy-main {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* DevExtreme'in kendi kaydırılabilir kapsayıcıları (DataGrid, TreeList,
+   Scheduler, geniş listeler) dokunmatik pan'i iki eksende de yakalasın; aksi
+   hâlde mobilde geniş bileşenler parmakla kaydırılamaz. */
+.dx-scrollable-container,
+.dx-datagrid-rowsview,
+.dx-datagrid-content { touch-action: pan-x pan-y; }
 
 @media (max-width: 768px) {
     /* Keep DevExtreme popups (group/members/forward, edit forms, ...) inside the
@@ -1335,8 +1432,9 @@ img, video, canvas, svg { max-width: 100%; }
         max-height: 92vh !important;
     }
 
-    /* Content padding tightened so grids/cards never spill past the screen. */
-    .energy-content { padding-left: 12px; padding-right: 12px; overflow-x: hidden; }
+    /* İçerik dolgusu daraltıldı; içerik kenardan taşmasın diye yatay kaydırma
+       .energy-main üzerinde yapılır (artık burada kırpma yok). */
+    .energy-content { padding-left: 12px; padding-right: 12px; }
     .energy-page-header { padding-left: 12px; padding-right: 12px; }
 
     /* Settings cards stack in a single column on phones. */
@@ -1346,6 +1444,7 @@ img, video, canvas, svg { max-width: 100%; }
     .dx-field, .dx-texteditor, .energy-settings__select { width: 100%; }
 }
 
-/* Prevent the whole shell from ever scrolling sideways. */
+/* Dış kabuğun ikinci bir yatay kaydırma çubuğu oluşturmasını engelle; pan'leme
+   .energy-main içinde yapılır. */
 body, #energy-app { max-width: 100%; overflow-x: hidden; }
 

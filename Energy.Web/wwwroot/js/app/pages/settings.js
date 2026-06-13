@@ -70,7 +70,10 @@
                     headers: token ? { "RequestVerificationToken": token } : {},
                     data: JSON.stringify(payload)
                 }).done(function (envelope) {
-                    var ok = envelope && (envelope.isSuccess || envelope.IsSuccess);
+                    // BaseResponse.IsSuccess JSON'da [JsonPropertyName("success")] ile
+                    // "success" olarak serileştirilir; bu yüzden önce "success" okunmalı
+                    // (isSuccess/IsSuccess yalnızca geriye dönük güvenlik için).
+                    var ok = envelope && (envelope.success || envelope.isSuccess || envelope.IsSuccess);
                     var data = envelope && (envelope.data || envelope.Data);
                     if (ok) {
                         window.EnergyUserSettings.set(data || payload);

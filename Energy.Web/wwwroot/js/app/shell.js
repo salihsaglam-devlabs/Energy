@@ -152,7 +152,11 @@
             onItemClick: function (e) {
                 var hasChildren = e.node && e.node.children && e.node.children.length > 0;
                 if (hasChildren) {
-                    if (e.component.isItemExpanded(e.itemData.id)) {
+                    // dxTreeView'da "isItemExpanded" metodu yoktur; düğümün genişleme
+                    // durumu doğrudan e.node.expanded üzerinden okunur. (Aksi hâlde
+                    // "isItemExpanded is not a function" hatası verir ve menü açılıp
+                    // kapanmazdı.)
+                    if (e.node.expanded) {
                         e.component.collapseItem(e.itemData.id);
                     } else {
                         e.component.expandItem(e.itemData.id);
@@ -180,11 +184,16 @@
         $toggle.off("click.energyNav").on("click.energyNav", function () {
             isOpen = !$(document.body).hasClass("energy-nav-open");
             applyNavState(isOpen);
+            // Çekmece kapalıyken gezinme alanı sıfır genişliktedir; bu sırada oluşturulan
+            // dxTreeView boyut ölçemediği için DevExtreme bir zamanlayıcıyla yeniden dener
+            // (konsolda tekrarlayan W0004 uyarısı). Görünür olunca bir kez yeniden boyutlandır.
+            if (isOpen) { try { treeInstance.repaint(); } catch (e) { /* yok say */ } }
         });
 
         var onViewportChange = function (event) {
             if (event.matches && !$(document.body).hasClass("energy-nav-open") && !$(document.body).hasClass("energy-nav-closed")) {
                 applyNavState(true);
+                try { treeInstance.repaint(); } catch (e) { /* yok say */ }
                 return;
             }
 

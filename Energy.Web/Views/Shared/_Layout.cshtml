@@ -32,6 +32,19 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" />
     <link rel="stylesheet" href="~/css/app.css" asp-append-version="true" />
 
+    @* Tema yanıp sönmesini (FOUC) önle: gövde boyanmadan önce son bilinen tercihi
+       uygula. "system" tercihinde işletim sistemi koyu modunu dikkate al. *@
+    <script>
+        (function () {
+            try {
+                var pref = window.localStorage.getItem("energy-theme") || "system";
+                var dark = pref === "dark" ||
+                    (pref === "system" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+                document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+            } catch (e) { /* yok say */ }
+        })();
+    </script>
+
     @await Html.PartialAsync("_LocalizationBootstrap")
 </head>
 <body class="dx-viewport energy-shell dx-swatch-energy-custom-scheme">
