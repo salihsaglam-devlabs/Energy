@@ -69,7 +69,7 @@ def gen_test(module, entity):
 
 def main():
     # Hand-written tests living under the generated tree are preserved across regens.
-    HAND_WRITTEN = ["Documents/DocumentFileServiceTests.cs"]
+    HAND_WRITTEN = ["Documents/DocumentFileServiceTests.cs", "Validation/ProjectRequestValidatorTests.cs"]
     preserved = {}
     for rel in HAND_WRITTEN:
         p = os.path.join(TESTS_ROOT, rel)

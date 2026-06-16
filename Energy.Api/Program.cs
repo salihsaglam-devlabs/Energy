@@ -4,6 +4,7 @@ using System.Text.Json;
 using Asp.Versioning;
 using Energy.Api.Common.Authorization;
 using Energy.Api.Common.Middleware;
+using Energy.Application;
 using Energy.Application.Identity.Services;
 using Energy.Infrastructure;
 using Energy.Infrastructure.Identity;
@@ -48,10 +49,33 @@ if (environmentSection.Exists())
     builder.Configuration.AddInMemoryCollection(environmentValues);
 }
 
-builder.Services.AddControllers().AddEnergyDataAnnotationsLocalization();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<Energy.Api.Common.Filters.FluentValidationActionFilter>();
+}).AddEnergyDataAnnotationsLocalization();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 
+// Model bağlama / DataAnnotations doğrulama hatalarını da standart BaseResponse
+// zarfında döndür (spec §21: tüm API'de tek tip hata standardı). [ApiController]
+// varsayılan ProblemDetails yanıtını bununla değiştiririz.
+builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(kvp => kvp.Value is not null && kvp.Value.Errors.Count > 0)
+            .SelectMany(kvp => kvp.Value!.Errors.Select(e =>
+                string.IsNullOrWhiteSpace(e.ErrorMessage) ? "Invalid value." : e.ErrorMessage))
+            .ToArray();
+
+        var body = Energy.Shared.Models.V1.Common.Responses.BaseResponse<object>
+            .Failure("Validation failed.", errors);
+        return new Microsoft.AspNetCore.Mvc.BadRequestObjectResult(body);
+    };
+});
+
+builder.Services.AddEnergyApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddEnergyLocalization();
 
