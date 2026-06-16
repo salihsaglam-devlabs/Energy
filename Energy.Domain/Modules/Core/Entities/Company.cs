@@ -2,26 +2,14 @@ using Energy.Domain.Common;
 
 namespace Energy.Domain.Modules.Core;
 
-/// <summary>
-/// Şirket tanımları
-/// </summary>
+/// <summary>Ana organizasyon kökü (şirket).</summary>
 public class Company : AuditableEntity
 {
-    /// <summary>Şirket kodu</summary>
     public string Code { get; set; } = string.Empty;
-
-    /// <summary>Şirket adı</summary>
     public string Name { get; set; } = string.Empty;
-
-    /// <summary>Ana para birimi</summary>
+    /// <summary>Ana para birimi. <see cref="Currency"/> FK.</summary>
     public Guid BaseCurrencyId { get; set; }
-
-    /// <summary>TaxNumber</summary>
     public string? TaxNumber { get; set; }
-
-    /// <summary>Address</summary>
     public string? Address { get; set; }
-
-    /// <summary>IsActive</summary>
-    public bool IsActive { get; set; }
+    public bool IsActive { get; set; } = true;
 }

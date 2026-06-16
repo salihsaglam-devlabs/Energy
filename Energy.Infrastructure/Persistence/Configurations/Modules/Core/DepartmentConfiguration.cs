@@ -1,16 +1,19 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.IAM;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Core;
 
-/// <summary>Department EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class DepartmentConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Core.Department>
+/// <summary>Department EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Core.Department> builder)
+    public void Configure(EntityTypeBuilder<Department> e)
     {
-        builder.ToTable("Departments");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Core.Company>().WithMany().HasForeignKey(e => e.CompanyId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Core.Department>().WithMany().HasForeignKey(e => e.ParentDepartmentId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("Departments");
+        e.HasIndex(x => new { x.CompanyId, x.Code }).IsUnique();
+        e.HasOne<Company>().WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<Department>().WithMany().HasForeignKey(x => x.ParentDepartmentId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<User>().WithMany().HasForeignKey(x => x.ManagerUserId).OnDelete(DeleteBehavior.Restrict);
     }
 }

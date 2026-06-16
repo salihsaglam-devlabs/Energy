@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Workflow.ApprovalRequest.Responses;
 
 /// <summary>ApprovalRequest detay görünümü.</summary>
@@ -43,7 +44,7 @@ public class ApprovalRequestDetailResponse
     public Guid RequestedByUserId { get; set; }
 
     /// <summary>Durum</summary>
-    public string Status { get; set; } = string.Empty;
+    public ApprovalRequestStatus Status { get; set; }
 
     /// <summary>CurrentStepNo</summary>
     public int CurrentStepNo { get; set; }

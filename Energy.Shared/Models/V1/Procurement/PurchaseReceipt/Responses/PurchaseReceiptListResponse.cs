@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Procurement.PurchaseReceipt.Responses;
 
 /// <summary>PurchaseReceipt liste satırı.</summary>
@@ -25,7 +26,7 @@ public class PurchaseReceiptListResponse
     public DateTime ReceiptDate { get; set; }
 
     /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
+    public DocumentStatus Status { get; set; }
 
     /// <summary>Oluşturma zamanı.</summary>
     public DateTime CreatedAt { get; set; }

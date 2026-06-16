@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Procurement.SupplierInvoice.Responses;
 
 /// <summary>SupplierInvoice detay görünümü.</summary>
@@ -49,5 +50,5 @@ public class SupplierInvoiceDetailResponse
     public decimal TotalAmount { get; set; }
 
     /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
+    public DocumentStatus Status { get; set; }
 }

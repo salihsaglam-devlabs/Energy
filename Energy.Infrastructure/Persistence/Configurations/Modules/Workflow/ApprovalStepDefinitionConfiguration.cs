@@ -1,15 +1,19 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Documents;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Notifications;
+using Energy.Domain.Modules.Reporting;
+using Energy.Domain.Modules.Workflow;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Workflow;
 
-/// <summary>ApprovalStepDefinition EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class ApprovalStepDefinitionConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Workflow.ApprovalStepDefinition>
+/// <summary>ApprovalStepDefinition EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class ApprovalStepDefinitionConfiguration : IEntityTypeConfiguration<ApprovalStepDefinition>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Workflow.ApprovalStepDefinition> builder)
+    public void Configure(EntityTypeBuilder<ApprovalStepDefinition> e)
     {
-        builder.ToTable("ApprovalStepDefinitions");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Workflow.ApprovalDefinitionVersion>().WithMany().HasForeignKey(e => e.ApprovalDefinitionVersionId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("ApprovalStepDefinitions");
+        e.HasOne<ApprovalDefinitionVersion>().WithMany().HasForeignKey(x => x.ApprovalDefinitionVersionId).OnDelete(DeleteBehavior.Restrict);
     }
 }

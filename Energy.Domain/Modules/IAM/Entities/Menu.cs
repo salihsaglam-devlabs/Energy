@@ -3,19 +3,33 @@ using Energy.Domain.Common;
 namespace Energy.Domain.Modules.IAM;
 
 /// <summary>
-/// Menü ağacı
+/// Navigasyon (menü) düğümü. Görünürlük yalnızca
+/// <see cref="RequiredPermissionCode"/> üzerinden hesaplanır; rol↔menü bağlantısı
+/// yoktur.
 /// </summary>
 public class Menu : AuditableEntity
 {
-    /// <summary>Üst menü</summary>
+    /// <summary>Üst menü düğümünün kimliği; kök düğümlerde null.</summary>
     public Guid? ParentId { get; set; }
 
-    /// <summary>Lokalizasyon anahtarı</summary>
+    /// <summary>Görünen ad için yerelleştirme anahtarı.</summary>
     public string NameKey { get; set; } = string.Empty;
 
-    /// <summary>URL</summary>
+    /// <summary>Yalnızca kapsayıcı (container) düğümlerde NULL.</summary>
     public string? Url { get; set; }
 
-    /// <summary>Gerekli permission</summary>
+    /// <summary>Menü ikonu (opsiyonel).</summary>
+    public string? Icon { get; set; }
+
+    /// <summary>Kardeş düğümler arasındaki görüntüleme sırası.</summary>
+    public int DisplayOrder { get; set; }
+
+    /// <summary>Menünün görünür olup olmadığı.</summary>
+    public bool IsVisible { get; set; } = true;
+
+    /// <summary>Menünün aktif olup olmadığı.</summary>
+    public bool IsActive { get; set; } = true;
+
+    /// <summary>NULL = herkese görünür (anonim dahil).</summary>
     public string? RequiredPermissionCode { get; set; }
 }

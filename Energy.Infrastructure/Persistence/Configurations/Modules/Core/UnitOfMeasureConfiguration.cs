@@ -1,14 +1,16 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.IAM;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Core;
 
-/// <summary>UnitOfMeasure EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class UnitOfMeasureConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Core.UnitOfMeasure>
+/// <summary>UnitOfMeasure EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class UnitOfMeasureConfiguration : IEntityTypeConfiguration<UnitOfMeasure>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Core.UnitOfMeasure> builder)
+    public void Configure(EntityTypeBuilder<UnitOfMeasure> e)
     {
-        builder.ToTable("UnitsOfMeasure");
-        builder.HasKey(e => e.Id);
+        e.ToTable("UnitsOfMeasure");
+        e.HasIndex(x => x.Code).IsUnique();
     }
 }

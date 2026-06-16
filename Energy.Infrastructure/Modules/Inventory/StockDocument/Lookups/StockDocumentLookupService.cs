@@ -9,21 +9,25 @@ namespace Energy.Infrastructure.Modules.Inventory.StockDocument.Lookups;
 /// <summary>StockDocument lookup servisi (aktif + arama filtreli projection).</summary>
 public class StockDocumentLookupService : IStockDocumentLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public StockDocumentLookupService(EnergyDbContext db) => _db = db;
+    public StockDocumentLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<StockDocumentLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.StockDocuments.AsNoTracking();
-        var items = await query.Select(e => new StockDocumentLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        if (!string.IsNullOrWhiteSpace(search)) query = query.Where(e => e.DocumentNo.Contains(search));
+        var items = await query
+            .OrderBy(e => e.DocumentNo)
+            .Select(e => new StockDocumentLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = e.DocumentNo,
+                DisplayName = e.DocumentNo,
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<StockDocumentLookupResponse>>.Success(items);
     }
 }

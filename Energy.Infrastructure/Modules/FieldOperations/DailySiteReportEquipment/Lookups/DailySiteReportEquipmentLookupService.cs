@@ -9,21 +9,24 @@ namespace Energy.Infrastructure.Modules.FieldOperations.DailySiteReportEquipment
 /// <summary>DailySiteReportEquipment lookup servisi (aktif + arama filtreli projection).</summary>
 public class DailySiteReportEquipmentLookupService : IDailySiteReportEquipmentLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public DailySiteReportEquipmentLookupService(EnergyDbContext db) => _db = db;
+    public DailySiteReportEquipmentLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<DailySiteReportEquipmentLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.DailySiteReportEquipments.AsNoTracking();
-        var items = await query.Select(e => new DailySiteReportEquipmentLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Select(e => new DailySiteReportEquipmentLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = null,
+                DisplayName = e.Id.ToString(),
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<DailySiteReportEquipmentLookupResponse>>.Success(items);
     }
 }

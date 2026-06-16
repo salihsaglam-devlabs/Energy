@@ -9,21 +9,24 @@ namespace Energy.Infrastructure.Modules.Catalog.MaterialUnitConversion.Lookups;
 /// <summary>MaterialUnitConversion lookup servisi (aktif + arama filtreli projection).</summary>
 public class MaterialUnitConversionLookupService : IMaterialUnitConversionLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public MaterialUnitConversionLookupService(EnergyDbContext db) => _db = db;
+    public MaterialUnitConversionLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<MaterialUnitConversionLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.MaterialUnitConversions.AsNoTracking();
-        var items = await query.Select(e => new MaterialUnitConversionLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Select(e => new MaterialUnitConversionLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = null,
+                DisplayName = e.Id.ToString(),
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<MaterialUnitConversionLookupResponse>>.Success(items);
     }
 }

@@ -1,14 +1,19 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.BusinessPartners;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Organization;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.BusinessPartners;
 
-/// <summary>BusinessPartnerContact EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class BusinessPartnerContactConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.BusinessPartners.BusinessPartnerContact>
+/// <summary>BusinessPartnerContact EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class BusinessPartnerContactConfiguration : IEntityTypeConfiguration<BusinessPartnerContact>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.BusinessPartners.BusinessPartnerContact> builder)
+    public void Configure(EntityTypeBuilder<BusinessPartnerContact> e)
     {
-        builder.ToTable("BusinessPartnerContacts");
-        builder.HasKey(e => e.Id);
+        e.ToTable("BusinessPartnerContacts");
+        e.HasOne<BusinessPartner>().WithMany().HasForeignKey(x => x.BusinessPartnerId).OnDelete(DeleteBehavior.Cascade);
     }
 }

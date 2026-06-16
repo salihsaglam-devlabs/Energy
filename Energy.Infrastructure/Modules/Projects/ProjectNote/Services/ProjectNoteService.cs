@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Projects.ProjectNote.Services;
 /// <summary>ProjectNote CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ProjectNoteService : IProjectNoteService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ProjectNoteService(EnergyDbContext db) => _db = db;
+    public ProjectNoteService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ProjectNoteListResponse>>> GetListAsync(GetProjectNoteListRequest request, CancellationToken ct = default)
     {

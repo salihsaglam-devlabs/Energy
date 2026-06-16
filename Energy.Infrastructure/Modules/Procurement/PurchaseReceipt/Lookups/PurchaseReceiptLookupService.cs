@@ -9,21 +9,25 @@ namespace Energy.Infrastructure.Modules.Procurement.PurchaseReceipt.Lookups;
 /// <summary>PurchaseReceipt lookup servisi (aktif + arama filtreli projection).</summary>
 public class PurchaseReceiptLookupService : IPurchaseReceiptLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public PurchaseReceiptLookupService(EnergyDbContext db) => _db = db;
+    public PurchaseReceiptLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<PurchaseReceiptLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.PurchaseReceipts.AsNoTracking();
-        var items = await query.Select(e => new PurchaseReceiptLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        if (!string.IsNullOrWhiteSpace(search)) query = query.Where(e => e.ReceiptNo.Contains(search));
+        var items = await query
+            .OrderBy(e => e.ReceiptNo)
+            .Select(e => new PurchaseReceiptLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = e.ReceiptNo,
+                DisplayName = e.ReceiptNo,
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<PurchaseReceiptLookupResponse>>.Success(items);
     }
 }

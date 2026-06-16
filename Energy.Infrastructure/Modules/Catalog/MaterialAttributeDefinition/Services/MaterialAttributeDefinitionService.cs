@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Catalog.MaterialAttributeDefinition.Serv
 /// <summary>MaterialAttributeDefinition CRUD servisi (projection, pagination, soft-delete).</summary>
 public class MaterialAttributeDefinitionService : IMaterialAttributeDefinitionService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public MaterialAttributeDefinitionService(EnergyDbContext db) => _db = db;
+    public MaterialAttributeDefinitionService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<MaterialAttributeDefinitionListResponse>>> GetListAsync(GetMaterialAttributeDefinitionListRequest request, CancellationToken ct = default)
     {

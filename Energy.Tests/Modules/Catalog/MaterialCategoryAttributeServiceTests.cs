@@ -9,12 +9,12 @@ namespace Energy.Tests.Modules.Catalog;
 /// <summary>MaterialCategoryAttribute CRUD servisi round-trip testi (EF InMemory).</summary>
 public sealed class MaterialCategoryAttributeServiceTests
 {
-    private static EnergyDbContext NewContext()
+    private static AppDbContext NewContext()
     {
-        var options = new DbContextOptionsBuilder<EnergyDbContext>()
+        var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-        return new EnergyDbContext(options);
+        return new AppDbContext(options);
     }
 
     [Fact]

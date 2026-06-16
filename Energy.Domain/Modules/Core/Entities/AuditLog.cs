@@ -1,60 +1,62 @@
-using Energy.Domain.Common;
-
 namespace Energy.Domain.Modules.Core;
 
 /// <summary>
-/// İstek, yanıt ve kritik işlem audit kayıtları
+/// Yalnızca-ekleme (append-only) istek denetim (audit) kaydı. Sadece INSERT
+/// yapılır; UPDATE/DELETE işlemleri veritabanı rolü seviyesinde iptal edilmelidir.
 /// </summary>
-public class AuditLog : AuditableEntity
+public class AuditLog
 {
-    /// <summary>OccurredAt</summary>
+    /// <summary>Otomatik artan birincil anahtar.</summary>
+    public long Id { get; set; }
+
+    /// <summary>İsteğin gerçekleştiği UTC zaman damgası.</summary>
     public DateTime OccurredAt { get; set; }
 
-    /// <summary>UserId</summary>
+    /// <summary>İsteği yapan kullanıcının kimliği (anonimse null).</summary>
     public Guid? UserId { get; set; }
 
-    /// <summary>UserName</summary>
+    /// <summary>İsteği yapan kullanıcının adı (varsa).</summary>
     public string? UserName { get; set; }
 
-    /// <summary>IpAddress</summary>
+    /// <summary>İsteğin geldiği IP adresi.</summary>
     public string? IpAddress { get; set; }
 
-    /// <summary>HttpMethod</summary>
+    /// <summary>HTTP metodu (GET, POST, ...).</summary>
     public string? HttpMethod { get; set; }
 
-    /// <summary>Path</summary>
+    /// <summary>İstek yolu (path).</summary>
     public string? Path { get; set; }
 
-    /// <summary>QueryString</summary>
+    /// <summary>Sorgu dizesi (query string).</summary>
     public string? QueryString { get; set; }
 
-    /// <summary>StatusCode</summary>
+    /// <summary>Yanıtın HTTP durum kodu.</summary>
     public int StatusCode { get; set; }
 
-    /// <summary>IsSuccess</summary>
+    /// <summary>İsteğin başarılı olup olmadığı.</summary>
     public bool IsSuccess { get; set; }
 
-    /// <summary>Source</summary>
+    /// <summary>Kaydı üreten katman: "API" veya "Web".</summary>
     public string? Source { get; set; }
 
-    /// <summary>RequestBody</summary>
+    /// <summary>Maskelenmiş istek gövdesi (hassas alanlar gizlenmiş).</summary>
     public string? RequestBody { get; set; }
 
-    /// <summary>ResponseBody</summary>
+    /// <summary>Maskelenmiş yanıt gövdesi (hassas alanlar gizlenmiş).</summary>
     public string? ResponseBody { get; set; }
 
-    /// <summary>HasException</summary>
+    /// <summary>İstek sırasında bir istisna oluşup oluşmadığı.</summary>
     public bool HasException { get; set; }
 
-    /// <summary>ExceptionType</summary>
+    /// <summary>Oluşan istisnanın tip adı (varsa).</summary>
     public string? ExceptionType { get; set; }
 
-    /// <summary>ExceptionMessage</summary>
+    /// <summary>İstisnanın mesajı (varsa).</summary>
     public string? ExceptionMessage { get; set; }
 
-    /// <summary>CorrelationId</summary>
+    /// <summary>İlişkilendirme (correlation) kimliği; katmanlar arası izleme için.</summary>
     public Guid? CorrelationId { get; set; }
 
-    /// <summary>DurationMs</summary>
+    /// <summary>İsteğin süresi (milisaniye).</summary>
     public int DurationMs { get; set; }
 }

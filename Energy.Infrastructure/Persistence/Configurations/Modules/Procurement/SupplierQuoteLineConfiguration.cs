@@ -1,17 +1,24 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.BusinessPartners;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Procurement;
+using Energy.Domain.Modules.Projects;
+using Energy.Domain.Modules.Requests;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Procurement;
 
-/// <summary>SupplierQuoteLine EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class SupplierQuoteLineConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Procurement.SupplierQuoteLine>
+/// <summary>SupplierQuoteLine EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class SupplierQuoteLineConfiguration : IEntityTypeConfiguration<SupplierQuoteLine>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Procurement.SupplierQuoteLine> builder)
+    public void Configure(EntityTypeBuilder<SupplierQuoteLine> e)
     {
-        builder.ToTable("SupplierQuoteLines");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Procurement.SupplierQuote>().WithMany().HasForeignKey(e => e.SupplierQuoteId).OnDelete(DeleteBehavior.Cascade);
-        builder.HasOne<global::Energy.Domain.Modules.Requests.RequestLine>().WithMany().HasForeignKey(e => e.RequestLineId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Catalog.Material>().WithMany().HasForeignKey(e => e.MaterialId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("SupplierQuoteLines");
+        e.HasOne<SupplierQuote>().WithMany().HasForeignKey(x => x.SupplierQuoteId).OnDelete(DeleteBehavior.Cascade);
+        e.HasOne<RequestLine>().WithMany().HasForeignKey(x => x.RequestLineId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<Material>().WithMany().HasForeignKey(x => x.MaterialId).OnDelete(DeleteBehavior.Restrict);
     }
 }

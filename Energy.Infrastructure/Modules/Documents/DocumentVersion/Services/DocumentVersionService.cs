@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Documents.DocumentVersion.Services;
 /// <summary>DocumentVersion CRUD servisi (projection, pagination, soft-delete).</summary>
 public class DocumentVersionService : IDocumentVersionService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public DocumentVersionService(EnergyDbContext db) => _db = db;
+    public DocumentVersionService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<DocumentVersionListResponse>>> GetListAsync(GetDocumentVersionListRequest request, CancellationToken ct = default)
     {

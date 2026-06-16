@@ -1,14 +1,19 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Catalog;
 
-/// <summary>MaterialCategory EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class MaterialCategoryConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Catalog.MaterialCategory>
+/// <summary>MaterialCategory EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class MaterialCategoryConfiguration : IEntityTypeConfiguration<MaterialCategory>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Catalog.MaterialCategory> builder)
+    public void Configure(EntityTypeBuilder<MaterialCategory> e)
     {
-        builder.ToTable("MaterialCategories");
-        builder.HasKey(e => e.Id);
+        e.ToTable("MaterialCategories");
+        e.HasIndex(x => x.Code).IsUnique();
+        e.HasOne<MaterialCategory>().WithMany().HasForeignKey(x => x.ParentCategoryId).OnDelete(DeleteBehavior.Restrict);
     }
 }

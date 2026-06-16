@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 using FluentValidation;
 using Energy.Shared.Models.V1.Contracts.Contract.Requests;
 

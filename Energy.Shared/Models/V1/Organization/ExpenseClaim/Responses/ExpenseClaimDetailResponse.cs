@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Organization.ExpenseClaim.Responses;
 
 /// <summary>ExpenseClaim detay görünümü.</summary>
@@ -46,7 +47,7 @@ public class ExpenseClaimDetailResponse
     public decimal TotalAmount { get; set; }
 
     /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
+    public ApprovalRequestStatus Status { get; set; }
 
     /// <summary>ApprovalRequestId</summary>
     public Guid? ApprovalRequestId { get; set; }

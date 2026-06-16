@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Projects.Project.Services;
 /// <summary>Project CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ProjectService : IProjectService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ProjectService(EnergyDbContext db) => _db = db;
+    public ProjectService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ProjectListResponse>>> GetListAsync(GetProjectListRequest request, CancellationToken ct = default)
     {

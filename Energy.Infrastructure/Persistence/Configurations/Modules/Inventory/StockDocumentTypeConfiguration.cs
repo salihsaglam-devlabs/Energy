@@ -1,14 +1,17 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Inventory;
 
-/// <summary>StockDocumentType EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class StockDocumentTypeConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Inventory.StockDocumentType>
+/// <summary>StockDocumentType EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class StockDocumentTypeConfiguration : IEntityTypeConfiguration<StockDocumentType>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Inventory.StockDocumentType> builder)
+    public void Configure(EntityTypeBuilder<StockDocumentType> e)
     {
-        builder.ToTable("StockDocumentTypes");
-        builder.HasKey(e => e.Id);
+        e.ToTable("StockDocumentTypes"); e.HasIndex(x => x.Code).IsUnique(); 
     }
 }

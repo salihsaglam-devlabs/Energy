@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Finance.Receivable.Services;
 /// <summary>Receivable CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ReceivableService : IReceivableService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ReceivableService(EnergyDbContext db) => _db = db;
+    public ReceivableService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ReceivableListResponse>>> GetListAsync(GetReceivableListRequest request, CancellationToken ct = default)
     {

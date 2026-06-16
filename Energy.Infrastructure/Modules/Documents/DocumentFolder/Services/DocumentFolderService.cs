@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Documents.DocumentFolder.Services;
 /// <summary>DocumentFolder CRUD servisi (projection, pagination, soft-delete).</summary>
 public class DocumentFolderService : IDocumentFolderService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public DocumentFolderService(EnergyDbContext db) => _db = db;
+    public DocumentFolderService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<DocumentFolderListResponse>>> GetListAsync(GetDocumentFolderListRequest request, CancellationToken ct = default)
     {

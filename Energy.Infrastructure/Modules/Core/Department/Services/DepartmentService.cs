@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Core.Department.Services;
 /// <summary>Department CRUD servisi (projection, pagination, soft-delete).</summary>
 public class DepartmentService : IDepartmentService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public DepartmentService(EnergyDbContext db) => _db = db;
+    public DepartmentService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<DepartmentListResponse>>> GetListAsync(GetDepartmentListRequest request, CancellationToken ct = default)
     {

@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Inventory.StockCount.Responses;
 
 /// <summary>StockCount detay görünümü.</summary>
@@ -37,5 +38,5 @@ public class StockCountDetailResponse
     public DateTime CountDate { get; set; }
 
     /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
+    public DocumentStatus Status { get; set; }
 }

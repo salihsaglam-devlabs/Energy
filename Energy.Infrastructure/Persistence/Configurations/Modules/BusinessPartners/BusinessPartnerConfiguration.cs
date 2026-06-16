@@ -1,14 +1,18 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.BusinessPartners;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Organization;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.BusinessPartners;
 
-/// <summary>BusinessPartner EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class BusinessPartnerConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.BusinessPartners.BusinessPartner>
+/// <summary>BusinessPartner EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class BusinessPartnerConfiguration : IEntityTypeConfiguration<BusinessPartner>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.BusinessPartners.BusinessPartner> builder)
+    public void Configure(EntityTypeBuilder<BusinessPartner> e)
     {
-        builder.ToTable("BusinessPartners");
-        builder.HasKey(e => e.Id);
+        e.ToTable("BusinessPartners"); e.HasIndex(x => x.Code).IsUnique(); 
     }
 }

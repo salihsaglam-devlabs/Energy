@@ -9,21 +9,24 @@ namespace Energy.Infrastructure.Modules.Procurement.SupplierInvoiceLine.Lookups;
 /// <summary>SupplierInvoiceLine lookup servisi (aktif + arama filtreli projection).</summary>
 public class SupplierInvoiceLineLookupService : ISupplierInvoiceLineLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public SupplierInvoiceLineLookupService(EnergyDbContext db) => _db = db;
+    public SupplierInvoiceLineLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<SupplierInvoiceLineLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.SupplierInvoiceLines.AsNoTracking();
-        var items = await query.Select(e => new SupplierInvoiceLineLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Select(e => new SupplierInvoiceLineLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = null,
+                DisplayName = e.Id.ToString(),
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<SupplierInvoiceLineLookupResponse>>.Success(items);
     }
 }

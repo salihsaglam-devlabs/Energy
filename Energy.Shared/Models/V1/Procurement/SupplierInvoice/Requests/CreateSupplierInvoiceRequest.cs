@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Procurement.SupplierInvoice.Requests;
 
 /// <summary>SupplierInvoice oluşturma isteği.</summary>
@@ -25,5 +26,5 @@ public class CreateSupplierInvoiceRequest
     public decimal TotalAmount { get; set; }
 
     /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
+    public DocumentStatus Status { get; set; }
 }

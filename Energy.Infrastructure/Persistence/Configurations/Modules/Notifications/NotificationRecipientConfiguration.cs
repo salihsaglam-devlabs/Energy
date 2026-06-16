@@ -1,16 +1,21 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Documents;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Notifications;
+using Energy.Domain.Modules.Reporting;
+using Energy.Domain.Modules.Workflow;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Notifications;
 
-/// <summary>NotificationRecipient EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class NotificationRecipientConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Notifications.NotificationRecipient>
+/// <summary>NotificationRecipient EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class NotificationRecipientConfiguration : IEntityTypeConfiguration<NotificationRecipient>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Notifications.NotificationRecipient> builder)
+    public void Configure(EntityTypeBuilder<NotificationRecipient> e)
     {
-        builder.ToTable("NotificationRecipients");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Notifications.Notification>().WithMany().HasForeignKey(e => e.NotificationId).OnDelete(DeleteBehavior.Cascade);
-        builder.HasOne<global::Energy.Domain.Modules.IAM.User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("NotificationRecipients");
+        e.HasIndex(x => new { x.UserId, x.IsRead });
+        e.HasOne<Notification>().WithMany().HasForeignKey(x => x.NotificationId).OnDelete(DeleteBehavior.Cascade);
+        e.HasOne<User>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Restrict);
     }
 }

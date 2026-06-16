@@ -1,18 +1,25 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.BusinessPartners;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Procurement;
+using Energy.Domain.Modules.Projects;
+using Energy.Domain.Modules.Requests;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Procurement;
 
-/// <summary>PurchaseOrderLine EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class PurchaseOrderLineConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Procurement.PurchaseOrderLine>
+/// <summary>PurchaseOrderLine EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class PurchaseOrderLineConfiguration : IEntityTypeConfiguration<PurchaseOrderLine>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Procurement.PurchaseOrderLine> builder)
+    public void Configure(EntityTypeBuilder<PurchaseOrderLine> e)
     {
-        builder.ToTable("PurchaseOrderLines");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Procurement.PurchaseOrder>().WithMany().HasForeignKey(e => e.PurchaseOrderId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Requests.RequestLine>().WithMany().HasForeignKey(e => e.RequestLineId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Catalog.Material>().WithMany().HasForeignKey(e => e.MaterialId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Core.Currency>().WithMany().HasForeignKey(e => e.CurrencyId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("PurchaseOrderLines");
+        e.HasOne<PurchaseOrder>().WithMany().HasForeignKey(x => x.PurchaseOrderId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<RequestLine>().WithMany().HasForeignKey(x => x.RequestLineId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<Material>().WithMany().HasForeignKey(x => x.MaterialId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<Currency>().WithMany().HasForeignKey(x => x.CurrencyId).OnDelete(DeleteBehavior.Restrict);
     }
 }

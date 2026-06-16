@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Projects.Reports.ProjectStatusReport;
 /// <summary>ProjectStatusReport raporu servisi (AsNoTracking, projection, filtre, sayfalama).</summary>
 public sealed class ProjectStatusReportService : IProjectStatusReportService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ProjectStatusReportService(EnergyDbContext db) => _db = db;
+    public ProjectStatusReportService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ProjectStatusReportRowResponse>>> GetDataAsync(ProjectStatusReportRequest request, CancellationToken ct = default)
     {

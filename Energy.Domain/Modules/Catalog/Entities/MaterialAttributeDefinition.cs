@@ -2,20 +2,12 @@ using Energy.Domain.Common;
 
 namespace Energy.Domain.Modules.Catalog;
 
-/// <summary>
-/// Dinamik malzeme öznitelik tanımları
-/// </summary>
+/// <summary>Dinamik malzeme öznitelik tanımı.</summary>
 public class MaterialAttributeDefinition : AuditableEntity
 {
-    /// <summary>Code</summary>
     public string Code { get; set; } = string.Empty;
-
-    /// <summary>Name</summary>
     public string Name { get; set; } = string.Empty;
-
-    /// <summary>DataType</summary>
-    public string DataType { get; set; } = string.Empty;
-
-    /// <summary>IsActive</summary>
-    public bool IsActive { get; set; }
+    /// <summary>Text, Number, Decimal, Boolean, Date, Option.</summary>
+    public string DataType { get; set; } = "Text";
+    public bool IsActive { get; set; } = true;
 }

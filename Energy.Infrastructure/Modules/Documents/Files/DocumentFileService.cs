@@ -14,10 +14,10 @@ namespace Energy.Infrastructure.Modules.Documents.Files;
 /// </summary>
 public sealed class DocumentFileService : IDocumentFileService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
     private readonly IFileStorage _storage;
 
-    public DocumentFileService(EnergyDbContext db, IFileStorage storage)
+    public DocumentFileService(AppDbContext db, IFileStorage storage)
     {
         _db = db;
         _storage = storage;

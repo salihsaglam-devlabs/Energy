@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Core.SystemSetting.Services;
 /// <summary>SystemSetting CRUD servisi (projection, pagination, soft-delete).</summary>
 public class SystemSettingService : ISystemSettingService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public SystemSettingService(EnergyDbContext db) => _db = db;
+    public SystemSettingService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<SystemSettingListResponse>>> GetListAsync(GetSystemSettingListRequest request, CancellationToken ct = default)
     {

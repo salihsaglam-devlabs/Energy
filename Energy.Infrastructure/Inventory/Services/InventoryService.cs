@@ -1,6 +1,7 @@
+using Energy.Shared.Common;
 using Energy.Application.Inventory.Services;
 using Energy.Domain.Common;
-using Energy.Domain.Inventory;
+using Energy.Domain.Modules.Inventory;
 using Energy.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

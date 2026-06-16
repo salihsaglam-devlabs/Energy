@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Finance.Payment.Requests;
 
 /// <summary>Payment oluşturma isteği.</summary>
@@ -22,7 +23,7 @@ public class CreatePaymentRequest
     public string PaymentNo { get; set; } = string.Empty;
 
     /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
+    public ApprovalRequestStatus Status { get; set; }
 
     /// <summary>ApprovalRequestId</summary>
     public Guid? ApprovalRequestId { get; set; }

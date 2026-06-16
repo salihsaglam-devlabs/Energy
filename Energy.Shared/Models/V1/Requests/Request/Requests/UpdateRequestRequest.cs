@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Requests.Request.Requests;
 
 /// <summary>Request güncelleme isteği.</summary>
@@ -16,7 +17,7 @@ public class UpdateRequestRequest
     public Guid RequestedByUserId { get; set; }
 
     /// <summary>Durum</summary>
-    public string Status { get; set; } = string.Empty;
+    public RequestStatus Status { get; set; }
 
     /// <summary>Talep no</summary>
     public string RequestNo { get; set; } = string.Empty;

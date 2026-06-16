@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Finance.FinancialTransactionLine.Service
 /// <summary>FinancialTransactionLine CRUD servisi (projection, pagination, soft-delete).</summary>
 public class FinancialTransactionLineService : IFinancialTransactionLineService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public FinancialTransactionLineService(EnergyDbContext db) => _db = db;
+    public FinancialTransactionLineService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<FinancialTransactionLineListResponse>>> GetListAsync(GetFinancialTransactionLineListRequest request, CancellationToken ct = default)
     {

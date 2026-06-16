@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Procurement.PurchaseOrder.Requests;
 
 /// <summary>PurchaseOrder güncelleme isteği.</summary>
@@ -13,7 +14,7 @@ public class UpdatePurchaseOrderRequest
     public Guid? ProjectId { get; set; }
 
     /// <summary>Durum</summary>
-    public string Status { get; set; } = string.Empty;
+    public PurchaseOrderStatus Status { get; set; }
 
     /// <summary>Sipariş no</summary>
     public string OrderNo { get; set; } = string.Empty;

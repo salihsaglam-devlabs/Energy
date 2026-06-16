@@ -1,14 +1,22 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Budget;
+using Energy.Domain.Modules.BusinessPartners;
+using Energy.Domain.Modules.Contracts;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.FieldOperations;
+using Energy.Domain.Modules.Finance;
+using Energy.Domain.Modules.ProgressPayments;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Contracts;
 
-/// <summary>ContractLine EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class ContractLineConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Contracts.ContractLine>
+/// <summary>ContractLine EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class ContractLineConfiguration : IEntityTypeConfiguration<ContractLine>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Contracts.ContractLine> builder)
+    public void Configure(EntityTypeBuilder<ContractLine> e)
     {
-        builder.ToTable("ContractLines");
-        builder.HasKey(e => e.Id);
+        e.ToTable("ContractLines");
+        e.HasOne<Contract>().WithMany().HasForeignKey(x => x.ContractId).OnDelete(DeleteBehavior.Cascade);
     }
 }

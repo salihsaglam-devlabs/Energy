@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Procurement.SupplierQuote.Requests;
 
 /// <summary>SupplierQuote güncelleme isteği.</summary>
@@ -25,7 +26,7 @@ public class UpdateSupplierQuoteRequest
     public string? PaymentTerm { get; set; }
 
     /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
+    public DocumentStatus Status { get; set; }
 
     /// <summary>IsSelected</summary>
     public bool IsSelected { get; set; }

@@ -9,21 +9,25 @@ namespace Energy.Infrastructure.Modules.FieldOperations.MeasurementSheet.Lookups
 /// <summary>MeasurementSheet lookup servisi (aktif + arama filtreli projection).</summary>
 public class MeasurementSheetLookupService : IMeasurementSheetLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public MeasurementSheetLookupService(EnergyDbContext db) => _db = db;
+    public MeasurementSheetLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<MeasurementSheetLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.MeasurementSheets.AsNoTracking();
-        var items = await query.Select(e => new MeasurementSheetLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        if (!string.IsNullOrWhiteSpace(search)) query = query.Where(e => e.SheetNo.Contains(search));
+        var items = await query
+            .OrderBy(e => e.SheetNo)
+            .Select(e => new MeasurementSheetLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = e.SheetNo,
+                DisplayName = e.SheetNo,
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<MeasurementSheetLookupResponse>>.Success(items);
     }
 }

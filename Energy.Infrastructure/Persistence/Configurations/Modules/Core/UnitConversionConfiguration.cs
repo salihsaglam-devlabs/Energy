@@ -1,14 +1,17 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.IAM;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Core;
 
-/// <summary>UnitConversion EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class UnitConversionConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Core.UnitConversion>
+/// <summary>UnitConversion EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class UnitConversionConfiguration : IEntityTypeConfiguration<UnitConversion>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Core.UnitConversion> builder)
+    public void Configure(EntityTypeBuilder<UnitConversion> e)
     {
-        builder.ToTable("UnitConversions");
-        builder.HasKey(e => e.Id);
+        e.ToTable("UnitConversions");
+        e.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.FromUnitOfMeasureId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.ToUnitOfMeasureId).OnDelete(DeleteBehavior.Restrict);
     }
 }

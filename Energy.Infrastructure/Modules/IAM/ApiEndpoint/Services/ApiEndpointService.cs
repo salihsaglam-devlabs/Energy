@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.IAM.ApiEndpoint.Services;
 /// <summary>ApiEndpoint CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ApiEndpointService : IApiEndpointService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ApiEndpointService(EnergyDbContext db) => _db = db;
+    public ApiEndpointService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ApiEndpointListResponse>>> GetListAsync(GetApiEndpointListRequest request, CancellationToken ct = default)
     {

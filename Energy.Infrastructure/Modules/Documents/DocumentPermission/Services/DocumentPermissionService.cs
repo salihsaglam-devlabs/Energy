@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Documents.DocumentPermission.Services;
 /// <summary>DocumentPermission CRUD servisi (projection, pagination, soft-delete).</summary>
 public class DocumentPermissionService : IDocumentPermissionService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public DocumentPermissionService(EnergyDbContext db) => _db = db;
+    public DocumentPermissionService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<DocumentPermissionListResponse>>> GetListAsync(GetDocumentPermissionListRequest request, CancellationToken ct = default)
     {

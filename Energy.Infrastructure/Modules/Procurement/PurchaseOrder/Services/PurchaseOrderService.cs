@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Procurement.PurchaseOrder.Services;
 /// <summary>PurchaseOrder CRUD servisi (projection, pagination, soft-delete).</summary>
 public class PurchaseOrderService : IPurchaseOrderService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public PurchaseOrderService(EnergyDbContext db) => _db = db;
+    public PurchaseOrderService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<PurchaseOrderListResponse>>> GetListAsync(GetPurchaseOrderListRequest request, CancellationToken ct = default)
     {

@@ -10,16 +10,16 @@ namespace Energy.Infrastructure.Modules.Procurement.Reports.PurchaseOrderSummary
 /// <summary>PurchaseOrderSummary raporu servisi (AsNoTracking, projection, filtre, sayfalama).</summary>
 public sealed class PurchaseOrderSummaryService : IPurchaseOrderSummaryService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public PurchaseOrderSummaryService(EnergyDbContext db) => _db = db;
+    public PurchaseOrderSummaryService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<PurchaseOrderSummaryRowResponse>>> GetDataAsync(PurchaseOrderSummaryRequest request, CancellationToken ct = default)
     {
         var query = _db.PurchaseOrders.AsNoTracking();
         if (request.StartDate.HasValue) query = query.Where(e => e.OrderDate >= request.StartDate.Value);
         if (request.EndDate.HasValue) query = query.Where(e => e.OrderDate <= request.EndDate.Value);
-        if (!string.IsNullOrWhiteSpace(request.Status)) query = query.Where(e => e.Status == request.Status);
+        if (!string.IsNullOrWhiteSpace(request.Status)) query = query.Where(e => e.Status.ToString() == request.Status);
         var total = await query.CountAsync(ct);
         var pageSize = request.PageSize <= 0 ? 50 : request.PageSize;
         var pageNumber = request.PageNumber <= 0 ? 1 : request.PageNumber;
@@ -35,7 +35,7 @@ public sealed class PurchaseOrderSummaryService : IPurchaseOrderSummaryService
                 SupplierId = e.SupplierId,
                 ProjectId = e.ProjectId,
                 CurrencyId = e.CurrencyId,
-                Status = e.Status
+                Status = e.Status.ToString()
             })
             .ToListAsync(ct);
         var page = PaginatedResponse<PurchaseOrderSummaryRowResponse>.Create(items, pageNumber, pageSize, total);

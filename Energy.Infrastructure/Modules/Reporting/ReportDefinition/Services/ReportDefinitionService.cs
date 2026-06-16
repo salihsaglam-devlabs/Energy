@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Reporting.ReportDefinition.Services;
 /// <summary>ReportDefinition CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ReportDefinitionService : IReportDefinitionService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ReportDefinitionService(EnergyDbContext db) => _db = db;
+    public ReportDefinitionService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ReportDefinitionListResponse>>> GetListAsync(GetReportDefinitionListRequest request, CancellationToken ct = default)
     {

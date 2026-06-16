@@ -9,21 +9,24 @@ namespace Energy.Infrastructure.Modules.Inventory.StockLot.Lookups;
 /// <summary>StockLot lookup servisi (aktif + arama filtreli projection).</summary>
 public class StockLotLookupService : IStockLotLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public StockLotLookupService(EnergyDbContext db) => _db = db;
+    public StockLotLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<StockLotLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.StockLots.AsNoTracking();
-        var items = await query.Select(e => new StockLotLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Select(e => new StockLotLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = null,
+                DisplayName = e.Id.ToString(),
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<StockLotLookupResponse>>.Success(items);
     }
 }

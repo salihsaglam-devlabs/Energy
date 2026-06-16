@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.FieldOperations.MeasurementSheet.Responses;
 
 /// <summary>MeasurementSheet liste satırı.</summary>
@@ -19,7 +20,7 @@ public class MeasurementSheetListResponse
     public DateTime SheetDate { get; set; }
 
     /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
+    public DocumentStatus Status { get; set; }
 
     /// <summary>Oluşturma zamanı.</summary>
     public DateTime CreatedAt { get; set; }

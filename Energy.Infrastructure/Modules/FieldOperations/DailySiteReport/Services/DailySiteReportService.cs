@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.FieldOperations.DailySiteReport.Services
 /// <summary>DailySiteReport CRUD servisi (projection, pagination, soft-delete).</summary>
 public class DailySiteReportService : IDailySiteReportService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public DailySiteReportService(EnergyDbContext db) => _db = db;
+    public DailySiteReportService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<DailySiteReportListResponse>>> GetListAsync(GetDailySiteReportListRequest request, CancellationToken ct = default)
     {

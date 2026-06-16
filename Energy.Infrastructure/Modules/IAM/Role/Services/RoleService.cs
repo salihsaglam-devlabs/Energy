@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.IAM.Role.Services;
 /// <summary>Role CRUD servisi (projection, pagination, soft-delete).</summary>
 public class RoleService : IRoleService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public RoleService(EnergyDbContext db) => _db = db;
+    public RoleService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<RoleListResponse>>> GetListAsync(GetRoleListRequest request, CancellationToken ct = default)
     {

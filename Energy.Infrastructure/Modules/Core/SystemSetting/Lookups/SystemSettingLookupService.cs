@@ -9,21 +9,24 @@ namespace Energy.Infrastructure.Modules.Core.SystemSetting.Lookups;
 /// <summary>SystemSetting lookup servisi (aktif + arama filtreli projection).</summary>
 public class SystemSettingLookupService : ISystemSettingLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public SystemSettingLookupService(EnergyDbContext db) => _db = db;
+    public SystemSettingLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<SystemSettingLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.SystemSettings.AsNoTracking();
-        var items = await query.Select(e => new SystemSettingLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .OrderBy(e => e.Key)
+            .Select(e => new SystemSettingLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = e.Key,
+                DisplayName = e.Key,
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<SystemSettingLookupResponse>>.Success(items);
     }
 }

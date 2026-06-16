@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Workflow.ApprovalRequestStep.Responses;
 
 /// <summary>ApprovalRequestStep detay görünümü.</summary>
@@ -37,10 +38,10 @@ public class ApprovalRequestStepDetailResponse
     public int StepNo { get; set; }
 
     /// <summary>Adım durumu</summary>
-    public string Status { get; set; } = string.Empty;
+    public ApprovalStepStatus Status { get; set; }
 
     /// <summary>ApprovalMode</summary>
-    public string ApprovalMode { get; set; } = string.Empty;
+    public ApprovalMode ApprovalMode { get; set; }
 
     /// <summary>RequiredApprovalCount</summary>
     public int? RequiredApprovalCount { get; set; }

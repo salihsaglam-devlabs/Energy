@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.FieldOperations.MeasurementSheet.Responses;
 
 /// <summary>MeasurementSheet detay görünümü.</summary>
@@ -40,5 +41,5 @@ public class MeasurementSheetDetailResponse
     public DateTime SheetDate { get; set; }
 
     /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
+    public DocumentStatus Status { get; set; }
 }

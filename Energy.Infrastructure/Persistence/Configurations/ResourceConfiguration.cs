@@ -1,4 +1,4 @@
-using Energy.Domain.Localization;
+using Energy.Domain.Modules.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

@@ -9,21 +9,24 @@ namespace Energy.Infrastructure.Modules.Contracts.ContractLine.Lookups;
 /// <summary>ContractLine lookup servisi (aktif + arama filtreli projection).</summary>
 public class ContractLineLookupService : IContractLineLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ContractLineLookupService(EnergyDbContext db) => _db = db;
+    public ContractLineLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<ContractLineLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.ContractLines.AsNoTracking();
-        var items = await query.Select(e => new ContractLineLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Select(e => new ContractLineLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = null,
+                DisplayName = e.Id.ToString(),
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<ContractLineLookupResponse>>.Success(items);
     }
 }

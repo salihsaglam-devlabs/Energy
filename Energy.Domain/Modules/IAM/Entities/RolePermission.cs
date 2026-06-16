@@ -1,15 +1,14 @@
-using Energy.Domain.Common;
-
 namespace Energy.Domain.Modules.IAM;
 
 /// <summary>
-/// Rol permission bağlantıları
+/// "Kim neyi yapabilir" sorusunun TEK doğruluk kaynağı. Başka hiçbir tablo
+/// yetkileri rollere/kullanıcılara eşlemez.
 /// </summary>
-public class RolePermission : AuditableEntity
+public class RolePermission
 {
-    /// <summary>Roles referansı</summary>
+    /// <summary>Yetkinin atandığı rolün kimliği.</summary>
     public Guid RoleId { get; set; }
 
-    /// <summary>Permissions referansı</summary>
+    /// <summary>Role atanan yetki kodu (ör. <c>User.Read</c>).</summary>
     public string PermissionCode { get; set; } = string.Empty;
 }

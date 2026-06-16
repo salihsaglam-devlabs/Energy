@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Chat.ChatGroupMember.Services;
 /// <summary>ChatGroupMember CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ChatGroupMemberService : IChatGroupMemberService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ChatGroupMemberService(EnergyDbContext db) => _db = db;
+    public ChatGroupMemberService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ChatGroupMemberListResponse>>> GetListAsync(GetChatGroupMemberListRequest request, CancellationToken ct = default)
     {

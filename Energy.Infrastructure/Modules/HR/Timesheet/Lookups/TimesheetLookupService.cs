@@ -9,21 +9,25 @@ namespace Energy.Infrastructure.Modules.HR.Timesheet.Lookups;
 /// <summary>Timesheet lookup servisi (aktif + arama filtreli projection).</summary>
 public class TimesheetLookupService : ITimesheetLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public TimesheetLookupService(EnergyDbContext db) => _db = db;
+    public TimesheetLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<TimesheetLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.Timesheets.AsNoTracking();
-        var items = await query.Select(e => new TimesheetLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        if (!string.IsNullOrWhiteSpace(search)) query = query.Where(e => e.TimesheetNo.Contains(search));
+        var items = await query
+            .OrderBy(e => e.TimesheetNo)
+            .Select(e => new TimesheetLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = e.TimesheetNo,
+                DisplayName = e.TimesheetNo,
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<TimesheetLookupResponse>>.Success(items);
     }
 }

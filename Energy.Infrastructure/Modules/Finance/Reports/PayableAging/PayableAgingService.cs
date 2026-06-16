@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Finance.Reports.PayableAging;
 /// <summary>PayableAging raporu servisi (AsNoTracking, projection, filtre, sayfalama).</summary>
 public sealed class PayableAgingService : IPayableAgingService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public PayableAgingService(EnergyDbContext db) => _db = db;
+    public PayableAgingService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<PayableAgingRowResponse>>> GetDataAsync(PayableAgingRequest request, CancellationToken ct = default)
     {

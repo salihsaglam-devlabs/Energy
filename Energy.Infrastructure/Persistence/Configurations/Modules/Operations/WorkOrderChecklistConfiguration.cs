@@ -1,14 +1,25 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Assets;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Contracts;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.FieldOperations;
+using Energy.Domain.Modules.HR;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Operations;
+using Energy.Domain.Modules.Organization;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Operations;
 
-/// <summary>WorkOrderChecklist EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class WorkOrderChecklistConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Operations.WorkOrderChecklist>
+/// <summary>WorkOrderChecklist EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class WorkOrderChecklistConfiguration : IEntityTypeConfiguration<WorkOrderChecklist>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Operations.WorkOrderChecklist> builder)
+    public void Configure(EntityTypeBuilder<WorkOrderChecklist> e)
     {
-        builder.ToTable("WorkOrderChecklists");
-        builder.HasKey(e => e.Id);
+        e.ToTable("WorkOrderChecklists");
+        e.HasOne<WorkOrder>().WithMany().HasForeignKey(x => x.WorkOrderId).OnDelete(DeleteBehavior.Cascade);
     }
 }

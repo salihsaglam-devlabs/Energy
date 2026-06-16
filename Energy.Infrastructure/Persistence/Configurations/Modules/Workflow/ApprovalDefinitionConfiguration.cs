@@ -1,14 +1,18 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Documents;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Notifications;
+using Energy.Domain.Modules.Reporting;
+using Energy.Domain.Modules.Workflow;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Workflow;
 
-/// <summary>ApprovalDefinition EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class ApprovalDefinitionConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Workflow.ApprovalDefinition>
+/// <summary>ApprovalDefinition EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class ApprovalDefinitionConfiguration : IEntityTypeConfiguration<ApprovalDefinition>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Workflow.ApprovalDefinition> builder)
+    public void Configure(EntityTypeBuilder<ApprovalDefinition> e)
     {
-        builder.ToTable("ApprovalDefinitions");
-        builder.HasKey(e => e.Id);
+        e.ToTable("ApprovalDefinitions"); e.HasIndex(x => x.Code).IsUnique(); 
     }
 }

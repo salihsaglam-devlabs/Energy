@@ -9,21 +9,24 @@ namespace Energy.Infrastructure.Modules.Budget.BudgetLine.Lookups;
 /// <summary>BudgetLine lookup servisi (aktif + arama filtreli projection).</summary>
 public class BudgetLineLookupService : IBudgetLineLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public BudgetLineLookupService(EnergyDbContext db) => _db = db;
+    public BudgetLineLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<BudgetLineLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.BudgetLines.AsNoTracking();
-        var items = await query.Select(e => new BudgetLineLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Select(e => new BudgetLineLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = null,
+                DisplayName = e.Id.ToString(),
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<BudgetLineLookupResponse>>.Success(items);
     }
 }

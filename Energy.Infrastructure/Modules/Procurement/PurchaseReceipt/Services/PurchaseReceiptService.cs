@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Procurement.PurchaseReceipt.Services;
 /// <summary>PurchaseReceipt CRUD servisi (projection, pagination, soft-delete).</summary>
 public class PurchaseReceiptService : IPurchaseReceiptService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public PurchaseReceiptService(EnergyDbContext db) => _db = db;
+    public PurchaseReceiptService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<PurchaseReceiptListResponse>>> GetListAsync(GetPurchaseReceiptListRequest request, CancellationToken ct = default)
     {

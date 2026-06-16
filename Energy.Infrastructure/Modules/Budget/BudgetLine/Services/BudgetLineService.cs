@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Budget.BudgetLine.Services;
 /// <summary>BudgetLine CRUD servisi (projection, pagination, soft-delete).</summary>
 public class BudgetLineService : IBudgetLineService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public BudgetLineService(EnergyDbContext db) => _db = db;
+    public BudgetLineService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<BudgetLineListResponse>>> GetListAsync(GetBudgetLineListRequest request, CancellationToken ct = default)
     {

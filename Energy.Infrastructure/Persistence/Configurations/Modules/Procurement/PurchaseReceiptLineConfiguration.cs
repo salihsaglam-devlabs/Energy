@@ -1,17 +1,24 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.BusinessPartners;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Procurement;
+using Energy.Domain.Modules.Projects;
+using Energy.Domain.Modules.Requests;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Procurement;
 
-/// <summary>PurchaseReceiptLine EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class PurchaseReceiptLineConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Procurement.PurchaseReceiptLine>
+/// <summary>PurchaseReceiptLine EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class PurchaseReceiptLineConfiguration : IEntityTypeConfiguration<PurchaseReceiptLine>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Procurement.PurchaseReceiptLine> builder)
+    public void Configure(EntityTypeBuilder<PurchaseReceiptLine> e)
     {
-        builder.ToTable("PurchaseReceiptLines");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Procurement.PurchaseReceipt>().WithMany().HasForeignKey(e => e.PurchaseReceiptId).OnDelete(DeleteBehavior.Cascade);
-        builder.HasOne<global::Energy.Domain.Modules.Procurement.PurchaseOrderLine>().WithMany().HasForeignKey(e => e.PurchaseOrderLineId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Catalog.Material>().WithMany().HasForeignKey(e => e.MaterialId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("PurchaseReceiptLines");
+        e.HasOne<PurchaseReceipt>().WithMany().HasForeignKey(x => x.PurchaseReceiptId).OnDelete(DeleteBehavior.Cascade);
+        e.HasOne<PurchaseOrderLine>().WithMany().HasForeignKey(x => x.PurchaseOrderLineId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<Material>().WithMany().HasForeignKey(x => x.MaterialId).OnDelete(DeleteBehavior.Restrict);
     }
 }

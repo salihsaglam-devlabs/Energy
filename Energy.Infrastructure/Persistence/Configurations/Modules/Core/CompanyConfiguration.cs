@@ -1,15 +1,17 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.IAM;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Core;
 
-/// <summary>Company EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class CompanyConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Core.Company>
+/// <summary>Company EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class CompanyConfiguration : IEntityTypeConfiguration<Company>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Core.Company> builder)
+    public void Configure(EntityTypeBuilder<Company> e)
     {
-        builder.ToTable("Companies");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Core.Currency>().WithMany().HasForeignKey(e => e.BaseCurrencyId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("Companies");
+        e.HasIndex(x => x.Code).IsUnique();
+        e.HasOne<Currency>().WithMany().HasForeignKey(x => x.BaseCurrencyId).OnDelete(DeleteBehavior.Restrict);
     }
 }

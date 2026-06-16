@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Workflow.ApprovalDelegation.Services;
 /// <summary>ApprovalDelegation CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ApprovalDelegationService : IApprovalDelegationService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ApprovalDelegationService(EnergyDbContext db) => _db = db;
+    public ApprovalDelegationService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ApprovalDelegationListResponse>>> GetListAsync(GetApprovalDelegationListRequest request, CancellationToken ct = default)
     {

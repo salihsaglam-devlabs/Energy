@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Requests.RequestLine.Services;
 /// <summary>RequestLine CRUD servisi (projection, pagination, soft-delete).</summary>
 public class RequestLineService : IRequestLineService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public RequestLineService(EnergyDbContext db) => _db = db;
+    public RequestLineService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<RequestLineListResponse>>> GetListAsync(GetRequestLineListRequest request, CancellationToken ct = default)
     {

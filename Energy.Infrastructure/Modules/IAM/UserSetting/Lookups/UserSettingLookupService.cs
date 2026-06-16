@@ -9,21 +9,23 @@ namespace Energy.Infrastructure.Modules.IAM.UserSetting.Lookups;
 /// <summary>UserSetting lookup servisi (aktif + arama filtreli projection).</summary>
 public class UserSettingLookupService : IUserSettingLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public UserSettingLookupService(EnergyDbContext db) => _db = db;
+    public UserSettingLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<UserSettingLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.UserSettings.AsNoTracking();
-        var items = await query.Select(e => new UserSettingLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .Select(e => new UserSettingLookupResponse
+            {
+                Id = Guid.Empty,
+                Code = null,
+                Name = null,
+                DisplayName = "",
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<UserSettingLookupResponse>>.Success(items);
     }
 }

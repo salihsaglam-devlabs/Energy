@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Operations.WorkOrderStatusHistory.Responses;
 
 /// <summary>WorkOrderStatusHistory detay görünümü.</summary>
@@ -31,10 +32,10 @@ public class WorkOrderStatusHistoryDetailResponse
     public Guid WorkOrderId { get; set; }
 
     /// <summary>FromStatus</summary>
-    public string FromStatus { get; set; } = string.Empty;
+    public WorkOrderStatus FromStatus { get; set; }
 
     /// <summary>ToStatus</summary>
-    public string ToStatus { get; set; } = string.Empty;
+    public WorkOrderStatus ToStatus { get; set; }
 
     /// <summary>ChangedAt</summary>
     public DateTime ChangedAt { get; set; }

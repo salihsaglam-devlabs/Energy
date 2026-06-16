@@ -9,21 +9,24 @@ namespace Energy.Infrastructure.Modules.Workflow.ApprovalStepApprover.Lookups;
 /// <summary>ApprovalStepApprover lookup servisi (aktif + arama filtreli projection).</summary>
 public class ApprovalStepApproverLookupService : IApprovalStepApproverLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ApprovalStepApproverLookupService(EnergyDbContext db) => _db = db;
+    public ApprovalStepApproverLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<ApprovalStepApproverLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.ApprovalStepApprovers.AsNoTracking();
-        var items = await query.Select(e => new ApprovalStepApproverLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Select(e => new ApprovalStepApproverLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = null,
+                DisplayName = e.Id.ToString(),
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<ApprovalStepApproverLookupResponse>>.Success(items);
     }
 }

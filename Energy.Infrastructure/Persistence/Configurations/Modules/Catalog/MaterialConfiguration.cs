@@ -1,17 +1,21 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Catalog;
 
-/// <summary>Material EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class MaterialConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Catalog.Material>
+/// <summary>Material EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class MaterialConfiguration : IEntityTypeConfiguration<Material>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Catalog.Material> builder)
+    public void Configure(EntityTypeBuilder<Material> e)
     {
-        builder.ToTable("Materials");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Catalog.MaterialCategory>().WithMany().HasForeignKey(e => e.MaterialCategoryId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Catalog.Brand>().WithMany().HasForeignKey(e => e.BrandId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Core.UnitOfMeasure>().WithMany().HasForeignKey(e => e.BaseUnitOfMeasureId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("Materials");
+        e.HasIndex(x => x.Code).IsUnique();
+        e.HasOne<MaterialCategory>().WithMany().HasForeignKey(x => x.MaterialCategoryId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<Brand>().WithMany().HasForeignKey(x => x.BrandId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.BaseUnitOfMeasureId).OnDelete(DeleteBehavior.Restrict);
     }
 }

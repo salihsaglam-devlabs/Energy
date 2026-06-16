@@ -9,21 +9,25 @@ namespace Energy.Infrastructure.Modules.Notifications.Notification.Lookups;
 /// <summary>Notification lookup servisi (aktif + arama filtreli projection).</summary>
 public class NotificationLookupService : INotificationLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public NotificationLookupService(EnergyDbContext db) => _db = db;
+    public NotificationLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<NotificationLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.Notifications.AsNoTracking();
-        var items = await query.Select(e => new NotificationLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        if (!string.IsNullOrWhiteSpace(search)) query = query.Where(e => e.Title.Contains(search));
+        var items = await query
+            .OrderBy(e => e.Title)
+            .Select(e => new NotificationLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = e.Title,
+                DisplayName = e.Title,
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<NotificationLookupResponse>>.Success(items);
     }
 }

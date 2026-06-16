@@ -1,14 +1,19 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.BusinessPartners;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Organization;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Projects;
 
-/// <summary>ProjectNote EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class ProjectNoteConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Projects.ProjectNote>
+/// <summary>ProjectNote EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class ProjectNoteConfiguration : IEntityTypeConfiguration<ProjectNote>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Projects.ProjectNote> builder)
+    public void Configure(EntityTypeBuilder<ProjectNote> e)
     {
-        builder.ToTable("ProjectNotes");
-        builder.HasKey(e => e.Id);
+        e.ToTable("ProjectNotes");
+        e.HasOne<Project>().WithMany().HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Cascade);
     }
 }

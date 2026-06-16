@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Core.UnitOfMeasure.Services;
 /// <summary>UnitOfMeasure CRUD servisi (projection, pagination, soft-delete).</summary>
 public class UnitOfMeasureService : IUnitOfMeasureService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public UnitOfMeasureService(EnergyDbContext db) => _db = db;
+    public UnitOfMeasureService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<UnitOfMeasureListResponse>>> GetListAsync(GetUnitOfMeasureListRequest request, CancellationToken ct = default)
     {

@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Procurement.SupplierQuoteLine.Services;
 /// <summary>SupplierQuoteLine CRUD servisi (projection, pagination, soft-delete).</summary>
 public class SupplierQuoteLineService : ISupplierQuoteLineService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public SupplierQuoteLineService(EnergyDbContext db) => _db = db;
+    public SupplierQuoteLineService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<SupplierQuoteLineListResponse>>> GetListAsync(GetSupplierQuoteLineListRequest request, CancellationToken ct = default)
     {

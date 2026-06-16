@@ -9,21 +9,24 @@ namespace Energy.Infrastructure.Modules.Contracts.ContractParty.Lookups;
 /// <summary>ContractParty lookup servisi (aktif + arama filtreli projection).</summary>
 public class ContractPartyLookupService : IContractPartyLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ContractPartyLookupService(EnergyDbContext db) => _db = db;
+    public ContractPartyLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<ContractPartyLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.ContractParties.AsNoTracking();
-        var items = await query.Select(e => new ContractPartyLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Select(e => new ContractPartyLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = null,
+                DisplayName = e.Id.ToString(),
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<ContractPartyLookupResponse>>.Success(items);
     }
 }

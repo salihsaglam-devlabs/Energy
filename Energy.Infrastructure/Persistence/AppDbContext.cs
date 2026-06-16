@@ -1,31 +1,31 @@
+using Energy.Shared.Common;
 using System.Reflection;
-using Energy.Domain.Assets;
-using Energy.Domain.BusinessPartners;
-using Energy.Domain.Budget;
-using Energy.Domain.Catalog;
-using Energy.Domain.Chat;
+using Energy.Domain.Modules.Assets;
+using Energy.Domain.Modules.BusinessPartners;
+using Energy.Domain.Modules.Budget;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Chat;
 using Energy.Domain.Common;
-using Energy.Domain.Contracts;
-using Energy.Domain.Core;
-using Energy.Domain.Documents;
-using Energy.Domain.FieldOperations;
-using Energy.Domain.Finance;
-using Energy.Domain.HR;
-using Energy.Domain.Identity;
-using Energy.Domain.Inventory;
-using Energy.Domain.Localization;
-using Energy.Domain.Logger;
-using Energy.Domain.Notifications;
-using Energy.Domain.Operations;
-using Energy.Domain.Organization;
-using Energy.Domain.Procurement;
-using Energy.Domain.ProgressPayments;
-using Energy.Domain.Projects;
-using Energy.Domain.Reporting;
-using Energy.Domain.Requests;
-using Energy.Domain.System;
-using Energy.Domain.Workflow;
-using Energy.Infrastructure.Persistence.Configurations.Enterprise;
+using Energy.Domain.Modules.Contracts;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.Documents;
+using Energy.Domain.Modules.FieldOperations;
+using Energy.Domain.Modules.Finance;
+using Energy.Domain.Modules.HR;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.Notifications;
+using Energy.Domain.Modules.Operations;
+using Energy.Domain.Modules.Organization;
+using Energy.Domain.Modules.Procurement;
+using Energy.Domain.Modules.ProgressPayments;
+using Energy.Domain.Modules.Projects;
+using Energy.Domain.Modules.Reporting;
+using Energy.Domain.Modules.Requests;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Workflow;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence;
@@ -47,6 +47,8 @@ public class AppDbContext : DbContext
     public DbSet<Menu> Menus => Set<Menu>();
     public DbSet<ApiEndpoint> ApiEndpoints => Set<ApiEndpoint>();
     public DbSet<Resource> Resources => Set<Resource>();
+    // LocalizationResources, Resource varlığının modül-standardı (Core) takma adıdır.
+    public DbSet<Resource> LocalizationResources => Set<Resource>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
     public DbSet<ChatGroup> ChatGroups => Set<ChatGroup>();
@@ -235,22 +237,10 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        // Legacy bağlam yalnızca kendi (Enterprise) yapılandırmalarını uygular.
-        // Yeni per-entity 'Modules' yapılandırmaları cutover'da kanonik bağlamda
-        // devreye girer; burada otomatik taranıp çift eşleştirme yapılması engellenir.
-        builder.ApplyConfigurationsFromAssembly(
-            typeof(AppDbContext).Assembly,
-            type => !(type.Namespace?.StartsWith(
-                "Energy.Infrastructure.Persistence.Configurations.Modules",
-                StringComparison.Ordinal) ?? false));
-
-        CoreModuleConfiguration.Configure(builder);
-        OrgPartnersProjectsConfiguration.Configure(builder);
-        CatalogInventoryConfiguration.Configure(builder);
-        RequestsProcurementConfiguration.Configure(builder);
-        OperationsFieldHrAssetsConfiguration.Configure(builder);
-        FinanceBudgetContractsProgressConfiguration.Configure(builder);
-        DocumentsWorkflowNotificationsReportingConfiguration.Configure(builder);
+        // Her tablo için ayrı IEntityTypeConfiguration uygulanır (per-entity standardı).
+        // Birleşik (combine) yapılandırma dosyaları kullanılmaz; tüm modül
+        // yapılandırmaları assembly taraması ile otomatik uygulanır.
+        builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
         ApplyAuditUserForeignKeys(builder);
         ApplySoftDeleteConvention(builder);

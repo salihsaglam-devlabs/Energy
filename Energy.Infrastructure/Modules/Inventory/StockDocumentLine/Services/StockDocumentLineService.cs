@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Inventory.StockDocumentLine.Services;
 /// <summary>StockDocumentLine CRUD servisi (projection, pagination, soft-delete).</summary>
 public class StockDocumentLineService : IStockDocumentLineService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public StockDocumentLineService(EnergyDbContext db) => _db = db;
+    public StockDocumentLineService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<StockDocumentLineListResponse>>> GetListAsync(GetStockDocumentLineListRequest request, CancellationToken ct = default)
     {

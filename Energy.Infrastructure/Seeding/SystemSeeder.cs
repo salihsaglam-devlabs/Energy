@@ -1,8 +1,8 @@
 using Energy.Application.Identity.Services;
 using Energy.Application.Localization.Services;
 using Energy.Application.System.Services;
-using Energy.Domain.Identity;
-using Energy.Domain.System;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.IAM;
 using Energy.Infrastructure.Identity.Services;
 using Energy.Infrastructure.Persistence;
 using Energy.Infrastructure.System.Services;
@@ -198,7 +198,7 @@ public sealed partial class SystemSeeder : ISystemSeeder
         // 1b) KURUMSAL ŞEMA — 134 kurumsal tabloyu (yoksa) modelden üretilen betikle
         //     idempotent sağlar. Taze SQL Server veritabanında EnsureCreated zaten
         //     oluşturduğu için bu adım no-op olur.
-        await EnsureEnterpriseSchemaAsync(ct);
+        await EnsureModuleTablesSchemaAsync(ct);
 
         // 2) YETKİLER — merkezi, tip güvenli PermissionCatalog'u veritabanına yansıtır.
         //    Yalnızca veritabanında eksik olan kodlar eklenir (mevcut satırlar
@@ -232,7 +232,12 @@ public sealed partial class SystemSeeder : ISystemSeeder
         // 5b) KURUMSAL VERİ — referans veriler, iş rolleri, modül menüleri, dashboard
         //     widget'ları ve varsayılan onay akışları (yetkiler senkronlandıktan sonra).
         _logger.LogInformation("Seeding: enterprise data (reference, roles, menus, widgets, approvals)");
-        await SeedEnterpriseDataAsync(ct);
+        await SeedReferenceAndOperationalDataAsync(ct);
+
+        // 5c) AYLIK DEMO VERİSİ — son 30 güne yayılmış, tüm durum (case) varyasyonlarını
+        //     içeren hacimli operasyonel kayıtlar; grid/rapor/onay ekranları gerçekçi görünür.
+        _logger.LogInformation("Seeding: demo month data (high-volume, all-status operational records)");
+        await EnsureDemoMonthDataAsync(ct);
 
         // 6) YERELLEŞTİRME — resx (geliştirme) + gömülü kaynaklar (üretim) veritabanına.
         _logger.LogInformation("Seeding: localization resources (resx → DB)");

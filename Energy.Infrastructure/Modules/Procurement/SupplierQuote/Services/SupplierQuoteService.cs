@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Procurement.SupplierQuote.Services;
 /// <summary>SupplierQuote CRUD servisi (projection, pagination, soft-delete).</summary>
 public class SupplierQuoteService : ISupplierQuoteService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public SupplierQuoteService(EnergyDbContext db) => _db = db;
+    public SupplierQuoteService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<SupplierQuoteListResponse>>> GetListAsync(GetSupplierQuoteListRequest request, CancellationToken ct = default)
     {

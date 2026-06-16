@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Projects.ProjectStatus.Services;
 /// <summary>ProjectStatus CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ProjectStatusService : IProjectStatusService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ProjectStatusService(EnergyDbContext db) => _db = db;
+    public ProjectStatusService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ProjectStatusListResponse>>> GetListAsync(GetProjectStatusListRequest request, CancellationToken ct = default)
     {

@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Procurement.SupplierInvoice.Services;
 /// <summary>SupplierInvoice CRUD servisi (projection, pagination, soft-delete).</summary>
 public class SupplierInvoiceService : ISupplierInvoiceService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public SupplierInvoiceService(EnergyDbContext db) => _db = db;
+    public SupplierInvoiceService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<SupplierInvoiceListResponse>>> GetListAsync(GetSupplierInvoiceListRequest request, CancellationToken ct = default)
     {

@@ -1,14 +1,17 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Catalog;
 
-/// <summary>MaterialAttributeDefinition EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class MaterialAttributeDefinitionConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Catalog.MaterialAttributeDefinition>
+/// <summary>MaterialAttributeDefinition EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class MaterialAttributeDefinitionConfiguration : IEntityTypeConfiguration<MaterialAttributeDefinition>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Catalog.MaterialAttributeDefinition> builder)
+    public void Configure(EntityTypeBuilder<MaterialAttributeDefinition> e)
     {
-        builder.ToTable("MaterialAttributeDefinitions");
-        builder.HasKey(e => e.Id);
+        e.ToTable("MaterialAttributeDefinitions"); e.HasIndex(x => x.Code).IsUnique(); 
     }
 }

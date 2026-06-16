@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Chat.ChatMessageReaction.Services;
 /// <summary>ChatMessageReaction CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ChatMessageReactionService : IChatMessageReactionService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ChatMessageReactionService(EnergyDbContext db) => _db = db;
+    public ChatMessageReactionService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ChatMessageReactionListResponse>>> GetListAsync(GetChatMessageReactionListRequest request, CancellationToken ct = default)
     {

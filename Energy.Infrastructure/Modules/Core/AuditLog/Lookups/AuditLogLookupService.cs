@@ -9,21 +9,25 @@ namespace Energy.Infrastructure.Modules.Core.AuditLog.Lookups;
 /// <summary>AuditLog lookup servisi (aktif + arama filtreli projection).</summary>
 public class AuditLogLookupService : IAuditLogLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public AuditLogLookupService(EnergyDbContext db) => _db = db;
+    public AuditLogLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<AuditLogLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.AuditLogs.AsNoTracking();
-        var items = await query.Select(e => new AuditLogLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        if (!string.IsNullOrWhiteSpace(search)) query = query.Where(e => e.UserName.Contains(search));
+        var items = await query
+            .OrderBy(e => e.UserName)
+            .Select(e => new AuditLogLookupResponse
+            {
+                Id = Guid.Empty,
+                Code = null,
+                Name = e.UserName,
+                DisplayName = e.UserName,
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<AuditLogLookupResponse>>.Success(items);
     }
 }

@@ -7,86 +7,53 @@ using Energy.Shared.Models.V1.IAM.UserPermission.Responses;
 
 namespace Energy.Infrastructure.Modules.IAM.UserPermission.Services;
 
-/// <summary>UserPermission CRUD servisi (projection, pagination, soft-delete).</summary>
+/// <summary>
+/// UserPermission: doğal/bileşik anahtarlı IAM kaydı. Liste/oluşturma desteklenir;
+/// surrogate Guid ile yönetim parent/self-service ekranlarından yapılır.
+/// </summary>
 public class UserPermissionService : IUserPermissionService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public UserPermissionService(EnergyDbContext db) => _db = db;
+    public UserPermissionService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<UserPermissionListResponse>>> GetListAsync(GetUserPermissionListRequest request, CancellationToken ct = default)
     {
         var query = _db.UserPermissions.AsNoTracking();
         var total = await query.CountAsync(ct);
         var items = await query
-            .OrderByDescending(e => e.Id)
+            .OrderBy(e => e.UserId)
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(e => new UserPermissionListResponse
             {
-                Id = e.Id,
+                Id = Guid.Empty,
                 UserId = e.UserId,
-                PermissionCode = e.PermissionCode,
-                CreatedAt = e.CreatedAt
+                PermissionCode = e.PermissionCode
             })
             .ToListAsync(ct);
         var page = PaginatedResponse<UserPermissionListResponse>.Create(items, request.PageNumber, request.PageSize, total);
         return BaseResponse<PaginatedResponse<UserPermissionListResponse>>.Success(page);
     }
 
-    public async Task<BaseResponse<UserPermissionDetailResponse>> GetByIdAsync(Guid id, CancellationToken ct = default)
-    {
-        var dto = await _db.UserPermissions.AsNoTracking().Where(e => e.Id == id)
-            .Select(e => new UserPermissionDetailResponse
-            {
-                Id = e.Id,
-                CreatedAt = e.CreatedAt,
-                CreatedBy = e.CreatedBy,
-                UpdatedAt = e.UpdatedAt,
-                UpdatedBy = e.UpdatedBy,
-                IsDeleted = e.IsDeleted,
-                DeletedAt = e.DeletedAt,
-                DeletedBy = e.DeletedBy,
-                UserId = e.UserId,
-                PermissionCode = e.PermissionCode
-            }).FirstOrDefaultAsync(ct);
-        return dto is null
-            ? BaseResponse<UserPermissionDetailResponse>.Failure("NotFound")
-            : BaseResponse<UserPermissionDetailResponse>.Success(dto);
-    }
+    public Task<BaseResponse<UserPermissionDetailResponse>> GetByIdAsync(Guid id, CancellationToken ct = default)
+        => Task.FromResult(BaseResponse<UserPermissionDetailResponse>.Failure("NotSupported"));
 
     public async Task<BaseResponse<Guid>> CreateAsync(CreateUserPermissionRequest request, CancellationToken ct = default)
     {
         var entity = new global::Energy.Domain.Modules.IAM.UserPermission
         {
-            Id = Guid.NewGuid(),
             UserId = request.UserId,
-            PermissionCode = request.PermissionCode,
-            CreatedAt = DateTime.UtcNow,
+            PermissionCode = request.PermissionCode
         };
         _db.UserPermissions.Add(entity);
         await _db.SaveChangesAsync(ct);
-        return BaseResponse<Guid>.Success(entity.Id, "Created");
+        return BaseResponse<Guid>.Success(Guid.Empty, "Created");
     }
 
-    public async Task<BaseResponse<bool>> UpdateAsync(Guid id, UpdateUserPermissionRequest request, CancellationToken ct = default)
-    {
-        var entity = await _db.UserPermissions.FirstOrDefaultAsync(e => e.Id == id, ct);
-        if (entity is null) return BaseResponse<bool>.Failure("NotFound");
-            entity.UserId = request.UserId;
-            entity.PermissionCode = request.PermissionCode;
-        entity.UpdatedAt = DateTime.UtcNow;
-        await _db.SaveChangesAsync(ct);
-        return BaseResponse<bool>.Success(true, "Updated");
-    }
+    public Task<BaseResponse<bool>> UpdateAsync(Guid id, UpdateUserPermissionRequest request, CancellationToken ct = default)
+        => Task.FromResult(BaseResponse<bool>.Failure("NotSupported"));
 
-    public async Task<BaseResponse<bool>> DeleteAsync(Guid id, CancellationToken ct = default)
-    {
-        var entity = await _db.UserPermissions.FirstOrDefaultAsync(e => e.Id == id, ct);
-        if (entity is null) return BaseResponse<bool>.Failure("NotFound");
-        entity.IsDeleted = true;
-        entity.DeletedAt = DateTime.UtcNow;
-        await _db.SaveChangesAsync(ct);
-        return BaseResponse<bool>.Success(true, "Deleted");
-    }
+    public Task<BaseResponse<bool>> DeleteAsync(Guid id, CancellationToken ct = default)
+        => Task.FromResult(BaseResponse<bool>.Failure("NotSupported"));
 }

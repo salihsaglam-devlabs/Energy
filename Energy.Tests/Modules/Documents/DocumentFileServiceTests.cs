@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 using Energy.Application.Common.Storage;
 using Energy.Domain.Modules.Documents;
 using Energy.Infrastructure.Modules.Documents.Files;
@@ -39,12 +40,12 @@ public sealed class DocumentFileServiceTests
         }
     }
 
-    private static EnergyDbContext NewContext()
+    private static AppDbContext NewContext()
     {
-        var options = new DbContextOptionsBuilder<EnergyDbContext>()
+        var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-        return new EnergyDbContext(options);
+        return new AppDbContext(options);
     }
 
     [Fact]
@@ -52,7 +53,7 @@ public sealed class DocumentFileServiceTests
     {
         await using var db = NewContext();
         var documentId = Guid.NewGuid();
-        db.Documents.Add(new Document { Id = documentId, Name = "Spec", Status = "Active", CurrentVersionNo = 0 });
+        db.Documents.Add(new Document { Id = documentId, Name = "Spec", Status = Energy.Shared.Common.DocumentStatus.Approved, CurrentVersionNo = 0 });
         await db.SaveChangesAsync();
 
         var service = new DocumentFileService(db, new FakeFileStorage());

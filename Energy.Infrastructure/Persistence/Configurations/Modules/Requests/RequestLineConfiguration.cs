@@ -1,17 +1,24 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.BusinessPartners;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Procurement;
+using Energy.Domain.Modules.Projects;
+using Energy.Domain.Modules.Requests;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Requests;
 
-/// <summary>RequestLine EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class RequestLineConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Requests.RequestLine>
+/// <summary>RequestLine EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class RequestLineConfiguration : IEntityTypeConfiguration<RequestLine>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Requests.RequestLine> builder)
+    public void Configure(EntityTypeBuilder<RequestLine> e)
     {
-        builder.ToTable("RequestLines");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Requests.Request>().WithMany().HasForeignKey(e => e.RequestId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Catalog.Material>().WithMany().HasForeignKey(e => e.MaterialId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Core.UnitOfMeasure>().WithMany().HasForeignKey(e => e.UnitOfMeasureId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("RequestLines");
+        e.HasOne<Request>().WithMany().HasForeignKey(x => x.RequestId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<Material>().WithMany().HasForeignKey(x => x.MaterialId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.UnitOfMeasureId).OnDelete(DeleteBehavior.Restrict);
     }
 }

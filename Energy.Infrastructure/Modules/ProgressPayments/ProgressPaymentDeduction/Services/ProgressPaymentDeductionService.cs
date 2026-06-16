@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.ProgressPayments.ProgressPaymentDeductio
 /// <summary>ProgressPaymentDeduction CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ProgressPaymentDeductionService : IProgressPaymentDeductionService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ProgressPaymentDeductionService(EnergyDbContext db) => _db = db;
+    public ProgressPaymentDeductionService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ProgressPaymentDeductionListResponse>>> GetListAsync(GetProgressPaymentDeductionListRequest request, CancellationToken ct = default)
     {

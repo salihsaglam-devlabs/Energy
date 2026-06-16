@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Finance.Collection.Services;
 /// <summary>Collection CRUD servisi (projection, pagination, soft-delete).</summary>
 public class CollectionService : ICollectionService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public CollectionService(EnergyDbContext db) => _db = db;
+    public CollectionService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<CollectionListResponse>>> GetListAsync(GetCollectionListRequest request, CancellationToken ct = default)
     {

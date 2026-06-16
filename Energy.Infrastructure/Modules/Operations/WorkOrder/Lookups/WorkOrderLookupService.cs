@@ -9,21 +9,25 @@ namespace Energy.Infrastructure.Modules.Operations.WorkOrder.Lookups;
 /// <summary>WorkOrder lookup servisi (aktif + arama filtreli projection).</summary>
 public class WorkOrderLookupService : IWorkOrderLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public WorkOrderLookupService(EnergyDbContext db) => _db = db;
+    public WorkOrderLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<WorkOrderLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.WorkOrders.AsNoTracking();
-        var items = await query.Select(e => new WorkOrderLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        if (!string.IsNullOrWhiteSpace(search)) query = query.Where(e => e.Title.Contains(search));
+        var items = await query
+            .OrderBy(e => e.Title)
+            .Select(e => new WorkOrderLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = e.Title,
+                DisplayName = e.Title,
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<WorkOrderLookupResponse>>.Success(items);
     }
 }

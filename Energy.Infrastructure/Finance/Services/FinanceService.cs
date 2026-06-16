@@ -1,8 +1,9 @@
+using Energy.Shared.Common;
 using Energy.Application.Finance.Services;
 using Energy.Domain.Common;
-using Energy.Domain.Contracts;
-using Energy.Domain.Finance;
-using Energy.Domain.Notifications;
+using Energy.Domain.Modules.Contracts;
+using Energy.Domain.Modules.Finance;
+using Energy.Domain.Modules.Notifications;
 using Energy.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

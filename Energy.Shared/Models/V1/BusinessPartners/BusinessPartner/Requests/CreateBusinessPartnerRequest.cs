@@ -1,10 +1,11 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.BusinessPartners.BusinessPartner.Requests;
 
 /// <summary>BusinessPartner oluşturma isteği.</summary>
 public class CreateBusinessPartnerRequest
 {
     /// <summary>Cari türü</summary>
-    public string PartnerType { get; set; } = string.Empty;
+    public PartnerType PartnerType { get; set; }
 
     /// <summary>Cari kodu</summary>
     public string Code { get; set; } = string.Empty;

@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 using Energy.Application.Home.Services;
 using Energy.Application.Identity.Services;
 using Energy.Domain.Common;

@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Operations.WorkOrder.Requests;
 
 /// <summary>WorkOrder güncelleme isteği.</summary>
@@ -19,7 +20,7 @@ public class UpdateWorkOrderRequest
     public Guid? ProjectLocationId { get; set; }
 
     /// <summary>Durum</summary>
-    public string Status { get; set; } = string.Empty;
+    public WorkOrderStatus Status { get; set; }
 
     /// <summary>İş emri no</summary>
     public string WorkOrderNo { get; set; } = string.Empty;

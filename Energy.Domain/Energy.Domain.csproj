@@ -4,4 +4,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
+    <ItemGroup>
+        <!-- Paylaşılan enum/değer tipleri Energy.Shared.Common altında tanımlıdır. -->
+        <ProjectReference Include="..\Energy.Shared\Energy.Shared.csproj" />
+    </ItemGroup>
 </Project>

@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Core.UnitConversion.Services;
 /// <summary>UnitConversion CRUD servisi (projection, pagination, soft-delete).</summary>
 public class UnitConversionService : IUnitConversionService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public UnitConversionService(EnergyDbContext db) => _db = db;
+    public UnitConversionService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<UnitConversionListResponse>>> GetListAsync(GetUnitConversionListRequest request, CancellationToken ct = default)
     {

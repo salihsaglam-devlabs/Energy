@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Organization.EmployeePosition.Services;
 /// <summary>EmployeePosition CRUD servisi (projection, pagination, soft-delete).</summary>
 public class EmployeePositionService : IEmployeePositionService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public EmployeePositionService(EnergyDbContext db) => _db = db;
+    public EmployeePositionService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<EmployeePositionListResponse>>> GetListAsync(GetEmployeePositionListRequest request, CancellationToken ct = default)
     {

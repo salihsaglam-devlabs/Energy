@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Workflow.ApprovalAction.Requests;
 
 /// <summary>ApprovalAction oluşturma isteği.</summary>
@@ -13,7 +14,7 @@ public class CreateApprovalActionRequest
     public Guid UserId { get; set; }
 
     /// <summary>Approve, Reject, Return, Cancel</summary>
-    public string ActionType { get; set; } = string.Empty;
+    public ApprovalActionType ActionType { get; set; }
 
     /// <summary>İşlem zamanı</summary>
     public DateTime ActionAt { get; set; }

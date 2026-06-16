@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.ProgressPayments.ProgressPaymentLine.Ser
 /// <summary>ProgressPaymentLine CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ProgressPaymentLineService : IProgressPaymentLineService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ProgressPaymentLineService(EnergyDbContext db) => _db = db;
+    public ProgressPaymentLineService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ProgressPaymentLineListResponse>>> GetListAsync(GetProgressPaymentLineListRequest request, CancellationToken ct = default)
     {

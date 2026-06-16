@@ -1,14 +1,23 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Budget;
+using Energy.Domain.Modules.BusinessPartners;
+using Energy.Domain.Modules.Contracts;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.FieldOperations;
+using Energy.Domain.Modules.Finance;
+using Energy.Domain.Modules.ProgressPayments;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Finance;
 
-/// <summary>CostCenter EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class CostCenterConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Finance.CostCenter>
+/// <summary>CostCenter EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class CostCenterConfiguration : IEntityTypeConfiguration<CostCenter>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Finance.CostCenter> builder)
+    public void Configure(EntityTypeBuilder<CostCenter> e)
     {
-        builder.ToTable("CostCenters");
-        builder.HasKey(e => e.Id);
+        e.ToTable("CostCenters");
+        e.HasIndex(x => x.Code).IsUnique();
+        e.HasOne<CostCenter>().WithMany().HasForeignKey(x => x.ParentCostCenterId).OnDelete(DeleteBehavior.Restrict);
     }
 }

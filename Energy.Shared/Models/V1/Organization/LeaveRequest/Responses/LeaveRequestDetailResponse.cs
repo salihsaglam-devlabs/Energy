@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Organization.LeaveRequest.Responses;
 
 /// <summary>LeaveRequest detay görünümü.</summary>
@@ -46,7 +47,7 @@ public class LeaveRequestDetailResponse
     public string? Reason { get; set; }
 
     /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
+    public ApprovalRequestStatus Status { get; set; }
 
     /// <summary>ApprovalRequestId</summary>
     public Guid? ApprovalRequestId { get; set; }

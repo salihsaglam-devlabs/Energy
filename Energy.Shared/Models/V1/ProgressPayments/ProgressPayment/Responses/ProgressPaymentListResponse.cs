@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.ProgressPayments.ProgressPayment.Responses;
 
 /// <summary>ProgressPayment liste satırı.</summary>
@@ -31,7 +32,7 @@ public class ProgressPaymentListResponse
     public decimal NetAmount { get; set; }
 
     /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
+    public ApprovalRequestStatus Status { get; set; }
 
     /// <summary>ApprovalRequestId</summary>
     public Guid? ApprovalRequestId { get; set; }

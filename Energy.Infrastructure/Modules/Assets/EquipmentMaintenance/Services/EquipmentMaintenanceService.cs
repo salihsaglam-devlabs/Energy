@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Assets.EquipmentMaintenance.Services;
 /// <summary>EquipmentMaintenance CRUD servisi (projection, pagination, soft-delete).</summary>
 public class EquipmentMaintenanceService : IEquipmentMaintenanceService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public EquipmentMaintenanceService(EnergyDbContext db) => _db = db;
+    public EquipmentMaintenanceService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<EquipmentMaintenanceListResponse>>> GetListAsync(GetEquipmentMaintenanceListRequest request, CancellationToken ct = default)
     {

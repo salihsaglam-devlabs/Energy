@@ -9,21 +9,24 @@ namespace Energy.Infrastructure.Modules.Contracts.ContractAmendment.Lookups;
 /// <summary>ContractAmendment lookup servisi (aktif + arama filtreli projection).</summary>
 public class ContractAmendmentLookupService : IContractAmendmentLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ContractAmendmentLookupService(EnergyDbContext db) => _db = db;
+    public ContractAmendmentLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<ContractAmendmentLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.ContractAmendments.AsNoTracking();
-        var items = await query.Select(e => new ContractAmendmentLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Select(e => new ContractAmendmentLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = null,
+                DisplayName = e.Id.ToString(),
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<ContractAmendmentLookupResponse>>.Success(items);
     }
 }

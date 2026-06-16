@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Workflow.ApprovalCondition.Responses;
 
 /// <summary>ApprovalCondition liste satırı.</summary>
@@ -13,7 +14,7 @@ public class ApprovalConditionListResponse
     public string FieldName { get; set; } = string.Empty;
 
     /// <summary>Karşılaştırma operatörü</summary>
-    public string Operator { get; set; } = string.Empty;
+    public ConditionOperator Operator { get; set; }
 
     /// <summary>Metin değer</summary>
     public string? ValueText { get; set; }

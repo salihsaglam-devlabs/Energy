@@ -1,16 +1,26 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Assets;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Contracts;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.FieldOperations;
+using Energy.Domain.Modules.HR;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Operations;
+using Energy.Domain.Modules.Organization;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.FieldOperations;
 
-/// <summary>DailySiteReportMaterial EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class DailySiteReportMaterialConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.FieldOperations.DailySiteReportMaterial>
+/// <summary>DailySiteReportMaterial EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class DailySiteReportMaterialConfiguration : IEntityTypeConfiguration<DailySiteReportMaterial>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.FieldOperations.DailySiteReportMaterial> builder)
+    public void Configure(EntityTypeBuilder<DailySiteReportMaterial> e)
     {
-        builder.ToTable("DailySiteReportMaterials");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.FieldOperations.DailySiteReport>().WithMany().HasForeignKey(e => e.DailySiteReportId).OnDelete(DeleteBehavior.Cascade);
-        builder.HasOne<global::Energy.Domain.Modules.Catalog.Material>().WithMany().HasForeignKey(e => e.MaterialId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("DailySiteReportMaterials");
+        e.HasOne<DailySiteReport>().WithMany().HasForeignKey(x => x.DailySiteReportId).OnDelete(DeleteBehavior.Cascade);
+        e.HasOne<Material>().WithMany().HasForeignKey(x => x.MaterialId).OnDelete(DeleteBehavior.Restrict);
     }
 }

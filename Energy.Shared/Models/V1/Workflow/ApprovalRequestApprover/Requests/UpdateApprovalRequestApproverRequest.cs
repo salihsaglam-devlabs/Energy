@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Workflow.ApprovalRequestApprover.Requests;
 
 /// <summary>ApprovalRequestApprover güncelleme isteği.</summary>
@@ -13,7 +14,7 @@ public class UpdateApprovalRequestApproverRequest
     public Guid UserId { get; set; }
 
     /// <summary>Kişisel onay durumu</summary>
-    public string Status { get; set; } = string.Empty;
+    public ApprovalApproverStatus Status { get; set; }
 
     /// <summary>İşlem zamanı</summary>
     public DateTime? ActionAt { get; set; }

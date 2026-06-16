@@ -52,6 +52,11 @@ if (environmentSection.Exists())
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<Energy.Api.Common.Filters.FluentValidationActionFilter>();
+}).AddJsonOptions(options =>
+{
+    // Enum değerleri tel üzerinde string olarak serileştirilir (UI/JS uyumluluğu).
+    options.JsonSerializerOptions.Converters.Add(
+        new System.Text.Json.Serialization.JsonStringEnumConverter());
 }).AddEnergyDataAnnotationsLocalization();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();

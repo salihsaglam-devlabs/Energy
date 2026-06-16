@@ -1,4 +1,4 @@
-using Energy.Domain.Identity;
+using Energy.Domain.Modules.IAM;
 using Energy.Shared.Models.V1.Identity.Responses;
 
 namespace Energy.Application.Identity.Services;

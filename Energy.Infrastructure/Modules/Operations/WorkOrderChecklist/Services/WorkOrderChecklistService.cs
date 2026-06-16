@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Operations.WorkOrderChecklist.Services;
 /// <summary>WorkOrderChecklist CRUD servisi (projection, pagination, soft-delete).</summary>
 public class WorkOrderChecklistService : IWorkOrderChecklistService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public WorkOrderChecklistService(EnergyDbContext db) => _db = db;
+    public WorkOrderChecklistService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<WorkOrderChecklistListResponse>>> GetListAsync(GetWorkOrderChecklistListRequest request, CancellationToken ct = default)
     {

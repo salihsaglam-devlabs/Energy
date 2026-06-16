@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Operations.WorkOrderMaterialUsage.Servic
 /// <summary>WorkOrderMaterialUsage CRUD servisi (projection, pagination, soft-delete).</summary>
 public class WorkOrderMaterialUsageService : IWorkOrderMaterialUsageService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public WorkOrderMaterialUsageService(EnergyDbContext db) => _db = db;
+    public WorkOrderMaterialUsageService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<WorkOrderMaterialUsageListResponse>>> GetListAsync(GetWorkOrderMaterialUsageListRequest request, CancellationToken ct = default)
     {

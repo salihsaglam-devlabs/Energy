@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Operations.WorkOrderMaterialPlan.Service
 /// <summary>WorkOrderMaterialPlan CRUD servisi (projection, pagination, soft-delete).</summary>
 public class WorkOrderMaterialPlanService : IWorkOrderMaterialPlanService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public WorkOrderMaterialPlanService(EnergyDbContext db) => _db = db;
+    public WorkOrderMaterialPlanService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<WorkOrderMaterialPlanListResponse>>> GetListAsync(GetWorkOrderMaterialPlanListRequest request, CancellationToken ct = default)
     {

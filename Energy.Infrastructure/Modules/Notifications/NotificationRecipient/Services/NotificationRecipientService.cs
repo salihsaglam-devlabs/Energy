@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Notifications.NotificationRecipient.Serv
 /// <summary>NotificationRecipient CRUD servisi (projection, pagination, soft-delete).</summary>
 public class NotificationRecipientService : INotificationRecipientService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public NotificationRecipientService(EnergyDbContext db) => _db = db;
+    public NotificationRecipientService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<NotificationRecipientListResponse>>> GetListAsync(GetNotificationRecipientListRequest request, CancellationToken ct = default)
     {

@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.IAM.Menu.Services;
 /// <summary>Menu CRUD servisi (projection, pagination, soft-delete).</summary>
 public class MenuService : IMenuService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public MenuService(EnergyDbContext db) => _db = db;
+    public MenuService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<MenuListResponse>>> GetListAsync(GetMenuListRequest request, CancellationToken ct = default)
     {

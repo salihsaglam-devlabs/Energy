@@ -1,14 +1,27 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Assets;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Contracts;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.FieldOperations;
+using Energy.Domain.Modules.HR;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Operations;
+using Energy.Domain.Modules.Organization;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.FieldOperations;
 
-/// <summary>MeasurementSheet EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class MeasurementSheetConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.FieldOperations.MeasurementSheet>
+/// <summary>MeasurementSheet EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class MeasurementSheetConfiguration : IEntityTypeConfiguration<MeasurementSheet>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.FieldOperations.MeasurementSheet> builder)
+    public void Configure(EntityTypeBuilder<MeasurementSheet> e)
     {
-        builder.ToTable("MeasurementSheets");
-        builder.HasKey(e => e.Id);
+        e.ToTable("MeasurementSheets");
+        e.HasIndex(x => x.SheetNo).IsUnique();
+        e.HasOne<Project>().WithMany().HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<Contract>().WithMany().HasForeignKey(x => x.ContractId).OnDelete(DeleteBehavior.Restrict);
     }
 }

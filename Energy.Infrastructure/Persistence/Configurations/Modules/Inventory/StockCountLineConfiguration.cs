@@ -1,16 +1,19 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Inventory;
 
-/// <summary>StockCountLine EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class StockCountLineConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Inventory.StockCountLine>
+/// <summary>StockCountLine EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class StockCountLineConfiguration : IEntityTypeConfiguration<StockCountLine>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Inventory.StockCountLine> builder)
+    public void Configure(EntityTypeBuilder<StockCountLine> e)
     {
-        builder.ToTable("StockCountLines");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Inventory.StockCount>().WithMany().HasForeignKey(e => e.StockCountId).OnDelete(DeleteBehavior.Cascade);
-        builder.HasOne<global::Energy.Domain.Modules.Catalog.Material>().WithMany().HasForeignKey(e => e.MaterialId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("StockCountLines");
+        e.HasOne<StockCount>().WithMany().HasForeignKey(x => x.StockCountId).OnDelete(DeleteBehavior.Cascade);
+        e.HasOne<Material>().WithMany().HasForeignKey(x => x.MaterialId).OnDelete(DeleteBehavior.Restrict);
     }
 }

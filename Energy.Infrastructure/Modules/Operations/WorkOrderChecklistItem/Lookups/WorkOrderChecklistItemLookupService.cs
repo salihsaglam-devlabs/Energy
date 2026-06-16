@@ -9,21 +9,24 @@ namespace Energy.Infrastructure.Modules.Operations.WorkOrderChecklistItem.Lookup
 /// <summary>WorkOrderChecklistItem lookup servisi (aktif + arama filtreli projection).</summary>
 public class WorkOrderChecklistItemLookupService : IWorkOrderChecklistItemLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public WorkOrderChecklistItemLookupService(EnergyDbContext db) => _db = db;
+    public WorkOrderChecklistItemLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<WorkOrderChecklistItemLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.WorkOrderChecklistItems.AsNoTracking();
-        var items = await query.Select(e => new WorkOrderChecklistItemLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Select(e => new WorkOrderChecklistItemLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = null,
+                DisplayName = e.Id.ToString(),
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<WorkOrderChecklistItemLookupResponse>>.Success(items);
     }
 }

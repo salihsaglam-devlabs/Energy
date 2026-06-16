@@ -1,15 +1,20 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Documents;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Notifications;
+using Energy.Domain.Modules.Reporting;
+using Energy.Domain.Modules.Workflow;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Workflow;
 
-/// <summary>ApprovalDefinitionVersion EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class ApprovalDefinitionVersionConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Workflow.ApprovalDefinitionVersion>
+/// <summary>ApprovalDefinitionVersion EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class ApprovalDefinitionVersionConfiguration : IEntityTypeConfiguration<ApprovalDefinitionVersion>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Workflow.ApprovalDefinitionVersion> builder)
+    public void Configure(EntityTypeBuilder<ApprovalDefinitionVersion> e)
     {
-        builder.ToTable("ApprovalDefinitionVersions");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Workflow.ApprovalDefinition>().WithMany().HasForeignKey(e => e.ApprovalDefinitionId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("ApprovalDefinitionVersions");
+        e.HasIndex(x => new { x.ApprovalDefinitionId, x.VersionNo }).IsUnique();
+        e.HasOne<ApprovalDefinition>().WithMany().HasForeignKey(x => x.ApprovalDefinitionId).OnDelete(DeleteBehavior.Restrict);
     }
 }

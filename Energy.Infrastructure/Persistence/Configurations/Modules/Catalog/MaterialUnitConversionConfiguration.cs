@@ -1,14 +1,20 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Catalog;
 
-/// <summary>MaterialUnitConversion EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class MaterialUnitConversionConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Catalog.MaterialUnitConversion>
+/// <summary>MaterialUnitConversion EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class MaterialUnitConversionConfiguration : IEntityTypeConfiguration<MaterialUnitConversion>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Catalog.MaterialUnitConversion> builder)
+    public void Configure(EntityTypeBuilder<MaterialUnitConversion> e)
     {
-        builder.ToTable("MaterialUnitConversions");
-        builder.HasKey(e => e.Id);
+        e.ToTable("MaterialUnitConversions");
+        e.HasOne<Material>().WithMany().HasForeignKey(x => x.MaterialId).OnDelete(DeleteBehavior.Cascade);
+        e.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.FromUnitOfMeasureId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.ToUnitOfMeasureId).OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Operations.WorkOrderType.Services;
 /// <summary>WorkOrderType CRUD servisi (projection, pagination, soft-delete).</summary>
 public class WorkOrderTypeService : IWorkOrderTypeService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public WorkOrderTypeService(EnergyDbContext db) => _db = db;
+    public WorkOrderTypeService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<WorkOrderTypeListResponse>>> GetListAsync(GetWorkOrderTypeListRequest request, CancellationToken ct = default)
     {

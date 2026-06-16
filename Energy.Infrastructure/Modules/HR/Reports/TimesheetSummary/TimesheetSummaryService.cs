@@ -10,16 +10,16 @@ namespace Energy.Infrastructure.Modules.HR.Reports.TimesheetSummary;
 /// <summary>TimesheetSummary raporu servisi (AsNoTracking, projection, filtre, sayfalama).</summary>
 public sealed class TimesheetSummaryService : ITimesheetSummaryService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public TimesheetSummaryService(EnergyDbContext db) => _db = db;
+    public TimesheetSummaryService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<TimesheetSummaryRowResponse>>> GetDataAsync(TimesheetSummaryRequest request, CancellationToken ct = default)
     {
         var query = _db.Timesheets.AsNoTracking();
         if (request.StartDate.HasValue) query = query.Where(e => e.PeriodStart >= request.StartDate.Value);
         if (request.EndDate.HasValue) query = query.Where(e => e.PeriodStart <= request.EndDate.Value);
-        if (!string.IsNullOrWhiteSpace(request.Status)) query = query.Where(e => e.Status == request.Status);
+        if (!string.IsNullOrWhiteSpace(request.Status)) query = query.Where(e => e.Status.ToString() == request.Status);
         var total = await query.CountAsync(ct);
         var pageSize = request.PageSize <= 0 ? 50 : request.PageSize;
         var pageNumber = request.PageNumber <= 0 ? 1 : request.PageNumber;
@@ -33,7 +33,7 @@ public sealed class TimesheetSummaryService : ITimesheetSummaryService
                 TimesheetNo = e.TimesheetNo,
                 PeriodStart = e.PeriodStart,
                 PeriodEnd = e.PeriodEnd,
-                Status = e.Status
+                Status = e.Status.ToString()
             })
             .ToListAsync(ct);
         var page = PaginatedResponse<TimesheetSummaryRowResponse>.Create(items, pageNumber, pageSize, total);

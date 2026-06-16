@@ -1,16 +1,27 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Assets;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Contracts;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.FieldOperations;
+using Energy.Domain.Modules.HR;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Operations;
+using Energy.Domain.Modules.Organization;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Operations;
 
-/// <summary>WorkOrderMaterialUsage EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class WorkOrderMaterialUsageConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Operations.WorkOrderMaterialUsage>
+/// <summary>WorkOrderMaterialUsage EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class WorkOrderMaterialUsageConfiguration : IEntityTypeConfiguration<WorkOrderMaterialUsage>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Operations.WorkOrderMaterialUsage> builder)
+    public void Configure(EntityTypeBuilder<WorkOrderMaterialUsage> e)
     {
-        builder.ToTable("WorkOrderMaterialUsages");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Operations.WorkOrder>().WithMany().HasForeignKey(e => e.WorkOrderId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Inventory.StockDocumentLine>().WithMany().HasForeignKey(e => e.StockDocumentLineId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("WorkOrderMaterialUsages");
+        e.HasOne<WorkOrder>().WithMany().HasForeignKey(x => x.WorkOrderId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<StockDocumentLine>().WithMany().HasForeignKey(x => x.StockDocumentLineId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<Material>().WithMany().HasForeignKey(x => x.MaterialId).OnDelete(DeleteBehavior.Restrict);
     }
 }

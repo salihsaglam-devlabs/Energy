@@ -9,12 +9,12 @@ namespace Energy.Tests.Modules.Core;
 /// <summary>LocalizationResource CRUD servisi round-trip testi (EF InMemory).</summary>
 public sealed class LocalizationResourceServiceTests
 {
-    private static EnergyDbContext NewContext()
+    private static AppDbContext NewContext()
     {
-        var options = new DbContextOptionsBuilder<EnergyDbContext>()
+        var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-        return new EnergyDbContext(options);
+        return new AppDbContext(options);
     }
 
     [Fact]

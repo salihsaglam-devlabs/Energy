@@ -1,15 +1,16 @@
+using Energy.Shared.Common;
 using System.Linq.Expressions;
 using Energy.Domain.Common;
-using Energy.Domain.Core;
-using Energy.Domain.Projects;
-using Energy.Domain.BusinessPartners;
-using Energy.Domain.Catalog;
-using Energy.Domain.Inventory;
-using Energy.Domain.Operations;
-using Energy.Domain.Procurement;
-using Energy.Domain.Budget;
-using Energy.Domain.Finance;
-using Energy.Domain.Workflow;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.Projects;
+using Energy.Domain.Modules.BusinessPartners;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Operations;
+using Energy.Domain.Modules.Procurement;
+using Energy.Domain.Modules.Budget;
+using Energy.Domain.Modules.Finance;
+using Energy.Domain.Modules.Workflow;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

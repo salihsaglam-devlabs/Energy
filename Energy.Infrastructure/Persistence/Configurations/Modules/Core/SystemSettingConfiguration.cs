@@ -1,14 +1,16 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.IAM;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Core;
 
-/// <summary>SystemSetting EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class SystemSettingConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Core.SystemSetting>
+/// <summary>SystemSetting EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class SystemSettingConfiguration : IEntityTypeConfiguration<SystemSetting>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Core.SystemSetting> builder)
+    public void Configure(EntityTypeBuilder<SystemSetting> e)
     {
-        builder.ToTable("SystemSettings");
-        builder.HasKey(e => e.Id);
+        e.ToTable("SystemSettings");
+        e.HasIndex(x => x.Key).IsUnique();
     }
 }

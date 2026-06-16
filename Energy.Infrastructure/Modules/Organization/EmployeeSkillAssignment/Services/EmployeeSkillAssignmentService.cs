@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Organization.EmployeeSkillAssignment.Ser
 /// <summary>EmployeeSkillAssignment CRUD servisi (projection, pagination, soft-delete).</summary>
 public class EmployeeSkillAssignmentService : IEmployeeSkillAssignmentService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public EmployeeSkillAssignmentService(EnergyDbContext db) => _db = db;
+    public EmployeeSkillAssignmentService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<EmployeeSkillAssignmentListResponse>>> GetListAsync(GetEmployeeSkillAssignmentListRequest request, CancellationToken ct = default)
     {

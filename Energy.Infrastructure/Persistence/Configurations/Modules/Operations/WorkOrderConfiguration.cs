@@ -1,18 +1,29 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Assets;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Contracts;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.FieldOperations;
+using Energy.Domain.Modules.HR;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Operations;
+using Energy.Domain.Modules.Organization;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Operations;
 
-/// <summary>WorkOrder EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class WorkOrderConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Operations.WorkOrder>
+/// <summary>WorkOrder EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class WorkOrderConfiguration : IEntityTypeConfiguration<WorkOrder>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Operations.WorkOrder> builder)
+    public void Configure(EntityTypeBuilder<WorkOrder> e)
     {
-        builder.ToTable("WorkOrders");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Operations.WorkOrderType>().WithMany().HasForeignKey(e => e.WorkOrderTypeId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Projects.Project>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Projects.ProjectPhas>().WithMany().HasForeignKey(e => e.ProjectPhaseId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Projects.ProjectLocation>().WithMany().HasForeignKey(e => e.ProjectLocationId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("WorkOrders");
+        e.HasIndex(x => x.WorkOrderNo).IsUnique();
+        e.HasOne<WorkOrderType>().WithMany().HasForeignKey(x => x.WorkOrderTypeId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<Project>().WithMany().HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<ProjectPhase>().WithMany().HasForeignKey(x => x.ProjectPhaseId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<ProjectLocation>().WithMany().HasForeignKey(x => x.ProjectLocationId).OnDelete(DeleteBehavior.Restrict);
     }
 }

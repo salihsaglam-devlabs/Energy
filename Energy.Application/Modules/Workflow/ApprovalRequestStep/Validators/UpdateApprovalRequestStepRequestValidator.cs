@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 using FluentValidation;
 using Energy.Shared.Models.V1.Workflow.ApprovalRequestStep.Requests;
 

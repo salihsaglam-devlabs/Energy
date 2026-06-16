@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 using Microsoft.EntityFrameworkCore;
 using Energy.Infrastructure.Persistence;
 using Energy.Shared.Models.V1.Common.Responses;
@@ -10,9 +11,9 @@ namespace Energy.Infrastructure.Modules.BusinessPartners.BusinessPartner.Service
 /// <summary>BusinessPartner CRUD servisi (projection, pagination, soft-delete).</summary>
 public class BusinessPartnerService : IBusinessPartnerService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public BusinessPartnerService(EnergyDbContext db) => _db = db;
+    public BusinessPartnerService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<BusinessPartnerListResponse>>> GetListAsync(GetBusinessPartnerListRequest request, CancellationToken ct = default)
     {

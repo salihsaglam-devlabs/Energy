@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Workflow.ApprovalStepDefinition.Responses;
 
 /// <summary>ApprovalStepDefinition liste satırı.</summary>
@@ -13,7 +14,7 @@ public class ApprovalStepDefinitionListResponse
     public int StepNo { get; set; }
 
     /// <summary>Sequential, ParallelAny, ParallelAll, Quorum</summary>
-    public string ApprovalMode { get; set; } = string.Empty;
+    public ApprovalMode ApprovalMode { get; set; }
 
     /// <summary>Quorum için gerekli sayı</summary>
     public int? RequiredApprovalCount { get; set; }

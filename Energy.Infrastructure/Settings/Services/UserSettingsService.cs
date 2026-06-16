@@ -1,5 +1,5 @@
 using Energy.Application.Settings.Services;
-using Energy.Domain.Identity;
+using Energy.Domain.Modules.IAM;
 using Energy.Infrastructure.Persistence;
 using Energy.Shared.Models.V1.Settings.Requests;
 using Energy.Shared.Models.V1.Settings.Responses;

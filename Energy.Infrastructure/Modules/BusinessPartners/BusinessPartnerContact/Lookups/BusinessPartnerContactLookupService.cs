@@ -9,21 +9,25 @@ namespace Energy.Infrastructure.Modules.BusinessPartners.BusinessPartnerContact.
 /// <summary>BusinessPartnerContact lookup servisi (aktif + arama filtreli projection).</summary>
 public class BusinessPartnerContactLookupService : IBusinessPartnerContactLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public BusinessPartnerContactLookupService(EnergyDbContext db) => _db = db;
+    public BusinessPartnerContactLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<BusinessPartnerContactLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.BusinessPartnerContacts.AsNoTracking();
-        var items = await query.Select(e => new BusinessPartnerContactLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        if (!string.IsNullOrWhiteSpace(search)) query = query.Where(e => e.Title.Contains(search));
+        var items = await query
+            .OrderBy(e => e.Title)
+            .Select(e => new BusinessPartnerContactLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = e.Title,
+                DisplayName = e.Title,
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<BusinessPartnerContactLookupResponse>>.Success(items);
     }
 }

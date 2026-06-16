@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Core.SequenceDefinition.Services;
 /// <summary>SequenceDefinition CRUD servisi (projection, pagination, soft-delete).</summary>
 public class SequenceDefinitionService : ISequenceDefinitionService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public SequenceDefinitionService(EnergyDbContext db) => _db = db;
+    public SequenceDefinitionService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<SequenceDefinitionListResponse>>> GetListAsync(GetSequenceDefinitionListRequest request, CancellationToken ct = default)
     {

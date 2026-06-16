@@ -46,6 +46,12 @@ builder.Services
         // döndürülen) 400'e yükselt; böylece istemci bunları hata olarak değerlendirir.
         options.Filters.Add<EnvelopeStatusResultFilter>();
     })
+    .AddJsonOptions(options =>
+    {
+        // Enum değerleri tel üzerinde string olarak serileştirilir (UI/JS uyumluluğu).
+        options.JsonSerializerOptions.Converters.Add(
+            new System.Text.Json.Serialization.JsonStringEnumConverter());
+    })
     .AddEnergyMvcLocalization();
 
 builder.Services.AddEnergyLocalization();

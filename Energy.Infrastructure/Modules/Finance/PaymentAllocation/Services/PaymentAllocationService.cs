@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Finance.PaymentAllocation.Services;
 /// <summary>PaymentAllocation CRUD servisi (projection, pagination, soft-delete).</summary>
 public class PaymentAllocationService : IPaymentAllocationService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public PaymentAllocationService(EnergyDbContext db) => _db = db;
+    public PaymentAllocationService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<PaymentAllocationListResponse>>> GetListAsync(GetPaymentAllocationListRequest request, CancellationToken ct = default)
     {

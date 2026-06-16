@@ -9,21 +9,26 @@ namespace Energy.Infrastructure.Modules.IAM.ApiEndpoint.Lookups;
 /// <summary>ApiEndpoint lookup servisi (aktif + arama filtreli projection).</summary>
 public class ApiEndpointLookupService : IApiEndpointLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ApiEndpointLookupService(EnergyDbContext db) => _db = db;
+    public ApiEndpointLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<ApiEndpointLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.ApiEndpoints.AsNoTracking();
-        var items = await query.Select(e => new ApiEndpointLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        if (activeOnly) query = query.Where(e => e.IsActive);
+        if (!string.IsNullOrWhiteSpace(search)) query = query.Where(e => e.Name.Contains(search));
+        var items = await query
+            .OrderBy(e => e.Name)
+            .Select(e => new ApiEndpointLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = e.Name,
+                DisplayName = e.Name,
+                IsActive = e.IsActive
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<ApiEndpointLookupResponse>>.Success(items);
     }
 }

@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Inventory.Warehouse.Requests;
 
 /// <summary>Warehouse oluşturma isteği.</summary>
@@ -13,7 +14,7 @@ public class CreateWarehouseRequest
     public Guid? ProjectId { get; set; }
 
     /// <summary>Depo türü</summary>
-    public string WarehouseType { get; set; } = string.Empty;
+    public WarehouseType WarehouseType { get; set; }
 
     /// <summary>Depo kodu</summary>
     public string Code { get; set; } = string.Empty;

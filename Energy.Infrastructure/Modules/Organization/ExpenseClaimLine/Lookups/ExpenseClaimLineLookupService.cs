@@ -9,21 +9,24 @@ namespace Energy.Infrastructure.Modules.Organization.ExpenseClaimLine.Lookups;
 /// <summary>ExpenseClaimLine lookup servisi (aktif + arama filtreli projection).</summary>
 public class ExpenseClaimLineLookupService : IExpenseClaimLineLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ExpenseClaimLineLookupService(EnergyDbContext db) => _db = db;
+    public ExpenseClaimLineLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<ExpenseClaimLineLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.ExpenseClaimLines.AsNoTracking();
-        var items = await query.Select(e => new ExpenseClaimLineLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Select(e => new ExpenseClaimLineLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = null,
+                DisplayName = e.Id.ToString(),
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<ExpenseClaimLineLookupResponse>>.Success(items);
     }
 }

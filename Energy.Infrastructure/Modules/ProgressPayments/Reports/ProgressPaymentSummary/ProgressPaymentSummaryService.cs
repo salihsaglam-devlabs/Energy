@@ -10,16 +10,16 @@ namespace Energy.Infrastructure.Modules.ProgressPayments.Reports.ProgressPayment
 /// <summary>ProgressPaymentSummary raporu servisi (AsNoTracking, projection, filtre, sayfalama).</summary>
 public sealed class ProgressPaymentSummaryService : IProgressPaymentSummaryService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ProgressPaymentSummaryService(EnergyDbContext db) => _db = db;
+    public ProgressPaymentSummaryService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ProgressPaymentSummaryRowResponse>>> GetDataAsync(ProgressPaymentSummaryRequest request, CancellationToken ct = default)
     {
         var query = _db.ProgressPayments.AsNoTracking();
         if (request.StartDate.HasValue) query = query.Where(e => e.PaymentPeriodStart >= request.StartDate.Value);
         if (request.EndDate.HasValue) query = query.Where(e => e.PaymentPeriodStart <= request.EndDate.Value);
-        if (!string.IsNullOrWhiteSpace(request.Status)) query = query.Where(e => e.Status == request.Status);
+        if (!string.IsNullOrWhiteSpace(request.Status)) query = query.Where(e => e.Status.ToString() == request.Status);
         var total = await query.CountAsync(ct);
         var pageSize = request.PageSize <= 0 ? 50 : request.PageSize;
         var pageNumber = request.PageNumber <= 0 ? 1 : request.PageNumber;
@@ -35,7 +35,7 @@ public sealed class ProgressPaymentSummaryService : IProgressPaymentSummaryServi
                 GrossAmount = e.GrossAmount,
                 NetAmount = e.NetAmount,
                 PaymentPeriodStart = e.PaymentPeriodStart,
-                Status = e.Status
+                Status = e.Status.ToString()
             })
             .ToListAsync(ct);
         var page = PaginatedResponse<ProgressPaymentSummaryRowResponse>.Create(items, pageNumber, pageSize, total);

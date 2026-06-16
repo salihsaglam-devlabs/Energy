@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.HR.Timesheet.Services;
 /// <summary>Timesheet CRUD servisi (projection, pagination, soft-delete).</summary>
 public class TimesheetService : ITimesheetService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public TimesheetService(EnergyDbContext db) => _db = db;
+    public TimesheetService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<TimesheetListResponse>>> GetListAsync(GetTimesheetListRequest request, CancellationToken ct = default)
     {

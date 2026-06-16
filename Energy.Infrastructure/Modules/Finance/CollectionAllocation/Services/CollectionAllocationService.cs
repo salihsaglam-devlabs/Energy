@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Finance.CollectionAllocation.Services;
 /// <summary>CollectionAllocation CRUD servisi (projection, pagination, soft-delete).</summary>
 public class CollectionAllocationService : ICollectionAllocationService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public CollectionAllocationService(EnergyDbContext db) => _db = db;
+    public CollectionAllocationService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<CollectionAllocationListResponse>>> GetListAsync(GetCollectionAllocationListRequest request, CancellationToken ct = default)
     {

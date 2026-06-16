@@ -9,21 +9,23 @@ namespace Energy.Infrastructure.Modules.IAM.UserPermission.Lookups;
 /// <summary>UserPermission lookup servisi (aktif + arama filtreli projection).</summary>
 public class UserPermissionLookupService : IUserPermissionLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public UserPermissionLookupService(EnergyDbContext db) => _db = db;
+    public UserPermissionLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<UserPermissionLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.UserPermissions.AsNoTracking();
-        var items = await query.Select(e => new UserPermissionLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .Select(e => new UserPermissionLookupResponse
+            {
+                Id = Guid.Empty,
+                Code = null,
+                Name = null,
+                DisplayName = "",
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<UserPermissionLookupResponse>>.Success(items);
     }
 }

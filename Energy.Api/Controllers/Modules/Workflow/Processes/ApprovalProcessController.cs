@@ -57,7 +57,7 @@ public sealed class ApprovalProcessController : ControllerBase
         => ActAsync(id, (uid, note) => _workflow.CancelAsync(id, uid, note, ct), request?.Note);
 
     private async Task<ActionResult<BaseResponse<ApprovalRequestListItemResponse>>> ActAsync(
-        Guid id, Func<Guid, string?, Task<Energy.Domain.Workflow.ApprovalRequest>> action, string? note)
+        Guid id, Func<Guid, string?, Task<Energy.Domain.Modules.Workflow.ApprovalRequest>> action, string? note)
     {
         if (_currentUser.UserId is not { } userId)
         {
@@ -75,7 +75,7 @@ public sealed class ApprovalProcessController : ControllerBase
         }
     }
 
-    private static ApprovalRequestListItemResponse Map(Energy.Domain.Workflow.ApprovalRequest r) => new()
+    private static ApprovalRequestListItemResponse Map(Energy.Domain.Modules.Workflow.ApprovalRequest r) => new()
     {
         Id = r.Id,
         RelatedModule = r.RelatedModule,

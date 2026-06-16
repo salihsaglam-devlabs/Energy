@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.FieldOperations.DailySiteReport.Requests;
 
 /// <summary>DailySiteReport güncelleme isteği.</summary>
@@ -25,5 +26,5 @@ public class UpdateDailySiteReportRequest
     public string? Notes { get; set; }
 
     /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
+    public DocumentStatus Status { get; set; }
 }

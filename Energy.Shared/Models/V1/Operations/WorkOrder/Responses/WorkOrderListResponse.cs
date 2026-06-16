@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Operations.WorkOrder.Responses;
 
 /// <summary>WorkOrder liste satırı.</summary>
@@ -19,7 +20,7 @@ public class WorkOrderListResponse
     public Guid? ProjectLocationId { get; set; }
 
     /// <summary>Durum</summary>
-    public string Status { get; set; } = string.Empty;
+    public WorkOrderStatus Status { get; set; }
 
     /// <summary>İş emri no</summary>
     public string WorkOrderNo { get; set; } = string.Empty;

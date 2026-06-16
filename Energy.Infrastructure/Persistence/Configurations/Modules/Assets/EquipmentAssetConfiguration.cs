@@ -1,14 +1,26 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Assets;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Contracts;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.FieldOperations;
+using Energy.Domain.Modules.HR;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Operations;
+using Energy.Domain.Modules.Organization;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Assets;
 
-/// <summary>EquipmentAsset EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class EquipmentAssetConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Assets.EquipmentAsset>
+/// <summary>EquipmentAsset EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class EquipmentAssetConfiguration : IEntityTypeConfiguration<EquipmentAsset>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Assets.EquipmentAsset> builder)
+    public void Configure(EntityTypeBuilder<EquipmentAsset> e)
     {
-        builder.ToTable("EquipmentAssets");
-        builder.HasKey(e => e.Id);
+        e.ToTable("EquipmentAssets");
+        e.HasIndex(x => x.Code).IsUnique();
+        e.HasOne<Company>().WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
     }
 }

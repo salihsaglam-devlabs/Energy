@@ -1,14 +1,16 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.IAM;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Core;
 
-/// <summary>Currency EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class CurrencyConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Core.Currency>
+/// <summary>Currency EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class CurrencyConfiguration : IEntityTypeConfiguration<Currency>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Core.Currency> builder)
+    public void Configure(EntityTypeBuilder<Currency> e)
     {
-        builder.ToTable("Currencies");
-        builder.HasKey(e => e.Id);
+        e.ToTable("Currencies");
+        e.HasIndex(x => x.Code).IsUnique();
     }
 }

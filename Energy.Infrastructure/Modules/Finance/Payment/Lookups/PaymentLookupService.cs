@@ -9,21 +9,25 @@ namespace Energy.Infrastructure.Modules.Finance.Payment.Lookups;
 /// <summary>Payment lookup servisi (aktif + arama filtreli projection).</summary>
 public class PaymentLookupService : IPaymentLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public PaymentLookupService(EnergyDbContext db) => _db = db;
+    public PaymentLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<PaymentLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.Payments.AsNoTracking();
-        var items = await query.Select(e => new PaymentLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        if (!string.IsNullOrWhiteSpace(search)) query = query.Where(e => e.PaymentNo.Contains(search));
+        var items = await query
+            .OrderBy(e => e.PaymentNo)
+            .Select(e => new PaymentLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = e.PaymentNo,
+                DisplayName = e.PaymentNo,
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<PaymentLookupResponse>>.Success(items);
     }
 }

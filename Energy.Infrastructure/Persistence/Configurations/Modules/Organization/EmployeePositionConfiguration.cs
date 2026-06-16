@@ -1,14 +1,18 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.BusinessPartners;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Organization;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Organization;
 
-/// <summary>EmployeePosition EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class EmployeePositionConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Organization.EmployeePosition>
+/// <summary>EmployeePosition EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class EmployeePositionConfiguration : IEntityTypeConfiguration<EmployeePosition>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Organization.EmployeePosition> builder)
+    public void Configure(EntityTypeBuilder<EmployeePosition> e)
     {
-        builder.ToTable("EmployeePositions");
-        builder.HasKey(e => e.Id);
+        e.ToTable("EmployeePositions"); e.HasIndex(x => x.Code).IsUnique(); 
     }
 }

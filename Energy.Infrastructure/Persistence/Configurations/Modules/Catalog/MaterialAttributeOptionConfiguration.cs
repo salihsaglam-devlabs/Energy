@@ -1,15 +1,18 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Catalog;
 
-/// <summary>MaterialAttributeOption EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class MaterialAttributeOptionConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Catalog.MaterialAttributeOption>
+/// <summary>MaterialAttributeOption EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class MaterialAttributeOptionConfiguration : IEntityTypeConfiguration<MaterialAttributeOption>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Catalog.MaterialAttributeOption> builder)
+    public void Configure(EntityTypeBuilder<MaterialAttributeOption> e)
     {
-        builder.ToTable("MaterialAttributeOptions");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Catalog.MaterialAttributeDefinition>().WithMany().HasForeignKey(e => e.MaterialAttributeDefinitionId).OnDelete(DeleteBehavior.Cascade);
+        e.ToTable("MaterialAttributeOptions");
+        e.HasOne<MaterialAttributeDefinition>().WithMany().HasForeignKey(x => x.MaterialAttributeDefinitionId).OnDelete(DeleteBehavior.Cascade);
     }
 }

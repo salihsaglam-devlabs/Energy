@@ -9,21 +9,24 @@ namespace Energy.Infrastructure.Modules.FieldOperations.ProgressEntry.Lookups;
 /// <summary>ProgressEntry lookup servisi (aktif + arama filtreli projection).</summary>
 public class ProgressEntryLookupService : IProgressEntryLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ProgressEntryLookupService(EnergyDbContext db) => _db = db;
+    public ProgressEntryLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<ProgressEntryLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.ProgressEntries.AsNoTracking();
-        var items = await query.Select(e => new ProgressEntryLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Select(e => new ProgressEntryLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = null,
+                DisplayName = e.Id.ToString(),
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<ProgressEntryLookupResponse>>.Success(items);
     }
 }

@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 using Microsoft.EntityFrameworkCore;
 using Energy.Infrastructure.Persistence;
 using Energy.Shared.Models.V1.Common.Responses;
@@ -10,9 +11,9 @@ namespace Energy.Infrastructure.Modules.Workflow.ApprovalStepApprover.Services;
 /// <summary>ApprovalStepApprover CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ApprovalStepApproverService : IApprovalStepApproverService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ApprovalStepApproverService(EnergyDbContext db) => _db = db;
+    public ApprovalStepApproverService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ApprovalStepApproverListResponse>>> GetListAsync(GetApprovalStepApproverListRequest request, CancellationToken ct = default)
     {

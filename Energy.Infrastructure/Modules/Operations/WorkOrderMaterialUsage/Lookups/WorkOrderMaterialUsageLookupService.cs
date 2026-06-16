@@ -9,21 +9,24 @@ namespace Energy.Infrastructure.Modules.Operations.WorkOrderMaterialUsage.Lookup
 /// <summary>WorkOrderMaterialUsage lookup servisi (aktif + arama filtreli projection).</summary>
 public class WorkOrderMaterialUsageLookupService : IWorkOrderMaterialUsageLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public WorkOrderMaterialUsageLookupService(EnergyDbContext db) => _db = db;
+    public WorkOrderMaterialUsageLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<WorkOrderMaterialUsageLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.WorkOrderMaterialUsages.AsNoTracking();
-        var items = await query.Select(e => new WorkOrderMaterialUsageLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Select(e => new WorkOrderMaterialUsageLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = null,
+                DisplayName = e.Id.ToString(),
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<WorkOrderMaterialUsageLookupResponse>>.Success(items);
     }
 }

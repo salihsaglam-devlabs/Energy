@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Notifications.NotificationPreference.Ser
 /// <summary>NotificationPreference CRUD servisi (projection, pagination, soft-delete).</summary>
 public class NotificationPreferenceService : INotificationPreferenceService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public NotificationPreferenceService(EnergyDbContext db) => _db = db;
+    public NotificationPreferenceService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<NotificationPreferenceListResponse>>> GetListAsync(GetNotificationPreferenceListRequest request, CancellationToken ct = default)
     {

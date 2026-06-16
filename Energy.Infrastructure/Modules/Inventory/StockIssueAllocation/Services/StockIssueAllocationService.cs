@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Inventory.StockIssueAllocation.Services;
 /// <summary>StockIssueAllocation CRUD servisi (projection, pagination, soft-delete).</summary>
 public class StockIssueAllocationService : IStockIssueAllocationService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public StockIssueAllocationService(EnergyDbContext db) => _db = db;
+    public StockIssueAllocationService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<StockIssueAllocationListResponse>>> GetListAsync(GetStockIssueAllocationListRequest request, CancellationToken ct = default)
     {

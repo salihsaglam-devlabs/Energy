@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Reporting.DashboardWidget.Services;
 /// <summary>DashboardWidget CRUD servisi (projection, pagination, soft-delete).</summary>
 public class DashboardWidgetService : IDashboardWidgetService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public DashboardWidgetService(EnergyDbContext db) => _db = db;
+    public DashboardWidgetService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<DashboardWidgetListResponse>>> GetListAsync(GetDashboardWidgetListRequest request, CancellationToken ct = default)
     {

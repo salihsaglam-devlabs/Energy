@@ -1,16 +1,25 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.BusinessPartners;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Procurement;
+using Energy.Domain.Modules.Projects;
+using Energy.Domain.Modules.Requests;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Procurement;
 
-/// <summary>PurchaseOrder EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class PurchaseOrderConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Procurement.PurchaseOrder>
+/// <summary>PurchaseOrder EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class PurchaseOrderConfiguration : IEntityTypeConfiguration<PurchaseOrder>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Procurement.PurchaseOrder> builder)
+    public void Configure(EntityTypeBuilder<PurchaseOrder> e)
     {
-        builder.ToTable("PurchaseOrders");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.BusinessPartners.BusinessPartner>().WithMany().HasForeignKey(e => e.SupplierId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Projects.Project>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("PurchaseOrders");
+        e.HasIndex(x => x.OrderNo).IsUnique();
+        e.HasOne<BusinessPartner>().WithMany().HasForeignKey(x => x.SupplierId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<Project>().WithMany().HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<Currency>().WithMany().HasForeignKey(x => x.CurrencyId).OnDelete(DeleteBehavior.Restrict);
     }
 }

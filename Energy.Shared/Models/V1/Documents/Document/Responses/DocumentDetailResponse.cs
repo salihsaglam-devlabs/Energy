@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Documents.Document.Responses;
 
 /// <summary>Document detay görünümü.</summary>
@@ -37,7 +38,7 @@ public class DocumentDetailResponse
     public string? Description { get; set; }
 
     /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
+    public DocumentStatus Status { get; set; }
 
     /// <summary>CurrentVersionNo</summary>
     public int CurrentVersionNo { get; set; }

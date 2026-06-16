@@ -1,24 +1,14 @@
+using Energy.Shared.Common;
 using Energy.Domain.Common;
 
 namespace Energy.Domain.Modules.Workflow;
 
-/// <summary>
-/// Adım bazlı kişi, rol veya grup onaycıları
-/// </summary>
+/// <summary>Adım bazlı onaycı (kullanıcı, rol veya departman).</summary>
 public class ApprovalStepApprover : AuditableEntity
 {
-    /// <summary>Adım</summary>
     public Guid ApprovalStepDefinitionId { get; set; }
-
-    /// <summary>User, Role, ProjectRole, DepartmentManager</summary>
-    public string ApproverType { get; set; } = string.Empty;
-
-    /// <summary>Kişi bazlı onaycı</summary>
+    public ApproverType ApproverType { get; set; }
     public Guid? ApproverUserId { get; set; }
-
-    /// <summary>Rol bazlı onaycı</summary>
     public Guid? ApproverRoleId { get; set; }
-
-    /// <summary>Departman bazlı onaycı</summary>
     public Guid? ApproverDepartmentId { get; set; }
 }

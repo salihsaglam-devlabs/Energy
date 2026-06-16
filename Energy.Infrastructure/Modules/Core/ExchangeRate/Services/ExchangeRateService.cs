@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Core.ExchangeRate.Services;
 /// <summary>ExchangeRate CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ExchangeRateService : IExchangeRateService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ExchangeRateService(EnergyDbContext db) => _db = db;
+    public ExchangeRateService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ExchangeRateListResponse>>> GetListAsync(GetExchangeRateListRequest request, CancellationToken ct = default)
     {

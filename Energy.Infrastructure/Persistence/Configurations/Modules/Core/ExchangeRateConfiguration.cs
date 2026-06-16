@@ -1,14 +1,17 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.IAM;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Core;
 
-/// <summary>ExchangeRate EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class ExchangeRateConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Core.ExchangeRate>
+/// <summary>ExchangeRate EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class ExchangeRateConfiguration : IEntityTypeConfiguration<ExchangeRate>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Core.ExchangeRate> builder)
+    public void Configure(EntityTypeBuilder<ExchangeRate> e)
     {
-        builder.ToTable("ExchangeRates");
-        builder.HasKey(e => e.Id);
+        e.ToTable("ExchangeRates");
+        e.HasIndex(x => new { x.CurrencyId, x.RateDate }).IsUnique();
+        e.HasOne<Currency>().WithMany().HasForeignKey(x => x.CurrencyId).OnDelete(DeleteBehavior.Restrict);
     }
 }

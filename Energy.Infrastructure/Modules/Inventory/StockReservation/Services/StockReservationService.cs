@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Inventory.StockReservation.Services;
 /// <summary>StockReservation CRUD servisi (projection, pagination, soft-delete).</summary>
 public class StockReservationService : IStockReservationService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public StockReservationService(EnergyDbContext db) => _db = db;
+    public StockReservationService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<StockReservationListResponse>>> GetListAsync(GetStockReservationListRequest request, CancellationToken ct = default)
     {

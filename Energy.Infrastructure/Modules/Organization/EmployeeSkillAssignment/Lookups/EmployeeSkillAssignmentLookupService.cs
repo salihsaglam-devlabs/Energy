@@ -9,21 +9,24 @@ namespace Energy.Infrastructure.Modules.Organization.EmployeeSkillAssignment.Loo
 /// <summary>EmployeeSkillAssignment lookup servisi (aktif + arama filtreli projection).</summary>
 public class EmployeeSkillAssignmentLookupService : IEmployeeSkillAssignmentLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public EmployeeSkillAssignmentLookupService(EnergyDbContext db) => _db = db;
+    public EmployeeSkillAssignmentLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<EmployeeSkillAssignmentLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.EmployeeSkillAssignments.AsNoTracking();
-        var items = await query.Select(e => new EmployeeSkillAssignmentLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Select(e => new EmployeeSkillAssignmentLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = null,
+                DisplayName = e.Id.ToString(),
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<EmployeeSkillAssignmentLookupResponse>>.Success(items);
     }
 }

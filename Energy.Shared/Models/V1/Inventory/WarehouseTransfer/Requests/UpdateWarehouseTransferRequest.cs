@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Inventory.WarehouseTransfer.Requests;
 
 /// <summary>WarehouseTransfer güncelleme isteği.</summary>
@@ -19,5 +20,5 @@ public class UpdateWarehouseTransferRequest
     public DateTime TransferDate { get; set; }
 
     /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
+    public DocumentStatus Status { get; set; }
 }

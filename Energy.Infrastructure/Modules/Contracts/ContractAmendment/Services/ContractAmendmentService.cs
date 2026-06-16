@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Contracts.ContractAmendment.Services;
 /// <summary>ContractAmendment CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ContractAmendmentService : IContractAmendmentService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ContractAmendmentService(EnergyDbContext db) => _db = db;
+    public ContractAmendmentService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ContractAmendmentListResponse>>> GetListAsync(GetContractAmendmentListRequest request, CancellationToken ct = default)
     {

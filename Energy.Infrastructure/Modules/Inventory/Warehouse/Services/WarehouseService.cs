@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 using Microsoft.EntityFrameworkCore;
 using Energy.Infrastructure.Persistence;
 using Energy.Shared.Models.V1.Common.Responses;
@@ -10,9 +11,9 @@ namespace Energy.Infrastructure.Modules.Inventory.Warehouse.Services;
 /// <summary>Warehouse CRUD servisi (projection, pagination, soft-delete).</summary>
 public class WarehouseService : IWarehouseService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public WarehouseService(EnergyDbContext db) => _db = db;
+    public WarehouseService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<WarehouseListResponse>>> GetListAsync(GetWarehouseListRequest request, CancellationToken ct = default)
     {

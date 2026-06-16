@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Projects.ProjectPhas.Services;
 /// <summary>ProjectPhas CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ProjectPhasService : IProjectPhasService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ProjectPhasService(EnergyDbContext db) => _db = db;
+    public ProjectPhasService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ProjectPhasListResponse>>> GetListAsync(GetProjectPhasListRequest request, CancellationToken ct = default)
     {
@@ -63,7 +63,7 @@ public class ProjectPhasService : IProjectPhasService
 
     public async Task<BaseResponse<Guid>> CreateAsync(CreateProjectPhasRequest request, CancellationToken ct = default)
     {
-        var entity = new global::Energy.Domain.Modules.Projects.ProjectPhas
+        var entity = new global::Energy.Domain.Modules.Projects.ProjectPhase
         {
             Id = Guid.NewGuid(),
             ProjectId = request.ProjectId,

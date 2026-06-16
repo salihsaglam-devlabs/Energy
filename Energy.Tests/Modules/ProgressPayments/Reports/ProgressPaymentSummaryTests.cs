@@ -9,12 +9,12 @@ namespace Energy.Tests.Modules.ProgressPayments.Reports;
 /// <summary>ProgressPaymentSummary raporu (salt-okunur) servis testi (EF InMemory).</summary>
 public sealed class ProgressPaymentSummaryTests
 {
-    private static EnergyDbContext NewContext()
+    private static AppDbContext NewContext()
     {
-        var options = new DbContextOptionsBuilder<EnergyDbContext>()
+        var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-        return new EnergyDbContext(options);
+        return new AppDbContext(options);
     }
 
     [Fact]

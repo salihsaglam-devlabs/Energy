@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Core.Branch.Services;
 /// <summary>Branch CRUD servisi (projection, pagination, soft-delete).</summary>
 public class BranchService : IBranchService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public BranchService(EnergyDbContext db) => _db = db;
+    public BranchService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<BranchListResponse>>> GetListAsync(GetBranchListRequest request, CancellationToken ct = default)
     {

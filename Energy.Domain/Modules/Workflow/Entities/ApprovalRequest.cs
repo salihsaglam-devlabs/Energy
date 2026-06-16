@@ -1,30 +1,16 @@
+using Energy.Shared.Common;
 using Energy.Domain.Common;
 
 namespace Energy.Domain.Modules.Workflow;
 
-/// <summary>
-/// Çalışan onay talepleri
-/// </summary>
+/// <summary>Çalışan onay talebi.</summary>
 public class ApprovalRequest : AuditableEntity
 {
-    /// <summary>Akış versiyonu</summary>
     public Guid ApprovalDefinitionVersionId { get; set; }
-
-    /// <summary>Kaynak modül</summary>
     public string RelatedModule { get; set; } = string.Empty;
-
-    /// <summary>Kaynak nesne türü</summary>
     public string RelatedEntityType { get; set; } = string.Empty;
-
-    /// <summary>Kaynak nesne</summary>
     public Guid RelatedEntityId { get; set; }
-
-    /// <summary>Talep eden</summary>
     public Guid RequestedByUserId { get; set; }
-
-    /// <summary>Durum</summary>
-    public string Status { get; set; } = string.Empty;
-
-    /// <summary>CurrentStepNo</summary>
+    public ApprovalRequestStatus Status { get; set; } = ApprovalRequestStatus.Draft;
     public int CurrentStepNo { get; set; }
 }

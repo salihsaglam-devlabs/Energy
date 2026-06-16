@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Inventory.StockCount.Services;
 /// <summary>StockCount CRUD servisi (projection, pagination, soft-delete).</summary>
 public class StockCountService : IStockCountService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public StockCountService(EnergyDbContext db) => _db = db;
+    public StockCountService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<StockCountListResponse>>> GetListAsync(GetStockCountListRequest request, CancellationToken ct = default)
     {

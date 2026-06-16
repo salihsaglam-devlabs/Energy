@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Inventory.StockDocument.Requests;
 
 /// <summary>StockDocument güncelleme isteği.</summary>
@@ -19,7 +20,7 @@ public class UpdateStockDocumentRequest
     public Guid? ProjectId { get; set; }
 
     /// <summary>Belge durumu</summary>
-    public string Status { get; set; } = string.Empty;
+    public DocumentStatus Status { get; set; }
 
     /// <summary>Belge numarası</summary>
     public string DocumentNo { get; set; } = string.Empty;

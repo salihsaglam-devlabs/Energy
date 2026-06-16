@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Catalog.MaterialUnitConversion.Services;
 /// <summary>MaterialUnitConversion CRUD servisi (projection, pagination, soft-delete).</summary>
 public class MaterialUnitConversionService : IMaterialUnitConversionService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public MaterialUnitConversionService(EnergyDbContext db) => _db = db;
+    public MaterialUnitConversionService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<MaterialUnitConversionListResponse>>> GetListAsync(GetMaterialUnitConversionListRequest request, CancellationToken ct = default)
     {

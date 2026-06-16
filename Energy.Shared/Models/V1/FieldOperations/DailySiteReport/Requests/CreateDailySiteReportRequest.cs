@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.FieldOperations.DailySiteReport.Requests;
 
 /// <summary>DailySiteReport oluşturma isteği.</summary>
@@ -22,5 +23,5 @@ public class CreateDailySiteReportRequest
     public string? Notes { get; set; }
 
     /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
+    public DocumentStatus Status { get; set; }
 }

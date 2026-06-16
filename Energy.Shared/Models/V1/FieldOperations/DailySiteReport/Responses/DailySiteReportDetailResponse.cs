@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.FieldOperations.DailySiteReport.Responses;
 
 /// <summary>DailySiteReport detay görünümü.</summary>
@@ -46,5 +47,5 @@ public class DailySiteReportDetailResponse
     public string? Notes { get; set; }
 
     /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
+    public DocumentStatus Status { get; set; }
 }

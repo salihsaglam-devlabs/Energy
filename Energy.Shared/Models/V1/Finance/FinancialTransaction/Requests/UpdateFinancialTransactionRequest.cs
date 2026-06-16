@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Finance.FinancialTransaction.Requests;
 
 /// <summary>FinancialTransaction güncelleme isteği.</summary>
@@ -7,7 +8,7 @@ public class UpdateFinancialTransactionRequest
     public Guid Id { get; set; }
 
     /// <summary>Finans hareket türü</summary>
-    public string TransactionType { get; set; } = string.Empty;
+    public FinancialTransactionType TransactionType { get; set; }
 
     /// <summary>Opsiyonel proje</summary>
     public Guid? ProjectId { get; set; }

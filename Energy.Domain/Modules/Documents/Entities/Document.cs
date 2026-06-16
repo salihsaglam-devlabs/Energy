@@ -1,24 +1,14 @@
+using Energy.Shared.Common;
 using Energy.Domain.Common;
 
 namespace Energy.Domain.Modules.Documents;
 
-/// <summary>
-/// Belge kayıtları
-/// </summary>
+/// <summary>Belge kaydı. Tüm modüllere bağlanabilir ama hiçbirine zorunlu bağımlı değildir.</summary>
 public class Document : AuditableEntity
 {
-    /// <summary>DocumentFolderId</summary>
     public Guid? DocumentFolderId { get; set; }
-
-    /// <summary>Name</summary>
     public string Name { get; set; } = string.Empty;
-
-    /// <summary>Description</summary>
     public string? Description { get; set; }
-
-    /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
-
-    /// <summary>CurrentVersionNo</summary>
+    public DocumentStatus Status { get; set; } = DocumentStatus.Draft;
     public int CurrentVersionNo { get; set; }
 }

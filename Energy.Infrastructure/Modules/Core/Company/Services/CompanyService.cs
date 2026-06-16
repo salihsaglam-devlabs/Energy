@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Core.Company.Services;
 /// <summary>Company CRUD servisi (projection, pagination, soft-delete).</summary>
 public class CompanyService : ICompanyService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public CompanyService(EnergyDbContext db) => _db = db;
+    public CompanyService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<CompanyListResponse>>> GetListAsync(GetCompanyListRequest request, CancellationToken ct = default)
     {

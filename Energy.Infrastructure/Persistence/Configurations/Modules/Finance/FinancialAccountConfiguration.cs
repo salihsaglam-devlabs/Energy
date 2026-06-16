@@ -1,14 +1,23 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Budget;
+using Energy.Domain.Modules.BusinessPartners;
+using Energy.Domain.Modules.Contracts;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.FieldOperations;
+using Energy.Domain.Modules.Finance;
+using Energy.Domain.Modules.ProgressPayments;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Finance;
 
-/// <summary>FinancialAccount EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class FinancialAccountConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Finance.FinancialAccount>
+/// <summary>FinancialAccount EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class FinancialAccountConfiguration : IEntityTypeConfiguration<FinancialAccount>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Finance.FinancialAccount> builder)
+    public void Configure(EntityTypeBuilder<FinancialAccount> e)
     {
-        builder.ToTable("FinancialAccounts");
-        builder.HasKey(e => e.Id);
+        e.ToTable("FinancialAccounts");
+        e.HasIndex(x => x.Code).IsUnique();
+        e.HasOne<Currency>().WithMany().HasForeignKey(x => x.CurrencyId).OnDelete(DeleteBehavior.Restrict);
     }
 }

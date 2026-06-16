@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Finance.CostCenter.Services;
 /// <summary>CostCenter CRUD servisi (projection, pagination, soft-delete).</summary>
 public class CostCenterService : ICostCenterService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public CostCenterService(EnergyDbContext db) => _db = db;
+    public CostCenterService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<CostCenterListResponse>>> GetListAsync(GetCostCenterListRequest request, CancellationToken ct = default)
     {

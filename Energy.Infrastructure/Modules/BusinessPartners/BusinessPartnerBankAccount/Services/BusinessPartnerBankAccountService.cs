@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.BusinessPartners.BusinessPartnerBankAcco
 /// <summary>BusinessPartnerBankAccount CRUD servisi (projection, pagination, soft-delete).</summary>
 public class BusinessPartnerBankAccountService : IBusinessPartnerBankAccountService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public BusinessPartnerBankAccountService(EnergyDbContext db) => _db = db;
+    public BusinessPartnerBankAccountService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<BusinessPartnerBankAccountListResponse>>> GetListAsync(GetBusinessPartnerBankAccountListRequest request, CancellationToken ct = default)
     {

@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Inventory.Reports.StockBalanceReport;
 /// <summary>StockBalanceReport raporu servisi (AsNoTracking, projection, filtre, sayfalama).</summary>
 public sealed class StockBalanceReportService : IStockBalanceReportService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public StockBalanceReportService(EnergyDbContext db) => _db = db;
+    public StockBalanceReportService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<StockBalanceReportRowResponse>>> GetDataAsync(StockBalanceReportRequest request, CancellationToken ct = default)
     {

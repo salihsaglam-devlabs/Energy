@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.FieldOperations.MeasurementSheetLine.Ser
 /// <summary>MeasurementSheetLine CRUD servisi (projection, pagination, soft-delete).</summary>
 public class MeasurementSheetLineService : IMeasurementSheetLineService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public MeasurementSheetLineService(EnergyDbContext db) => _db = db;
+    public MeasurementSheetLineService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<MeasurementSheetLineListResponse>>> GetListAsync(GetMeasurementSheetLineListRequest request, CancellationToken ct = default)
     {

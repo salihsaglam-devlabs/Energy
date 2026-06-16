@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Projects.ProjectLocation.Services;
 /// <summary>ProjectLocation CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ProjectLocationService : IProjectLocationService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ProjectLocationService(EnergyDbContext db) => _db = db;
+    public ProjectLocationService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ProjectLocationListResponse>>> GetListAsync(GetProjectLocationListRequest request, CancellationToken ct = default)
     {

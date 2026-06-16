@@ -9,21 +9,25 @@ namespace Energy.Infrastructure.Modules.IAM.Menu.Lookups;
 /// <summary>Menu lookup servisi (aktif + arama filtreli projection).</summary>
 public class MenuLookupService : IMenuLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public MenuLookupService(EnergyDbContext db) => _db = db;
+    public MenuLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<MenuLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.Menus.AsNoTracking();
-        var items = await query.Select(e => new MenuLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        if (activeOnly) query = query.Where(e => e.IsActive);
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Select(e => new MenuLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = null,
+                DisplayName = e.Id.ToString(),
+                IsActive = e.IsActive
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<MenuLookupResponse>>.Success(items);
     }
 }

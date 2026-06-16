@@ -1,14 +1,19 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Documents;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Notifications;
+using Energy.Domain.Modules.Reporting;
+using Energy.Domain.Modules.Workflow;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Notifications;
 
-/// <summary>Notification EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class NotificationConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Notifications.Notification>
+/// <summary>Notification EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class NotificationConfiguration : IEntityTypeConfiguration<Notification>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Notifications.Notification> builder)
+    public void Configure(EntityTypeBuilder<Notification> e)
     {
-        builder.ToTable("Notifications");
-        builder.HasKey(e => e.Id);
+        e.ToTable("Notifications");
+        e.HasIndex(x => new { x.RelatedModule, x.RelatedEntityType, x.RelatedEntityId });
     }
 }

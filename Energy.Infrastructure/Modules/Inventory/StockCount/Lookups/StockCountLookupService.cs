@@ -9,21 +9,25 @@ namespace Energy.Infrastructure.Modules.Inventory.StockCount.Lookups;
 /// <summary>StockCount lookup servisi (aktif + arama filtreli projection).</summary>
 public class StockCountLookupService : IStockCountLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public StockCountLookupService(EnergyDbContext db) => _db = db;
+    public StockCountLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<StockCountLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.StockCounts.AsNoTracking();
-        var items = await query.Select(e => new StockCountLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        if (!string.IsNullOrWhiteSpace(search)) query = query.Where(e => e.CountNo.Contains(search));
+        var items = await query
+            .OrderBy(e => e.CountNo)
+            .Select(e => new StockCountLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = e.CountNo,
+                DisplayName = e.CountNo,
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<StockCountLookupResponse>>.Success(items);
     }
 }

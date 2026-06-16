@@ -1,16 +1,20 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.BusinessPartners;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Organization;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Projects;
 
-/// <summary>ProjectLocation EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class ProjectLocationConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Projects.ProjectLocation>
+/// <summary>ProjectLocation EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class ProjectLocationConfiguration : IEntityTypeConfiguration<ProjectLocation>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Projects.ProjectLocation> builder)
+    public void Configure(EntityTypeBuilder<ProjectLocation> e)
     {
-        builder.ToTable("ProjectLocations");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Projects.Project>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Projects.ProjectLocation>().WithMany().HasForeignKey(e => e.ParentLocationId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("ProjectLocations");
+        e.HasOne<Project>().WithMany().HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<ProjectLocation>().WithMany().HasForeignKey(x => x.ParentLocationId).OnDelete(DeleteBehavior.Restrict);
     }
 }

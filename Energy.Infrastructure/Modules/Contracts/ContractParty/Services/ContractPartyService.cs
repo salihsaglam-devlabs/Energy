@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Contracts.ContractParty.Services;
 /// <summary>ContractParty CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ContractPartyService : IContractPartyService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ContractPartyService(EnergyDbContext db) => _db = db;
+    public ContractPartyService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ContractPartyListResponse>>> GetListAsync(GetContractPartyListRequest request, CancellationToken ct = default)
     {

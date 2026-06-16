@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Finance.FinancialTransaction.Responses;
 
 /// <summary>FinancialTransaction detay görünümü.</summary>
@@ -28,7 +29,7 @@ public class FinancialTransactionDetailResponse
     public Guid? DeletedBy { get; set; }
 
     /// <summary>Finans hareket türü</summary>
-    public string TransactionType { get; set; } = string.Empty;
+    public FinancialTransactionType TransactionType { get; set; }
 
     /// <summary>Opsiyonel proje</summary>
     public Guid? ProjectId { get; set; }

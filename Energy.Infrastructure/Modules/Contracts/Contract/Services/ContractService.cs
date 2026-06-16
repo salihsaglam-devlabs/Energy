@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 using Microsoft.EntityFrameworkCore;
 using Energy.Infrastructure.Persistence;
 using Energy.Shared.Models.V1.Common.Responses;
@@ -10,9 +11,9 @@ namespace Energy.Infrastructure.Modules.Contracts.Contract.Services;
 /// <summary>Contract CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ContractService : IContractService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ContractService(EnergyDbContext db) => _db = db;
+    public ContractService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ContractListResponse>>> GetListAsync(GetContractListRequest request, CancellationToken ct = default)
     {

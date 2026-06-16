@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Workflow.ApprovalDefinition.Services;
 /// <summary>ApprovalDefinition CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ApprovalDefinitionService : IApprovalDefinitionService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ApprovalDefinitionService(EnergyDbContext db) => _db = db;
+    public ApprovalDefinitionService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ApprovalDefinitionListResponse>>> GetListAsync(GetApprovalDefinitionListRequest request, CancellationToken ct = default)
     {

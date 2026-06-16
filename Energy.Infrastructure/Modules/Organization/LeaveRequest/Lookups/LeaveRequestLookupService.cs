@@ -9,21 +9,24 @@ namespace Energy.Infrastructure.Modules.Organization.LeaveRequest.Lookups;
 /// <summary>LeaveRequest lookup servisi (aktif + arama filtreli projection).</summary>
 public class LeaveRequestLookupService : ILeaveRequestLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public LeaveRequestLookupService(EnergyDbContext db) => _db = db;
+    public LeaveRequestLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<LeaveRequestLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.LeaveRequests.AsNoTracking();
-        var items = await query.Select(e => new LeaveRequestLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Select(e => new LeaveRequestLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = null,
+                DisplayName = e.Id.ToString(),
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<LeaveRequestLookupResponse>>.Success(items);
     }
 }

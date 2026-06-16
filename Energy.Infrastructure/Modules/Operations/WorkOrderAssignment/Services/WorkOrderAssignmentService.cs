@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Operations.WorkOrderAssignment.Services;
 /// <summary>WorkOrderAssignment CRUD servisi (projection, pagination, soft-delete).</summary>
 public class WorkOrderAssignmentService : IWorkOrderAssignmentService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public WorkOrderAssignmentService(EnergyDbContext db) => _db = db;
+    public WorkOrderAssignmentService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<WorkOrderAssignmentListResponse>>> GetListAsync(GetWorkOrderAssignmentListRequest request, CancellationToken ct = default)
     {

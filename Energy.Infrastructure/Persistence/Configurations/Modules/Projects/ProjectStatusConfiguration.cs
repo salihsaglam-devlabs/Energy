@@ -1,14 +1,18 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.BusinessPartners;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Organization;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Projects;
 
-/// <summary>ProjectStatus EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class ProjectStatusConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Projects.ProjectStatus>
+/// <summary>ProjectStatus EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class ProjectStatusConfiguration : IEntityTypeConfiguration<ProjectStatus>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Projects.ProjectStatus> builder)
+    public void Configure(EntityTypeBuilder<ProjectStatus> e)
     {
-        builder.ToTable("ProjectStatuses");
-        builder.HasKey(e => e.Id);
+        e.ToTable("ProjectStatuses"); e.HasIndex(x => x.Code).IsUnique(); 
     }
 }

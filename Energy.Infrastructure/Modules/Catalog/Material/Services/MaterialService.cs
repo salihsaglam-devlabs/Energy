@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Catalog.Material.Services;
 /// <summary>Material CRUD servisi (projection, pagination, soft-delete).</summary>
 public class MaterialService : IMaterialService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public MaterialService(EnergyDbContext db) => _db = db;
+    public MaterialService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<MaterialListResponse>>> GetListAsync(GetMaterialListRequest request, CancellationToken ct = default)
     {

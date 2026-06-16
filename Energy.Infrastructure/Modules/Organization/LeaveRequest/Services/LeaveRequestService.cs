@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Organization.LeaveRequest.Services;
 /// <summary>LeaveRequest CRUD servisi (projection, pagination, soft-delete).</summary>
 public class LeaveRequestService : ILeaveRequestService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public LeaveRequestService(EnergyDbContext db) => _db = db;
+    public LeaveRequestService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<LeaveRequestListResponse>>> GetListAsync(GetLeaveRequestListRequest request, CancellationToken ct = default)
     {

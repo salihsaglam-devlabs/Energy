@@ -9,12 +9,12 @@ namespace Energy.Tests.Modules.Finance;
 /// <summary>CostCenter CRUD servisi round-trip testi (EF InMemory).</summary>
 public sealed class CostCenterServiceTests
 {
-    private static EnergyDbContext NewContext()
+    private static AppDbContext NewContext()
     {
-        var options = new DbContextOptionsBuilder<EnergyDbContext>()
+        var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-        return new EnergyDbContext(options);
+        return new AppDbContext(options);
     }
 
     [Fact]

@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.BusinessPartners.BusinessPartnerAddress.
 /// <summary>BusinessPartnerAddress CRUD servisi (projection, pagination, soft-delete).</summary>
 public class BusinessPartnerAddressService : IBusinessPartnerAddressService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public BusinessPartnerAddressService(EnergyDbContext db) => _db = db;
+    public BusinessPartnerAddressService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<BusinessPartnerAddressListResponse>>> GetListAsync(GetBusinessPartnerAddressListRequest request, CancellationToken ct = default)
     {

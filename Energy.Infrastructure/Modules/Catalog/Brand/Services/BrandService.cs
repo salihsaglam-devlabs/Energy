@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Catalog.Brand.Services;
 /// <summary>Brand CRUD servisi (projection, pagination, soft-delete).</summary>
 public class BrandService : IBrandService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public BrandService(EnergyDbContext db) => _db = db;
+    public BrandService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<BrandListResponse>>> GetListAsync(GetBrandListRequest request, CancellationToken ct = default)
     {

@@ -9,21 +9,24 @@ namespace Energy.Infrastructure.Modules.Chat.ChatMessage.Lookups;
 /// <summary>ChatMessage lookup servisi (aktif + arama filtreli projection).</summary>
 public class ChatMessageLookupService : IChatMessageLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ChatMessageLookupService(EnergyDbContext db) => _db = db;
+    public ChatMessageLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<ChatMessageLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.ChatMessages.AsNoTracking();
-        var items = await query.Select(e => new ChatMessageLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Select(e => new ChatMessageLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = null,
+                DisplayName = e.Id.ToString(),
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<ChatMessageLookupResponse>>.Success(items);
     }
 }

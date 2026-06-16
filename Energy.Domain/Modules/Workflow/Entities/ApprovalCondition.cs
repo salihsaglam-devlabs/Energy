@@ -1,24 +1,14 @@
+using Energy.Shared.Common;
 using Energy.Domain.Common;
 
 namespace Energy.Domain.Modules.Workflow;
 
-/// <summary>
-/// Tutar, proje, belge türü ve benzeri koşullar
-/// </summary>
+/// <summary>Onay koşulu (tutar, proje, belge türü vb.).</summary>
 public class ApprovalCondition : AuditableEntity
 {
-    /// <summary>Akış versiyonu</summary>
     public Guid ApprovalDefinitionVersionId { get; set; }
-
-    /// <summary>Koşul alanı</summary>
     public string FieldName { get; set; } = string.Empty;
-
-    /// <summary>Karşılaştırma operatörü</summary>
-    public string Operator { get; set; } = string.Empty;
-
-    /// <summary>Metin değer</summary>
+    public ConditionOperator Operator { get; set; }
     public string? ValueText { get; set; }
-
-    /// <summary>Sayısal değer</summary>
     public decimal? ValueNumber { get; set; }
 }

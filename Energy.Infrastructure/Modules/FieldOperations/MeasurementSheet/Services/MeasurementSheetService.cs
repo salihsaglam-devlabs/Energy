@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.FieldOperations.MeasurementSheet.Service
 /// <summary>MeasurementSheet CRUD servisi (projection, pagination, soft-delete).</summary>
 public class MeasurementSheetService : IMeasurementSheetService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public MeasurementSheetService(EnergyDbContext db) => _db = db;
+    public MeasurementSheetService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<MeasurementSheetListResponse>>> GetListAsync(GetMeasurementSheetListRequest request, CancellationToken ct = default)
     {

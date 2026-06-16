@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Documents.DocumentRelation.Services;
 /// <summary>DocumentRelation CRUD servisi (projection, pagination, soft-delete).</summary>
 public class DocumentRelationService : IDocumentRelationService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public DocumentRelationService(EnergyDbContext db) => _db = db;
+    public DocumentRelationService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<DocumentRelationListResponse>>> GetListAsync(GetDocumentRelationListRequest request, CancellationToken ct = default)
     {

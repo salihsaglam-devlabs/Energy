@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Inventory.WarehouseTransferLine.Services
 /// <summary>WarehouseTransferLine CRUD servisi (projection, pagination, soft-delete).</summary>
 public class WarehouseTransferLineService : IWarehouseTransferLineService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public WarehouseTransferLineService(EnergyDbContext db) => _db = db;
+    public WarehouseTransferLineService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<WarehouseTransferLineListResponse>>> GetListAsync(GetWarehouseTransferLineListRequest request, CancellationToken ct = default)
     {

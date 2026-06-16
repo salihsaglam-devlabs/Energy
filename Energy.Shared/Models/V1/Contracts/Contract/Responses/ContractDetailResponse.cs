@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Contracts.Contract.Responses;
 
 /// <summary>Contract detay görünümü.</summary>
@@ -28,7 +29,7 @@ public class ContractDetailResponse
     public Guid? DeletedBy { get; set; }
 
     /// <summary>Sözleşme türü</summary>
-    public string ContractType { get; set; } = string.Empty;
+    public ContractType ContractType { get; set; }
 
     /// <summary>Opsiyonel proje</summary>
     public Guid? ProjectId { get; set; }
@@ -52,5 +53,5 @@ public class ContractDetailResponse
     public DateTime? EndDate { get; set; }
 
     /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
+    public DocumentStatus Status { get; set; }
 }

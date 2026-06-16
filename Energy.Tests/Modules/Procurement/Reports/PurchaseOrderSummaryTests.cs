@@ -9,12 +9,12 @@ namespace Energy.Tests.Modules.Procurement.Reports;
 /// <summary>PurchaseOrderSummary raporu (salt-okunur) servis testi (EF InMemory).</summary>
 public sealed class PurchaseOrderSummaryTests
 {
-    private static EnergyDbContext NewContext()
+    private static AppDbContext NewContext()
     {
-        var options = new DbContextOptionsBuilder<EnergyDbContext>()
+        var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-        return new EnergyDbContext(options);
+        return new AppDbContext(options);
     }
 
     [Fact]

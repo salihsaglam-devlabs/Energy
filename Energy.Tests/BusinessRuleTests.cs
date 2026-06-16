@@ -1,11 +1,12 @@
+using Energy.Shared.Common;
 using Energy.Application.Catalog.Services;
 using Energy.Application.Inventory.Services;
 using Energy.Application.Operations.Services;
-using Energy.Domain.Catalog;
+using Energy.Domain.Modules.Catalog;
 using Energy.Domain.Common;
-using Energy.Domain.Core;
-using Energy.Domain.Inventory;
-using Energy.Domain.Operations;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Operations;
 using Energy.Infrastructure.Catalog.Services;
 using Energy.Infrastructure.Inventory.Services;
 using Energy.Infrastructure.Operations.Services;

@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.FieldOperations.ProgressEntry.Services;
 /// <summary>ProgressEntry CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ProgressEntryService : IProgressEntryService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ProgressEntryService(EnergyDbContext db) => _db = db;
+    public ProgressEntryService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ProgressEntryListResponse>>> GetListAsync(GetProgressEntryListRequest request, CancellationToken ct = default)
     {

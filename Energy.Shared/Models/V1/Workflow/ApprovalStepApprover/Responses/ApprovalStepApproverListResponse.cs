@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Workflow.ApprovalStepApprover.Responses;
 
 /// <summary>ApprovalStepApprover liste satırı.</summary>
@@ -10,7 +11,7 @@ public class ApprovalStepApproverListResponse
     public Guid ApprovalStepDefinitionId { get; set; }
 
     /// <summary>User, Role, ProjectRole, DepartmentManager</summary>
-    public string ApproverType { get; set; } = string.Empty;
+    public ApproverType ApproverType { get; set; }
 
     /// <summary>Kişi bazlı onaycı</summary>
     public Guid? ApproverUserId { get; set; }

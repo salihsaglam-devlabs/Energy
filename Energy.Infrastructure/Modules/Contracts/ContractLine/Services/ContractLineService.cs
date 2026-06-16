@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Contracts.ContractLine.Services;
 /// <summary>ContractLine CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ContractLineService : IContractLineService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ContractLineService(EnergyDbContext db) => _db = db;
+    public ContractLineService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ContractLineListResponse>>> GetListAsync(GetContractLineListRequest request, CancellationToken ct = default)
     {

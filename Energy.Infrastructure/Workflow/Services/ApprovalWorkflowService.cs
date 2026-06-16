@@ -1,8 +1,9 @@
+using Energy.Shared.Common;
 using Energy.Application.Workflow.Services;
 using Energy.Domain.Common;
-using Energy.Domain.Identity;
-using Energy.Domain.Notifications;
-using Energy.Domain.Workflow;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Notifications;
+using Energy.Domain.Modules.Workflow;
 using Energy.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

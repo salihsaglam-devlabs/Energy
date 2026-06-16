@@ -1,6 +1,6 @@
 using Energy.Application.Chat.Services;
-using Energy.Domain.Chat;
-using Energy.Domain.Identity;
+using Energy.Domain.Modules.Chat;
+using Energy.Domain.Modules.IAM;
 using Energy.Infrastructure.Persistence;
 using Energy.Shared.Models.V1.Chat.Requests;
 using Energy.Shared.Models.V1.Chat.Responses;

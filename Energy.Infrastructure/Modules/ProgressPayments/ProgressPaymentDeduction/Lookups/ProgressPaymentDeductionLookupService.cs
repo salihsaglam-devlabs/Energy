@@ -9,21 +9,24 @@ namespace Energy.Infrastructure.Modules.ProgressPayments.ProgressPaymentDeductio
 /// <summary>ProgressPaymentDeduction lookup servisi (aktif + arama filtreli projection).</summary>
 public class ProgressPaymentDeductionLookupService : IProgressPaymentDeductionLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ProgressPaymentDeductionLookupService(EnergyDbContext db) => _db = db;
+    public ProgressPaymentDeductionLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<ProgressPaymentDeductionLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.ProgressPaymentDeductions.AsNoTracking();
-        var items = await query.Select(e => new ProgressPaymentDeductionLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Select(e => new ProgressPaymentDeductionLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = null,
+                DisplayName = e.Id.ToString(),
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<ProgressPaymentDeductionLookupResponse>>.Success(items);
     }
 }

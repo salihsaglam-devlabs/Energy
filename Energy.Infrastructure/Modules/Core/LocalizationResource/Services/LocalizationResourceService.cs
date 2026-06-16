@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Core.LocalizationResource.Services;
 /// <summary>LocalizationResource CRUD servisi (projection, pagination, soft-delete).</summary>
 public class LocalizationResourceService : ILocalizationResourceService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public LocalizationResourceService(EnergyDbContext db) => _db = db;
+    public LocalizationResourceService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<LocalizationResourceListResponse>>> GetListAsync(GetLocalizationResourceListRequest request, CancellationToken ct = default)
     {
@@ -59,7 +59,7 @@ public class LocalizationResourceService : ILocalizationResourceService
 
     public async Task<BaseResponse<Guid>> CreateAsync(CreateLocalizationResourceRequest request, CancellationToken ct = default)
     {
-        var entity = new global::Energy.Domain.Modules.Core.LocalizationResource
+        var entity = new global::Energy.Domain.Modules.Core.Resource
         {
             Id = Guid.NewGuid(),
             Key = request.Key,

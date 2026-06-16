@@ -1,17 +1,26 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Budget;
+using Energy.Domain.Modules.BusinessPartners;
+using Energy.Domain.Modules.Contracts;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.FieldOperations;
+using Energy.Domain.Modules.Finance;
+using Energy.Domain.Modules.ProgressPayments;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Finance;
 
-/// <summary>FinancialTransaction EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class FinancialTransactionConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Finance.FinancialTransaction>
+/// <summary>FinancialTransaction EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class FinancialTransactionConfiguration : IEntityTypeConfiguration<FinancialTransaction>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Finance.FinancialTransaction> builder)
+    public void Configure(EntityTypeBuilder<FinancialTransaction> e)
     {
-        builder.ToTable("FinancialTransactions");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Projects.Project>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.BusinessPartners.BusinessPartner>().WithMany().HasForeignKey(e => e.PartnerId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Core.Currency>().WithMany().HasForeignKey(e => e.CurrencyId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("FinancialTransactions");
+        e.HasOne<Project>().WithMany().HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<BusinessPartner>().WithMany().HasForeignKey(x => x.PartnerId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<Currency>().WithMany().HasForeignKey(x => x.CurrencyId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<FinancialAccount>().WithMany().HasForeignKey(x => x.FinancialAccountId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<CostCenter>().WithMany().HasForeignKey(x => x.CostCenterId).OnDelete(DeleteBehavior.Restrict);
     }
 }

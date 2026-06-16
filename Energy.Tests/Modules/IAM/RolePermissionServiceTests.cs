@@ -9,32 +9,28 @@ namespace Energy.Tests.Modules.IAM;
 /// <summary>RolePermission CRUD servisi round-trip testi (EF InMemory).</summary>
 public sealed class RolePermissionServiceTests
 {
-    private static EnergyDbContext NewContext()
+    private static AppDbContext NewContext()
     {
-        var options = new DbContextOptionsBuilder<EnergyDbContext>()
+        var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-        return new EnergyDbContext(options);
+        return new AppDbContext(options);
     }
 
     [Fact]
-    public async Task Create_Get_Update_Delete_RoundTrips()
+    public async Task List_Works_And_Surrogate_Mutations_NotSupported()
     {
+        // Doğal/bileşik anahtarlı veya append-only kayıtlar surrogate Guid ile
+        // yönetilmez; salt-okunur liste desteklenir, mutasyonlar NotSupported döner.
         await using var db = NewContext();
         var service = new RolePermissionService(db);
 
-        var created = await service.CreateAsync(new CreateRolePermissionRequest());
-        Assert.True(created.IsSuccess);
-        var id = created.Data;
+        var list = await service.GetListAsync(new GetRolePermissionListRequest { PageNumber = 1, PageSize = 10 });
+        Assert.True(list.IsSuccess);
 
-        var detail = await service.GetByIdAsync(id);
-        Assert.True(detail.IsSuccess);
-
-        var updated = await service.UpdateAsync(id, new UpdateRolePermissionRequest { Id = id });
-        Assert.True(updated.IsSuccess);
-
-        var deleted = await service.DeleteAsync(id);
-        Assert.True(deleted.IsSuccess);
+        Assert.False((await service.GetByIdAsync(Guid.NewGuid())).IsSuccess);
+        Assert.False((await service.UpdateAsync(Guid.NewGuid(), new UpdateRolePermissionRequest())).IsSuccess);
+        Assert.False((await service.DeleteAsync(Guid.NewGuid())).IsSuccess);
     }
 
     [Fact]

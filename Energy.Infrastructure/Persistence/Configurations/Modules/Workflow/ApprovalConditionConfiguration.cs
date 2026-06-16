@@ -1,15 +1,19 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Documents;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Notifications;
+using Energy.Domain.Modules.Reporting;
+using Energy.Domain.Modules.Workflow;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Workflow;
 
-/// <summary>ApprovalCondition EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class ApprovalConditionConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Workflow.ApprovalCondition>
+/// <summary>ApprovalCondition EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class ApprovalConditionConfiguration : IEntityTypeConfiguration<ApprovalCondition>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Workflow.ApprovalCondition> builder)
+    public void Configure(EntityTypeBuilder<ApprovalCondition> e)
     {
-        builder.ToTable("ApprovalConditions");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Workflow.ApprovalDefinitionVersion>().WithMany().HasForeignKey(e => e.ApprovalDefinitionVersionId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("ApprovalConditions");
+        e.HasOne<ApprovalDefinitionVersion>().WithMany().HasForeignKey(x => x.ApprovalDefinitionVersionId).OnDelete(DeleteBehavior.Restrict);
     }
 }

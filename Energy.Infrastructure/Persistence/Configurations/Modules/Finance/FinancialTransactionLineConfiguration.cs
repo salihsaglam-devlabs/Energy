@@ -1,14 +1,24 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Budget;
+using Energy.Domain.Modules.BusinessPartners;
+using Energy.Domain.Modules.Contracts;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.FieldOperations;
+using Energy.Domain.Modules.Finance;
+using Energy.Domain.Modules.ProgressPayments;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Finance;
 
-/// <summary>FinancialTransactionLine EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class FinancialTransactionLineConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Finance.FinancialTransactionLine>
+/// <summary>FinancialTransactionLine EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class FinancialTransactionLineConfiguration : IEntityTypeConfiguration<FinancialTransactionLine>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Finance.FinancialTransactionLine> builder)
+    public void Configure(EntityTypeBuilder<FinancialTransactionLine> e)
     {
-        builder.ToTable("FinancialTransactionLines");
-        builder.HasKey(e => e.Id);
+        e.ToTable("FinancialTransactionLines");
+        e.HasOne<FinancialTransaction>().WithMany().HasForeignKey(x => x.FinancialTransactionId).OnDelete(DeleteBehavior.Cascade);
+        e.HasOne<CostCenter>().WithMany().HasForeignKey(x => x.CostCenterId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<Project>().WithMany().HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Restrict);
     }
 }

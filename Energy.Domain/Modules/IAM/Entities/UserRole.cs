@@ -1,15 +1,14 @@
-using Energy.Domain.Common;
-
 namespace Energy.Domain.Modules.IAM;
 
 /// <summary>
-/// Kullanıcı rol bağlantıları
+/// Kullanıcı–rol bağlantı (join) tablosu. Kalıcı (hard) silme uygulanır: satırın
+/// kaldırılması rol atamasını geri alır.
 /// </summary>
-public class UserRole : AuditableEntity
+public class UserRole
 {
-    /// <summary>Users referansı</summary>
+    /// <summary>Rolün atandığı kullanıcının kimliği.</summary>
     public Guid UserId { get; set; }
 
-    /// <summary>Roles referansı</summary>
+    /// <summary>Kullanıcıya atanan rolün kimliği.</summary>
     public Guid RoleId { get; set; }
 }

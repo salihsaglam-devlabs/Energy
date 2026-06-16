@@ -1,4 +1,5 @@
-using Energy.Domain.Workflow;
+using Energy.Shared.Common;
+using Energy.Domain.Modules.Workflow;
 
 namespace Energy.Application.Workflow.Services;
 

@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Organization.ExpenseClaimLine.Services;
 /// <summary>ExpenseClaimLine CRUD servisi (projection, pagination, soft-delete).</summary>
 public class ExpenseClaimLineService : IExpenseClaimLineService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ExpenseClaimLineService(EnergyDbContext db) => _db = db;
+    public ExpenseClaimLineService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ExpenseClaimLineListResponse>>> GetListAsync(GetExpenseClaimLineListRequest request, CancellationToken ct = default)
     {

@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Inventory.WarehouseLocation.Services;
 /// <summary>WarehouseLocation CRUD servisi (projection, pagination, soft-delete).</summary>
 public class WarehouseLocationService : IWarehouseLocationService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public WarehouseLocationService(EnergyDbContext db) => _db = db;
+    public WarehouseLocationService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<WarehouseLocationListResponse>>> GetListAsync(GetWarehouseLocationListRequest request, CancellationToken ct = default)
     {

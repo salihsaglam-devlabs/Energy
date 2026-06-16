@@ -1,4 +1,4 @@
-using Energy.Domain.System;
+using Energy.Domain.Modules.IAM;
 using Energy.Infrastructure.Persistence;
 using Energy.Shared.Identity.Permissions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;

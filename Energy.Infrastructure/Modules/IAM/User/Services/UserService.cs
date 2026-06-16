@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.IAM.User.Services;
 /// <summary>User CRUD servisi (projection, pagination, soft-delete).</summary>
 public class UserService : IUserService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public UserService(EnergyDbContext db) => _db = db;
+    public UserService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<UserListResponse>>> GetListAsync(GetUserListRequest request, CancellationToken ct = default)
     {

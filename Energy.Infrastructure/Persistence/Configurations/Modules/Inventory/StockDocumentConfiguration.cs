@@ -1,18 +1,22 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Inventory;
 
-/// <summary>StockDocument EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class StockDocumentConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Inventory.StockDocument>
+/// <summary>StockDocument EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class StockDocumentConfiguration : IEntityTypeConfiguration<StockDocument>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Inventory.StockDocument> builder)
+    public void Configure(EntityTypeBuilder<StockDocument> e)
     {
-        builder.ToTable("StockDocuments");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Inventory.StockDocumentType>().WithMany().HasForeignKey(e => e.DocumentTypeId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Inventory.Warehouse>().WithMany().HasForeignKey(e => e.SourceWarehouseId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Inventory.Warehouse>().WithMany().HasForeignKey(e => e.TargetWarehouseId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Projects.Project>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("StockDocuments");
+        e.HasIndex(x => x.DocumentNo).IsUnique();
+        e.HasOne<StockDocumentType>().WithMany().HasForeignKey(x => x.DocumentTypeId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<Warehouse>().WithMany().HasForeignKey(x => x.SourceWarehouseId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<Warehouse>().WithMany().HasForeignKey(x => x.TargetWarehouseId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<Project>().WithMany().HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Restrict);
     }
 }

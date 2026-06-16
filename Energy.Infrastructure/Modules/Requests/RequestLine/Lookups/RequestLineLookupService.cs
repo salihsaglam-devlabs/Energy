@@ -9,21 +9,24 @@ namespace Energy.Infrastructure.Modules.Requests.RequestLine.Lookups;
 /// <summary>RequestLine lookup servisi (aktif + arama filtreli projection).</summary>
 public class RequestLineLookupService : IRequestLineLookupService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public RequestLineLookupService(EnergyDbContext db) => _db = db;
+    public RequestLineLookupService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<IReadOnlyList<RequestLineLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.RequestLines.AsNoTracking();
-        var items = await query.Select(e => new RequestLineLookupResponse
-        {
-            Id = e.Id,
-            Code = null,
-            Name = null,
-            DisplayName = e.Id.ToString(),
-            IsActive = true
-        }).ToListAsync(ct);
+        var items = await query
+            .OrderBy(e => e.Id)
+            .Select(e => new RequestLineLookupResponse
+            {
+                Id = e.Id,
+                Code = null,
+                Name = null,
+                DisplayName = e.Id.ToString(),
+                IsActive = true
+            })
+            .ToListAsync(ct);
         return BaseResponse<IReadOnlyList<RequestLineLookupResponse>>.Success(items);
     }
 }

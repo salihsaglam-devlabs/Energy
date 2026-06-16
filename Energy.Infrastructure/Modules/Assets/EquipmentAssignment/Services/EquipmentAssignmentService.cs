@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Assets.EquipmentAssignment.Services;
 /// <summary>EquipmentAssignment CRUD servisi (projection, pagination, soft-delete).</summary>
 public class EquipmentAssignmentService : IEquipmentAssignmentService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public EquipmentAssignmentService(EnergyDbContext db) => _db = db;
+    public EquipmentAssignmentService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<EquipmentAssignmentListResponse>>> GetListAsync(GetEquipmentAssignmentListRequest request, CancellationToken ct = default)
     {

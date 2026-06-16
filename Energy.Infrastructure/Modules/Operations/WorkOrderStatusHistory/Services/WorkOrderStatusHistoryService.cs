@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Operations.WorkOrderStatusHistory.Servic
 /// <summary>WorkOrderStatusHistory CRUD servisi (projection, pagination, soft-delete).</summary>
 public class WorkOrderStatusHistoryService : IWorkOrderStatusHistoryService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public WorkOrderStatusHistoryService(EnergyDbContext db) => _db = db;
+    public WorkOrderStatusHistoryService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<WorkOrderStatusHistoryListResponse>>> GetListAsync(GetWorkOrderStatusHistoryListRequest request, CancellationToken ct = default)
     {

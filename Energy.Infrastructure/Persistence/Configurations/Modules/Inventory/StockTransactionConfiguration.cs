@@ -1,19 +1,22 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Modules.Core;
+using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Modules.Projects;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Inventory;
 
-/// <summary>StockTransaction EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class StockTransactionConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Inventory.StockTransaction>
+/// <summary>StockTransaction EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class StockTransactionConfiguration : IEntityTypeConfiguration<StockTransaction>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Inventory.StockTransaction> builder)
+    public void Configure(EntityTypeBuilder<StockTransaction> e)
     {
-        builder.ToTable("StockTransactions");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Inventory.StockDocument>().WithMany().HasForeignKey(e => e.StockDocumentId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Inventory.StockDocumentLine>().WithMany().HasForeignKey(e => e.StockDocumentLineId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Inventory.StockLot>().WithMany().HasForeignKey(e => e.StockLotId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Inventory.Warehouse>().WithMany().HasForeignKey(e => e.WarehouseId).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne<global::Energy.Domain.Modules.Catalog.Material>().WithMany().HasForeignKey(e => e.MaterialId).OnDelete(DeleteBehavior.Restrict);
+        e.ToTable("StockTransactions");
+        e.HasOne<StockDocument>().WithMany().HasForeignKey(x => x.StockDocumentId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<StockDocumentLine>().WithMany().HasForeignKey(x => x.StockDocumentLineId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<StockLot>().WithMany().HasForeignKey(x => x.StockLotId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<Warehouse>().WithMany().HasForeignKey(x => x.WarehouseId).OnDelete(DeleteBehavior.Restrict);
+        e.HasOne<Material>().WithMany().HasForeignKey(x => x.MaterialId).OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Finance.Payable.Services;
 /// <summary>Payable CRUD servisi (projection, pagination, soft-delete).</summary>
 public class PayableService : IPayableService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public PayableService(EnergyDbContext db) => _db = db;
+    public PayableService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<PayableListResponse>>> GetListAsync(GetPayableListRequest request, CancellationToken ct = default)
     {

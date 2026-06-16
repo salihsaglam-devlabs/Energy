@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Requests.RequestType.Services;
 /// <summary>RequestType CRUD servisi (projection, pagination, soft-delete).</summary>
 public class RequestTypeService : IRequestTypeService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public RequestTypeService(EnergyDbContext db) => _db = db;
+    public RequestTypeService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<RequestTypeListResponse>>> GetListAsync(GetRequestTypeListRequest request, CancellationToken ct = default)
     {

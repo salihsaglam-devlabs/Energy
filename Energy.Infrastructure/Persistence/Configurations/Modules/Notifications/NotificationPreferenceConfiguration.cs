@@ -1,14 +1,20 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Documents;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Notifications;
+using Energy.Domain.Modules.Reporting;
+using Energy.Domain.Modules.Workflow;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Notifications;
 
-/// <summary>NotificationPreference EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class NotificationPreferenceConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Notifications.NotificationPreference>
+/// <summary>NotificationPreference EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class NotificationPreferenceConfiguration : IEntityTypeConfiguration<NotificationPreference>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Notifications.NotificationPreference> builder)
+    public void Configure(EntityTypeBuilder<NotificationPreference> e)
     {
-        builder.ToTable("NotificationPreferences");
-        builder.HasKey(e => e.Id);
+        e.ToTable("NotificationPreferences");
+        e.HasIndex(x => new { x.UserId, x.NotificationType }).IsUnique();
+        e.HasOne<User>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Restrict);
     }
 }

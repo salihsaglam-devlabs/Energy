@@ -61,21 +61,6 @@ public static class DependencyInjection
             options.AddInterceptors(sp.GetRequiredService<AuditingSaveChangesInterceptor>());
         });
 
-        // Kanonik (Modules) bağlam: 134 per-entity yapılandırmayı uygular. Legacy
-        // AppDbContext ile birlikte kayıtlıdır; cutover tamamlandığında AppDbContext
-        // kaldırılıp bu bağlam tek kaynak olur.
-        services.AddDbContext<EnergyDbContext>((sp, options) =>
-        {
-            if (useSqlServer)
-            {
-                options.UseSqlServer(connectionString, sql => sql.MigrationsAssembly("Energy.Migrations.SqlServer"));
-            }
-            else
-            {
-                options.UseNpgsql(connectionString, npg => npg.MigrationsAssembly("Energy.Migrations.PostgreSql"));
-            }
-            options.AddInterceptors(sp.GetRequiredService<AuditingSaveChangesInterceptor>());
-        });
 
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
         services.Configure<LocalizationSettings>(configuration.GetSection(LocalizationSettings.SectionName));

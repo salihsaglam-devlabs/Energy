@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.HR.Timesheet.Requests;
 
 /// <summary>Timesheet oluşturma isteği.</summary>
@@ -13,7 +14,7 @@ public class CreateTimesheetRequest
     public DateTime PeriodEnd { get; set; }
 
     /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
+    public ApprovalRequestStatus Status { get; set; }
 
     /// <summary>ApprovalRequestId</summary>
     public Guid? ApprovalRequestId { get; set; }

@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Core.Currency.Services;
 /// <summary>Currency CRUD servisi (projection, pagination, soft-delete).</summary>
 public class CurrencyService : ICurrencyService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public CurrencyService(EnergyDbContext db) => _db = db;
+    public CurrencyService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<CurrencyListResponse>>> GetListAsync(GetCurrencyListRequest request, CancellationToken ct = default)
     {

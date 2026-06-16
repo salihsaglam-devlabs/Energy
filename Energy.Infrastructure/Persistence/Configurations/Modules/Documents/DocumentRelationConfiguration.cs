@@ -1,15 +1,20 @@
-using Microsoft.EntityFrameworkCore;
+using Energy.Domain.Modules.Documents;
+using Energy.Domain.Modules.IAM;
+using Energy.Domain.Modules.Notifications;
+using Energy.Domain.Modules.Reporting;
+using Energy.Domain.Modules.Workflow;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence.Configurations.Modules.Documents;
 
-/// <summary>DocumentRelation EF Core eşleştirmesi (tablo, anahtar ve ilişkiler).</summary>
-public class DocumentRelationConfiguration : IEntityTypeConfiguration<global::Energy.Domain.Modules.Documents.DocumentRelation>
+/// <summary>DocumentRelation EF Core yapılandırması (Relationship Catalogue'a göre).</summary>
+public sealed class DocumentRelationConfiguration : IEntityTypeConfiguration<DocumentRelation>
 {
-    public void Configure(EntityTypeBuilder<global::Energy.Domain.Modules.Documents.DocumentRelation> builder)
+    public void Configure(EntityTypeBuilder<DocumentRelation> e)
     {
-        builder.ToTable("DocumentRelations");
-        builder.HasKey(e => e.Id);
-        builder.HasOne<global::Energy.Domain.Modules.Documents.Document>().WithMany().HasForeignKey(e => e.DocumentId).OnDelete(DeleteBehavior.Cascade);
+        e.ToTable("DocumentRelations");
+        e.HasIndex(x => new { x.RelatedModule, x.RelatedEntityType, x.RelatedEntityId });
+        e.HasOne<Document>().WithMany().HasForeignKey(x => x.DocumentId).OnDelete(DeleteBehavior.Cascade);
     }
 }

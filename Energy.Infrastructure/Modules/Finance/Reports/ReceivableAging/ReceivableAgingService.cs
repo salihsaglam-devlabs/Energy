@@ -10,9 +10,9 @@ namespace Energy.Infrastructure.Modules.Finance.Reports.ReceivableAging;
 /// <summary>ReceivableAging raporu servisi (AsNoTracking, projection, filtre, sayfalama).</summary>
 public sealed class ReceivableAgingService : IReceivableAgingService
 {
-    private readonly EnergyDbContext _db;
+    private readonly AppDbContext _db;
 
-    public ReceivableAgingService(EnergyDbContext db) => _db = db;
+    public ReceivableAgingService(AppDbContext db) => _db = db;
 
     public async Task<BaseResponse<PaginatedResponse<ReceivableAgingRowResponse>>> GetDataAsync(ReceivableAgingRequest request, CancellationToken ct = default)
     {

@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 namespace Energy.Shared.Models.V1.Inventory.WarehouseTransfer.Responses;
 
 /// <summary>WarehouseTransfer liste satırı.</summary>
@@ -19,7 +20,7 @@ public class WarehouseTransferListResponse
     public DateTime TransferDate { get; set; }
 
     /// <summary>Status</summary>
-    public string Status { get; set; } = string.Empty;
+    public DocumentStatus Status { get; set; }
 
     /// <summary>Oluşturma zamanı.</summary>
     public DateTime CreatedAt { get; set; }
