@@ -5,6 +5,7 @@ using Energy.Web.Clients.Infrastructure.Authentication;
 using Energy.Web.Clients.Infrastructure.ClientIdentity;
 using Energy.Web.Clients.Localization;
 using Energy.Web.Clients.Logger;
+using Energy.Web.Clients.Modules;
 using Energy.Web.Clients.Settings;
 using Energy.Web.Configuration;
 using Microsoft.Extensions.Options;
@@ -36,7 +37,34 @@ public static class DependencyInjection
         AddAuthenticated<IAuditLogQueryClient, AuditLogQueryClient>(services);
         AddAuthenticated<IChatApiClient, ChatApiClient>(services);
         AddAuthenticated<ISettingsApiClient, SettingsApiClient>(services);
-        AddAuthenticated<Enterprise.IEnterpriseApiClient, Enterprise.EnterpriseApiClient>(services);
+
+        // Tüm per-entity Modules API istemcileri (IAM/Chat hariç).
+        services.AddModulesApiClients();
+
+        // ER Overview rapor API istemcileri.
+        services.AddModulesReportApiClients();
+
+        // Süreç ekranı API istemcileri (standart süreç rotaları).
+        AddAuthenticated<Energy.Web.Clients.Modules.Workflow.Processes.Approval.IApprovalProcessApiClient,
+            Energy.Web.Clients.Modules.Workflow.Processes.Approval.ApprovalProcessApiClient>(services);
+        AddAuthenticated<Energy.Web.Clients.Modules.Inventory.Processes.StockIssue.IStockIssueProcessApiClient,
+            Energy.Web.Clients.Modules.Inventory.Processes.StockIssue.StockIssueProcessApiClient>(services);
+        AddAuthenticated<Energy.Web.Clients.Modules.Inventory.Processes.StockTransfer.IStockTransferProcessApiClient,
+            Energy.Web.Clients.Modules.Inventory.Processes.StockTransfer.StockTransferProcessApiClient>(services);
+        AddAuthenticated<Energy.Web.Clients.Modules.Procurement.Processes.GoodsReceipt.IGoodsReceiptProcessApiClient,
+            Energy.Web.Clients.Modules.Procurement.Processes.GoodsReceipt.GoodsReceiptProcessApiClient>(services);
+        AddAuthenticated<Energy.Web.Clients.Modules.Finance.Processes.TimesheetCost.ITimesheetCostProcessApiClient,
+            Energy.Web.Clients.Modules.Finance.Processes.TimesheetCost.TimesheetCostProcessApiClient>(services);
+        AddAuthenticated<Energy.Web.Clients.Modules.Finance.Processes.ProgressPaymentPosting.IProgressPaymentPostingProcessApiClient,
+            Energy.Web.Clients.Modules.Finance.Processes.ProgressPaymentPosting.ProgressPaymentPostingProcessApiClient>(services);
+
+        // Belge dosya/versiyon yönetimi API istemcisi.
+        AddAuthenticated<Energy.Web.Clients.Modules.Documents.Files.IDocumentFilesApiClient,
+            Energy.Web.Clients.Modules.Documents.Files.DocumentFilesApiClient>(services);
+
+        // Ödeme tahsis süreci API istemcisi.
+        AddAuthenticated<Energy.Web.Clients.Modules.Finance.Processes.PaymentAllocation.IPaymentAllocationProcessApiClient,
+            Energy.Web.Clients.Modules.Finance.Processes.PaymentAllocation.PaymentAllocationProcessApiClient>(services);
         return services;
     }
 

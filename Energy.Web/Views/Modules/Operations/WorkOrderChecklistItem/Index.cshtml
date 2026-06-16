@@ -1,0 +1,21 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Modules.Operations.WorkOrderChecklistItem.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Modules.Operations.WorkOrderChecklistItem.Title"]</h2></div>
+    </header>
+    <div id="work-order-checklist-item-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/modules/operations/work-order-checklist-item/work-order-checklist-item.index.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.OperationsWorkOrderChecklistItem.init("/operations/work-order-checklist-items", "work-order-checklist-item-grid", "Operations");
+        });
+    </script>
+}

@@ -1,0 +1,21 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Modules.Catalog.MaterialUnitConversion.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Modules.Catalog.MaterialUnitConversion.Title"]</h2></div>
+    </header>
+    <div id="material-unit-conversion-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/modules/catalog/material-unit-conversion/material-unit-conversion.index.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.CatalogMaterialUnitConversion.init("/catalog/material-unit-conversions", "material-unit-conversion-grid", "Catalog");
+        });
+    </script>
+}

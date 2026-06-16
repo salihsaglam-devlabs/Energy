@@ -1,0 +1,27 @@
+using Energy.Domain.Common;
+
+namespace Energy.Domain.Modules.IAM;
+
+/// <summary>
+/// Kullanıcı tercihleri
+/// </summary>
+public class UserSetting : AuditableEntity
+{
+    /// <summary>UserId</summary>
+    public Guid UserId { get; set; }
+
+    /// <summary>NotificationSound</summary>
+    public bool NotificationSound { get; set; }
+
+    /// <summary>CallSound</summary>
+    public bool CallSound { get; set; }
+
+    /// <summary>DesktopNotifications</summary>
+    public bool DesktopNotifications { get; set; }
+
+    /// <summary>ReadReceipts</summary>
+    public bool ReadReceipts { get; set; }
+
+    /// <summary>Theme</summary>
+    public string Theme { get; set; } = string.Empty;
+}

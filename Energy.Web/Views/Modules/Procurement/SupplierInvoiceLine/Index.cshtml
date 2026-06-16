@@ -1,0 +1,21 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Modules.Procurement.SupplierInvoiceLine.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Modules.Procurement.SupplierInvoiceLine.Title"]</h2></div>
+    </header>
+    <div id="supplier-invoice-line-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/modules/procurement/supplier-invoice-line/supplier-invoice-line.index.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.ProcurementSupplierInvoiceLine.init("/procurement/supplier-invoice-lines", "supplier-invoice-line-grid", "Procurement");
+        });
+    </script>
+}

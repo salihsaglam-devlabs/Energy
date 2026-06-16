@@ -1,0 +1,21 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Modules.FieldOperations.DailySiteReportMaterial.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Modules.FieldOperations.DailySiteReportMaterial.Title"]</h2></div>
+    </header>
+    <div id="daily-site-report-material-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/modules/field-operations/daily-site-report-material/daily-site-report-material.index.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.FieldOperationsDailySiteReportMaterial.init("/field-operations/daily-site-report-materials", "daily-site-report-material-grid", "FieldOperations");
+        });
+    </script>
+}

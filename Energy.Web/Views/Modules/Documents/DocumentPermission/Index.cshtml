@@ -1,0 +1,21 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Modules.Documents.DocumentPermission.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Modules.Documents.DocumentPermission.Title"]</h2></div>
+    </header>
+    <div id="document-permission-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/modules/documents/document-permission/document-permission.index.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.DocumentsDocumentPermission.init("/documents/document-permissions", "document-permission-grid", "Documents");
+        });
+    </script>
+}

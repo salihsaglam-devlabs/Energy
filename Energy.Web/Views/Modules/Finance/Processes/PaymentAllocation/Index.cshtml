@@ -1,0 +1,42 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Modules.Finance.Processes.PaymentAllocation.Title"].Value;
+}
+
+<link rel="stylesheet" href="~/css/modules/finance/processes/payment-allocation/payment-allocation.css" asp-append-version="true" />
+
+<section class="energy-screen energy-process">
+    <header class="energy-screen__header">
+        <div><h2>@T["Modules.Finance.Processes.PaymentAllocation.Title"]</h2></div>
+    </header>
+    <p class="energy-process__hint">@T["Modules.Finance.Processes.PaymentAllocation.Hint"]</p>
+
+    <div id="pa-master" class="energy-process__form"></div>
+
+    <h3 class="energy-process__subtitle">@T["Modules.Finance.Processes.PaymentAllocation.Lines"]</h3>
+    <div id="pa-lines-grid"></div>
+
+    <div class="energy-process__footer">
+        <div id="pa-submit"></div>
+        <div id="pa-result" class="energy-process__result"></div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/modules/finance/processes/payment-allocation/payment-allocation.index.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppProcesses.FinancePaymentAllocation.init("/finance/processes/payment-allocation", {
+                masterId: "pa-master",
+                gridId: "pa-lines-grid",
+                submitId: "pa-submit",
+                resultId: "pa-result",
+                submit: "@T["Modules.Finance.Processes.PaymentAllocation.Actions.Execute"]",
+                success: "@T["Modules.Finance.Processes.PaymentAllocation.Messages.Completed"]",
+                pickPayment: "@T["Modules.Finance.Processes.PaymentAllocation.Messages.PickPayment"]"
+            });
+        });
+    </script>
+}
+

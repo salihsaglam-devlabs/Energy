@@ -1,0 +1,24 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Modules.Procurement.Reports.PurchaseOrderSummary.Title"].Value;
+}
+
+<link rel="stylesheet" href="~/css/modules/procurement/reports/purchase-order-summary/purchase-order-summary.css" asp-append-version="true" />
+
+<section class="energy-screen energy-report">
+    <header class="energy-screen__header">
+        <div><h2>@T["Modules.Procurement.Reports.PurchaseOrderSummary.Title"]</h2></div>
+    </header>
+    <div id="purchase-order-summary-filters" class="energy-report__filters"></div>
+    <div id="purchase-order-summary-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/modules/procurement/reports/purchase-order-summary/purchase-order-summary.index.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppReports.ProcurementPurchaseOrderSummary.init("/procurement/reports/purchase-order-summary", "purchase-order-summary-grid", "purchase-order-summary-filters", { hasStatus: true });
+        });
+    </script>
+}

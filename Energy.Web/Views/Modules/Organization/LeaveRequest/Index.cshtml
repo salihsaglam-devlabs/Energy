@@ -1,0 +1,21 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Modules.Organization.LeaveRequest.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Modules.Organization.LeaveRequest.Title"]</h2></div>
+    </header>
+    <div id="leave-request-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/modules/organization/leave-request/leave-request.index.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.OrganizationLeaveRequest.init("/organization/leave-requests", "leave-request-grid", "Organization");
+        });
+    </script>
+}

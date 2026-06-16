@@ -1,0 +1,43 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Modules.Documents.Files.Title"].Value;
+}
+
+<link rel="stylesheet" href="~/css/modules/documents/files/files.css" asp-append-version="true" />
+
+<section class="energy-screen energy-documents">
+    <header class="energy-screen__header">
+        <div><h2>@T["Modules.Documents.Files.Title"]</h2></div>
+    </header>
+    <p class="energy-documents__hint">@T["Modules.Documents.Files.Hint"]</p>
+
+    <div class="energy-documents__toolbar">
+        <div id="document-select" class="energy-documents__select"></div>
+        <div id="document-upload" class="energy-documents__upload"></div>
+    </div>
+
+    <h3 class="energy-documents__subtitle">@T["Modules.Documents.Files.VersionHistory"]</h3>
+    <div id="document-versions-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/modules/documents/files/files.index.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppDocuments.Files.init("/documents/files", {
+                selectId: "document-select",
+                uploadId: "document-upload",
+                gridId: "document-versions-grid",
+                labels: {
+                    selectDocument: "@T["Modules.Documents.Files.SelectDocument"]",
+                    upload: "@T["Modules.Documents.Files.Actions.Upload"]",
+                    download: "@T["Modules.Documents.Files.Actions.Download"]",
+                    uploaded: "@T["Modules.Documents.Files.Messages.Uploaded"]",
+                    pickFirst: "@T["Modules.Documents.Files.Messages.PickDocument"]"
+                }
+            });
+        });
+    </script>
+}
+

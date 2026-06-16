@@ -1,0 +1,31 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Modules.Procurement.Processes.GoodsReceipt.Title"].Value;
+}
+
+<link rel="stylesheet" href="~/css/modules/procurement/processes/goods-receipt/goods-receipt.css" asp-append-version="true" />
+
+<section class="energy-screen energy-process">
+    <header class="energy-screen__header">
+        <div><h2>@T["Modules.Procurement.Processes.GoodsReceipt.Title"]</h2></div>
+    </header>
+    <p class="energy-process__hint">@T["Modules.Procurement.Processes.GoodsReceipt.Hint"]</p>
+    <div id="goods-receipt-form" class="energy-process__form"></div>
+    <div id="goods-receipt-result" class="energy-process__result"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/modules/procurement/processes/goods-receipt/goods-receipt.index.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppProcesses.ProcurementGoodsReceipt.init("/procurement/processes/goods-receipt", {
+                formId: "goods-receipt-form",
+                resultId: "goods-receipt-result",
+                submit: "@T["Modules.Procurement.Processes.GoodsReceipt.Actions.Execute"]",
+                success: "@T["Modules.Procurement.Processes.GoodsReceipt.Messages.Completed"]"
+            });
+        });
+    </script>
+}
+

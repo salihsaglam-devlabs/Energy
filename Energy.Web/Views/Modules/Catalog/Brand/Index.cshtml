@@ -1,0 +1,21 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Modules.Catalog.Brand.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Modules.Catalog.Brand.Title"]</h2></div>
+    </header>
+    <div id="brand-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/modules/catalog/brand/brand.index.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.CatalogBrand.init("/catalog/brands", "brand-grid", "Catalog");
+        });
+    </script>
+}

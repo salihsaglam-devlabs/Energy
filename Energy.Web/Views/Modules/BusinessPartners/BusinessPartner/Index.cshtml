@@ -1,0 +1,21 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Modules.BusinessPartners.BusinessPartner.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Modules.BusinessPartners.BusinessPartner.Title"]</h2></div>
+    </header>
+    <div id="business-partner-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/modules/business-partners/business-partner/business-partner.index.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.BusinessPartnersBusinessPartner.init("/business-partners/business-partners", "business-partner-grid", "BusinessPartners");
+        });
+    </script>
+}

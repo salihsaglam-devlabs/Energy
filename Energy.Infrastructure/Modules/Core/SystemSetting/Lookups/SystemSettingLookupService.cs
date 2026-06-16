@@ -1,0 +1,29 @@
+using Microsoft.EntityFrameworkCore;
+using Energy.Infrastructure.Persistence;
+using Energy.Shared.Models.V1.Common.Responses;
+using Energy.Application.Modules.Core.SystemSetting.Lookups;
+using Energy.Shared.Models.V1.Core.SystemSetting.Responses;
+
+namespace Energy.Infrastructure.Modules.Core.SystemSetting.Lookups;
+
+/// <summary>SystemSetting lookup servisi (aktif + arama filtreli projection).</summary>
+public class SystemSettingLookupService : ISystemSettingLookupService
+{
+    private readonly EnergyDbContext _db;
+
+    public SystemSettingLookupService(EnergyDbContext db) => _db = db;
+
+    public async Task<BaseResponse<IReadOnlyList<SystemSettingLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
+    {
+        var query = _db.SystemSettings.AsNoTracking();
+        var items = await query.Select(e => new SystemSettingLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = e.Id.ToString(),
+            IsActive = true
+        }).ToListAsync(ct);
+        return BaseResponse<IReadOnlyList<SystemSettingLookupResponse>>.Success(items);
+    }
+}

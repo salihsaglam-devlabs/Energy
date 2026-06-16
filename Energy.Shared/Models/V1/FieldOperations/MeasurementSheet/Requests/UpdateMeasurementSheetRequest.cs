@@ -1,0 +1,23 @@
+namespace Energy.Shared.Models.V1.FieldOperations.MeasurementSheet.Requests;
+
+/// <summary>MeasurementSheet güncelleme isteği.</summary>
+public class UpdateMeasurementSheetRequest
+{
+    /// <summary>Güncellenecek kaydın kimliği.</summary>
+    public Guid Id { get; set; }
+
+    /// <summary>ProjectId</summary>
+    public Guid ProjectId { get; set; }
+
+    /// <summary>ContractId</summary>
+    public Guid? ContractId { get; set; }
+
+    /// <summary>SheetNo</summary>
+    public string SheetNo { get; set; } = string.Empty;
+
+    /// <summary>SheetDate</summary>
+    public DateTime SheetDate { get; set; }
+
+    /// <summary>Status</summary>
+    public string Status { get; set; } = string.Empty;
+}

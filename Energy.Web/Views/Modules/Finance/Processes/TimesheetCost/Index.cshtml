@@ -1,0 +1,31 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Modules.Finance.Processes.TimesheetCost.Title"].Value;
+}
+
+<link rel="stylesheet" href="~/css/modules/finance/processes/timesheet-cost/timesheet-cost.css" asp-append-version="true" />
+
+<section class="energy-screen energy-process">
+    <header class="energy-screen__header">
+        <div><h2>@T["Modules.Finance.Processes.TimesheetCost.Title"]</h2></div>
+    </header>
+    <p class="energy-process__hint">@T["Modules.Finance.Processes.TimesheetCost.Hint"]</p>
+    <div id="timesheet-cost-form" class="energy-process__form"></div>
+    <div id="timesheet-cost-result" class="energy-process__result"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/modules/finance/processes/timesheet-cost/timesheet-cost.index.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppProcesses.FinanceTimesheetCost.init("/finance/processes/timesheet-cost", {
+                formId: "timesheet-cost-form",
+                resultId: "timesheet-cost-result",
+                submit: "@T["Modules.Finance.Processes.TimesheetCost.Actions.Execute"]",
+                success: "@T["Modules.Finance.Processes.TimesheetCost.Messages.Completed"]"
+            });
+        });
+    </script>
+}
+

@@ -95,6 +95,19 @@ public abstract class ApiClientBase
         return (bytes, contentType, (int)response.StatusCode);
     }
 
+    /// <summary>
+    /// Bir multipart/form-data POST isteği gönderir (dosya yükleme) ve BaseResponse
+    /// zarfını çözer. İçerik çağıran tarafından oluşturulup yönetilir.
+    /// </summary>
+    protected async Task<TResponse> PostMultipartAsync<TResponse>(
+        string requestUri,
+        MultipartFormDataContent content,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _httpClient.PostAsync(requestUri, content, cancellationToken);
+        return await ReadAsync<TResponse>(response, requestUri, cancellationToken);
+    }
+
     /// <summary>Yanıt gövdesini BaseResponse zarfı olarak okur ve seri durumdan çıkarır.</summary>
     private static async Task<TResponse> ReadAsync<TResponse>(
         HttpResponseMessage response,

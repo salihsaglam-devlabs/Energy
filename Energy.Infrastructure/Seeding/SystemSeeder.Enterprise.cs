@@ -88,6 +88,15 @@ public sealed partial class SystemSeeder
         _logger.LogInformation("Seeding: enterprise module menus");
         await EnsureEnterpriseMenusAsync(ct);
 
+        _logger.LogInformation("Seeding: per-entity module menus");
+        await EnsureModulesEntityMenusAsync(ct);
+
+        _logger.LogInformation("Seeding: per-report module menus");
+        await EnsureModulesReportMenusAsync(ct);
+
+        _logger.LogInformation("Seeding: per-process module menus");
+        await EnsureModulesProcessMenusAsync(ct);
+
         _logger.LogInformation("Seeding: dashboard widgets");
         await EnsureDashboardWidgetsAsync(ct);
 
@@ -313,34 +322,34 @@ public sealed partial class SystemSeeder
     {
         // Alan bazlı üst menüler + modül girdileri. Her modül kendi <Module>.ReadAll yetkisiyle korunur.
         var projects = await EnsureMenuAsync("Menus.ProjectsArea", null, null, "hierarchy", 20, null, ct);
-        await EnsureMenuAsync("Menus.Projects", projects.Id, "/m/projects", "box", 21, "Projects.ReadAll", ct);
-        await EnsureMenuAsync("Menus.Operations", projects.Id, "/m/operations", "preferences", 22, "Operations.ReadAll", ct);
-        await EnsureMenuAsync("Menus.FieldOperations", projects.Id, "/m/field-operations", "map", 23, "FieldOperations.ReadAll", ct);
-        await EnsureMenuAsync("Menus.Contracts", projects.Id, "/m/contracts", "doc", 24, "Contracts.ReadAll", ct);
-        await EnsureMenuAsync("Menus.ProgressPayments", projects.Id, "/m/progress-payments", "money", 25, "ProgressPayments.ReadAll", ct);
+        await EnsureMenuAsync("Menus.Projects", projects.Id, null, "box", 21, "Projects.ReadAll", ct);
+        await EnsureMenuAsync("Menus.Operations", projects.Id, null, "preferences", 22, "Operations.ReadAll", ct);
+        await EnsureMenuAsync("Menus.FieldOperations", projects.Id, null, "map", 23, "FieldOperations.ReadAll", ct);
+        await EnsureMenuAsync("Menus.Contracts", projects.Id, null, "doc", 24, "Contracts.ReadAll", ct);
+        await EnsureMenuAsync("Menus.ProgressPayments", projects.Id, null, "money", 25, "ProgressPayments.ReadAll", ct);
 
         var supply = await EnsureMenuAsync("Menus.SupplyArea", null, null, "cart", 30, null, ct);
-        await EnsureMenuAsync("Menus.Catalog", supply.Id, "/m/catalog", "detailslayout", 31, "Catalog.ReadAll", ct);
-        await EnsureMenuAsync("Menus.Inventory", supply.Id, "/m/inventory", "box", 32, "Inventory.ReadAll", ct);
-        await EnsureMenuAsync("Menus.Requests", supply.Id, "/m/requests", "newfolder", 33, "Requests.ReadAll", ct);
-        await EnsureMenuAsync("Menus.Procurement", supply.Id, "/m/procurement", "cart", 34, "Procurement.ReadAll", ct);
+        await EnsureMenuAsync("Menus.Catalog", supply.Id, null, "detailslayout", 31, "Catalog.ReadAll", ct);
+        await EnsureMenuAsync("Menus.Inventory", supply.Id, null, "box", 32, "Inventory.ReadAll", ct);
+        await EnsureMenuAsync("Menus.Requests", supply.Id, null, "newfolder", 33, "Requests.ReadAll", ct);
+        await EnsureMenuAsync("Menus.Procurement", supply.Id, null, "cart", 34, "Procurement.ReadAll", ct);
 
         var finance = await EnsureMenuAsync("Menus.FinanceArea", null, null, "money", 40, null, ct);
-        await EnsureMenuAsync("Menus.Finance", finance.Id, "/m/finance", "money", 41, "Finance.ReadAll", ct);
-        await EnsureMenuAsync("Menus.Budget", finance.Id, "/m/budget", "chart", 42, "Budget.ReadAll", ct);
+        await EnsureMenuAsync("Menus.Finance", finance.Id, null, "money", 41, "Finance.ReadAll", ct);
+        await EnsureMenuAsync("Menus.Budget", finance.Id, null, "chart", 42, "Budget.ReadAll", ct);
 
         var hr = await EnsureMenuAsync("Menus.HRArea", null, null, "group", 50, null, ct);
-        await EnsureMenuAsync("Menus.Organization", hr.Id, "/m/organization", "group", 51, "Organization.ReadAll", ct);
-        await EnsureMenuAsync("Menus.HR", hr.Id, "/m/hr", "clock", 52, "HR.ReadAll", ct);
-        await EnsureMenuAsync("Menus.Assets", hr.Id, "/m/assets", "car", 53, "Assets.ReadAll", ct);
+        await EnsureMenuAsync("Menus.Organization", hr.Id, null, "group", 51, "Organization.ReadAll", ct);
+        await EnsureMenuAsync("Menus.HR", hr.Id, null, "clock", 52, "HR.ReadAll", ct);
+        await EnsureMenuAsync("Menus.Assets", hr.Id, null, "car", 53, "Assets.ReadAll", ct);
 
         var common = await EnsureMenuAsync("Menus.CommonArea", null, null, "more", 60, null, ct);
-        await EnsureMenuAsync("Menus.BusinessPartners", common.Id, "/m/business-partners", "card", 61, "BusinessPartners.ReadAll", ct);
-        await EnsureMenuAsync("Menus.Documents", common.Id, "/m/documents", "doc", 62, "Documents.ReadAll", ct);
-        await EnsureMenuAsync("Menus.Workflow", common.Id, "/m/workflow", "check", 63, "Workflow.ReadAll", ct);
-        await EnsureMenuAsync("Menus.Notifications", common.Id, "/m/notifications", "bell", 64, "Notifications.ReadAll", ct);
-        await EnsureMenuAsync("Menus.Reporting", common.Id, "/m/reporting", "chart", 65, "Reporting.ReadAll", ct);
-        await EnsureMenuAsync("Menus.CoreData", common.Id, "/m/core", "preferences", 66, "Core.ReadAll", ct);
+        await EnsureMenuAsync("Menus.BusinessPartners", common.Id, null, "card", 61, "BusinessPartners.ReadAll", ct);
+        await EnsureMenuAsync("Menus.Documents", common.Id, null, "doc", 62, "Documents.ReadAll", ct);
+        await EnsureMenuAsync("Menus.Workflow", common.Id, null, "check", 63, "Workflow.ReadAll", ct);
+        await EnsureMenuAsync("Menus.Notifications", common.Id, null, "bell", 64, "Notifications.ReadAll", ct);
+        await EnsureMenuAsync("Menus.Reporting", common.Id, null, "chart", 65, "Reporting.ReadAll", ct);
+        await EnsureMenuAsync("Menus.CoreData", common.Id, null, "preferences", 66, "Core.ReadAll", ct);
     }
 
     private async Task EnsureDashboardWidgetsAsync(CancellationToken ct)

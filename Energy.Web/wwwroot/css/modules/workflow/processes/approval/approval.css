@@ -1,0 +1,11 @@
+/* Approval process (inbox) screen styles. */
+.energy-process__hint {
+    margin: 0 0 16px;
+    color: var(--energy-muted, #6c757d);
+    font-size: 0.95rem;
+}
+
+@media (max-width: 640px) {
+    .energy-process .dx-datagrid { font-size: 0.9rem; }
+}
+

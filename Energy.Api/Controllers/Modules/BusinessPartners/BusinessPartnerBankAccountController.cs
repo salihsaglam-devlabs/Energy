@@ -1,0 +1,55 @@
+using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc;
+using Energy.Application.Modules.BusinessPartners.BusinessPartnerBankAccount.Services;
+using Energy.Application.Modules.BusinessPartners.BusinessPartnerBankAccount.Lookups;
+using Energy.Shared.Models.V1.Common.Responses;
+using Energy.Shared.Models.V1.BusinessPartners.BusinessPartnerBankAccount.Requests;
+using Energy.Shared.Models.V1.BusinessPartners.BusinessPartnerBankAccount.Responses;
+
+namespace Energy.Api.Controllers.Modules.BusinessPartners;
+
+/// <summary>BusinessPartnerBankAccount uç noktaları (liste, detay, lookup, create, update, delete).</summary>
+[ApiController]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/business-partners/business-partner-bank-accounts")]
+public sealed class BusinessPartnerBankAccountController : ControllerBase
+{
+    private readonly IBusinessPartnerBankAccountService _service;
+    private readonly IBusinessPartnerBankAccountLookupService _lookup;
+
+    public BusinessPartnerBankAccountController(IBusinessPartnerBankAccountService service, IBusinessPartnerBankAccountLookupService lookup)
+    {
+        _service = service;
+        _lookup = lookup;
+    }
+
+    /// <summary>Sayfalanmış liste.</summary>
+    [HttpGet]
+    public async Task<ActionResult<BaseResponse<PaginatedResponse<BusinessPartnerBankAccountListResponse>>>> GetList([FromQuery] GetBusinessPartnerBankAccountListRequest request, CancellationToken ct)
+        => Ok(await _service.GetListAsync(request, ct));
+
+    /// <summary>Kimliğe göre detay.</summary>
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<BaseResponse<BusinessPartnerBankAccountDetailResponse>>> GetById(Guid id, CancellationToken ct)
+        => Ok(await _service.GetByIdAsync(id, ct));
+
+    /// <summary>Lookup listesi.</summary>
+    [HttpGet("lookup")]
+    public async Task<ActionResult<BaseResponse<IReadOnlyList<BusinessPartnerBankAccountLookupResponse>>>> Lookup([FromQuery] string? search, [FromQuery] bool activeOnly, CancellationToken ct)
+        => Ok(await _lookup.GetLookupAsync(search, activeOnly, ct));
+
+    /// <summary>Yeni kayıt oluşturur.</summary>
+    [HttpPost]
+    public async Task<ActionResult<BaseResponse<Guid>>> Create(CreateBusinessPartnerBankAccountRequest request, CancellationToken ct)
+        => Ok(await _service.CreateAsync(request, ct));
+
+    /// <summary>Var olan kaydı günceller.</summary>
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<BaseResponse<bool>>> Update(Guid id, UpdateBusinessPartnerBankAccountRequest request, CancellationToken ct)
+        => Ok(await _service.UpdateAsync(id, request, ct));
+
+    /// <summary>Kaydı (soft-delete) siler.</summary>
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<BaseResponse<bool>>> Delete(Guid id, CancellationToken ct)
+        => Ok(await _service.DeleteAsync(id, ct));
+}

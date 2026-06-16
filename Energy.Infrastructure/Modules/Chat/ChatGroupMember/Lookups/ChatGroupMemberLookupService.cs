@@ -1,0 +1,29 @@
+using Microsoft.EntityFrameworkCore;
+using Energy.Infrastructure.Persistence;
+using Energy.Shared.Models.V1.Common.Responses;
+using Energy.Application.Modules.Chat.ChatGroupMember.Lookups;
+using Energy.Shared.Models.V1.Chat.ChatGroupMember.Responses;
+
+namespace Energy.Infrastructure.Modules.Chat.ChatGroupMember.Lookups;
+
+/// <summary>ChatGroupMember lookup servisi (aktif + arama filtreli projection).</summary>
+public class ChatGroupMemberLookupService : IChatGroupMemberLookupService
+{
+    private readonly EnergyDbContext _db;
+
+    public ChatGroupMemberLookupService(EnergyDbContext db) => _db = db;
+
+    public async Task<BaseResponse<IReadOnlyList<ChatGroupMemberLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
+    {
+        var query = _db.ChatGroupMembers.AsNoTracking();
+        var items = await query.Select(e => new ChatGroupMemberLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = e.Id.ToString(),
+            IsActive = true
+        }).ToListAsync(ct);
+        return BaseResponse<IReadOnlyList<ChatGroupMemberLookupResponse>>.Success(items);
+    }
+}

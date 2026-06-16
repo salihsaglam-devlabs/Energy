@@ -1,0 +1,21 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Modules.Reporting.ReportDefinition.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Modules.Reporting.ReportDefinition.Title"]</h2></div>
+    </header>
+    <div id="report-definition-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/modules/reporting/report-definition/report-definition.index.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.ReportingReportDefinition.init("/reporting/report-definitions", "report-definition-grid", "Reporting");
+        });
+    </script>
+}

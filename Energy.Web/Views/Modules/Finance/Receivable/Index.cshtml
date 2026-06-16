@@ -1,0 +1,21 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Modules.Finance.Receivable.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Modules.Finance.Receivable.Title"]</h2></div>
+    </header>
+    <div id="receivable-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/modules/finance/receivable/receivable.index.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.FinanceReceivable.init("/finance/receivables", "receivable-grid", "Finance");
+        });
+    </script>
+}

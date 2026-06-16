@@ -1,0 +1,30 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Modules.Workflow.Processes.Approval.Title"].Value;
+}
+
+<link rel="stylesheet" href="~/css/modules/workflow/processes/approval/approval.css" asp-append-version="true" />
+
+<section class="energy-screen energy-process">
+    <header class="energy-screen__header">
+        <div><h2>@T["Modules.Workflow.Processes.Approval.Title"]</h2></div>
+    </header>
+    <p class="energy-process__hint">@T["Modules.Workflow.Processes.Approval.Hint"]</p>
+    <div id="approval-inbox-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/modules/workflow/processes/approval/approval.index.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppProcesses.WorkflowApproval.init("/workflow/processes/approval", "approval-inbox-grid", {
+                approve: "@T["Modules.Workflow.Processes.Approval.Actions.Approve"]",
+                reject: "@T["Modules.Workflow.Processes.Approval.Actions.Reject"]",
+                cancel: "@T["Modules.Workflow.Processes.Approval.Actions.Cancel"]",
+                notePrompt: "@T["Modules.Workflow.Processes.Approval.NotePrompt"]"
+            });
+        });
+    </script>
+}
+

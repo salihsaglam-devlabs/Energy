@@ -1,0 +1,21 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Modules.Workflow.ApprovalRequestApprover.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Modules.Workflow.ApprovalRequestApprover.Title"]</h2></div>
+    </header>
+    <div id="approval-request-approver-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/modules/workflow/approval-request-approver/approval-request-approver.index.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.WorkflowApprovalRequestApprover.init("/workflow/approval-request-approvers", "approval-request-approver-grid", "Workflow");
+        });
+    </script>
+}

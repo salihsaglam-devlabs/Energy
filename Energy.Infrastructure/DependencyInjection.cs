@@ -9,6 +9,7 @@ using Energy.Infrastructure.Identity;
 using Energy.Infrastructure.Identity.Services;
 using Energy.Infrastructure.Localization;
 using Energy.Infrastructure.Logger.Services;
+using Energy.Infrastructure.Modules;
 using Energy.Infrastructure.Persistence;
 using Energy.Infrastructure.Persistence.Interceptors;
 using Energy.Infrastructure.Seeding;
@@ -60,6 +61,22 @@ public static class DependencyInjection
             options.AddInterceptors(sp.GetRequiredService<AuditingSaveChangesInterceptor>());
         });
 
+        // Kanonik (Modules) bağlam: 134 per-entity yapılandırmayı uygular. Legacy
+        // AppDbContext ile birlikte kayıtlıdır; cutover tamamlandığında AppDbContext
+        // kaldırılıp bu bağlam tek kaynak olur.
+        services.AddDbContext<EnergyDbContext>((sp, options) =>
+        {
+            if (useSqlServer)
+            {
+                options.UseSqlServer(connectionString, sql => sql.MigrationsAssembly("Energy.Migrations.SqlServer"));
+            }
+            else
+            {
+                options.UseNpgsql(connectionString, npg => npg.MigrationsAssembly("Energy.Migrations.PostgreSql"));
+            }
+            options.AddInterceptors(sp.GetRequiredService<AuditingSaveChangesInterceptor>());
+        });
+
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
         services.Configure<LocalizationSettings>(configuration.GetSection(LocalizationSettings.SectionName));
 
@@ -77,14 +94,6 @@ public static class DependencyInjection
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<Application.Settings.Services.IUserSettingsService, Infrastructure.Settings.Services.UserSettingsService>();
 
-        // Kurumsal modüllerin ortak CRUD servisi (açık generic kayıt).
-        services.AddScoped(typeof(Application.Common.Crud.IGenericCrudService<>), typeof(Infrastructure.Common.GenericCrudService<>));
-
-        // Ana-detay ekranları için ortak alt-koleksiyon sorgu servisi.
-        services.AddScoped<Application.Common.Crud.IModuleDetailQueryService, Infrastructure.Common.ModuleDetailQueryService>();
-
-        // Ana-detay ekranları için ortak alt-koleksiyon yazma (CRUD) servisi.
-        services.AddScoped<Application.Common.Crud.IModuleDetailCommandService, Infrastructure.Common.ModuleDetailCommandService>();
 
         // Workflow (onay) motoru + kaynak belge durum güncelleyici.
         services.AddScoped<Application.Workflow.Services.IApprovalSourceUpdater, Infrastructure.Workflow.Services.ApprovalSourceUpdater>();
@@ -104,6 +113,16 @@ public static class DependencyInjection
         services.AddLocalizationOverrides();
         services.AddScoped<SystemSeeder>();
         services.AddScoped<ISystemSeeder>(sp => sp.GetRequiredService<SystemSeeder>());
+
+        // Tüm 134 per-entity Modules CRUD + lookup servisleri (üretildi).
+        services.AddModulesEntityServices();
+
+        // ER Overview iş akışlarından türetilen salt-okunur rapor servisleri (üretildi).
+        services.AddModulesReportServices();
+
+        // Belge dosya/versiyon yönetimi: yerel dosya saklama + dosya servisi.
+        services.AddScoped<Energy.Application.Common.Storage.IFileStorage, Energy.Infrastructure.Common.Storage.LocalFileStorage>();
+        services.AddScoped<Energy.Application.Modules.Documents.Files.Services.IDocumentFileService, Energy.Infrastructure.Modules.Documents.Files.DocumentFileService>();
 
         return services;
     }

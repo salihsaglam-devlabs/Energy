@@ -603,4 +603,345 @@
   <data name="ModuleDetails.MaterialAttributeValues" xml:space="preserve"><value>Attribute Values</value></data>
   <data name="ModuleDetails.MaterialUnitConversions" xml:space="preserve"><value>Unit Conversions</value></data>
   <data name="ModuleDetails.WarehouseLocations" xml:space="preserve"><value>Locations</value></data>
+  <data name="Modules.Core.Company.Title" xml:space="preserve"><value>Company</value></data>
+  <data name="Menus.Core.Company" xml:space="preserve"><value>Company</value></data>
+  <data name="Modules.Core.Branch.Title" xml:space="preserve"><value>Branch</value></data>
+  <data name="Menus.Core.Branch" xml:space="preserve"><value>Branch</value></data>
+  <data name="Modules.Core.Department.Title" xml:space="preserve"><value>Department</value></data>
+  <data name="Menus.Core.Department" xml:space="preserve"><value>Department</value></data>
+  <data name="Modules.Core.Currency.Title" xml:space="preserve"><value>Currency</value></data>
+  <data name="Menus.Core.Currency" xml:space="preserve"><value>Currency</value></data>
+  <data name="Modules.Core.ExchangeRate.Title" xml:space="preserve"><value>Exchange Rate</value></data>
+  <data name="Menus.Core.ExchangeRate" xml:space="preserve"><value>Exchange Rate</value></data>
+  <data name="Modules.Core.UnitOfMeasure.Title" xml:space="preserve"><value>Unit Of Measure</value></data>
+  <data name="Menus.Core.UnitOfMeasure" xml:space="preserve"><value>Unit Of Measure</value></data>
+  <data name="Modules.Core.UnitConversion.Title" xml:space="preserve"><value>Unit Conversion</value></data>
+  <data name="Menus.Core.UnitConversion" xml:space="preserve"><value>Unit Conversion</value></data>
+  <data name="Modules.Core.SequenceDefinition.Title" xml:space="preserve"><value>Sequence Definition</value></data>
+  <data name="Menus.Core.SequenceDefinition" xml:space="preserve"><value>Sequence Definition</value></data>
+  <data name="Modules.Core.SystemSetting.Title" xml:space="preserve"><value>System Setting</value></data>
+  <data name="Menus.Core.SystemSetting" xml:space="preserve"><value>System Setting</value></data>
+  <data name="Modules.Core.LocalizationResource.Title" xml:space="preserve"><value>Localization Resource</value></data>
+  <data name="Menus.Core.LocalizationResource" xml:space="preserve"><value>Localization Resource</value></data>
+  <data name="Modules.Core.AuditLog.Title" xml:space="preserve"><value>Audit Log</value></data>
+  <data name="Menus.Core.AuditLog" xml:space="preserve"><value>Audit Log</value></data>
+  <data name="Modules.IAM.User.Title" xml:space="preserve"><value>User</value></data>
+  <data name="Modules.IAM.Role.Title" xml:space="preserve"><value>Role</value></data>
+  <data name="Modules.IAM.Permission.Title" xml:space="preserve"><value>Permission</value></data>
+  <data name="Modules.IAM.UserRole.Title" xml:space="preserve"><value>User Role</value></data>
+  <data name="Modules.IAM.RolePermission.Title" xml:space="preserve"><value>Role Permission</value></data>
+  <data name="Modules.IAM.UserPermission.Title" xml:space="preserve"><value>User Permission</value></data>
+  <data name="Modules.IAM.Menu.Title" xml:space="preserve"><value>Menu</value></data>
+  <data name="Modules.IAM.ApiEndpoint.Title" xml:space="preserve"><value>Api Endpoint</value></data>
+  <data name="Modules.IAM.UserSetting.Title" xml:space="preserve"><value>User Setting</value></data>
+  <data name="Modules.Chat.ChatGroup.Title" xml:space="preserve"><value>Chat Group</value></data>
+  <data name="Modules.Chat.ChatGroupMember.Title" xml:space="preserve"><value>Chat Group Member</value></data>
+  <data name="Modules.Chat.ChatMessage.Title" xml:space="preserve"><value>Chat Message</value></data>
+  <data name="Modules.Chat.ChatMessageReaction.Title" xml:space="preserve"><value>Chat Message Reaction</value></data>
+  <data name="Modules.Organization.Employee.Title" xml:space="preserve"><value>Employee</value></data>
+  <data name="Menus.Organization.Employee" xml:space="preserve"><value>Employee</value></data>
+  <data name="Modules.Organization.EmployeePosition.Title" xml:space="preserve"><value>Employee Position</value></data>
+  <data name="Menus.Organization.EmployeePosition" xml:space="preserve"><value>Employee Position</value></data>
+  <data name="Modules.Organization.EmployeeSkill.Title" xml:space="preserve"><value>Employee Skill</value></data>
+  <data name="Menus.Organization.EmployeeSkill" xml:space="preserve"><value>Employee Skill</value></data>
+  <data name="Modules.Organization.EmployeeSkillAssignment.Title" xml:space="preserve"><value>Employee Skill Assignment</value></data>
+  <data name="Menus.Organization.EmployeeSkillAssignment" xml:space="preserve"><value>Employee Skill Assignment</value></data>
+  <data name="Modules.Organization.LeaveRequest.Title" xml:space="preserve"><value>Leave Request</value></data>
+  <data name="Menus.Organization.LeaveRequest" xml:space="preserve"><value>Leave Request</value></data>
+  <data name="Modules.Organization.ExpenseClaim.Title" xml:space="preserve"><value>Expense Claim</value></data>
+  <data name="Menus.Organization.ExpenseClaim" xml:space="preserve"><value>Expense Claim</value></data>
+  <data name="Modules.Organization.ExpenseClaimLine.Title" xml:space="preserve"><value>Expense Claim Line</value></data>
+  <data name="Menus.Organization.ExpenseClaimLine" xml:space="preserve"><value>Expense Claim Line</value></data>
+  <data name="Modules.BusinessPartners.BusinessPartner.Title" xml:space="preserve"><value>Business Partner</value></data>
+  <data name="Menus.BusinessPartners.BusinessPartner" xml:space="preserve"><value>Business Partner</value></data>
+  <data name="Modules.BusinessPartners.BusinessPartnerContact.Title" xml:space="preserve"><value>Business Partner Contact</value></data>
+  <data name="Menus.BusinessPartners.BusinessPartnerContact" xml:space="preserve"><value>Business Partner Contact</value></data>
+  <data name="Modules.BusinessPartners.BusinessPartnerAddress.Title" xml:space="preserve"><value>Business Partner Address</value></data>
+  <data name="Menus.BusinessPartners.BusinessPartnerAddress" xml:space="preserve"><value>Business Partner Address</value></data>
+  <data name="Modules.BusinessPartners.BusinessPartnerBankAccount.Title" xml:space="preserve"><value>Business Partner Bank Account</value></data>
+  <data name="Menus.BusinessPartners.BusinessPartnerBankAccount" xml:space="preserve"><value>Business Partner Bank Account</value></data>
+  <data name="Modules.Projects.Project.Title" xml:space="preserve"><value>Project</value></data>
+  <data name="Menus.Projects.Project" xml:space="preserve"><value>Project</value></data>
+  <data name="Modules.Projects.ProjectType.Title" xml:space="preserve"><value>Project Type</value></data>
+  <data name="Menus.Projects.ProjectType" xml:space="preserve"><value>Project Type</value></data>
+  <data name="Modules.Projects.ProjectStatus.Title" xml:space="preserve"><value>Project Status</value></data>
+  <data name="Menus.Projects.ProjectStatus" xml:space="preserve"><value>Project Status</value></data>
+  <data name="Modules.Projects.ProjectLocation.Title" xml:space="preserve"><value>Project Location</value></data>
+  <data name="Menus.Projects.ProjectLocation" xml:space="preserve"><value>Project Location</value></data>
+  <data name="Modules.Projects.ProjectPhas.Title" xml:space="preserve"><value>Project Phas</value></data>
+  <data name="Menus.Projects.ProjectPhas" xml:space="preserve"><value>Project Phas</value></data>
+  <data name="Modules.Projects.ProjectMember.Title" xml:space="preserve"><value>Project Member</value></data>
+  <data name="Menus.Projects.ProjectMember" xml:space="preserve"><value>Project Member</value></data>
+  <data name="Modules.Projects.ProjectNote.Title" xml:space="preserve"><value>Project Note</value></data>
+  <data name="Menus.Projects.ProjectNote" xml:space="preserve"><value>Project Note</value></data>
+  <data name="Modules.Catalog.Brand.Title" xml:space="preserve"><value>Brand</value></data>
+  <data name="Menus.Catalog.Brand" xml:space="preserve"><value>Brand</value></data>
+  <data name="Modules.Catalog.MaterialCategory.Title" xml:space="preserve"><value>Material Category</value></data>
+  <data name="Menus.Catalog.MaterialCategory" xml:space="preserve"><value>Material Category</value></data>
+  <data name="Modules.Catalog.MaterialAttributeDefinition.Title" xml:space="preserve"><value>Material Attribute Definition</value></data>
+  <data name="Menus.Catalog.MaterialAttributeDefinition" xml:space="preserve"><value>Material Attribute Definition</value></data>
+  <data name="Modules.Catalog.MaterialAttributeOption.Title" xml:space="preserve"><value>Material Attribute Option</value></data>
+  <data name="Menus.Catalog.MaterialAttributeOption" xml:space="preserve"><value>Material Attribute Option</value></data>
+  <data name="Modules.Catalog.MaterialCategoryAttribute.Title" xml:space="preserve"><value>Material Category Attribute</value></data>
+  <data name="Menus.Catalog.MaterialCategoryAttribute" xml:space="preserve"><value>Material Category Attribute</value></data>
+  <data name="Modules.Catalog.Material.Title" xml:space="preserve"><value>Material</value></data>
+  <data name="Menus.Catalog.Material" xml:space="preserve"><value>Material</value></data>
+  <data name="Modules.Catalog.MaterialAttributeValue.Title" xml:space="preserve"><value>Material Attribute Value</value></data>
+  <data name="Menus.Catalog.MaterialAttributeValue" xml:space="preserve"><value>Material Attribute Value</value></data>
+  <data name="Modules.Catalog.MaterialUnitConversion.Title" xml:space="preserve"><value>Material Unit Conversion</value></data>
+  <data name="Menus.Catalog.MaterialUnitConversion" xml:space="preserve"><value>Material Unit Conversion</value></data>
+  <data name="Modules.Inventory.Warehous.Title" xml:space="preserve"><value>Warehous</value></data>
+  <data name="Menus.Inventory.Warehous" xml:space="preserve"><value>Warehous</value></data>
+  <data name="Modules.Inventory.WarehouseLocation.Title" xml:space="preserve"><value>Warehouse Location</value></data>
+  <data name="Menus.Inventory.WarehouseLocation" xml:space="preserve"><value>Warehouse Location</value></data>
+  <data name="Modules.Inventory.StockDocumentType.Title" xml:space="preserve"><value>Stock Document Type</value></data>
+  <data name="Menus.Inventory.StockDocumentType" xml:space="preserve"><value>Stock Document Type</value></data>
+  <data name="Modules.Inventory.StockDocument.Title" xml:space="preserve"><value>Stock Document</value></data>
+  <data name="Menus.Inventory.StockDocument" xml:space="preserve"><value>Stock Document</value></data>
+  <data name="Modules.Inventory.StockDocumentLine.Title" xml:space="preserve"><value>Stock Document Line</value></data>
+  <data name="Menus.Inventory.StockDocumentLine" xml:space="preserve"><value>Stock Document Line</value></data>
+  <data name="Modules.Inventory.StockLot.Title" xml:space="preserve"><value>Stock Lot</value></data>
+  <data name="Menus.Inventory.StockLot" xml:space="preserve"><value>Stock Lot</value></data>
+  <data name="Modules.Inventory.StockIssueAllocation.Title" xml:space="preserve"><value>Stock Issue Allocation</value></data>
+  <data name="Menus.Inventory.StockIssueAllocation" xml:space="preserve"><value>Stock Issue Allocation</value></data>
+  <data name="Modules.Inventory.StockTransaction.Title" xml:space="preserve"><value>Stock Transaction</value></data>
+  <data name="Menus.Inventory.StockTransaction" xml:space="preserve"><value>Stock Transaction</value></data>
+  <data name="Modules.Inventory.StockBalance.Title" xml:space="preserve"><value>Stock Balance</value></data>
+  <data name="Menus.Inventory.StockBalance" xml:space="preserve"><value>Stock Balance</value></data>
+  <data name="Modules.Inventory.StockReservation.Title" xml:space="preserve"><value>Stock Reservation</value></data>
+  <data name="Menus.Inventory.StockReservation" xml:space="preserve"><value>Stock Reservation</value></data>
+  <data name="Modules.Inventory.StockCount.Title" xml:space="preserve"><value>Stock Count</value></data>
+  <data name="Menus.Inventory.StockCount" xml:space="preserve"><value>Stock Count</value></data>
+  <data name="Modules.Inventory.StockCountLine.Title" xml:space="preserve"><value>Stock Count Line</value></data>
+  <data name="Menus.Inventory.StockCountLine" xml:space="preserve"><value>Stock Count Line</value></data>
+  <data name="Modules.Inventory.WarehouseTransfer.Title" xml:space="preserve"><value>Warehouse Transfer</value></data>
+  <data name="Menus.Inventory.WarehouseTransfer" xml:space="preserve"><value>Warehouse Transfer</value></data>
+  <data name="Modules.Inventory.WarehouseTransferLine.Title" xml:space="preserve"><value>Warehouse Transfer Line</value></data>
+  <data name="Menus.Inventory.WarehouseTransferLine" xml:space="preserve"><value>Warehouse Transfer Line</value></data>
+  <data name="Modules.Requests.RequestType.Title" xml:space="preserve"><value>Request Type</value></data>
+  <data name="Menus.Requests.RequestType" xml:space="preserve"><value>Request Type</value></data>
+  <data name="Modules.Requests.Request.Title" xml:space="preserve"><value>Request</value></data>
+  <data name="Menus.Requests.Request" xml:space="preserve"><value>Request</value></data>
+  <data name="Modules.Requests.RequestLine.Title" xml:space="preserve"><value>Request Line</value></data>
+  <data name="Menus.Requests.RequestLine" xml:space="preserve"><value>Request Line</value></data>
+  <data name="Modules.Procurement.SupplierQuote.Title" xml:space="preserve"><value>Supplier Quote</value></data>
+  <data name="Menus.Procurement.SupplierQuote" xml:space="preserve"><value>Supplier Quote</value></data>
+  <data name="Modules.Procurement.SupplierQuoteLine.Title" xml:space="preserve"><value>Supplier Quote Line</value></data>
+  <data name="Menus.Procurement.SupplierQuoteLine" xml:space="preserve"><value>Supplier Quote Line</value></data>
+  <data name="Modules.Procurement.PurchaseOrder.Title" xml:space="preserve"><value>Purchase Order</value></data>
+  <data name="Menus.Procurement.PurchaseOrder" xml:space="preserve"><value>Purchase Order</value></data>
+  <data name="Modules.Procurement.PurchaseOrderLine.Title" xml:space="preserve"><value>Purchase Order Line</value></data>
+  <data name="Menus.Procurement.PurchaseOrderLine" xml:space="preserve"><value>Purchase Order Line</value></data>
+  <data name="Modules.Procurement.PurchaseReceipt.Title" xml:space="preserve"><value>Purchase Receipt</value></data>
+  <data name="Menus.Procurement.PurchaseReceipt" xml:space="preserve"><value>Purchase Receipt</value></data>
+  <data name="Modules.Procurement.PurchaseReceiptLine.Title" xml:space="preserve"><value>Purchase Receipt Line</value></data>
+  <data name="Menus.Procurement.PurchaseReceiptLine" xml:space="preserve"><value>Purchase Receipt Line</value></data>
+  <data name="Modules.Procurement.SupplierInvoice.Title" xml:space="preserve"><value>Supplier Invoice</value></data>
+  <data name="Menus.Procurement.SupplierInvoice" xml:space="preserve"><value>Supplier Invoice</value></data>
+  <data name="Modules.Procurement.SupplierInvoiceLine.Title" xml:space="preserve"><value>Supplier Invoice Line</value></data>
+  <data name="Menus.Procurement.SupplierInvoiceLine" xml:space="preserve"><value>Supplier Invoice Line</value></data>
+  <data name="Modules.Operations.WorkOrderType.Title" xml:space="preserve"><value>Work Order Type</value></data>
+  <data name="Menus.Operations.WorkOrderType" xml:space="preserve"><value>Work Order Type</value></data>
+  <data name="Modules.Operations.WorkOrder.Title" xml:space="preserve"><value>Work Order</value></data>
+  <data name="Menus.Operations.WorkOrder" xml:space="preserve"><value>Work Order</value></data>
+  <data name="Modules.Operations.WorkOrderAssignment.Title" xml:space="preserve"><value>Work Order Assignment</value></data>
+  <data name="Menus.Operations.WorkOrderAssignment" xml:space="preserve"><value>Work Order Assignment</value></data>
+  <data name="Modules.Operations.WorkOrderMaterialPlan.Title" xml:space="preserve"><value>Work Order Material Plan</value></data>
+  <data name="Menus.Operations.WorkOrderMaterialPlan" xml:space="preserve"><value>Work Order Material Plan</value></data>
+  <data name="Modules.Operations.WorkOrderMaterialUsage.Title" xml:space="preserve"><value>Work Order Material Usage</value></data>
+  <data name="Menus.Operations.WorkOrderMaterialUsage" xml:space="preserve"><value>Work Order Material Usage</value></data>
+  <data name="Modules.Operations.WorkOrderChecklist.Title" xml:space="preserve"><value>Work Order Checklist</value></data>
+  <data name="Menus.Operations.WorkOrderChecklist" xml:space="preserve"><value>Work Order Checklist</value></data>
+  <data name="Modules.Operations.WorkOrderChecklistItem.Title" xml:space="preserve"><value>Work Order Checklist Item</value></data>
+  <data name="Menus.Operations.WorkOrderChecklistItem" xml:space="preserve"><value>Work Order Checklist Item</value></data>
+  <data name="Modules.Operations.WorkOrderStatusHistory.Title" xml:space="preserve"><value>Work Order Status History</value></data>
+  <data name="Menus.Operations.WorkOrderStatusHistory" xml:space="preserve"><value>Work Order Status History</value></data>
+  <data name="Modules.FieldOperations.DailySiteReport.Title" xml:space="preserve"><value>Daily Site Report</value></data>
+  <data name="Menus.FieldOperations.DailySiteReport" xml:space="preserve"><value>Daily Site Report</value></data>
+  <data name="Modules.FieldOperations.DailySiteReportWorker.Title" xml:space="preserve"><value>Daily Site Report Worker</value></data>
+  <data name="Menus.FieldOperations.DailySiteReportWorker" xml:space="preserve"><value>Daily Site Report Worker</value></data>
+  <data name="Modules.FieldOperations.DailySiteReportEquipment.Title" xml:space="preserve"><value>Daily Site Report Equipment</value></data>
+  <data name="Menus.FieldOperations.DailySiteReportEquipment" xml:space="preserve"><value>Daily Site Report Equipment</value></data>
+  <data name="Modules.FieldOperations.DailySiteReportMaterial.Title" xml:space="preserve"><value>Daily Site Report Material</value></data>
+  <data name="Menus.FieldOperations.DailySiteReportMaterial" xml:space="preserve"><value>Daily Site Report Material</value></data>
+  <data name="Modules.FieldOperations.ProgressEntry.Title" xml:space="preserve"><value>Progress Entry</value></data>
+  <data name="Menus.FieldOperations.ProgressEntry" xml:space="preserve"><value>Progress Entry</value></data>
+  <data name="Modules.FieldOperations.MeasurementSheet.Title" xml:space="preserve"><value>Measurement Sheet</value></data>
+  <data name="Menus.FieldOperations.MeasurementSheet" xml:space="preserve"><value>Measurement Sheet</value></data>
+  <data name="Modules.FieldOperations.MeasurementSheetLine.Title" xml:space="preserve"><value>Measurement Sheet Line</value></data>
+  <data name="Menus.FieldOperations.MeasurementSheetLine" xml:space="preserve"><value>Measurement Sheet Line</value></data>
+  <data name="Modules.HR.Timesheet.Title" xml:space="preserve"><value>Timesheet</value></data>
+  <data name="Menus.HR.Timesheet" xml:space="preserve"><value>Timesheet</value></data>
+  <data name="Modules.HR.TimesheetLine.Title" xml:space="preserve"><value>Timesheet Line</value></data>
+  <data name="Menus.HR.TimesheetLine" xml:space="preserve"><value>Timesheet Line</value></data>
+  <data name="Modules.Assets.EquipmentAsset.Title" xml:space="preserve"><value>Equipment Asset</value></data>
+  <data name="Menus.Assets.EquipmentAsset" xml:space="preserve"><value>Equipment Asset</value></data>
+  <data name="Modules.Assets.EquipmentAssignment.Title" xml:space="preserve"><value>Equipment Assignment</value></data>
+  <data name="Menus.Assets.EquipmentAssignment" xml:space="preserve"><value>Equipment Assignment</value></data>
+  <data name="Modules.Assets.EquipmentMaintenance.Title" xml:space="preserve"><value>Equipment Maintenance</value></data>
+  <data name="Menus.Assets.EquipmentMaintenance" xml:space="preserve"><value>Equipment Maintenance</value></data>
+  <data name="Modules.Finance.FinancialAccount.Title" xml:space="preserve"><value>Financial Account</value></data>
+  <data name="Menus.Finance.FinancialAccount" xml:space="preserve"><value>Financial Account</value></data>
+  <data name="Modules.Finance.CostCenter.Title" xml:space="preserve"><value>Cost Center</value></data>
+  <data name="Menus.Finance.CostCenter" xml:space="preserve"><value>Cost Center</value></data>
+  <data name="Modules.Finance.FinancialTransaction.Title" xml:space="preserve"><value>Financial Transaction</value></data>
+  <data name="Menus.Finance.FinancialTransaction" xml:space="preserve"><value>Financial Transaction</value></data>
+  <data name="Modules.Finance.FinancialTransactionLine.Title" xml:space="preserve"><value>Financial Transaction Line</value></data>
+  <data name="Menus.Finance.FinancialTransactionLine" xml:space="preserve"><value>Financial Transaction Line</value></data>
+  <data name="Modules.Finance.Payable.Title" xml:space="preserve"><value>Payable</value></data>
+  <data name="Menus.Finance.Payable" xml:space="preserve"><value>Payable</value></data>
+  <data name="Modules.Finance.Receivable.Title" xml:space="preserve"><value>Receivable</value></data>
+  <data name="Menus.Finance.Receivable" xml:space="preserve"><value>Receivable</value></data>
+  <data name="Modules.Finance.Payment.Title" xml:space="preserve"><value>Payment</value></data>
+  <data name="Menus.Finance.Payment" xml:space="preserve"><value>Payment</value></data>
+  <data name="Modules.Finance.PaymentAllocation.Title" xml:space="preserve"><value>Payment Allocation</value></data>
+  <data name="Menus.Finance.PaymentAllocation" xml:space="preserve"><value>Payment Allocation</value></data>
+  <data name="Modules.Finance.Collection.Title" xml:space="preserve"><value>Collection</value></data>
+  <data name="Menus.Finance.Collection" xml:space="preserve"><value>Collection</value></data>
+  <data name="Modules.Finance.CollectionAllocation.Title" xml:space="preserve"><value>Collection Allocation</value></data>
+  <data name="Menus.Finance.CollectionAllocation" xml:space="preserve"><value>Collection Allocation</value></data>
+  <data name="Modules.Budget.Budget.Title" xml:space="preserve"><value>Budget</value></data>
+  <data name="Menus.Budget.Budget" xml:space="preserve"><value>Budget</value></data>
+  <data name="Modules.Budget.BudgetLine.Title" xml:space="preserve"><value>Budget Line</value></data>
+  <data name="Menus.Budget.BudgetLine" xml:space="preserve"><value>Budget Line</value></data>
+  <data name="Modules.Contracts.Contract.Title" xml:space="preserve"><value>Contract</value></data>
+  <data name="Menus.Contracts.Contract" xml:space="preserve"><value>Contract</value></data>
+  <data name="Modules.Contracts.ContractParty.Title" xml:space="preserve"><value>Contract Party</value></data>
+  <data name="Menus.Contracts.ContractParty" xml:space="preserve"><value>Contract Party</value></data>
+  <data name="Modules.Contracts.ContractLine.Title" xml:space="preserve"><value>Contract Line</value></data>
+  <data name="Menus.Contracts.ContractLine" xml:space="preserve"><value>Contract Line</value></data>
+  <data name="Modules.Contracts.ContractAmendment.Title" xml:space="preserve"><value>Contract Amendment</value></data>
+  <data name="Menus.Contracts.ContractAmendment" xml:space="preserve"><value>Contract Amendment</value></data>
+  <data name="Modules.ProgressPayments.ProgressPayment.Title" xml:space="preserve"><value>Progress Payment</value></data>
+  <data name="Menus.ProgressPayments.ProgressPayment" xml:space="preserve"><value>Progress Payment</value></data>
+  <data name="Modules.ProgressPayments.ProgressPaymentLine.Title" xml:space="preserve"><value>Progress Payment Line</value></data>
+  <data name="Menus.ProgressPayments.ProgressPaymentLine" xml:space="preserve"><value>Progress Payment Line</value></data>
+  <data name="Modules.ProgressPayments.ProgressPaymentDeduction.Title" xml:space="preserve"><value>Progress Payment Deduction</value></data>
+  <data name="Menus.ProgressPayments.ProgressPaymentDeduction" xml:space="preserve"><value>Progress Payment Deduction</value></data>
+  <data name="Modules.Documents.DocumentFolder.Title" xml:space="preserve"><value>Document Folder</value></data>
+  <data name="Menus.Documents.DocumentFolder" xml:space="preserve"><value>Document Folder</value></data>
+  <data name="Modules.Documents.Document.Title" xml:space="preserve"><value>Document</value></data>
+  <data name="Menus.Documents.Document" xml:space="preserve"><value>Document</value></data>
+  <data name="Modules.Documents.DocumentVersion.Title" xml:space="preserve"><value>Document Version</value></data>
+  <data name="Menus.Documents.DocumentVersion" xml:space="preserve"><value>Document Version</value></data>
+  <data name="Modules.Documents.DocumentRelation.Title" xml:space="preserve"><value>Document Relation</value></data>
+  <data name="Menus.Documents.DocumentRelation" xml:space="preserve"><value>Document Relation</value></data>
+  <data name="Modules.Documents.DocumentPermission.Title" xml:space="preserve"><value>Document Permission</value></data>
+  <data name="Menus.Documents.DocumentPermission" xml:space="preserve"><value>Document Permission</value></data>
+  <data name="Modules.Workflow.ApprovalDefinition.Title" xml:space="preserve"><value>Approval Definition</value></data>
+  <data name="Menus.Workflow.ApprovalDefinition" xml:space="preserve"><value>Approval Definition</value></data>
+  <data name="Modules.Workflow.ApprovalDefinitionVersion.Title" xml:space="preserve"><value>Approval Definition Version</value></data>
+  <data name="Menus.Workflow.ApprovalDefinitionVersion" xml:space="preserve"><value>Approval Definition Version</value></data>
+  <data name="Modules.Workflow.ApprovalStepDefinition.Title" xml:space="preserve"><value>Approval Step Definition</value></data>
+  <data name="Menus.Workflow.ApprovalStepDefinition" xml:space="preserve"><value>Approval Step Definition</value></data>
+  <data name="Modules.Workflow.ApprovalStepApprover.Title" xml:space="preserve"><value>Approval Step Approver</value></data>
+  <data name="Menus.Workflow.ApprovalStepApprover" xml:space="preserve"><value>Approval Step Approver</value></data>
+  <data name="Modules.Workflow.ApprovalCondition.Title" xml:space="preserve"><value>Approval Condition</value></data>
+  <data name="Menus.Workflow.ApprovalCondition" xml:space="preserve"><value>Approval Condition</value></data>
+  <data name="Modules.Workflow.ApprovalRequest.Title" xml:space="preserve"><value>Approval Request</value></data>
+  <data name="Menus.Workflow.ApprovalRequest" xml:space="preserve"><value>Approval Request</value></data>
+  <data name="Modules.Workflow.ApprovalRequestStep.Title" xml:space="preserve"><value>Approval Request Step</value></data>
+  <data name="Menus.Workflow.ApprovalRequestStep" xml:space="preserve"><value>Approval Request Step</value></data>
+  <data name="Modules.Workflow.ApprovalRequestApprover.Title" xml:space="preserve"><value>Approval Request Approver</value></data>
+  <data name="Menus.Workflow.ApprovalRequestApprover" xml:space="preserve"><value>Approval Request Approver</value></data>
+  <data name="Modules.Workflow.ApprovalAction.Title" xml:space="preserve"><value>Approval Action</value></data>
+  <data name="Menus.Workflow.ApprovalAction" xml:space="preserve"><value>Approval Action</value></data>
+  <data name="Modules.Workflow.ApprovalDelegation.Title" xml:space="preserve"><value>Approval Delegation</value></data>
+  <data name="Menus.Workflow.ApprovalDelegation" xml:space="preserve"><value>Approval Delegation</value></data>
+  <data name="Modules.Notifications.Notification.Title" xml:space="preserve"><value>Notification</value></data>
+  <data name="Menus.Notifications.Notification" xml:space="preserve"><value>Notification</value></data>
+  <data name="Modules.Notifications.NotificationRecipient.Title" xml:space="preserve"><value>Notification Recipient</value></data>
+  <data name="Menus.Notifications.NotificationRecipient" xml:space="preserve"><value>Notification Recipient</value></data>
+  <data name="Modules.Notifications.NotificationPreference.Title" xml:space="preserve"><value>Notification Preference</value></data>
+  <data name="Menus.Notifications.NotificationPreference" xml:space="preserve"><value>Notification Preference</value></data>
+  <data name="Modules.Reporting.ReportDefinition.Title" xml:space="preserve"><value>Report Definition</value></data>
+  <data name="Menus.Reporting.ReportDefinition" xml:space="preserve"><value>Report Definition</value></data>
+  <data name="Modules.Reporting.DashboardWidget.Title" xml:space="preserve"><value>Dashboard Widget</value></data>
+  <data name="Menus.Reporting.DashboardWidget" xml:space="preserve"><value>Dashboard Widget</value></data>
+  <data name="Modules.Inventory.Warehouse.Title" xml:space="preserve"><value>Warehouse</value></data>
+  <data name="Menus.Inventory.Warehouse" xml:space="preserve"><value>Warehouse</value></data>
+  <data name="Modules.Procurement.Reports.PurchaseOrderSummary.Title" xml:space="preserve"><value>Purchase Order Summary</value></data>
+  <data name="Menus.Procurement.Reports.PurchaseOrderSummary" xml:space="preserve"><value>Purchase Order Summary</value></data>
+  <data name="Modules.Procurement.Reports.PurchaseOrderSummary.Filters.StartDate" xml:space="preserve"><value>Start Date</value></data>
+  <data name="Modules.Procurement.Reports.PurchaseOrderSummary.Filters.EndDate" xml:space="preserve"><value>End Date</value></data>
+  <data name="Modules.Procurement.Reports.PurchaseOrderSummary.Filters.Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Modules.Procurement.Reports.PurchaseOrderSummary.Actions.Export" xml:space="preserve"><value>Export</value></data>
+  <data name="Modules.Inventory.Reports.StockBalanceReport.Title" xml:space="preserve"><value>Stock Balance Report</value></data>
+  <data name="Menus.Inventory.Reports.StockBalanceReport" xml:space="preserve"><value>Stock Balance Report</value></data>
+  <data name="Modules.Inventory.Reports.StockBalanceReport.Filters.StartDate" xml:space="preserve"><value>Start Date</value></data>
+  <data name="Modules.Inventory.Reports.StockBalanceReport.Filters.EndDate" xml:space="preserve"><value>End Date</value></data>
+  <data name="Modules.Inventory.Reports.StockBalanceReport.Actions.Export" xml:space="preserve"><value>Export</value></data>
+  <data name="Modules.Projects.Reports.ProjectStatusReport.Title" xml:space="preserve"><value>Project Status Report</value></data>
+  <data name="Menus.Projects.Reports.ProjectStatusReport" xml:space="preserve"><value>Project Status Report</value></data>
+  <data name="Modules.Projects.Reports.ProjectStatusReport.Filters.StartDate" xml:space="preserve"><value>Start Date</value></data>
+  <data name="Modules.Projects.Reports.ProjectStatusReport.Filters.EndDate" xml:space="preserve"><value>End Date</value></data>
+  <data name="Modules.Projects.Reports.ProjectStatusReport.Actions.Export" xml:space="preserve"><value>Export</value></data>
+  <data name="Modules.HR.Reports.TimesheetSummary.Title" xml:space="preserve"><value>Timesheet Summary</value></data>
+  <data name="Menus.HR.Reports.TimesheetSummary" xml:space="preserve"><value>Timesheet Summary</value></data>
+  <data name="Modules.HR.Reports.TimesheetSummary.Filters.StartDate" xml:space="preserve"><value>Start Date</value></data>
+  <data name="Modules.HR.Reports.TimesheetSummary.Filters.EndDate" xml:space="preserve"><value>End Date</value></data>
+  <data name="Modules.HR.Reports.TimesheetSummary.Filters.Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Modules.HR.Reports.TimesheetSummary.Actions.Export" xml:space="preserve"><value>Export</value></data>
+  <data name="Modules.Finance.Reports.PayableAging.Title" xml:space="preserve"><value>Payable Aging</value></data>
+  <data name="Menus.Finance.Reports.PayableAging" xml:space="preserve"><value>Payable Aging</value></data>
+  <data name="Modules.Finance.Reports.PayableAging.Filters.StartDate" xml:space="preserve"><value>Start Date</value></data>
+  <data name="Modules.Finance.Reports.PayableAging.Filters.EndDate" xml:space="preserve"><value>End Date</value></data>
+  <data name="Modules.Finance.Reports.PayableAging.Actions.Export" xml:space="preserve"><value>Export</value></data>
+  <data name="Modules.Finance.Reports.ReceivableAging.Title" xml:space="preserve"><value>Receivable Aging</value></data>
+  <data name="Menus.Finance.Reports.ReceivableAging" xml:space="preserve"><value>Receivable Aging</value></data>
+  <data name="Modules.Finance.Reports.ReceivableAging.Filters.StartDate" xml:space="preserve"><value>Start Date</value></data>
+  <data name="Modules.Finance.Reports.ReceivableAging.Filters.EndDate" xml:space="preserve"><value>End Date</value></data>
+  <data name="Modules.Finance.Reports.ReceivableAging.Actions.Export" xml:space="preserve"><value>Export</value></data>
+  <data name="Modules.ProgressPayments.Reports.ProgressPaymentSummary.Title" xml:space="preserve"><value>Progress Payment Summary</value></data>
+  <data name="Menus.ProgressPayments.Reports.ProgressPaymentSummary" xml:space="preserve"><value>Progress Payment Summary</value></data>
+  <data name="Modules.ProgressPayments.Reports.ProgressPaymentSummary.Filters.StartDate" xml:space="preserve"><value>Start Date</value></data>
+  <data name="Modules.ProgressPayments.Reports.ProgressPaymentSummary.Filters.EndDate" xml:space="preserve"><value>End Date</value></data>
+  <data name="Modules.ProgressPayments.Reports.ProgressPaymentSummary.Filters.Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Modules.ProgressPayments.Reports.ProgressPaymentSummary.Actions.Export" xml:space="preserve"><value>Export</value></data>
+  <data name="Modules.Workflow.Processes.Approval.Title" xml:space="preserve"><value>Approval Inbox</value></data>
+  <data name="Modules.Workflow.Processes.Approval.Hint" xml:space="preserve"><value>Pending approvals awaiting your action.</value></data>
+  <data name="Modules.Workflow.Processes.Approval.NotePrompt" xml:space="preserve"><value>Note (optional)</value></data>
+  <data name="Modules.Workflow.Processes.Approval.Actions.Approve" xml:space="preserve"><value>Approve</value></data>
+  <data name="Modules.Workflow.Processes.Approval.Actions.Reject" xml:space="preserve"><value>Reject</value></data>
+  <data name="Modules.Workflow.Processes.Approval.Actions.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Menus.Workflow.Processes.Approval" xml:space="preserve"><value>Approval Inbox</value></data>
+  <data name="Modules.Inventory.Processes.StockIssue.Title" xml:space="preserve"><value>Stock Issue</value></data>
+  <data name="Modules.Inventory.Processes.StockIssue.Actions.Execute" xml:space="preserve"><value>Issue Stock</value></data>
+  <data name="Modules.Inventory.Processes.StockIssue.Messages.Completed" xml:space="preserve"><value>Stock issue completed.</value></data>
+  <data name="Menus.Inventory.Processes.StockIssue" xml:space="preserve"><value>Stock Issue</value></data>
+  <data name="Modules.Inventory.Processes.StockTransfer.Title" xml:space="preserve"><value>Stock Transfer</value></data>
+  <data name="Modules.Inventory.Processes.StockTransfer.Actions.Execute" xml:space="preserve"><value>Transfer Stock</value></data>
+  <data name="Modules.Inventory.Processes.StockTransfer.Messages.Completed" xml:space="preserve"><value>Stock transfer completed.</value></data>
+  <data name="Menus.Inventory.Processes.StockTransfer" xml:space="preserve"><value>Stock Transfer</value></data>
+  <data name="Modules.Procurement.Processes.GoodsReceipt.Title" xml:space="preserve"><value>Goods Receipt</value></data>
+  <data name="Modules.Procurement.Processes.GoodsReceipt.Hint" xml:space="preserve"><value>Convert an approved purchase receipt into a stock-in document.</value></data>
+  <data name="Modules.Procurement.Processes.GoodsReceipt.Actions.Execute" xml:space="preserve"><value>Receive</value></data>
+  <data name="Modules.Procurement.Processes.GoodsReceipt.Messages.Completed" xml:space="preserve"><value>Goods receipt completed.</value></data>
+  <data name="Menus.Procurement.Processes.GoodsReceipt" xml:space="preserve"><value>Goods Receipt</value></data>
+  <data name="Modules.Finance.Processes.TimesheetCost.Title" xml:space="preserve"><value>Timesheet Costing</value></data>
+  <data name="Modules.Finance.Processes.TimesheetCost.Hint" xml:space="preserve"><value>Post an approved timesheet's labour cost to a financial transaction.</value></data>
+  <data name="Modules.Finance.Processes.TimesheetCost.Actions.Execute" xml:space="preserve"><value>Post Cost</value></data>
+  <data name="Modules.Finance.Processes.TimesheetCost.Messages.Completed" xml:space="preserve"><value>Timesheet cost posted.</value></data>
+  <data name="Menus.Finance.Processes.TimesheetCost" xml:space="preserve"><value>Timesheet Costing</value></data>
+  <data name="Modules.Finance.Processes.ProgressPaymentPosting.Title" xml:space="preserve"><value>Progress Payment Posting</value></data>
+  <data name="Modules.Finance.Processes.ProgressPaymentPosting.Hint" xml:space="preserve"><value>Post an approved progress payment to a receivable/payable transaction.</value></data>
+  <data name="Modules.Finance.Processes.ProgressPaymentPosting.Actions.Execute" xml:space="preserve"><value>Post</value></data>
+  <data name="Modules.Finance.Processes.ProgressPaymentPosting.Messages.Completed" xml:space="preserve"><value>Progress payment posted.</value></data>
+  <data name="Menus.Finance.Processes.ProgressPaymentPosting" xml:space="preserve"><value>Progress Payment Posting</value></data>
+  <data name="Modules.Documents.Files.Title" xml:space="preserve"><value>Document Files</value></data>
+  <data name="Modules.Documents.Files.Hint" xml:space="preserve"><value>Upload new versions and download the version history of a document.</value></data>
+  <data name="Modules.Documents.Files.VersionHistory" xml:space="preserve"><value>Version History</value></data>
+  <data name="Modules.Documents.Files.SelectDocument" xml:space="preserve"><value>Select a document</value></data>
+  <data name="Modules.Documents.Files.Actions.Upload" xml:space="preserve"><value>Upload New Version</value></data>
+  <data name="Modules.Documents.Files.Actions.Download" xml:space="preserve"><value>Download</value></data>
+  <data name="Modules.Documents.Files.Messages.Uploaded" xml:space="preserve"><value>New version uploaded.</value></data>
+  <data name="Modules.Documents.Files.Messages.PickDocument" xml:space="preserve"><value>Please select a document first.</value></data>
+  <data name="Menus.Documents.Files" xml:space="preserve"><value>Document Files</value></data>
+  <data name="Modules.Finance.Processes.PaymentAllocation.Title" xml:space="preserve"><value>Payment Allocation</value></data>
+  <data name="Modules.Finance.Processes.PaymentAllocation.Hint" xml:space="preserve"><value>Allocate a payment across one or more payables in a single transaction.</value></data>
+  <data name="Modules.Finance.Processes.PaymentAllocation.Lines" xml:space="preserve"><value>Allocation Lines</value></data>
+  <data name="Modules.Finance.Processes.PaymentAllocation.Actions.Execute" xml:space="preserve"><value>Allocate</value></data>
+  <data name="Modules.Finance.Processes.PaymentAllocation.Messages.Completed" xml:space="preserve"><value>Payment allocated.</value></data>
+  <data name="Modules.Finance.Processes.PaymentAllocation.Messages.PickPayment" xml:space="preserve"><value>Select a payment and add at least one line.</value></data>
+  <data name="Menus.Finance.Processes.PaymentAllocation" xml:space="preserve"><value>Payment Allocation</value></data>
 </root>

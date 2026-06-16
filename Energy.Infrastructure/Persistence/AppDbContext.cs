@@ -235,7 +235,14 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+        // Legacy bağlam yalnızca kendi (Enterprise) yapılandırmalarını uygular.
+        // Yeni per-entity 'Modules' yapılandırmaları cutover'da kanonik bağlamda
+        // devreye girer; burada otomatik taranıp çift eşleştirme yapılması engellenir.
+        builder.ApplyConfigurationsFromAssembly(
+            typeof(AppDbContext).Assembly,
+            type => !(type.Namespace?.StartsWith(
+                "Energy.Infrastructure.Persistence.Configurations.Modules",
+                StringComparison.Ordinal) ?? false));
 
         CoreModuleConfiguration.Configure(builder);
         OrgPartnersProjectsConfiguration.Configure(builder);
