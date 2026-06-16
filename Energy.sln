@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energy.Migrations.SqlServer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energy.Migrator", "Energy.Migrator\Energy.Migrator.csproj", "{F05C400F-1D9C-4D8F-8950-3C3E28901ADD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energy.Tests", "Energy.Tests\Energy.Tests.csproj", "{3E003E65-1EFA-487F-BE5A-74779F0ECB1E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -169,6 +171,18 @@ Global
 		{F05C400F-1D9C-4D8F-8950-3C3E28901ADD}.Release|x64.Build.0 = Release|Any CPU
 		{F05C400F-1D9C-4D8F-8950-3C3E28901ADD}.Release|x86.ActiveCfg = Release|Any CPU
 		{F05C400F-1D9C-4D8F-8950-3C3E28901ADD}.Release|x86.Build.0 = Release|Any CPU
+		{3E003E65-1EFA-487F-BE5A-74779F0ECB1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E003E65-1EFA-487F-BE5A-74779F0ECB1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E003E65-1EFA-487F-BE5A-74779F0ECB1E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3E003E65-1EFA-487F-BE5A-74779F0ECB1E}.Debug|x64.Build.0 = Debug|Any CPU
+		{3E003E65-1EFA-487F-BE5A-74779F0ECB1E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3E003E65-1EFA-487F-BE5A-74779F0ECB1E}.Debug|x86.Build.0 = Debug|Any CPU
+		{3E003E65-1EFA-487F-BE5A-74779F0ECB1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E003E65-1EFA-487F-BE5A-74779F0ECB1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E003E65-1EFA-487F-BE5A-74779F0ECB1E}.Release|x64.ActiveCfg = Release|Any CPU
+		{3E003E65-1EFA-487F-BE5A-74779F0ECB1E}.Release|x64.Build.0 = Release|Any CPU
+		{3E003E65-1EFA-487F-BE5A-74779F0ECB1E}.Release|x86.ActiveCfg = Release|Any CPU
+		{3E003E65-1EFA-487F-BE5A-74779F0ECB1E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

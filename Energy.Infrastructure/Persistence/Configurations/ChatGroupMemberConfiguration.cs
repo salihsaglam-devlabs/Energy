@@ -1,4 +1,5 @@
 using Energy.Domain.Chat;
+using Energy.Domain.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -20,6 +21,8 @@ public sealed class ChatGroupMemberConfiguration : IEntityTypeConfiguration<Chat
         builder.HasIndex(m => new { m.UserId, m.Status });
 
         builder.HasOne<ChatGroup>().WithMany().HasForeignKey(m => m.GroupId).OnDelete(DeleteBehavior.Cascade);
+        // Üye kullanıcısı. Geçmiş üyelik kaydının bozulmaması için Restrict.
+        builder.HasOne<User>().WithMany().HasForeignKey(m => m.UserId).OnDelete(DeleteBehavior.Restrict);
 
         builder.HasQueryFilter(m => !m.IsDeleted);
     }

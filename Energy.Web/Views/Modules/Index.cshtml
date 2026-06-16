@@ -1,0 +1,30 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    var module = (string)ViewData["Module"]!;
+    var permModule = (string)ViewData["PermModule"]!;
+    var titleKey = (string)ViewData["TitleKey"]!;
+    ViewData["Title"] = T[titleKey].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div>
+            <h2>@T[titleKey]</h2>
+            <p>@module</p>
+        </div>
+    </header>
+
+    <div id="module-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/app/pages/modules.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.Modules.init(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(module)),
+                                         @Html.Raw(System.Text.Json.JsonSerializer.Serialize(permModule)));
+        });
+    </script>
+}
+

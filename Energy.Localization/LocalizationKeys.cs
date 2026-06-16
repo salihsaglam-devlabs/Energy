@@ -231,6 +231,8 @@ public static class LocalizationKeys
         public const string TotalPermissionsDescription = "Dashboard.TotalPermissionsDescription";
         public const string TotalMenus = "Dashboard.TotalMenus";
         public const string TotalMenusDescription = "Dashboard.TotalMenusDescription";
+        public const string BusinessOverview = "Dashboard.BusinessOverview";
+        public const string BusinessOverviewDescription = "Dashboard.BusinessOverviewDescription";
     }
 
     public static class Auth
@@ -311,6 +313,55 @@ public static class LocalizationKeys
         public const string Loading = "Grid.Loading";
         public const string Yes = "Grid.Yes";
         public const string No = "Grid.No";
+    }
+
+    /// <summary>İş kuralı (modül) satır eylem butonları için anahtarlar.</summary>
+    public static class ModuleActions
+    {
+        public const string Column = "ModuleActions.Column";
+        public const string Approve = "ModuleActions.Approve";
+        public const string Reject = "ModuleActions.Reject";
+        public const string Return = "ModuleActions.Return";
+        public const string Cancel = "ModuleActions.Cancel";
+        public const string Reverse = "ModuleActions.Reverse";
+        public const string Receive = "ModuleActions.Receive";
+        public const string Close = "ModuleActions.Close";
+        public const string Reopen = "ModuleActions.Reopen";
+        public const string Activate = "ModuleActions.Activate";
+        public const string Validate = "ModuleActions.Validate";
+        public const string ConfirmTitle = "ModuleActions.ConfirmTitle";
+        public const string ConfirmMessage = "ModuleActions.ConfirmMessage";
+        public const string NotePrompt = "ModuleActions.NotePrompt";
+        public const string Succeeded = "ModuleActions.Succeeded";
+        public const string ValidationOk = "ModuleActions.ValidationOk";
+        public const string ValidationIssues = "ModuleActions.ValidationIssues";
+    }
+
+    /// <summary>Ana-detay (master-detail) alt-koleksiyon sekme başlıkları için anahtarlar.</summary>
+    public static class ModuleDetails
+    {
+        public const string RequestLines = "ModuleDetails.RequestLines";
+        public const string PurchaseOrderLines = "ModuleDetails.PurchaseOrderLines";
+        public const string WorkOrderAssignments = "ModuleDetails.WorkOrderAssignments";
+        public const string WorkOrderMaterialPlans = "ModuleDetails.WorkOrderMaterialPlans";
+        public const string WorkOrderChecklists = "ModuleDetails.WorkOrderChecklists";
+        public const string WorkOrderStatusHistories = "ModuleDetails.WorkOrderStatusHistories";
+        public const string DailySiteReportWorkers = "ModuleDetails.DailySiteReportWorkers";
+        public const string DailySiteReportEquipments = "ModuleDetails.DailySiteReportEquipments";
+        public const string DailySiteReportMaterials = "ModuleDetails.DailySiteReportMaterials";
+        public const string TimesheetLines = "ModuleDetails.TimesheetLines";
+        public const string EquipmentAssignments = "ModuleDetails.EquipmentAssignments";
+        public const string EquipmentMaintenances = "ModuleDetails.EquipmentMaintenances";
+        public const string FinancialTransactionLines = "ModuleDetails.FinancialTransactionLines";
+        public const string BudgetLines = "ModuleDetails.BudgetLines";
+        public const string ContractLines = "ModuleDetails.ContractLines";
+        public const string ContractParties = "ModuleDetails.ContractParties";
+        public const string ContractAmendments = "ModuleDetails.ContractAmendments";
+        public const string ProgressPaymentLines = "ModuleDetails.ProgressPaymentLines";
+        public const string ProgressPaymentDeductions = "ModuleDetails.ProgressPaymentDeductions";
+        public const string MaterialAttributeValues = "ModuleDetails.MaterialAttributeValues";
+        public const string MaterialUnitConversions = "ModuleDetails.MaterialUnitConversions";
+        public const string WarehouseLocations = "ModuleDetails.WarehouseLocations";
     }
 
     public static class Notifications

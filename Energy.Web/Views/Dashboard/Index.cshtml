@@ -83,5 +83,38 @@
             }
         </aside>
     </div>
+
+    @if (Model.EnterpriseMetrics.Count > 0)
+    {
+        <section class="energy-dashboard__panel energy-dashboard__panel--business">
+            <div class="energy-dashboard__panel-heading">
+                <span class="energy-dashboard__eyebrow">@T[LocalizationKeys.Dashboard.BusinessOverview]</span>
+                <h3>@T[LocalizationKeys.Dashboard.BusinessOverview]</h3>
+                <p>@T[LocalizationKeys.Dashboard.BusinessOverviewDescription]</p>
+            </div>
+
+            <div class="energy-dashboard__metrics">
+                @foreach (var metric in Model.EnterpriseMetrics)
+                {
+                    if (!string.IsNullOrEmpty(metric.Url))
+                    {
+                        <a class="energy-dashboard__metric energy-dashboard__metric--link" href="@metric.Url">
+                            <span class="energy-dashboard__metric-label">@T[metric.NameKey]</span>
+                            <strong class="energy-dashboard__metric-value">@metric.Value</strong>
+                            <p class="energy-dashboard__metric-description">@T[metric.DescriptionKey]</p>
+                        </a>
+                    }
+                    else
+                    {
+                        <article class="energy-dashboard__metric">
+                            <span class="energy-dashboard__metric-label">@T[metric.NameKey]</span>
+                            <strong class="energy-dashboard__metric-value">@metric.Value</strong>
+                            <p class="energy-dashboard__metric-description">@T[metric.DescriptionKey]</p>
+                        </article>
+                    }
+                }
+            </div>
+        </section>
+    }
 </section>
 

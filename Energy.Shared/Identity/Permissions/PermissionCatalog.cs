@@ -103,35 +103,100 @@ public static class PermissionCatalog
     /// <summary>Self servis: kullanıcı kendi tercihlerini güncelleyebilir. Varsayılan verilir.</summary>
     public const string UserSettingsUpdate = "UserSettings.Update";
 
-    /// <summary>Tanımlanmış her yetki kodunun düz listesi.</summary>
-    public static IReadOnlyList<PermissionDescriptor> All { get; } =
+    /// <summary>
+    /// CRUD yetkisi (Read/ReadAll/Create/Update/Delete) üretilen kurumsal iş modülleri.
+    /// Tasarım dokümanındaki 22 modülün iş modüllerini kapsar.
+    /// </summary>
+    public static IReadOnlyList<string> CrudModules { get; } =
     [
-        Describe(DashboardRead),
-
-        Describe(UserRead), Describe(UserReadAll), Describe(UserCreate), Describe(UserUpdate), Describe(UserDelete),
-
-        Describe(RoleRead), Describe(RoleReadAll), Describe(RoleCreate), Describe(RoleUpdate), Describe(RoleDelete),
-
-        Describe(PermissionRead), Describe(PermissionReadAll),
-
-        Describe(MenuRead), Describe(MenuReadAll), Describe(MenuCreate), Describe(MenuUpdate), Describe(MenuDelete),
-
-        Describe(ApiAccessRead), Describe(ApiAccessReadAll), Describe(ApiAccessCreate), Describe(ApiAccessUpdate), Describe(ApiAccessDelete),
-
-        Describe(LocalizationRead), Describe(LocalizationReadAll), Describe(LocalizationCreate), Describe(LocalizationUpdate), Describe(LocalizationDelete),
-
-        Describe(LogRead), Describe(LogReadAll),
-
-        Describe(SettingRead), Describe(SettingUpdate),
-
-        Describe(SystemSeed),
-
-        Describe(ProfileRead), Describe(ProfileUpdate),
-
-        Describe(ChatUse),
-
-        Describe(UserSettingsRead), Describe(UserSettingsUpdate),
+        "Core",
+        "Organization",
+        "BusinessPartners",
+        "Projects",
+        "Catalog",
+        "Inventory",
+        "Requests",
+        "Procurement",
+        "Operations",
+        "FieldOperations",
+        "HR",
+        "Assets",
+        "Finance",
+        "Budget",
+        "Contracts",
+        "ProgressPayments",
+        "Documents",
+        "Workflow",
+        "Notifications",
+        "Reporting",
     ];
+
+    /// <summary>Modül CRUD dışındaki özel iş yetkileri.</summary>
+    public static IReadOnlyList<string> SpecialPermissions { get; } =
+    [
+        "Default.Read", "Default.ReadAll", "Default.Create", "Default.Update", "Default.Delete",
+        "Inventory.Approve", "Inventory.Transfer", "Inventory.Count", "Inventory.Reverse",
+        "Procurement.Approve",
+        "Workflow.Approve", "Workflow.Reject", "Workflow.Return",
+        "Documents.Upload", "Documents.Download", "Documents.Version",
+        "Reporting.Export",
+        "Chat.GroupManage", "Chat.GroupDelete", "Chat.MemberAdd", "Chat.MemberRemove", "Chat.AdminAssign",
+    ];
+
+    /// <summary>Tanımlanmış her yetki kodunun düz listesi.</summary>
+    public static IReadOnlyList<PermissionDescriptor> All { get; } = BuildAll();
+
+    private static IReadOnlyList<PermissionDescriptor> BuildAll()
+    {
+        var list = new List<PermissionDescriptor>
+        {
+            Describe(DashboardRead),
+
+            Describe(UserRead), Describe(UserReadAll), Describe(UserCreate), Describe(UserUpdate), Describe(UserDelete),
+
+            Describe(RoleRead), Describe(RoleReadAll), Describe(RoleCreate), Describe(RoleUpdate), Describe(RoleDelete),
+
+            Describe(PermissionRead), Describe(PermissionReadAll),
+
+            Describe(MenuRead), Describe(MenuReadAll), Describe(MenuCreate), Describe(MenuUpdate), Describe(MenuDelete),
+
+            Describe(ApiAccessRead), Describe(ApiAccessReadAll), Describe(ApiAccessCreate), Describe(ApiAccessUpdate), Describe(ApiAccessDelete),
+
+            Describe(LocalizationRead), Describe(LocalizationReadAll), Describe(LocalizationCreate), Describe(LocalizationUpdate), Describe(LocalizationDelete),
+
+            Describe(LogRead), Describe(LogReadAll),
+
+            Describe(SettingRead), Describe(SettingUpdate),
+
+            Describe(SystemSeed),
+
+            Describe(ProfileRead), Describe(ProfileUpdate),
+
+            Describe(ChatUse),
+
+            Describe(UserSettingsRead), Describe(UserSettingsUpdate),
+        };
+
+        foreach (var module in CrudModules)
+        {
+            list.Add(Describe($"{module}.{PermissionActions.Read}"));
+            list.Add(Describe($"{module}.{PermissionActions.ReadAll}"));
+            list.Add(Describe($"{module}.{PermissionActions.Create}"));
+            list.Add(Describe($"{module}.{PermissionActions.Update}"));
+            list.Add(Describe($"{module}.{PermissionActions.Delete}"));
+        }
+
+        foreach (var code in SpecialPermissions)
+        {
+            list.Add(Describe(code));
+        }
+
+        // Aynı kod birden çok kez gelirse (örn. Inventory CRUD + özel) tekilleştir.
+        return list
+            .GroupBy(item => item.Code, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.First())
+            .ToList();
+    }
 
     /// <summary>Üyelik kontrolleri için pratik küme (O(1)).</summary>
     public static IReadOnlySet<string> AllCodes { get; } =

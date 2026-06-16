@@ -61,6 +61,7 @@ internal static class ApiRoutes
     public static class Home
     {
         public static readonly string Dashboard = $"{V1}/home/dashboard";
+        public static readonly string EnterpriseMetrics = $"{V1}/home/enterprise-metrics";
     }
 
     public static class Settings

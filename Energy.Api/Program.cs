@@ -201,6 +201,11 @@ builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
+    // Birden fazla controller aynı isimde iç içe tip (ör. NoteBody) tanımlayabildiğinden,
+    // şema kimliğini yalnızca tip adı yerine benzersiz tam adla üretiriz; aksi halde
+    // Swashbuckle "aynı schemaId zaten kullanılıyor" hatasıyla başarısız olur.
+    options.CustomSchemaIds(type => (type.FullName ?? type.Name).Replace("+", ".").Replace("`", "_"));
+
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Type = SecuritySchemeType.Http,

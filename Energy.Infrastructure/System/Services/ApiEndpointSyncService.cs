@@ -23,14 +23,18 @@ public sealed class ApiEndpointSyncService
     /// düzenlenmiş kural haritası. Değer, gereken yetki kodudur; <c>null</c> ise
     /// rotayı herkese açık olarak işaretler (etkin, yetki gerekmez — ör. login, "menüm").
     /// </summary>
-    private static readonly IReadOnlyDictionary<string, string?> DefaultEndpointPermissionMap =
-        new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
+    private static readonly IReadOnlyDictionary<string, string?> DefaultEndpointPermissionMap = BuildDefaultMap();
+
+    private static IReadOnlyDictionary<string, string?> BuildDefaultMap()
+    {
+        var map = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
         {
             // Auth — login anonimdir; satır yönetici arayüzünde görünürlük için vardır.
             ["Auth.Login"] = null,
 
             // Ana sayfa / Gösterge panosu
             ["Home.GetDashboard"] = PermissionCatalog.DashboardRead,
+            ["Home.EnterpriseMetrics"] = PermissionCatalog.DashboardRead,
 
             // Kullanıcılar
             ["Users.GetAll"]         = PermissionCatalog.UserReadAll,
@@ -124,6 +128,119 @@ public sealed class ApiEndpointSyncService
             ["Settings.GetMine"]    = PermissionCatalog.UserSettingsRead,
             ["Settings.UpdateMine"] = PermissionCatalog.UserSettingsRead,
         };
+
+        // Kurumsal modül CRUD denetleyicileri: "<Module>.<Action>" kuralını standart
+        // CRUD permission'larına eşle; böylece 20 iş modülü kutudan çıktığı gibi korunur.
+        foreach (var module in PermissionCatalog.CrudModules)
+        {
+            map[$"{module}.GetAll"] = $"{module}.{PermissionActions.ReadAll}";
+            map[$"{module}.GetById"] = $"{module}.{PermissionActions.Read}";
+            map[$"{module}.Create"] = $"{module}.{PermissionActions.Create}";
+            map[$"{module}.Update"] = $"{module}.{PermissionActions.Update}";
+            map[$"{module}.Delete"] = $"{module}.{PermissionActions.Delete}";
+        }
+
+        // Ana-detay (master-detail) alt-koleksiyon uç noktaları. Her alt-koleksiyon,
+        // ana modülünün ReadAll yetkisiyle korunur (ModuleDetails.<Action> kuralı).
+        var readAll = PermissionActions.ReadAll;
+        map["ModuleDetails.RequestLines"]               = $"Requests.{readAll}";
+        map["ModuleDetails.PurchaseOrderLines"]         = $"Procurement.{readAll}";
+        map["ModuleDetails.WorkOrderAssignments"]       = $"Operations.{readAll}";
+        map["ModuleDetails.WorkOrderMaterialPlans"]     = $"Operations.{readAll}";
+        map["ModuleDetails.WorkOrderChecklists"]        = $"Operations.{readAll}";
+        map["ModuleDetails.WorkOrderStatusHistories"]   = $"Operations.{readAll}";
+        map["ModuleDetails.DailySiteReportWorkers"]     = $"FieldOperations.{readAll}";
+        map["ModuleDetails.DailySiteReportEquipments"]  = $"FieldOperations.{readAll}";
+        map["ModuleDetails.DailySiteReportMaterials"]   = $"FieldOperations.{readAll}";
+        map["ModuleDetails.TimesheetLines"]             = $"HR.{readAll}";
+        map["ModuleDetails.EquipmentAssignments"]       = $"Assets.{readAll}";
+        map["ModuleDetails.EquipmentMaintenances"]      = $"Assets.{readAll}";
+        map["ModuleDetails.FinancialTransactionLines"]  = $"Finance.{readAll}";
+        map["ModuleDetails.BudgetLines"]                = $"Budget.{readAll}";
+        map["ModuleDetails.ContractLines"]              = $"Contracts.{readAll}";
+        map["ModuleDetails.ContractParties"]            = $"Contracts.{readAll}";
+        map["ModuleDetails.ContractAmendments"]         = $"Contracts.{readAll}";
+        map["ModuleDetails.ProgressPaymentLines"]       = $"ProgressPayments.{readAll}";
+        map["ModuleDetails.ProgressPaymentDeductions"]  = $"ProgressPayments.{readAll}";
+        map["ModuleDetails.MaterialAttributeValues"]    = $"Catalog.{readAll}";
+        map["ModuleDetails.MaterialUnitConversions"]    = $"Catalog.{readAll}";
+        map["ModuleDetails.WarehouseLocations"]         = $"Inventory.{readAll}";
+
+        // Alt-koleksiyon yazma (CRUD) uç noktaları: her satır koleksiyonu kendi ana modülünün
+        // Create/Update/Delete yetkisiyle korunur (ModuleDetails.<Create|Update|Delete><Suffix>).
+        // Denetim/iz niteliğindeki koleksiyonlar (ör. iş emri durum geçmişi) yazma sunmaz.
+        var create = PermissionActions.Create;
+        var update = PermissionActions.Update;
+        var delete = PermissionActions.Delete;
+        var detailWrites = new (string Suffix, string Module)[]
+        {
+            ("RequestLine", "Requests"),
+            ("PurchaseOrderLine", "Procurement"),
+            ("WorkOrderAssignment", "Operations"),
+            ("WorkOrderMaterialPlan", "Operations"),
+            ("WorkOrderChecklist", "Operations"),
+            ("DailySiteReportWorker", "FieldOperations"),
+            ("DailySiteReportEquipment", "FieldOperations"),
+            ("DailySiteReportMaterial", "FieldOperations"),
+            ("TimesheetLine", "HR"),
+            ("EquipmentAssignment", "Assets"),
+            ("EquipmentMaintenance", "Assets"),
+            ("FinancialTransactionLine", "Finance"),
+            ("BudgetLine", "Budget"),
+            ("ContractLine", "Contracts"),
+            ("ContractParty", "Contracts"),
+            ("ContractAmendment", "Contracts"),
+            ("ProgressPaymentLine", "ProgressPayments"),
+            ("ProgressPaymentDeduction", "ProgressPayments"),
+            ("MaterialAttributeValue", "Catalog"),
+            ("MaterialUnitConversion", "Catalog"),
+            ("WarehouseLocation", "Inventory"),
+        };
+        foreach (var (suffix, module) in detailWrites)
+        {
+            map[$"ModuleDetails.Create{suffix}"] = $"{module}.{create}";
+            map[$"ModuleDetails.Update{suffix}"] = $"{module}.{update}";
+            map[$"ModuleDetails.Delete{suffix}"] = $"{module}.{delete}";
+        }
+
+        // Workflow (onay) motoru eylemleri.
+        map["WorkflowActions.Start"] = "Workflow.Create";
+        map["WorkflowActions.Approve"] = "Workflow.Approve";
+        map["WorkflowActions.Reject"] = "Workflow.Reject";
+        map["WorkflowActions.Return"] = "Workflow.Return";
+        map["WorkflowActions.Cancel"] = "Workflow.Update";
+        map["WorkflowActions.MyPending"] = "Workflow.Read";
+
+        // Inventory iş kuralı eylemleri.
+        map["InventoryActions.StockIn"] = "Inventory.Approve";
+        map["InventoryActions.StockOut"] = "Inventory.Approve";
+        map["InventoryActions.Transfer"] = "Inventory.Transfer";
+        map["InventoryActions.Count"] = "Inventory.Count";
+        map["InventoryActions.Rebuild"] = "Inventory.Reverse";
+        map["InventoryActions.Reverse"] = "Inventory.Reverse";
+
+        // Operations iş kuralı eylemleri.
+        map["OperationsActions.Close"] = "Operations.Update";
+        map["OperationsActions.Reopen"] = "Operations.Update";
+        map["OperationsActions.ChangeStatus"] = "Operations.Update";
+
+        // Catalog iş kuralı eylemleri.
+        map["CatalogActions.Validate"] = "Catalog.Read";
+        map["CatalogActions.Activate"] = "Catalog.Update";
+        map["CatalogActions.ChangeBaseUnit"] = "Catalog.Update";
+
+        // Procurement iş kuralı eylemleri.
+        map["ProcurementActions.Receive"] = "Procurement.Approve";
+
+        // Finance iş kuralı eylemleri.
+        map["FinanceActions.AllocatePayment"] = "Finance.Update";
+        map["FinanceActions.AllocateCollection"] = "Finance.Update";
+        map["FinanceActions.TimesheetCost"] = "Finance.Create";
+        map["FinanceActions.ProgressPayment"] = "Finance.Create";
+        map["FinanceActions.BudgetOverrun"] = "Budget.Read";
+
+        return map;
+    }
 
     /// <summary>
     /// Varsayılan haritada kullanılan tüm (null olmayan) yetki kodlarının kümesi.
