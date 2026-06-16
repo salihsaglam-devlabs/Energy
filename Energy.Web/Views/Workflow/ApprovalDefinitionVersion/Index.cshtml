@@ -1,18 +1,18 @@
 @using Energy.Localization
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
-    ViewData["Title"] = T["Modules.Workflow.ApprovalDefinitionVersion.Title"].Value;
+    ViewData["Title"] = T["Workflow.ApprovalDefinitionVersion.Title"].Value;
 }
 
 <section class="energy-screen">
     <header class="energy-screen__header">
-        <div><h2>@T["Modules.Workflow.ApprovalDefinitionVersion.Title"]</h2></div>
+        <div><h2>@T["Workflow.ApprovalDefinitionVersion.Title"]</h2></div>
     </header>
     <div id="approval-definition-version-grid"></div>
 </section>
 
 @section Scripts {
-    <script src="~/js/modules/workflow/approval-definition-version/approval-definition-version.index.js" asp-append-version="true"></script>
+    <script src="~/js/workflow/approval-definition-version/approval-definition-version.index.js" asp-append-version="true"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.WorkflowApprovalDefinitionVersion.init("/workflow/approval-definition-versions", "approval-definition-version-grid", "Workflow");

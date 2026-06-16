@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Procurement.Reports.PurchaseOrderSummary.Requests;
 using Energy.Shared.Models.V1.Procurement.Reports.PurchaseOrderSummary.Responses;
-using Energy.Application.Modules.Procurement.Reports.PurchaseOrderSummary.Queries.GetPurchaseOrderSummaryData;
+using Energy.Application.Procurement.Reports.PurchaseOrderSummary.Queries.GetPurchaseOrderSummaryData;
 using Energy.Api.Common.Export;
 
 namespace Energy.Api.Controllers.Procurement.Reports;

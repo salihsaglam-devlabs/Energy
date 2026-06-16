@@ -1,18 +1,18 @@
 @using Energy.Localization
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
-    ViewData["Title"] = T["Modules.Workflow.ApprovalDelegation.Title"].Value;
+    ViewData["Title"] = T["Workflow.ApprovalDelegation.Title"].Value;
 }
 
 <section class="energy-screen">
     <header class="energy-screen__header">
-        <div><h2>@T["Modules.Workflow.ApprovalDelegation.Title"]</h2></div>
+        <div><h2>@T["Workflow.ApprovalDelegation.Title"]</h2></div>
     </header>
     <div id="approval-delegation-grid"></div>
 </section>
 
 @section Scripts {
-    <script src="~/js/modules/workflow/approval-delegation/approval-delegation.index.js" asp-append-version="true"></script>
+    <script src="~/js/workflow/approval-delegation/approval-delegation.index.js" asp-append-version="true"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.WorkflowApprovalDelegation.init("/workflow/approval-delegations", "approval-delegation-grid", "Workflow");

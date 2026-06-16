@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Settings.Requests;
 using Energy.Shared.Models.V1.Settings.Responses;
-using Energy.Application.Modules.Core.UserSettings.Commands.UpdateMySettings;
-using Energy.Application.Modules.Core.UserSettings.Queries.GetMySettings;
+using Energy.Application.Core.UserSettings.Commands.UpdateMySettings;
+using Energy.Application.Core.UserSettings.Queries.GetMySettings;
 
 namespace Energy.Api.Controllers.Core;
 

@@ -1,29 +1,29 @@
 @using Energy.Localization
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
-    ViewData["Title"] = T["Modules.Finance.Processes.ProgressPaymentPosting.Title"].Value;
+    ViewData["Title"] = T["Finance.Processes.ProgressPaymentPosting.Title"].Value;
 }
 
-<link rel="stylesheet" href="~/css/modules/finance/processes/progress-payment-posting/progress-payment-posting.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/finance/processes/progress-payment-posting/progress-payment-posting.css" asp-append-version="true" />
 
 <section class="energy-screen energy-process">
     <header class="energy-screen__header">
-        <div><h2>@T["Modules.Finance.Processes.ProgressPaymentPosting.Title"]</h2></div>
+        <div><h2>@T["Finance.Processes.ProgressPaymentPosting.Title"]</h2></div>
     </header>
-    <p class="energy-process__hint">@T["Modules.Finance.Processes.ProgressPaymentPosting.Hint"]</p>
+    <p class="energy-process__hint">@T["Finance.Processes.ProgressPaymentPosting.Hint"]</p>
     <div id="ppp-form" class="energy-process__form"></div>
     <div id="ppp-result" class="energy-process__result"></div>
 </section>
 
 @section Scripts {
-    <script src="~/js/modules/finance/processes/progress-payment-posting/progress-payment-posting.index.js" asp-append-version="true"></script>
+    <script src="~/js/finance/processes/progress-payment-posting/progress-payment-posting.index.js" asp-append-version="true"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             window.AppProcesses.FinanceProgressPaymentPosting.init("/finance/processes/progress-payment-posting", {
                 formId: "ppp-form",
                 resultId: "ppp-result",
-                submit: "@T["Modules.Finance.Processes.ProgressPaymentPosting.Actions.Execute"]",
-                success: "@T["Modules.Finance.Processes.ProgressPaymentPosting.Messages.Completed"]"
+                submit: "@T["Finance.Processes.ProgressPaymentPosting.Actions.Execute"]",
+                success: "@T["Finance.Processes.ProgressPaymentPosting.Messages.Completed"]"
             });
         });
     </script>

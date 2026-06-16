@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Finance.Processes.ProgressPaymentPosting.Requests;
 using Energy.Shared.Models.V1.Finance.Processes.ProgressPaymentPosting.Responses;
-using Energy.Application.Modules.Finance.Processes.ProgressPaymentPosting.Commands.ExecuteProgressPaymentPosting;
+using Energy.Application.Finance.Processes.ProgressPaymentPosting.Commands.ExecuteProgressPaymentPosting;
 
 namespace Energy.Api.Controllers.Finance.Processes;
 

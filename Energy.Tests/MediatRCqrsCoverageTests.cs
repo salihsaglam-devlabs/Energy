@@ -108,12 +108,12 @@ public sealed class MediatRCqrsCoverageTests
     }
 
     [Theory]
-    [InlineData("Energy.Application.Modules.Procurement.PurchaseOrder.Commands.CreatePurchaseOrder.CreatePurchaseOrderCommand")]
-    [InlineData("Energy.Application.Modules.Procurement.PurchaseOrder.Commands.UpdatePurchaseOrder.UpdatePurchaseOrderCommand")]
-    [InlineData("Energy.Application.Modules.Procurement.PurchaseOrder.Commands.DeletePurchaseOrder.DeletePurchaseOrderCommand")]
-    [InlineData("Energy.Application.Modules.Procurement.PurchaseOrder.Queries.GetPurchaseOrderById.GetPurchaseOrderByIdQuery")]
-    [InlineData("Energy.Application.Modules.Procurement.PurchaseOrder.Queries.GetPurchaseOrderList.GetPurchaseOrderListQuery")]
-    [InlineData("Energy.Application.Modules.Procurement.PurchaseOrder.Queries.GetPurchaseOrderLookup.GetPurchaseOrderLookupQuery")]
+    [InlineData("Energy.Application.Procurement.PurchaseOrder.Commands.CreatePurchaseOrder.CreatePurchaseOrderCommand")]
+    [InlineData("Energy.Application.Procurement.PurchaseOrder.Commands.UpdatePurchaseOrder.UpdatePurchaseOrderCommand")]
+    [InlineData("Energy.Application.Procurement.PurchaseOrder.Commands.DeletePurchaseOrder.DeletePurchaseOrderCommand")]
+    [InlineData("Energy.Application.Procurement.PurchaseOrder.Queries.GetPurchaseOrderById.GetPurchaseOrderByIdQuery")]
+    [InlineData("Energy.Application.Procurement.PurchaseOrder.Queries.GetPurchaseOrderList.GetPurchaseOrderListQuery")]
+    [InlineData("Energy.Application.Procurement.PurchaseOrder.Queries.GetPurchaseOrderLookup.GetPurchaseOrderLookupQuery")]
     public void Reference_PurchaseOrder_Vertical_Slice_Is_Defined(string requestTypeName)
     {
         var requestType = ApplicationAssembly.GetType(requestTypeName);

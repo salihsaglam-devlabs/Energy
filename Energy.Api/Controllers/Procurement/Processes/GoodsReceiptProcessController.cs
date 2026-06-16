@@ -3,7 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Procurement.Processes.GoodsReceipt.Requests;
-using Energy.Application.Modules.Procurement.Processes.GoodsReceipt.Commands.ExecuteGoodsReceipt;
+using Energy.Application.Procurement.Processes.GoodsReceipt.Commands.ExecuteGoodsReceipt;
 
 namespace Energy.Api.Controllers.Procurement.Processes;
 

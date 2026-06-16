@@ -1,5 +1,5 @@
 using Energy.Application.Common.Messaging.Behaviors;
-using Energy.Application.Modules;
+using Energy.Application;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +18,7 @@ public static class DependencyInjection
         // MediatR: Energy.Application assembly'sindeki tüm Command/Query handler'ları taranır.
         services.AddMediatR(cfg =>
         {
-            cfg.RegisterServicesFromAssemblyContaining<ModulesValidatorMarker>();
+            cfg.RegisterServicesFromAssemblyContaining<ApplicationAssemblyMarker>();
 
             // Pipeline behavior'ları (sıra önemlidir): önce logging, sonra validation.
             cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
@@ -26,7 +26,7 @@ public static class DependencyInjection
         });
 
         // FluentValidation: request-model ve Command/Query validator'ları.
-        services.AddValidatorsFromAssemblyContaining<ModulesValidatorMarker>(ServiceLifetime.Scoped);
+        services.AddValidatorsFromAssemblyContaining<ApplicationAssemblyMarker>(ServiceLifetime.Scoped);
         return services;
     }
 }

@@ -1,8 +1,8 @@
 using Energy.Shared.Common;
 using Energy.Application.Workflow.Services;
 using Energy.Domain.Common;
-using Energy.Domain.Modules.IAM;
-using Energy.Domain.Modules.Workflow;
+using Energy.Domain.IAM;
+using Energy.Domain.Workflow;
 using Energy.Infrastructure.Persistence;
 using Energy.Infrastructure.Workflow.Services;
 using Microsoft.Data.Sqlite;

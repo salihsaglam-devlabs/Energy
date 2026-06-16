@@ -5,11 +5,11 @@ using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Common.Requests;
 using Energy.Shared.Models.V1.System.Requests;
 using Energy.Shared.Models.V1.System.Responses;
-using Energy.Application.Modules.IAM.ApiEndpoint.Commands.CreateApiEndpoint;
-using Energy.Application.Modules.IAM.ApiEndpoint.Commands.DeleteApiEndpoint;
-using Energy.Application.Modules.IAM.ApiEndpoint.Commands.UpdateApiEndpoint;
-using Energy.Application.Modules.IAM.ApiEndpoint.Queries.GetApiEndpointById;
-using Energy.Application.Modules.IAM.ApiEndpoint.Queries.GetApiEndpointList;
+using Energy.Application.IAM.ApiEndpoint.Commands.CreateApiEndpoint;
+using Energy.Application.IAM.ApiEndpoint.Commands.DeleteApiEndpoint;
+using Energy.Application.IAM.ApiEndpoint.Commands.UpdateApiEndpoint;
+using Energy.Application.IAM.ApiEndpoint.Queries.GetApiEndpointById;
+using Energy.Application.IAM.ApiEndpoint.Queries.GetApiEndpointList;
 
 namespace Energy.Api.Controllers.IAM;
 

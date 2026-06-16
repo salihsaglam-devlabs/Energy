@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Inventory.Processes.StockTransfer.Requests;
 using Energy.Shared.Models.V1.Inventory.Processes.StockTransfer.Responses;
-using Energy.Application.Modules.Inventory.Processes.StockTransfer.Commands.ExecuteStockTransfer;
+using Energy.Application.Inventory.Processes.StockTransfer.Commands.ExecuteStockTransfer;
 
 namespace Energy.Api.Controllers.Inventory.Processes;
 

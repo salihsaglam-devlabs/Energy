@@ -5,12 +5,12 @@ using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Common.Requests;
 using Energy.Shared.Models.V1.System.Requests;
 using Energy.Shared.Models.V1.System.Responses;
-using Energy.Application.Modules.IAM.Menu.Commands.CreateMenu;
-using Energy.Application.Modules.IAM.Menu.Commands.DeleteMenu;
-using Energy.Application.Modules.IAM.Menu.Commands.UpdateMenu;
-using Energy.Application.Modules.IAM.Menu.Queries.GetMenuById;
-using Energy.Application.Modules.IAM.Menu.Queries.GetMenuList;
-using Energy.Application.Modules.IAM.Menu.Queries.GetMyMenu;
+using Energy.Application.IAM.Menu.Commands.CreateMenu;
+using Energy.Application.IAM.Menu.Commands.DeleteMenu;
+using Energy.Application.IAM.Menu.Commands.UpdateMenu;
+using Energy.Application.IAM.Menu.Queries.GetMenuById;
+using Energy.Application.IAM.Menu.Queries.GetMenuList;
+using Energy.Application.IAM.Menu.Queries.GetMyMenu;
 
 namespace Energy.Api.Controllers.IAM;
 

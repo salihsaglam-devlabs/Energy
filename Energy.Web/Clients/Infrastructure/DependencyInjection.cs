@@ -38,11 +38,11 @@ public static class DependencyInjection
         AddAuthenticated<IChatApiClient, ChatApiClient>(services);
         AddAuthenticated<ISettingsApiClient, SettingsApiClient>(services);
 
-        // Tüm per-entity Modules API istemcileri (IAM/Chat hariç).
-        services.AddModulesApiClients();
+        // Tüm per-entity API istemcileri (IAM/Chat hariç).
+        services.AddEntityApiClients();
 
         // ER Overview rapor API istemcileri.
-        services.AddModulesReportApiClients();
+        services.AddReportApiClients();
 
         // Süreç ekranı API istemcileri (standart süreç rotaları).
         AddAuthenticated<Energy.Web.Clients.Workflow.Processes.Approval.IApprovalProcessApiClient,

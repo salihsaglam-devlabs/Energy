@@ -5,17 +5,17 @@ using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Common.Requests;
 using Energy.Shared.Models.V1.Identity.Requests;
 using Energy.Shared.Models.V1.Identity.Responses;
-using Energy.Application.Modules.IAM.User.Commands.ChangeUserPassword;
-using Energy.Application.Modules.IAM.User.Commands.CreateUser;
-using Energy.Application.Modules.IAM.User.Commands.DeleteUser;
-using Energy.Application.Modules.IAM.User.Commands.RemoveUserProfileImage;
-using Energy.Application.Modules.IAM.User.Commands.SetUserAccess;
-using Energy.Application.Modules.IAM.User.Commands.SetUserProfileImage;
-using Energy.Application.Modules.IAM.User.Commands.UpdateUser;
-using Energy.Application.Modules.IAM.User.Queries.GetUserAccess;
-using Energy.Application.Modules.IAM.User.Queries.GetUserById;
-using Energy.Application.Modules.IAM.User.Queries.GetUserList;
-using Energy.Application.Modules.IAM.User.Queries.GetUserProfileImage;
+using Energy.Application.IAM.User.Commands.ChangeUserPassword;
+using Energy.Application.IAM.User.Commands.CreateUser;
+using Energy.Application.IAM.User.Commands.DeleteUser;
+using Energy.Application.IAM.User.Commands.RemoveUserProfileImage;
+using Energy.Application.IAM.User.Commands.SetUserAccess;
+using Energy.Application.IAM.User.Commands.SetUserProfileImage;
+using Energy.Application.IAM.User.Commands.UpdateUser;
+using Energy.Application.IAM.User.Queries.GetUserAccess;
+using Energy.Application.IAM.User.Queries.GetUserById;
+using Energy.Application.IAM.User.Queries.GetUserList;
+using Energy.Application.IAM.User.Queries.GetUserProfileImage;
 
 namespace Energy.Api.Controllers.IAM;
 

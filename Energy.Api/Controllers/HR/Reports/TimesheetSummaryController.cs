@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.HR.Reports.TimesheetSummary.Requests;
 using Energy.Shared.Models.V1.HR.Reports.TimesheetSummary.Responses;
-using Energy.Application.Modules.HR.Reports.TimesheetSummary.Queries.GetTimesheetSummaryData;
+using Energy.Application.HR.Reports.TimesheetSummary.Queries.GetTimesheetSummaryData;
 using Energy.Api.Common.Export;
 
 namespace Energy.Api.Controllers.HR.Reports;

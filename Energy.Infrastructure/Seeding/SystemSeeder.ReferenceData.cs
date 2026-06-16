@@ -1,10 +1,11 @@
+using BudgetEntity = Energy.Domain.Budget.Budget;
 using Energy.Shared.Common;
 using System.Text.RegularExpressions;
 using Energy.Domain.Common;
-using Energy.Domain.Modules.Core;
-using Energy.Domain.Modules.IAM;
-using Energy.Domain.Modules.Reporting;
-using Energy.Domain.Modules.Workflow;
+using Energy.Domain.Core;
+using Energy.Domain.IAM;
+using Energy.Domain.Reporting;
+using Energy.Domain.Workflow;
 using Energy.Shared.Identity;
 using Energy.Shared.Identity.Permissions;
 using Microsoft.EntityFrameworkCore;
@@ -66,7 +67,7 @@ public sealed partial class SystemSeeder
             ["Procurement", "Requests"],
             ["Procurement.Approve", "Inventory.Read", "Catalog.Read", "Workflow.Approve", "Workflow.Reject"]),
         ("FinanceManager",
-            ["Finance", "Budget", "Contracts", "ProgressPayments"],
+            ["Finance", "BudgetEntity", "Contracts", "ProgressPayments"],
             ["Workflow.Approve", "Workflow.Reject", "Reporting.Export", "Reporting.Read"]),
         ("HRManager",
             ["HR", "Organization"],
@@ -90,13 +91,13 @@ public sealed partial class SystemSeeder
         await EnsureModuleMenusAsync(ct);
 
         _logger.LogInformation("Seeding: per-entity module menus");
-        await EnsureModulesEntityMenusAsync(ct);
+        await EnsureEntityMenusAsync(ct);
 
         _logger.LogInformation("Seeding: per-report module menus");
-        await EnsureModulesReportMenusAsync(ct);
+        await EnsureReportMenusAsync(ct);
 
         _logger.LogInformation("Seeding: per-process module menus");
-        await EnsureModulesProcessMenusAsync(ct);
+        await EnsureProcessMenusAsync(ct);
 
         _logger.LogInformation("Seeding: dashboard widgets");
         await EnsureDashboardWidgetsAsync(ct);
@@ -337,7 +338,7 @@ public sealed partial class SystemSeeder
 
         var finance = await EnsureMenuAsync("Menus.FinanceArea", null, null, "money", 40, null, ct);
         await EnsureMenuAsync("Menus.Finance", finance.Id, null, "money", 41, "Finance.ReadAll", ct);
-        await EnsureMenuAsync("Menus.Budget", finance.Id, null, "chart", 42, "Budget.ReadAll", ct);
+        await EnsureMenuAsync("Menus.Budget", finance.Id, null, "chart", 42, "BudgetEntity.ReadAll", ct);
 
         var hr = await EnsureMenuAsync("Menus.HRArea", null, null, "group", 50, null, ct);
         await EnsureMenuAsync("Menus.Organization", hr.Id, null, "group", 51, "Organization.ReadAll", ct);
@@ -359,7 +360,7 @@ public sealed partial class SystemSeeder
         [
             ("LowStock", "Inventory", "Counter", 1, "Inventory.ReadAll"),
             ("PendingApprovals", "Workflow", "Counter", 2, "Workflow.ReadAll"),
-            ("BudgetOverrun", "Budget", "Chart", 3, "Budget.ReadAll"),
+            ("BudgetOverrun", "BudgetEntity", "Chart", 3, "BudgetEntity.ReadAll"),
             ("OrderDelivery", "Procurement", "Grid", 4, "Procurement.ReadAll"),
             ("WorkOrderProgress", "Operations", "Gauge", 5, "Operations.ReadAll"),
         ];

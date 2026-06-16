@@ -1,18 +1,18 @@
 @using Energy.Localization
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
-    ViewData["Title"] = T["Modules.Notifications.NotificationRecipient.Title"].Value;
+    ViewData["Title"] = T["Notifications.NotificationRecipient.Title"].Value;
 }
 
 <section class="energy-screen">
     <header class="energy-screen__header">
-        <div><h2>@T["Modules.Notifications.NotificationRecipient.Title"]</h2></div>
+        <div><h2>@T["Notifications.NotificationRecipient.Title"]</h2></div>
     </header>
     <div id="notification-recipient-grid"></div>
 </section>
 
 @section Scripts {
-    <script src="~/js/modules/notifications/notification-recipient/notification-recipient.index.js" asp-append-version="true"></script>
+    <script src="~/js/notifications/notification-recipient/notification-recipient.index.js" asp-append-version="true"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.NotificationsNotificationRecipient.init("/notifications/notification-recipients", "notification-recipient-grid", "Notifications");

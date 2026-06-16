@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Localization.Requests;
 using Energy.Shared.Models.V1.Localization.Responses;
-using Energy.Application.Modules.Core.Localization.Commands.DeleteLocalizationEntry;
-using Energy.Application.Modules.Core.Localization.Commands.UpsertLocalizationEntry;
-using Energy.Application.Modules.Core.Localization.Queries.GetLocalizationByKey;
-using Energy.Application.Modules.Core.Localization.Queries.GetLocalizationEntries;
+using Energy.Application.Core.Localization.Commands.DeleteLocalizationEntry;
+using Energy.Application.Core.Localization.Commands.UpsertLocalizationEntry;
+using Energy.Application.Core.Localization.Queries.GetLocalizationByKey;
+using Energy.Application.Core.Localization.Queries.GetLocalizationEntries;
 
 namespace Energy.Api.Controllers.Core;
 

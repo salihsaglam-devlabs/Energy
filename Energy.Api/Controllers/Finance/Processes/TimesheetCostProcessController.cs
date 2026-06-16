@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Finance.Processes.TimesheetCost.Requests;
 using Energy.Shared.Models.V1.Finance.Processes.TimesheetCost.Responses;
-using Energy.Application.Modules.Finance.Processes.TimesheetCost.Commands.ExecuteTimesheetCost;
+using Energy.Application.Finance.Processes.TimesheetCost.Commands.ExecuteTimesheetCost;
 
 namespace Energy.Api.Controllers.Finance.Processes;
 

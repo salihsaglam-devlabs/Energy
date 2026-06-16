@@ -1,18 +1,18 @@
 @using Energy.Localization
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
-    ViewData["Title"] = T["Modules.Inventory.WarehouseTransferLine.Title"].Value;
+    ViewData["Title"] = T["Inventory.WarehouseTransferLine.Title"].Value;
 }
 
 <section class="energy-screen">
     <header class="energy-screen__header">
-        <div><h2>@T["Modules.Inventory.WarehouseTransferLine.Title"]</h2></div>
+        <div><h2>@T["Inventory.WarehouseTransferLine.Title"]</h2></div>
     </header>
     <div id="warehouse-transfer-line-grid"></div>
 </section>
 
 @section Scripts {
-    <script src="~/js/modules/inventory/warehouse-transfer-line/warehouse-transfer-line.index.js" asp-append-version="true"></script>
+    <script src="~/js/inventory/warehouse-transfer-line/warehouse-transfer-line.index.js" asp-append-version="true"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.InventoryWarehouseTransferLine.init("/inventory/warehouse-transfer-lines", "warehouse-transfer-line-grid", "Inventory");

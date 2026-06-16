@@ -1,5 +1,5 @@
 using Energy.Application.Logger.Services;
-using Energy.Domain.Modules.Core;
+using Energy.Domain.Core;
 using Energy.Infrastructure.Persistence;
 using Energy.Shared.Logging;
 using Energy.Shared.Models.V1.Common.Requests;

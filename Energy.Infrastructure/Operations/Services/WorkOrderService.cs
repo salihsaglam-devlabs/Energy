@@ -1,7 +1,9 @@
+using WorkOrderEntity = Energy.Domain.Operations.WorkOrder;
+using WorkOrderStatusHistoryEntity = Energy.Domain.Operations.WorkOrderStatusHistory;
 using Energy.Shared.Common;
 using Energy.Application.Operations.Services;
 using Energy.Domain.Common;
-using Energy.Domain.Modules.Operations;
+using Energy.Domain.Operations;
 using Energy.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -76,16 +78,16 @@ public sealed class WorkOrderService : IWorkOrderService
         await tx.CommitAsync(ct);
     }
 
-    private async Task<WorkOrder> LoadAsync(Guid id, CancellationToken ct)
+    private async Task<WorkOrderEntity> LoadAsync(Guid id, CancellationToken ct)
         => await _db.WorkOrders.FirstOrDefaultAsync(w => w.Id == id, ct)
            ?? throw new InvalidOperationException($"Work order {id} not found.");
 
-    private Task TransitionAsync(WorkOrder workOrder, WorkOrderStatus newStatus, string? note, CancellationToken ct)
+    private Task TransitionAsync(WorkOrderEntity workOrder, WorkOrderStatus newStatus, string? note, CancellationToken ct)
     {
         var from = workOrder.Status;
         workOrder.Status = newStatus;
 
-        _db.WorkOrderStatusHistories.Add(new WorkOrderStatusHistory
+        _db.WorkOrderStatusHistories.Add(new WorkOrderStatusHistoryEntity
         {
             Id = Guid.NewGuid(),
             WorkOrderId = workOrder.Id,

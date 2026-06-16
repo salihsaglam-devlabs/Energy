@@ -3,8 +3,8 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Identity.Responses;
-using Energy.Application.Modules.IAM.Permission.Queries.GetPermissionByCode;
-using Energy.Application.Modules.IAM.Permission.Queries.GetPermissionList;
+using Energy.Application.IAM.Permission.Queries.GetPermissionByCode;
+using Energy.Application.IAM.Permission.Queries.GetPermissionList;
 
 namespace Energy.Api.Controllers.IAM;
 

@@ -1,18 +1,19 @@
+using BudgetEntity = Energy.Domain.Budget.Budget;
 using Energy.Shared.Common;
 using Energy.Application.Identity.Services;
-using Energy.Domain.Modules.Budget;
-using Energy.Domain.Modules.BusinessPartners;
-using Energy.Domain.Modules.Catalog;
+using Energy.Domain.Budget;
+using Energy.Domain.BusinessPartners;
+using Energy.Domain.Catalog;
 using Energy.Domain.Common;
-using Energy.Domain.Modules.Core;
-using Energy.Domain.Modules.Finance;
-using Energy.Domain.Modules.IAM;
-using Energy.Domain.Modules.Inventory;
-using Energy.Domain.Modules.Operations;
-using Energy.Domain.Modules.Procurement;
-using Energy.Domain.Modules.Projects;
-using Energy.Domain.Modules.Reporting;
-using Energy.Domain.Modules.Workflow;
+using Energy.Domain.Core;
+using Energy.Domain.Finance;
+using Energy.Domain.IAM;
+using Energy.Domain.Inventory;
+using Energy.Domain.Operations;
+using Energy.Domain.Procurement;
+using Energy.Domain.Projects;
+using Energy.Domain.Reporting;
+using Energy.Domain.Workflow;
 using Energy.Infrastructure.Home.Services;
 using Energy.Infrastructure.Persistence;
 using Microsoft.Data.Sqlite;
@@ -35,7 +36,7 @@ public sealed class DashboardMetricsTests : IDisposable
     [
         ("LowStock", "Inventory", "Inventory.ReadAll"),
         ("PendingApprovals", "Workflow", "Workflow.ReadAll"),
-        ("BudgetOverrun", "Budget", "Budget.ReadAll"),
+        ("BudgetOverrun", "BudgetEntity", "BudgetEntity.ReadAll"),
         ("OrderDelivery", "Procurement", "Procurement.ReadAll"),
         ("WorkOrderProgress", "Operations", "Operations.ReadAll"),
     ];
@@ -155,7 +156,7 @@ public sealed class DashboardMetricsTests : IDisposable
         });
 
         // BudgetOverrun = gerçekleşen > planlanan olan etkin bütçe sayısı → 1.
-        var budget = new Budget
+        var budget = new BudgetEntity
         {
             Id = Guid.NewGuid(), ProjectId = project.Id, CurrencyId = currency.Id,
             Name = "Test Bütçe", Year = DateTime.UtcNow.Year, IsActive = true,
@@ -212,7 +213,7 @@ public sealed class DashboardMetricsTests : IDisposable
     [Fact]
     public async Task All_metrics_compute_expected_values_when_user_has_all_permissions()
     {
-        var service = BuildService("Inventory.ReadAll", "Workflow.ReadAll", "Budget.ReadAll", "Procurement.ReadAll", "Operations.ReadAll");
+        var service = BuildService("Inventory.ReadAll", "Workflow.ReadAll", "BudgetEntity.ReadAll", "Procurement.ReadAll", "Operations.ReadAll");
 
         var metrics = await service.GetEnterpriseMetricsAsync();
         var byCode = metrics.ToDictionary(m => m.Code, m => m.Value);
@@ -249,7 +250,7 @@ public sealed class DashboardMetricsTests : IDisposable
     [Fact]
     public async Task Metrics_are_ordered_by_display_order()
     {
-        var service = BuildService("Inventory.ReadAll", "Workflow.ReadAll", "Budget.ReadAll", "Procurement.ReadAll", "Operations.ReadAll");
+        var service = BuildService("Inventory.ReadAll", "Workflow.ReadAll", "BudgetEntity.ReadAll", "Procurement.ReadAll", "Operations.ReadAll");
 
         var metrics = await service.GetEnterpriseMetricsAsync();
 

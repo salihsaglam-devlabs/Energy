@@ -1,18 +1,18 @@
 @using Energy.Localization
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
-    ViewData["Title"] = T["Modules.Core.UnitOfMeasure.Title"].Value;
+    ViewData["Title"] = T["Core.UnitOfMeasure.Title"].Value;
 }
 
 <section class="energy-screen">
     <header class="energy-screen__header">
-        <div><h2>@T["Modules.Core.UnitOfMeasure.Title"]</h2></div>
+        <div><h2>@T["Core.UnitOfMeasure.Title"]</h2></div>
     </header>
     <div id="unit-of-measure-grid"></div>
 </section>
 
 @section Scripts {
-    <script src="~/js/modules/core/unit-of-measure/unit-of-measure.index.js" asp-append-version="true"></script>
+    <script src="~/js/core/unit-of-measure/unit-of-measure.index.js" asp-append-version="true"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.CoreUnitOfMeasure.init("/core/units-of-measure", "unit-of-measure-grid", "Core");

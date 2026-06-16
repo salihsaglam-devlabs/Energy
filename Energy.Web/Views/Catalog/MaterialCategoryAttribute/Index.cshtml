@@ -1,18 +1,18 @@
 @using Energy.Localization
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
-    ViewData["Title"] = T["Modules.Catalog.MaterialCategoryAttribute.Title"].Value;
+    ViewData["Title"] = T["Catalog.MaterialCategoryAttribute.Title"].Value;
 }
 
 <section class="energy-screen">
     <header class="energy-screen__header">
-        <div><h2>@T["Modules.Catalog.MaterialCategoryAttribute.Title"]</h2></div>
+        <div><h2>@T["Catalog.MaterialCategoryAttribute.Title"]</h2></div>
     </header>
     <div id="material-category-attribute-grid"></div>
 </section>
 
 @section Scripts {
-    <script src="~/js/modules/catalog/material-category-attribute/material-category-attribute.index.js" asp-append-version="true"></script>
+    <script src="~/js/catalog/material-category-attribute/material-category-attribute.index.js" asp-append-version="true"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.CatalogMaterialCategoryAttribute.init("/catalog/material-category-attributes", "material-category-attribute-grid", "Catalog");

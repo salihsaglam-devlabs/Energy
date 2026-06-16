@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.ProgressPayments.Reports.ProgressPaymentSummary.Requests;
 using Energy.Shared.Models.V1.ProgressPayments.Reports.ProgressPaymentSummary.Responses;
-using Energy.Application.Modules.ProgressPayments.Reports.ProgressPaymentSummary.Queries.GetProgressPaymentSummaryData;
+using Energy.Application.ProgressPayments.Reports.ProgressPaymentSummary.Queries.GetProgressPaymentSummaryData;
 using Energy.Api.Common.Export;
 
 namespace Energy.Api.Controllers.ProgressPayments.Reports;

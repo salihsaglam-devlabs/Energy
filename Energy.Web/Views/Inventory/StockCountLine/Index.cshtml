@@ -1,18 +1,18 @@
 @using Energy.Localization
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
-    ViewData["Title"] = T["Modules.Inventory.StockCountLine.Title"].Value;
+    ViewData["Title"] = T["Inventory.StockCountLine.Title"].Value;
 }
 
 <section class="energy-screen">
     <header class="energy-screen__header">
-        <div><h2>@T["Modules.Inventory.StockCountLine.Title"]</h2></div>
+        <div><h2>@T["Inventory.StockCountLine.Title"]</h2></div>
     </header>
     <div id="stock-count-line-grid"></div>
 </section>
 
 @section Scripts {
-    <script src="~/js/modules/inventory/stock-count-line/stock-count-line.index.js" asp-append-version="true"></script>
+    <script src="~/js/inventory/stock-count-line/stock-count-line.index.js" asp-append-version="true"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.InventoryStockCountLine.init("/inventory/stock-count-lines", "stock-count-line-grid", "Inventory");

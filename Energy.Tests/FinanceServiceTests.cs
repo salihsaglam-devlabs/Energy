@@ -1,14 +1,15 @@
+using BudgetEntity = Energy.Domain.Budget.Budget;
 using Energy.Shared.Common;
 using Energy.Application.Finance.Services;
-using Energy.Domain.Modules.Budget;
-using Energy.Domain.Modules.BusinessPartners;
+using Energy.Domain.Budget;
+using Energy.Domain.BusinessPartners;
 using Energy.Domain.Common;
-using Energy.Domain.Modules.Contracts;
-using Energy.Domain.Modules.Core;
-using Energy.Domain.Modules.Finance;
-using Energy.Domain.Modules.Organization;
-using Energy.Domain.Modules.HR;
-using Energy.Domain.Modules.ProgressPayments;
+using Energy.Domain.Contracts;
+using Energy.Domain.Core;
+using Energy.Domain.Finance;
+using Energy.Domain.Organization;
+using Energy.Domain.HR;
+using Energy.Domain.ProgressPayments;
 using Energy.Infrastructure.Finance.Services;
 using Energy.Infrastructure.Persistence;
 using Microsoft.Data.Sqlite;
@@ -156,7 +157,7 @@ public sealed class FinanceServiceTests : IDisposable
     {
         var costCenter = new CostCenter { Id = Guid.NewGuid(), Code = "CC1", Name = "CC", IsActive = true };
         _db.CostCenters.Add(costCenter);
-        var budget = new Budget { Id = Guid.NewGuid(), CostCenterId = costCenter.Id, CurrencyId = _currencyId, Name = "B", Year = 2026, IsActive = true };
+        var budget = new BudgetEntity { Id = Guid.NewGuid(), CostCenterId = costCenter.Id, CurrencyId = _currencyId, Name = "B", Year = 2026, IsActive = true };
         _db.Budgets.Add(budget);
         _db.BudgetLines.Add(new BudgetLine { Id = Guid.NewGuid(), BudgetId = budget.Id, CostCenterId = costCenter.Id, Description = "L", PlannedAmount = 1000m });
 

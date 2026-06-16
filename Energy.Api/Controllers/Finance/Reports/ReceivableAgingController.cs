@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Finance.Reports.ReceivableAging.Requests;
 using Energy.Shared.Models.V1.Finance.Reports.ReceivableAging.Responses;
-using Energy.Application.Modules.Finance.Reports.ReceivableAging.Queries.GetReceivableAgingData;
+using Energy.Application.Finance.Reports.ReceivableAging.Queries.GetReceivableAgingData;
 using Energy.Api.Common.Export;
 
 namespace Energy.Api.Controllers.Finance.Reports;

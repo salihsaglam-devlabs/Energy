@@ -1,28 +1,28 @@
 @using Energy.Localization
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
-    ViewData["Title"] = T["Modules.Inventory.Processes.StockTransfer.Title"].Value;
+    ViewData["Title"] = T["Inventory.Processes.StockTransfer.Title"].Value;
 }
 
-<link rel="stylesheet" href="~/css/modules/inventory/processes/stock-transfer/stock-transfer.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/inventory/processes/stock-transfer/stock-transfer.css" asp-append-version="true" />
 
 <section class="energy-screen energy-process">
     <header class="energy-screen__header">
-        <div><h2>@T["Modules.Inventory.Processes.StockTransfer.Title"]</h2></div>
+        <div><h2>@T["Inventory.Processes.StockTransfer.Title"]</h2></div>
     </header>
     <div id="stock-transfer-form" class="energy-process__form"></div>
     <div id="stock-transfer-result" class="energy-process__result"></div>
 </section>
 
 @section Scripts {
-    <script src="~/js/modules/inventory/processes/stock-transfer/stock-transfer.index.js" asp-append-version="true"></script>
+    <script src="~/js/inventory/processes/stock-transfer/stock-transfer.index.js" asp-append-version="true"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             window.AppProcesses.InventoryStockTransfer.init("/inventory/processes/stock-transfer", {
                 formId: "stock-transfer-form",
                 resultId: "stock-transfer-result",
-                submit: "@T["Modules.Inventory.Processes.StockTransfer.Actions.Execute"]",
-                success: "@T["Modules.Inventory.Processes.StockTransfer.Messages.Completed"]"
+                submit: "@T["Inventory.Processes.StockTransfer.Actions.Execute"]",
+                success: "@T["Inventory.Processes.StockTransfer.Messages.Completed"]"
             });
         });
     </script>

@@ -2,9 +2,9 @@ using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Energy.Shared.Models.V1.Common.Responses;
-using Energy.Application.Modules.Core.Seeding.Commands.SeedAll;
-using Energy.Application.Modules.Core.Seeding.Commands.SeedLocalization;
-using Energy.Application.Modules.Core.Seeding.Commands.SeedLocalizationFromResx;
+using Energy.Application.Core.Seeding.Commands.SeedAll;
+using Energy.Application.Core.Seeding.Commands.SeedLocalization;
+using Energy.Application.Core.Seeding.Commands.SeedLocalizationFromResx;
 
 namespace Energy.Api.Controllers.Core;
 

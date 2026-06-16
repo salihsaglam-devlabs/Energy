@@ -5,7 +5,7 @@ using System.Text.Json;
 using Energy.Application.Common.Exceptions;
 using Energy.Application.Identity.Services;
 using Energy.Application.Logger.Services;
-using Energy.Domain.Modules.Core;
+using Energy.Domain.Core;
 using Energy.Localization;
 using Energy.Shared.Logging;
 using Energy.Shared.Models.V1.Common.Responses;

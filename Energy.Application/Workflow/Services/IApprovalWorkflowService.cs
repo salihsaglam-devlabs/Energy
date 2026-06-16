@@ -1,5 +1,8 @@
 using Energy.Shared.Common;
-using Energy.Domain.Modules.Workflow;
+using Energy.Domain.Workflow;
+// Düzleştirme sonrası Energy.Application.Workflow.ApprovalRequest bir namespace (entity klasörü)
+// olduğundan, domain entity tipini alias ile netleştiriyoruz.
+using ApprovalRequestEntity = Energy.Domain.Workflow.ApprovalRequest;
 
 namespace Energy.Application.Workflow.Services;
 
@@ -38,22 +41,22 @@ public interface IApprovalWorkflowService
     /// onaycılarla bir <see cref="ApprovalRequest"/> başlatır ve ilk adımı aktive eder.
     /// Uygun akış yoksa null döner (onay gerektirmez).
     /// </summary>
-    Task<ApprovalRequest?> StartAsync(StartApprovalRequest request, CancellationToken ct = default);
+    Task<ApprovalRequestEntity?> StartAsync(StartApprovalRequest request, CancellationToken ct = default);
 
     /// <summary>Geçerli kullanıcının aktif bir adımdaki onayını kaydeder ve akışı ilerletir.</summary>
-    Task<ApprovalRequest> ApproveAsync(Guid approvalRequestId, Guid actingUserId, string? note = null, CancellationToken ct = default);
+    Task<ApprovalRequestEntity> ApproveAsync(Guid approvalRequestId, Guid actingUserId, string? note = null, CancellationToken ct = default);
 
     /// <summary>Talebi reddeder; açık adımları kapatır ve kaynak belgeyi reddedilmiş duruma çeker.</summary>
-    Task<ApprovalRequest> RejectAsync(Guid approvalRequestId, Guid actingUserId, string? note = null, CancellationToken ct = default);
+    Task<ApprovalRequestEntity> RejectAsync(Guid approvalRequestId, Guid actingUserId, string? note = null, CancellationToken ct = default);
 
     /// <summary>Talebi düzenleme için iade eder.</summary>
-    Task<ApprovalRequest> ReturnAsync(Guid approvalRequestId, Guid actingUserId, string? note = null, CancellationToken ct = default);
+    Task<ApprovalRequestEntity> ReturnAsync(Guid approvalRequestId, Guid actingUserId, string? note = null, CancellationToken ct = default);
 
     /// <summary>Talebi iptal eder (yetkili kullanıcı veya talep sahibi).</summary>
-    Task<ApprovalRequest> CancelAsync(Guid approvalRequestId, Guid actingUserId, string? note = null, CancellationToken ct = default);
+    Task<ApprovalRequestEntity> CancelAsync(Guid approvalRequestId, Guid actingUserId, string? note = null, CancellationToken ct = default);
 
     /// <summary>Geçerli kullanıcının onay bekleyen taleplerini döndürür.</summary>
-    Task<IReadOnlyList<ApprovalRequest>> GetPendingForUserAsync(Guid userId, CancellationToken ct = default);
+    Task<IReadOnlyList<ApprovalRequestEntity>> GetPendingForUserAsync(Guid userId, CancellationToken ct = default);
 }
 
 /// <summary>

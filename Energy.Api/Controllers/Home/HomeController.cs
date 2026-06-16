@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Home.Requests;
 using Energy.Shared.Models.V1.Home.Responses;
-using Energy.Application.Modules.Home.Dashboard.Queries.GetEnterpriseMetrics;
-using Energy.Application.Modules.Home.Dashboard.Queries.GetHomeDashboard;
+using Energy.Application.Home.Dashboard.Queries.GetEnterpriseMetrics;
+using Energy.Application.Home.Dashboard.Queries.GetHomeDashboard;
 
 namespace Energy.Api.Controllers.Home;
 

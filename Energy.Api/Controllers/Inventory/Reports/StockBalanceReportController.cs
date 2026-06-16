@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Inventory.Reports.StockBalanceReport.Requests;
 using Energy.Shared.Models.V1.Inventory.Reports.StockBalanceReport.Responses;
-using Energy.Application.Modules.Inventory.Reports.StockBalanceReport.Queries.GetStockBalanceReportData;
+using Energy.Application.Inventory.Reports.StockBalanceReport.Queries.GetStockBalanceReportData;
 using Energy.Api.Common.Export;
 
 namespace Energy.Api.Controllers.Inventory.Reports;

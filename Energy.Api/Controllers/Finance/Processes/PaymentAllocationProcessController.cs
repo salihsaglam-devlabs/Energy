@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Finance.Processes.PaymentAllocation.Requests;
 using Energy.Shared.Models.V1.Finance.Processes.PaymentAllocation.Responses;
-using Energy.Application.Modules.Finance.Processes.PaymentAllocation.Commands.ExecutePaymentAllocation;
+using Energy.Application.Finance.Processes.PaymentAllocation.Commands.ExecutePaymentAllocation;
 
 namespace Energy.Api.Controllers.Finance.Processes;
 

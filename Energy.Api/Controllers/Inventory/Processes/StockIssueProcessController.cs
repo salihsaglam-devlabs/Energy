@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Inventory.Processes.StockIssue.Requests;
 using Energy.Shared.Models.V1.Inventory.Processes.StockIssue.Responses;
-using Energy.Application.Modules.Inventory.Processes.StockIssue.Commands.ExecuteStockIssue;
+using Energy.Application.Inventory.Processes.StockIssue.Commands.ExecuteStockIssue;
 
 namespace Energy.Api.Controllers.Inventory.Processes;
 

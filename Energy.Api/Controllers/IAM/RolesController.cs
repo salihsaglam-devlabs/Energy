@@ -5,12 +5,12 @@ using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Common.Requests;
 using Energy.Shared.Models.V1.Identity.Requests;
 using Energy.Shared.Models.V1.Identity.Responses;
-using Energy.Application.Modules.IAM.Role.Commands.CreateRole;
-using Energy.Application.Modules.IAM.Role.Commands.DeleteRole;
-using Energy.Application.Modules.IAM.Role.Commands.SetRolePermissions;
-using Energy.Application.Modules.IAM.Role.Commands.UpdateRole;
-using Energy.Application.Modules.IAM.Role.Queries.GetRoleById;
-using Energy.Application.Modules.IAM.Role.Queries.GetRoleList;
+using Energy.Application.IAM.Role.Commands.CreateRole;
+using Energy.Application.IAM.Role.Commands.DeleteRole;
+using Energy.Application.IAM.Role.Commands.SetRolePermissions;
+using Energy.Application.IAM.Role.Commands.UpdateRole;
+using Energy.Application.IAM.Role.Queries.GetRoleById;
+using Energy.Application.IAM.Role.Queries.GetRoleList;
 
 namespace Energy.Api.Controllers.IAM;
 

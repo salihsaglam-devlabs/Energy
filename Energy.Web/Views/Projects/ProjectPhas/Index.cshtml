@@ -1,18 +1,18 @@
 @using Energy.Localization
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
-    ViewData["Title"] = T["Modules.Projects.ProjectPhas.Title"].Value;
+    ViewData["Title"] = T["Projects.ProjectPhas.Title"].Value;
 }
 
 <section class="energy-screen">
     <header class="energy-screen__header">
-        <div><h2>@T["Modules.Projects.ProjectPhas.Title"]</h2></div>
+        <div><h2>@T["Projects.ProjectPhas.Title"]</h2></div>
     </header>
     <div id="project-phas-grid"></div>
 </section>
 
 @section Scripts {
-    <script src="~/js/modules/projects/project-phas/project-phas.index.js" asp-append-version="true"></script>
+    <script src="~/js/projects/project-phas/project-phas.index.js" asp-append-version="true"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.ProjectsProjectPhas.init("/projects/project-phases", "project-phas-grid", "Projects");

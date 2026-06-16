@@ -9,7 +9,7 @@ using Energy.Infrastructure.Identity;
 using Energy.Infrastructure.Identity.Services;
 using Energy.Infrastructure.Localization;
 using Energy.Infrastructure.Logger.Services;
-using Energy.Infrastructure.Modules;
+using Energy.Infrastructure;
 using Energy.Infrastructure.Persistence;
 using Energy.Infrastructure.Persistence.Interceptors;
 using Energy.Infrastructure.Seeding;
@@ -99,15 +99,15 @@ public static class DependencyInjection
         services.AddScoped<SystemSeeder>();
         services.AddScoped<ISystemSeeder>(sp => sp.GetRequiredService<SystemSeeder>());
 
-        // Tüm 134 per-entity Modules CRUD + lookup servisleri (üretildi).
-        services.AddModulesEntityServices();
+        // Tüm 134 per-entity CRUD + lookup servisleri (üretildi).
+        services.AddEntityServices();
 
         // ER Overview iş akışlarından türetilen salt-okunur rapor servisleri (üretildi).
-        services.AddModulesReportServices();
+        services.AddReportServices();
 
         // Belge dosya/versiyon yönetimi: yerel dosya saklama + dosya servisi.
         services.AddScoped<Energy.Application.Common.Storage.IFileStorage, Energy.Infrastructure.Common.Storage.LocalFileStorage>();
-        services.AddScoped<Energy.Application.Modules.Documents.Files.Services.IDocumentFileService, Energy.Infrastructure.Modules.Documents.Files.DocumentFileService>();
+        services.AddScoped<Energy.Application.Documents.Files.Services.IDocumentFileService, Energy.Infrastructure.Documents.Files.DocumentFileService>();
 
         return services;
     }

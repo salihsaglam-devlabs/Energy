@@ -1,18 +1,18 @@
 @using Energy.Localization
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
-    ViewData["Title"] = T["Modules.FieldOperations.MeasurementSheetLine.Title"].Value;
+    ViewData["Title"] = T["FieldOperations.MeasurementSheetLine.Title"].Value;
 }
 
 <section class="energy-screen">
     <header class="energy-screen__header">
-        <div><h2>@T["Modules.FieldOperations.MeasurementSheetLine.Title"]</h2></div>
+        <div><h2>@T["FieldOperations.MeasurementSheetLine.Title"]</h2></div>
     </header>
     <div id="measurement-sheet-line-grid"></div>
 </section>
 
 @section Scripts {
-    <script src="~/js/modules/field-operations/measurement-sheet-line/measurement-sheet-line.index.js" asp-append-version="true"></script>
+    <script src="~/js/field-operations/measurement-sheet-line/measurement-sheet-line.index.js" asp-append-version="true"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.FieldOperationsMeasurementSheetLine.init("/field-operations/measurement-sheet-lines", "measurement-sheet-line-grid", "FieldOperations");

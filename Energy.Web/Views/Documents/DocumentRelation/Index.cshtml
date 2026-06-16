@@ -1,18 +1,18 @@
 @using Energy.Localization
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
-    ViewData["Title"] = T["Modules.Documents.DocumentRelation.Title"].Value;
+    ViewData["Title"] = T["Documents.DocumentRelation.Title"].Value;
 }
 
 <section class="energy-screen">
     <header class="energy-screen__header">
-        <div><h2>@T["Modules.Documents.DocumentRelation.Title"]</h2></div>
+        <div><h2>@T["Documents.DocumentRelation.Title"]</h2></div>
     </header>
     <div id="document-relation-grid"></div>
 </section>
 
 @section Scripts {
-    <script src="~/js/modules/documents/document-relation/document-relation.index.js" asp-append-version="true"></script>
+    <script src="~/js/documents/document-relation/document-relation.index.js" asp-append-version="true"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.DocumentsDocumentRelation.init("/documents/document-relations", "document-relation-grid", "Documents");

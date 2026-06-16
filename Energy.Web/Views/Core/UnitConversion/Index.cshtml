@@ -1,18 +1,18 @@
 @using Energy.Localization
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
-    ViewData["Title"] = T["Modules.Core.UnitConversion.Title"].Value;
+    ViewData["Title"] = T["Core.UnitConversion.Title"].Value;
 }
 
 <section class="energy-screen">
     <header class="energy-screen__header">
-        <div><h2>@T["Modules.Core.UnitConversion.Title"]</h2></div>
+        <div><h2>@T["Core.UnitConversion.Title"]</h2></div>
     </header>
     <div id="unit-conversion-grid"></div>
 </section>
 
 @section Scripts {
-    <script src="~/js/modules/core/unit-conversion/unit-conversion.index.js" asp-append-version="true"></script>
+    <script src="~/js/core/unit-conversion/unit-conversion.index.js" asp-append-version="true"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.CoreUnitConversion.init("/core/unit-conversions", "unit-conversion-grid", "Core");

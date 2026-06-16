@@ -5,9 +5,9 @@ using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Common.Requests;
 using Energy.Shared.Models.V1.Logger.Requests;
 using Energy.Shared.Models.V1.Logger.Responses;
-using Energy.Application.Modules.Core.Auditing.Commands.IngestAuditLog;
-using Energy.Application.Modules.Core.Auditing.Queries.GetAuditLogById;
-using Energy.Application.Modules.Core.Auditing.Queries.QueryAuditLogs;
+using Energy.Application.Core.Auditing.Commands.IngestAuditLog;
+using Energy.Application.Core.Auditing.Queries.GetAuditLogById;
+using Energy.Application.Core.Auditing.Queries.QueryAuditLogs;
 
 namespace Energy.Api.Controllers.Core;
 

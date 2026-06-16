@@ -1,6 +1,6 @@
 using Energy.Application.Common.Exceptions;
 using Energy.Application.System.Services;
-using Energy.Domain.Modules.IAM;
+using Energy.Domain.IAM;
 using Energy.Infrastructure.Persistence;
 using Energy.Localization;
 using Energy.Shared.Models.V1.Common.Requests;

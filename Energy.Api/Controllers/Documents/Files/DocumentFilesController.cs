@@ -1,9 +1,9 @@
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Energy.Application.Modules.Documents.Files.Commands.UploadDocumentVersion;
-using Energy.Application.Modules.Documents.Files.Queries.GetDocumentVersionContent;
-using Energy.Application.Modules.Documents.Files.Queries.GetDocumentVersions;
+using Energy.Application.Documents.Files.Commands.UploadDocumentVersion;
+using Energy.Application.Documents.Files.Queries.GetDocumentVersionContent;
+using Energy.Application.Documents.Files.Queries.GetDocumentVersions;
 using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Documents.Files.Responses;
 

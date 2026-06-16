@@ -1,8 +1,8 @@
 using Energy.Application.Identity.Services;
 using Energy.Application.Localization.Services;
 using Energy.Application.System.Services;
-using Energy.Domain.Modules.IAM;
-using Energy.Domain.Modules.IAM;
+using Energy.Domain.IAM;
+using Energy.Domain.IAM;
 using Energy.Infrastructure.Identity.Services;
 using Energy.Infrastructure.Persistence;
 using Energy.Infrastructure.System.Services;

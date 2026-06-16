@@ -1,13 +1,13 @@
 using Energy.Shared.Common;
-using Energy.Domain.Modules.IAM;
-using Energy.Domain.Modules.Core;
-using Energy.Domain.Modules.Projects;
-using Energy.Domain.Modules.BusinessPartners;
-using Energy.Domain.Modules.Catalog;
-using Energy.Domain.Modules.Operations;
-using Energy.Domain.Modules.Procurement;
-using Energy.Domain.Modules.Workflow;
-using Energy.Domain.Modules.Notifications;
+using Energy.Domain.IAM;
+using Energy.Domain.Core;
+using Energy.Domain.Projects;
+using Energy.Domain.BusinessPartners;
+using Energy.Domain.Catalog;
+using Energy.Domain.Operations;
+using Energy.Domain.Procurement;
+using Energy.Domain.Workflow;
+using Energy.Domain.Notifications;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

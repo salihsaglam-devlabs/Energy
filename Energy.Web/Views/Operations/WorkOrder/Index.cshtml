@@ -1,18 +1,18 @@
 @using Energy.Localization
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
-    ViewData["Title"] = T["Modules.Operations.WorkOrder.Title"].Value;
+    ViewData["Title"] = T["Operations.WorkOrder.Title"].Value;
 }
 
 <section class="energy-screen">
     <header class="energy-screen__header">
-        <div><h2>@T["Modules.Operations.WorkOrder.Title"]</h2></div>
+        <div><h2>@T["Operations.WorkOrder.Title"]</h2></div>
     </header>
     <div id="work-order-grid"></div>
 </section>
 
 @section Scripts {
-    <script src="~/js/modules/operations/work-order/work-order.index.js" asp-append-version="true"></script>
+    <script src="~/js/operations/work-order/work-order.index.js" asp-append-version="true"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.OperationsWorkOrder.init("/operations/work-orders", "work-order-grid", "Operations");

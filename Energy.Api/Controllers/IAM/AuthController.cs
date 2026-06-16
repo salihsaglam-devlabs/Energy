@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Identity.Requests;
 using Energy.Shared.Models.V1.Identity.Responses;
-using Energy.Application.Modules.IAM.Auth.Commands.Login;
+using Energy.Application.IAM.Auth.Commands.Login;
 
 namespace Energy.Api.Controllers.IAM;
 

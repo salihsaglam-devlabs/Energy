@@ -1,16 +1,17 @@
+using BudgetEntity = Energy.Domain.Budget.Budget;
 using Energy.Shared.Common;
 using System.Linq.Expressions;
 using Energy.Domain.Common;
-using Energy.Domain.Modules.Core;
-using Energy.Domain.Modules.Projects;
-using Energy.Domain.Modules.BusinessPartners;
-using Energy.Domain.Modules.Catalog;
-using Energy.Domain.Modules.Inventory;
-using Energy.Domain.Modules.Operations;
-using Energy.Domain.Modules.Procurement;
-using Energy.Domain.Modules.Budget;
-using Energy.Domain.Modules.Finance;
-using Energy.Domain.Modules.Workflow;
+using Energy.Domain.Core;
+using Energy.Domain.Projects;
+using Energy.Domain.BusinessPartners;
+using Energy.Domain.Catalog;
+using Energy.Domain.Inventory;
+using Energy.Domain.Operations;
+using Energy.Domain.Procurement;
+using Energy.Domain.Budget;
+using Energy.Domain.Finance;
+using Energy.Domain.Workflow;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -141,7 +142,7 @@ public sealed partial class SystemSeeder
             }, ct);
 
         // 9) Bütçe + satır + (planı aşan) finansal hareket (BudgetOverrun = aşan bütçe sayısı).
-        var budget = await GetOrAddAsync(_db.Budgets, b => b.Name == "PRJ-001 Bütçesi", () => new Budget
+        var budget = await GetOrAddAsync(_db.Budgets, b => b.Name == "PRJ-001 Bütçesi", () => new BudgetEntity
         {
             Id = Guid.NewGuid(), ProjectId = project.Id, CurrencyId = currency.Id,
             Name = "PRJ-001 Bütçesi", Year = DateTime.UtcNow.Year, IsActive = true,

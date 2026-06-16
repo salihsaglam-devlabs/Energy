@@ -1,7 +1,14 @@
+using StockBalanceEntity = Energy.Domain.Inventory.StockBalance;
+using StockDocumentEntity = Energy.Domain.Inventory.StockDocument;
+using StockDocumentLineEntity = Energy.Domain.Inventory.StockDocumentLine;
+using StockDocumentTypeEntity = Energy.Domain.Inventory.StockDocumentType;
+using StockIssueAllocationEntity = Energy.Domain.Inventory.StockIssueAllocation;
+using StockLotEntity = Energy.Domain.Inventory.StockLot;
+using StockTransactionEntity = Energy.Domain.Inventory.StockTransaction;
 using Energy.Shared.Common;
 using Energy.Application.Inventory.Services;
 using Energy.Domain.Common;
-using Energy.Domain.Modules.Inventory;
+using Energy.Domain.Inventory;
 using Energy.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -145,7 +152,7 @@ public sealed class InventoryService : IInventoryService
         var now = DateTime.UtcNow;
         var docType = await EnsureDocumentTypeAsync("Reverse", ct);
 
-        var reversal = new StockDocument
+        var reversal = new StockDocumentEntity
         {
             Id = Guid.NewGuid(),
             DocumentTypeId = docType.Id,
@@ -163,7 +170,7 @@ public sealed class InventoryService : IInventoryService
         {
             var originalLine = await _db.StockDocumentLines.FirstAsync(l => l.Id == txn.StockDocumentLineId, ct);
 
-            var reversalLine = new StockDocumentLine
+            var reversalLine = new StockDocumentLineEntity
             {
                 Id = Guid.NewGuid(),
                 StockDocumentId = reversal.Id,
@@ -173,7 +180,7 @@ public sealed class InventoryService : IInventoryService
             };
             _db.StockDocumentLines.Add(reversalLine);
 
-            _db.StockTransactions.Add(new StockTransaction
+            _db.StockTransactions.Add(new StockTransactionEntity
             {
                 Id = Guid.NewGuid(),
                 StockDocumentId = reversal.Id,
@@ -239,7 +246,7 @@ public sealed class InventoryService : IInventoryService
                 .FirstOrDefaultAsync(b => b.WarehouseId == agg.WarehouseId && b.MaterialId == agg.MaterialId, ct);
             if (balance is null)
             {
-                balance = new StockBalance
+                balance = new StockBalanceEntity
                 {
                     Id = Guid.NewGuid(),
                     WarehouseId = agg.WarehouseId,
@@ -266,7 +273,7 @@ public sealed class InventoryService : IInventoryService
         var now = DateTime.UtcNow;
         var docType = await EnsureDocumentTypeAsync("In", ct);
 
-        var document = new StockDocument
+        var document = new StockDocumentEntity
         {
             Id = Guid.NewGuid(),
             DocumentTypeId = docType.Id,
@@ -279,7 +286,7 @@ public sealed class InventoryService : IInventoryService
         };
         _db.StockDocuments.Add(document);
 
-        var line = new StockDocumentLine
+        var line = new StockDocumentLineEntity
         {
             Id = Guid.NewGuid(),
             StockDocumentId = document.Id,
@@ -291,7 +298,7 @@ public sealed class InventoryService : IInventoryService
         };
         _db.StockDocumentLines.Add(line);
 
-        var lot = new StockLot
+        var lot = new StockLotEntity
         {
             Id = Guid.NewGuid(),
             WarehouseId = warehouseId,
@@ -305,7 +312,7 @@ public sealed class InventoryService : IInventoryService
         };
         _db.StockLots.Add(lot);
 
-        _db.StockTransactions.Add(new StockTransaction
+        _db.StockTransactions.Add(new StockTransactionEntity
         {
             Id = Guid.NewGuid(),
             StockDocumentId = document.Id,
@@ -342,7 +349,7 @@ public sealed class InventoryService : IInventoryService
         var now = DateTime.UtcNow;
         var docType = await EnsureDocumentTypeAsync("Out", ct);
 
-        var document = new StockDocument
+        var document = new StockDocumentEntity
         {
             Id = Guid.NewGuid(),
             DocumentTypeId = docType.Id,
@@ -355,7 +362,7 @@ public sealed class InventoryService : IInventoryService
         };
         _db.StockDocuments.Add(document);
 
-        var line = new StockDocumentLine
+        var line = new StockDocumentLineEntity
         {
             Id = Guid.NewGuid(),
             StockDocumentId = document.Id,
@@ -376,7 +383,7 @@ public sealed class InventoryService : IInventoryService
             var take = Math.Min(remaining, lot.RemainingQuantity);
             lot.RemainingQuantity -= take;
 
-            _db.StockIssueAllocations.Add(new StockIssueAllocation
+            _db.StockIssueAllocations.Add(new StockIssueAllocationEntity
             {
                 Id = Guid.NewGuid(),
                 StockDocumentLineId = line.Id,
@@ -385,7 +392,7 @@ public sealed class InventoryService : IInventoryService
                 UnitCost = lot.UnitCost,
             });
 
-            _db.StockTransactions.Add(new StockTransaction
+            _db.StockTransactions.Add(new StockTransactionEntity
             {
                 Id = Guid.NewGuid(),
                 StockDocumentId = document.Id,
@@ -414,7 +421,7 @@ public sealed class InventoryService : IInventoryService
             .FirstOrDefaultAsync(b => b.WarehouseId == warehouseId && b.MaterialId == materialId, ct);
         if (balance is null)
         {
-            balance = new StockBalance
+            balance = new StockBalanceEntity
             {
                 Id = Guid.NewGuid(),
                 WarehouseId = warehouseId,
@@ -428,13 +435,13 @@ public sealed class InventoryService : IInventoryService
         balance.LastRecalculatedAt = now;
     }
 
-    private async Task<StockDocumentType> EnsureDocumentTypeAsync(string direction, CancellationToken ct)
+    private async Task<StockDocumentTypeEntity> EnsureDocumentTypeAsync(string direction, CancellationToken ct)
     {
         var code = "SYS-" + direction.ToUpperInvariant();
         var type = await _db.StockDocumentTypes.FirstOrDefaultAsync(t => t.Code == code, ct);
         if (type is null)
         {
-            type = new StockDocumentType
+            type = new StockDocumentTypeEntity
             {
                 Id = Guid.NewGuid(),
                 Code = code,

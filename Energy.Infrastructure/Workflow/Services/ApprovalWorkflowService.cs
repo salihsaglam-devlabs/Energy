@@ -1,9 +1,15 @@
+using ApprovalActionEntity = Energy.Domain.Workflow.ApprovalAction;
+using ApprovalConditionEntity = Energy.Domain.Workflow.ApprovalCondition;
+using ApprovalDefinitionVersionEntity = Energy.Domain.Workflow.ApprovalDefinitionVersion;
+using ApprovalRequestEntity = Energy.Domain.Workflow.ApprovalRequest;
+using ApprovalRequestApproverEntity = Energy.Domain.Workflow.ApprovalRequestApprover;
+using ApprovalRequestStepEntity = Energy.Domain.Workflow.ApprovalRequestStep;
 using Energy.Shared.Common;
 using Energy.Application.Workflow.Services;
 using Energy.Domain.Common;
-using Energy.Domain.Modules.IAM;
-using Energy.Domain.Modules.Notifications;
-using Energy.Domain.Modules.Workflow;
+using Energy.Domain.IAM;
+using Energy.Domain.Notifications;
+using Energy.Domain.Workflow;
 using Energy.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -31,7 +37,7 @@ public sealed class ApprovalWorkflowService : IApprovalWorkflowService
         _logger = logger;
     }
 
-    public async Task<ApprovalRequest?> StartAsync(StartApprovalRequest request, CancellationToken ct = default)
+    public async Task<ApprovalRequestEntity?> StartAsync(StartApprovalRequest request, CancellationToken ct = default)
     {
         var version = await SelectActiveVersionAsync(request.RelatedModule, request.RelatedEntityType, request.Fields, ct);
         if (version is null)
@@ -55,7 +61,7 @@ public sealed class ApprovalWorkflowService : IApprovalWorkflowService
 
         await using var tx = await _db.Database.BeginTransactionAsync(ct);
 
-        var approvalRequest = new ApprovalRequest
+        var approvalRequest = new ApprovalRequestEntity
         {
             Id = Guid.NewGuid(),
             ApprovalDefinitionVersionId = version.Id,
@@ -70,7 +76,7 @@ public sealed class ApprovalWorkflowService : IApprovalWorkflowService
 
         foreach (var def in stepDefs)
         {
-            _db.ApprovalRequestSteps.Add(new ApprovalRequestStep
+            _db.ApprovalRequestSteps.Add(new ApprovalRequestStepEntity
             {
                 Id = Guid.NewGuid(),
                 ApprovalRequestId = approvalRequest.Id,
@@ -101,7 +107,7 @@ public sealed class ApprovalWorkflowService : IApprovalWorkflowService
         return approvalRequest;
     }
 
-    public async Task<ApprovalRequest> ApproveAsync(Guid approvalRequestId, Guid actingUserId, string? note = null, CancellationToken ct = default)
+    public async Task<ApprovalRequestEntity> ApproveAsync(Guid approvalRequestId, Guid actingUserId, string? note = null, CancellationToken ct = default)
     {
         await using var tx = await _db.Database.BeginTransactionAsync(ct);
         var request = await LoadPendingRequestAsync(approvalRequestId, ct);
@@ -120,7 +126,7 @@ public sealed class ApprovalWorkflowService : IApprovalWorkflowService
         approver.Status = ApprovalApproverStatus.Approved;
         approver.ActionAt = now;
 
-        _db.ApprovalActions.Add(new ApprovalAction
+        _db.ApprovalActions.Add(new ApprovalActionEntity
         {
             Id = Guid.NewGuid(),
             ApprovalRequestId = request.Id,
@@ -159,16 +165,16 @@ public sealed class ApprovalWorkflowService : IApprovalWorkflowService
         return request;
     }
 
-    public Task<ApprovalRequest> RejectAsync(Guid approvalRequestId, Guid actingUserId, string? note = null, CancellationToken ct = default)
+    public Task<ApprovalRequestEntity> RejectAsync(Guid approvalRequestId, Guid actingUserId, string? note = null, CancellationToken ct = default)
         => TerminateAsync(approvalRequestId, actingUserId, ApprovalActionType.Reject, ApprovalRequestStatus.Rejected, ApprovalOutcome.Rejected, note, ct);
 
-    public Task<ApprovalRequest> ReturnAsync(Guid approvalRequestId, Guid actingUserId, string? note = null, CancellationToken ct = default)
+    public Task<ApprovalRequestEntity> ReturnAsync(Guid approvalRequestId, Guid actingUserId, string? note = null, CancellationToken ct = default)
         => TerminateAsync(approvalRequestId, actingUserId, ApprovalActionType.Return, ApprovalRequestStatus.Returned, ApprovalOutcome.Returned, note, ct);
 
-    public Task<ApprovalRequest> CancelAsync(Guid approvalRequestId, Guid actingUserId, string? note = null, CancellationToken ct = default)
+    public Task<ApprovalRequestEntity> CancelAsync(Guid approvalRequestId, Guid actingUserId, string? note = null, CancellationToken ct = default)
         => TerminateAsync(approvalRequestId, actingUserId, ApprovalActionType.Cancel, ApprovalRequestStatus.Cancelled, ApprovalOutcome.Cancelled, note, ct);
 
-    public async Task<IReadOnlyList<ApprovalRequest>> GetPendingForUserAsync(Guid userId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<ApprovalRequestEntity>> GetPendingForUserAsync(Guid userId, CancellationToken ct = default)
     {
         var now = DateTime.UtcNow;
 
@@ -197,7 +203,7 @@ public sealed class ApprovalWorkflowService : IApprovalWorkflowService
 
     // ---- Yardımcılar ----
 
-    private async Task<ApprovalRequest> TerminateAsync(
+    private async Task<ApprovalRequestEntity> TerminateAsync(
         Guid approvalRequestId, Guid actingUserId, ApprovalActionType action,
         ApprovalRequestStatus status, ApprovalOutcome outcome, string? note, CancellationToken ct)
     {
@@ -228,7 +234,7 @@ public sealed class ApprovalWorkflowService : IApprovalWorkflowService
             s.Status = action == ApprovalActionType.Reject ? ApprovalStepStatus.Rejected : ApprovalStepStatus.Skipped;
         }
 
-        _db.ApprovalActions.Add(new ApprovalAction
+        _db.ApprovalActions.Add(new ApprovalActionEntity
         {
             Id = Guid.NewGuid(),
             ApprovalRequestId = request.Id,
@@ -244,7 +250,7 @@ public sealed class ApprovalWorkflowService : IApprovalWorkflowService
         return request;
     }
 
-    private async Task<ApprovalRequest> LoadPendingRequestAsync(Guid id, CancellationToken ct)
+    private async Task<ApprovalRequestEntity> LoadPendingRequestAsync(Guid id, CancellationToken ct)
     {
         var request = await _db.ApprovalRequests.FirstOrDefaultAsync(r => r.Id == id, ct)
             ?? throw new InvalidOperationException($"Approval request {id} not found.");
@@ -255,7 +261,7 @@ public sealed class ApprovalWorkflowService : IApprovalWorkflowService
         return request;
     }
 
-    private async Task<ApprovalDefinitionVersion?> SelectActiveVersionAsync(
+    private async Task<ApprovalDefinitionVersionEntity?> SelectActiveVersionAsync(
         string module, string entityType, IReadOnlyDictionary<string, string>? fields, CancellationToken ct)
     {
         var now = DateTime.UtcNow;
@@ -278,7 +284,7 @@ public sealed class ApprovalWorkflowService : IApprovalWorkflowService
             .OrderByDescending(v => v.VersionNo)
             .ToListAsync(ct);
 
-        ApprovalDefinitionVersion? fallback = null;
+        ApprovalDefinitionVersionEntity? fallback = null;
         foreach (var version in versions)
         {
             var conditions = await _db.ApprovalConditions
@@ -300,7 +306,7 @@ public sealed class ApprovalWorkflowService : IApprovalWorkflowService
         return fallback;
     }
 
-    private static bool EvaluateCondition(ApprovalCondition condition, IReadOnlyDictionary<string, string>? fields)
+    private static bool EvaluateCondition(ApprovalConditionEntity condition, IReadOnlyDictionary<string, string>? fields)
     {
         if (fields is null || !fields.TryGetValue(condition.FieldName, out var actual))
         {
@@ -339,7 +345,7 @@ public sealed class ApprovalWorkflowService : IApprovalWorkflowService
         }
     }
 
-    private async Task ActivateStepAsync(ApprovalRequest request, ApprovalRequestStep step, CancellationToken ct)
+    private async Task ActivateStepAsync(ApprovalRequestEntity request, ApprovalRequestStepEntity step, CancellationToken ct)
     {
         step.Status = ApprovalStepStatus.Active;
 
@@ -374,7 +380,7 @@ public sealed class ApprovalWorkflowService : IApprovalWorkflowService
 
         foreach (var userId in userIds)
         {
-            _db.ApprovalRequestApprovers.Add(new ApprovalRequestApprover
+            _db.ApprovalRequestApprovers.Add(new ApprovalRequestApproverEntity
             {
                 Id = Guid.NewGuid(),
                 ApprovalRequestStepId = step.Id,
@@ -391,7 +397,7 @@ public sealed class ApprovalWorkflowService : IApprovalWorkflowService
         await _db.SaveChangesAsync(ct);
     }
 
-    private async Task NotifyApproversAsync(ApprovalRequest request, IEnumerable<Guid> userIds, CancellationToken ct)
+    private async Task NotifyApproversAsync(ApprovalRequestEntity request, IEnumerable<Guid> userIds, CancellationToken ct)
     {
         var notification = new Notification
         {
@@ -417,7 +423,7 @@ public sealed class ApprovalWorkflowService : IApprovalWorkflowService
         }
     }
 
-    private async Task<bool> IsStepCompletedAsync(ApprovalRequestStep step, CancellationToken ct)
+    private async Task<bool> IsStepCompletedAsync(ApprovalRequestStepEntity step, CancellationToken ct)
     {
         var approvers = await _db.ApprovalRequestApprovers
             .Where(a => a.ApprovalRequestStepId == step.Id)
@@ -439,7 +445,7 @@ public sealed class ApprovalWorkflowService : IApprovalWorkflowService
         };
     }
 
-    private async Task<ApprovalRequestApprover?> ResolveActingApproverAsync(
+    private async Task<ApprovalRequestApproverEntity?> ResolveActingApproverAsync(
         IReadOnlyCollection<Guid> activeStepIds, Guid actingUserId, CancellationToken ct)
     {
         if (activeStepIds.Count == 0)
@@ -477,7 +483,7 @@ public sealed class ApprovalWorkflowService : IApprovalWorkflowService
     }
 
     private async Task CompleteRequestAsync(
-        ApprovalRequest request, ApprovalRequestStatus status, ApprovalOutcome outcome, CancellationToken ct)
+        ApprovalRequestEntity request, ApprovalRequestStatus status, ApprovalOutcome outcome, CancellationToken ct)
     {
         request.Status = status;
         await _db.SaveChangesAsync(ct);

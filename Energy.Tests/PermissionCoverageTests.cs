@@ -15,8 +15,8 @@ public sealed class PermissionCoverageTests
     private static IReadOnlyCollection<string> CollectMappedPermissions()
     {
         var map = new Dictionary<string, string?>(StringComparer.Ordinal);
-        ModulesEndpointPermissionMap.Apply(map);
-        ModulesReportEndpointPermissionMap.Apply(map);
+        EntityEndpointPermissionMap.Apply(map);
+        ReportEndpointPermissionMap.Apply(map);
         return map.Values
             .Where(v => !string.IsNullOrWhiteSpace(v))
             .Select(v => v!)

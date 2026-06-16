@@ -1,9 +1,17 @@
+using CollectionEntity = Energy.Domain.Finance.Collection;
+using CollectionAllocationEntity = Energy.Domain.Finance.CollectionAllocation;
+using FinancialTransactionEntity = Energy.Domain.Finance.FinancialTransaction;
+using FinancialTransactionLineEntity = Energy.Domain.Finance.FinancialTransactionLine;
+using PayableEntity = Energy.Domain.Finance.Payable;
+using PaymentEntity = Energy.Domain.Finance.Payment;
+using PaymentAllocationEntity = Energy.Domain.Finance.PaymentAllocation;
+using ReceivableEntity = Energy.Domain.Finance.Receivable;
 using Energy.Shared.Common;
 using Energy.Application.Finance.Services;
 using Energy.Domain.Common;
-using Energy.Domain.Modules.Contracts;
-using Energy.Domain.Modules.Finance;
-using Energy.Domain.Modules.Notifications;
+using Energy.Domain.Contracts;
+using Energy.Domain.Finance;
+using Energy.Domain.Notifications;
 using Energy.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -51,7 +59,7 @@ public sealed class FinanceService : IFinanceService
         await using var tx = await _db.Database.BeginTransactionAsync(ct);
 
         var payment = await _db.Payments.FirstOrDefaultAsync(p => p.Id == paymentId, ct)
-            ?? throw new InvalidOperationException($"Payment {paymentId} not found.");
+            ?? throw new InvalidOperationException($"PaymentEntity {paymentId} not found.");
 
         var alreadyAllocated = await _db.PaymentAllocations
             .Where(a => a.PaymentId == paymentId)
@@ -69,14 +77,14 @@ public sealed class FinanceService : IFinanceService
             if (line.Amount <= 0) continue;
 
             var payable = await _db.Payables.FirstOrDefaultAsync(p => p.Id == line.TargetId, ct)
-                ?? throw new InvalidOperationException($"Payable {line.TargetId} not found.");
+                ?? throw new InvalidOperationException($"PayableEntity {line.TargetId} not found.");
             if (line.Amount > payable.RemainingAmount)
             {
                 throw new InvalidOperationException(
                     $"Allocation {line.Amount} exceeds payable remaining {payable.RemainingAmount}.");
             }
 
-            _db.PaymentAllocations.Add(new PaymentAllocation
+            _db.PaymentAllocations.Add(new PaymentAllocationEntity
             {
                 Id = Guid.NewGuid(),
                 PaymentId = paymentId,
@@ -101,7 +109,7 @@ public sealed class FinanceService : IFinanceService
         await using var tx = await _db.Database.BeginTransactionAsync(ct);
 
         var collection = await _db.Collections.FirstOrDefaultAsync(c => c.Id == collectionId, ct)
-            ?? throw new InvalidOperationException($"Collection {collectionId} not found.");
+            ?? throw new InvalidOperationException($"CollectionEntity {collectionId} not found.");
 
         var alreadyAllocated = await _db.CollectionAllocations
             .Where(a => a.CollectionId == collectionId)
@@ -119,14 +127,14 @@ public sealed class FinanceService : IFinanceService
             if (line.Amount <= 0) continue;
 
             var receivable = await _db.Receivables.FirstOrDefaultAsync(r => r.Id == line.TargetId, ct)
-                ?? throw new InvalidOperationException($"Receivable {line.TargetId} not found.");
+                ?? throw new InvalidOperationException($"ReceivableEntity {line.TargetId} not found.");
             if (line.Amount > receivable.RemainingAmount)
             {
                 throw new InvalidOperationException(
                     $"Allocation {line.Amount} exceeds receivable remaining {receivable.RemainingAmount}.");
             }
 
-            _db.CollectionAllocations.Add(new CollectionAllocation
+            _db.CollectionAllocations.Add(new CollectionAllocationEntity
             {
                 Id = Guid.NewGuid(),
                 CollectionId = collectionId,
@@ -160,7 +168,7 @@ public sealed class FinanceService : IFinanceService
 
         var total = lines.Sum(l => (l.NormalHours + l.OvertimeHours) * l.HourlyCost);
 
-        var transaction = new FinancialTransaction
+        var transaction = new FinancialTransactionEntity
         {
             Id = Guid.NewGuid(),
             TransactionType = FinancialTransactionType.Expense,
@@ -176,7 +184,7 @@ public sealed class FinanceService : IFinanceService
 
         foreach (var group in lines.GroupBy(l => l.ProjectId))
         {
-            _db.FinancialTransactionLines.Add(new FinancialTransactionLine
+            _db.FinancialTransactionLines.Add(new FinancialTransactionLineEntity
             {
                 Id = Guid.NewGuid(),
                 FinancialTransactionId = transaction.Id,
@@ -285,7 +293,7 @@ public sealed class FinanceService : IFinanceService
     private Guid CreatePayableCore(Guid partnerId, Guid currencyId, decimal amount, DateTime dueDate,
         string? relatedModule, string? relatedEntityType, Guid? relatedEntityId)
     {
-        var payable = new Payable
+        var payable = new PayableEntity
         {
             Id = Guid.NewGuid(),
             PartnerId = partnerId,
@@ -304,7 +312,7 @@ public sealed class FinanceService : IFinanceService
     private Guid CreateReceivableCore(Guid partnerId, Guid currencyId, decimal amount, DateTime dueDate,
         string? relatedModule, string? relatedEntityType, Guid? relatedEntityId)
     {
-        var receivable = new Receivable
+        var receivable = new ReceivableEntity
         {
             Id = Guid.NewGuid(),
             PartnerId = partnerId,

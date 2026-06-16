@@ -1,4 +1,4 @@
-using Energy.Domain.Modules.IAM;
+using Energy.Domain.IAM;
 using Energy.Infrastructure.Persistence;
 using Energy.Shared.Identity.Permissions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -264,11 +264,11 @@ public sealed class ApiEndpointSyncService
 
         // Üretilen per-entity API controller uç noktaları (134 tablo, IAM/Chat hariç):
         // Controller.Action → modül CRUD yetkisi. Başlangıçta otomatik etkinleştirilir.
-        ModulesEndpointPermissionMap.Apply(map);
+        EntityEndpointPermissionMap.Apply(map);
 
         // ER Overview iş akışlarından türetilen rapor uç noktaları:
         // Controller.Action → {Module}.{Report}.Read / .Export.
-        ModulesReportEndpointPermissionMap.Apply(map);
+        ReportEndpointPermissionMap.Apply(map);
 
         return map;
     }
