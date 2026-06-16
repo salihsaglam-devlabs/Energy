@@ -21,4 +21,3 @@ public sealed class GetPurchaseOrderLookupQueryHandler
         CancellationToken cancellationToken)
         => _lookup.GetLookupAsync(request.Search, request.ActiveOnly, cancellationToken);
 }
-

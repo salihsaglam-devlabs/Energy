@@ -31,10 +31,10 @@ from generate_domain import ROOT, build_model, load_rows
 SHARED = os.path.join(ROOT, "Energy.Shared", "Models", "V1")
 APP = os.path.join(ROOT, "Energy.Application", "Modules")
 INFRA = os.path.join(ROOT, "Energy.Infrastructure", "Modules")
-API = os.path.join(ROOT, "Energy.Api", "Controllers", "Modules")
-WEB_CLIENTS = os.path.join(ROOT, "Energy.Web", "Clients", "Modules")
-WEB_CTRL = os.path.join(ROOT, "Energy.Web", "Controllers", "Modules")
-VIEWS = os.path.join(ROOT, "Energy.Web", "Views", "Modules")
+API = os.path.join(ROOT, "Energy.Api", "Controllers")
+WEB_CLIENTS = os.path.join(ROOT, "Energy.Web", "Clients")
+WEB_CTRL = os.path.join(ROOT, "Energy.Web", "Controllers")
+VIEWS = os.path.join(ROOT, "Energy.Web", "Views")
 JS = os.path.join(ROOT, "Energy.Web", "wwwroot", "js", "modules")
 CSS = os.path.join(ROOT, "Energy.Web", "wwwroot", "css", "modules")
 
@@ -250,7 +250,7 @@ def gen_api_controller(rep):
         "using Energy.Shared.Models.V1.Common.Responses;",
         f"using Energy.Shared.Models.V1.{m}.Reports.{n}.Requests;",
         f"using Energy.Shared.Models.V1.{m}.Reports.{n}.Responses;", "",
-        f"namespace Energy.Api.Controllers.Modules.{m}.Reports;", "",
+        f"namespace Energy.Api.Controllers.{m}.Reports;", "",
         f"/// <summary>{n} raporu uç noktaları (veri + export). Salt-okunur.</summary>",
         "[ApiController]",
         '[ApiVersion("1.0")]',
@@ -292,7 +292,7 @@ def gen_web_client(rep):
         "using Energy.Shared.Models.V1.Common.Responses;",
         f"using Energy.Shared.Models.V1.{m}.Reports.{n}.Responses;",
         "using Energy.Web.Clients.Infrastructure;", "",
-        f"namespace Energy.Web.Clients.Modules.{m}.Reports.{n};", "",
+        f"namespace Energy.Web.Clients.{m}.Reports.{n};", "",
         f"/// <summary>{n} raporu API istemci sözleşmesi.</summary>",
         f"public interface I{n}ApiClient",
         "{",
@@ -312,7 +312,7 @@ def gen_web_client(rep):
 def gen_web_controller(rep):
     m, n = rep["module"], rep["name"]
     route = f"{kebab(m)}/reports/{kebab(n)}"
-    view = f"~/Views/Modules/{m}/Reports/{n}/Index.cshtml"
+    view = f"~/Views/{m}/Reports/{n}/Index.cshtml"
     status_q = ""
     if rep["status_field"]:
         status_q = '        if (!string.IsNullOrWhiteSpace(status)) parts.Add($"Status={Uri.EscapeDataString(status)}");\n'
@@ -322,8 +322,8 @@ def gen_web_controller(rep):
     L = [
         "using Microsoft.AspNetCore.Authorization;",
         "using Microsoft.AspNetCore.Mvc;",
-        f"using Energy.Web.Clients.Modules.{m}.Reports.{n};", "",
-        f"namespace Energy.Web.Controllers.Modules.{m}.Reports;", "",
+        f"using Energy.Web.Clients.{m}.Reports.{n};", "",
+        f"namespace Energy.Web.Controllers.{m}.Reports;", "",
         f"/// <summary>{n} rapor ekran denetleyicisi (yalnızca API istemcisiyle konuşur, salt-okunur).</summary>",
         "[Authorize]",
         f'[Route("{route}")]',
@@ -526,7 +526,7 @@ def gen_web_registration():
         "using Energy.Web.Clients.Infrastructure.ClientIdentity;",
         "using Energy.Web.Configuration;",
         "using Microsoft.Extensions.Options;", "",
-        "namespace Energy.Web.Clients.Modules;", "",
+        "namespace Energy.Web.Clients;", "",
         "/// <summary>Tüm rapor API istemcilerinin (typed HttpClient) kaydı.</summary>",
         "public static class ModulesReportApiClientRegistration",
         "{",
@@ -535,8 +535,8 @@ def gen_web_registration():
     ]
     for rep in REPORTS:
         m, n = rep["module"], rep["name"]
-        itype = f"global::Energy.Web.Clients.Modules.{m}.Reports.{n}.I{n}ApiClient"
-        impl = f"global::Energy.Web.Clients.Modules.{m}.Reports.{n}.{n}ApiClient"
+        itype = f"global::Energy.Web.Clients.{m}.Reports.{n}.I{n}ApiClient"
+        impl = f"global::Energy.Web.Clients.{m}.Reports.{n}.{n}ApiClient"
         L += [
             f"        services.AddHttpClient<{itype}, {impl}>(Configure)",
             "            .AddHttpMessageHandler<ClientIdentityHeaderHandler>()",

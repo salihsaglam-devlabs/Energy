@@ -20,4 +20,3 @@ public sealed class UpdatePurchaseOrderCommandHandler
         CancellationToken cancellationToken)
         => _service.UpdateAsync(request.Id, request.Request, cancellationToken);
 }
-

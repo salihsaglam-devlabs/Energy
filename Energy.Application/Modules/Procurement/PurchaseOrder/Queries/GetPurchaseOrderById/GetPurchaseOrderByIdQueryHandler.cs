@@ -21,4 +21,3 @@ public sealed class GetPurchaseOrderByIdQueryHandler
         CancellationToken cancellationToken)
         => _service.GetByIdAsync(request.Id, cancellationToken);
 }
-

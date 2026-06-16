@@ -8,4 +8,3 @@ namespace Energy.Application.Modules.Procurement.PurchaseOrder.Commands.CreatePu
 /// <param name="Request">Oluşturma alanlarını taşıyan istek modeli.</param>
 public sealed record CreatePurchaseOrderCommand(CreatePurchaseOrderRequest Request)
     : IRequest<BaseResponse<Guid>>;
-

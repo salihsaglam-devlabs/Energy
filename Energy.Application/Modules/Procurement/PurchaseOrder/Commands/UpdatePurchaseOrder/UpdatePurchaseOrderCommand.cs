@@ -9,4 +9,3 @@ namespace Energy.Application.Modules.Procurement.PurchaseOrder.Commands.UpdatePu
 /// <param name="Request">Güncellenecek alanları taşıyan istek modeli.</param>
 public sealed record UpdatePurchaseOrderCommand(Guid Id, UpdatePurchaseOrderRequest Request)
     : IRequest<BaseResponse<bool>>;
-

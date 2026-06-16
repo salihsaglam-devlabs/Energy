@@ -3,7 +3,7 @@
 Energy — Web Views + JS generator (Phase 7 UI).
 
 Per web-managed entity (IAM/Chat excluded):
-  * Views/Modules/{Module}/{Entity}/Index.cshtml  — DevExtreme grid host + init.
+  * Views/{Module}/{Entity}/Index.cshtml  — DevExtreme grid host + init.
   * wwwroot/js/modules/{module-kebab}/{entity-kebab}/{entity-kebab}.index.js
         — entity-specific dxDataGrid bound to the entity Web controller routes,
           reusing the shared AppHttp/AppNotify/AppAuth/AppL10n helpers.
@@ -18,7 +18,7 @@ import shutil
 
 from generate_domain import ROOT, build_model, load_rows
 
-VIEWS_ROOT = os.path.join(ROOT, "Energy.Web", "Views", "Modules")
+VIEWS_ROOT = os.path.join(ROOT, "Energy.Web", "Views")
 JS_ROOT = os.path.join(ROOT, "Energy.Web", "wwwroot", "js", "modules")
 EXCLUDE_MODULES = {"IAM", "Chat"}
 AUDIT_FK = {"CreatedBy", "UpdatedBy", "DeletedBy"}

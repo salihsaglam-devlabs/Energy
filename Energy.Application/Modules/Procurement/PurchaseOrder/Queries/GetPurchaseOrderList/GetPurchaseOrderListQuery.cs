@@ -9,4 +9,3 @@ namespace Energy.Application.Modules.Procurement.PurchaseOrder.Queries.GetPurcha
 /// <param name="Request">Sayfalama/filtre parametrelerini taşıyan istek modeli.</param>
 public sealed record GetPurchaseOrderListQuery(GetPurchaseOrderListRequest Request)
     : IRequest<BaseResponse<PaginatedResponse<PurchaseOrderListResponse>>>;
-

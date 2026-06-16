@@ -9,4 +9,3 @@ namespace Energy.Application.Modules.Procurement.PurchaseOrder.Queries.GetPurcha
 /// <param name="ActiveOnly">Yalnızca aktif kayıtlar getirilsin mi.</param>
 public sealed record GetPurchaseOrderLookupQuery(string? Search, bool ActiveOnly)
     : IRequest<BaseResponse<IReadOnlyList<PurchaseOrderLookupResponse>>>;
-

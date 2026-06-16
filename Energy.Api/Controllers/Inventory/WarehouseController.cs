@@ -1,0 +1,60 @@
+using Asp.Versioning;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Energy.Application.Modules.Inventory.Warehouse.Commands.CreateWarehouse;
+using Energy.Application.Modules.Inventory.Warehouse.Commands.DeleteWarehouse;
+using Energy.Application.Modules.Inventory.Warehouse.Commands.UpdateWarehouse;
+using Energy.Application.Modules.Inventory.Warehouse.Queries.GetWarehouseById;
+using Energy.Application.Modules.Inventory.Warehouse.Queries.GetWarehouseList;
+using Energy.Application.Modules.Inventory.Warehouse.Queries.GetWarehouseLookup;
+using Energy.Shared.Models.V1.Common.Responses;
+using Energy.Shared.Models.V1.Inventory.Warehouse.Requests;
+using Energy.Shared.Models.V1.Inventory.Warehouse.Responses;
+
+namespace Energy.Api.Controllers.Inventory;
+
+/// <summary>
+/// Warehouse uç noktaları (liste, detay, lookup, create, update, delete).
+/// Controller iş mantığı içermez; her istek ilgili Command/Query'ye map edilip
+/// <see cref="IMediator"/> üzerinden Application use-case'ine yönlendirilir.
+/// </summary>
+[ApiController]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/inventory/warehouses")]
+public sealed class WarehouseController : ControllerBase
+{
+    private readonly IMediator _mediator;
+
+    public WarehouseController(IMediator mediator)
+        => _mediator = mediator;
+
+    /// <summary>Sayfalanmış liste.</summary>
+    [HttpGet]
+    public async Task<ActionResult<BaseResponse<PaginatedResponse<WarehouseListResponse>>>> GetList([FromQuery] GetWarehouseListRequest request, CancellationToken ct)
+        => Ok(await _mediator.Send(new GetWarehouseListQuery(request), ct));
+
+    /// <summary>Kimliğe göre detay.</summary>
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<BaseResponse<WarehouseDetailResponse>>> GetById(Guid id, CancellationToken ct)
+        => Ok(await _mediator.Send(new GetWarehouseByIdQuery(id), ct));
+
+    /// <summary>Lookup listesi.</summary>
+    [HttpGet("lookup")]
+    public async Task<ActionResult<BaseResponse<IReadOnlyList<WarehouseLookupResponse>>>> Lookup([FromQuery] string? search, [FromQuery] bool activeOnly, CancellationToken ct)
+        => Ok(await _mediator.Send(new GetWarehouseLookupQuery(search, activeOnly), ct));
+
+    /// <summary>Yeni kayıt oluşturur.</summary>
+    [HttpPost]
+    public async Task<ActionResult<BaseResponse<Guid>>> Create(CreateWarehouseRequest request, CancellationToken ct)
+        => Ok(await _mediator.Send(new CreateWarehouseCommand(request), ct));
+
+    /// <summary>Var olan kaydı günceller.</summary>
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<BaseResponse<bool>>> Update(Guid id, UpdateWarehouseRequest request, CancellationToken ct)
+        => Ok(await _mediator.Send(new UpdateWarehouseCommand(id, request), ct));
+
+    /// <summary>Kaydı (soft-delete) siler.</summary>
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<BaseResponse<bool>>> Delete(Guid id, CancellationToken ct)
+        => Ok(await _mediator.Send(new DeleteWarehouseCommand(id), ct));
+}

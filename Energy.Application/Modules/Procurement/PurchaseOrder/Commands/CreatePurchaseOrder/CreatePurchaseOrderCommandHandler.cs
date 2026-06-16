@@ -21,4 +21,3 @@ public sealed class CreatePurchaseOrderCommandHandler
         CancellationToken cancellationToken)
         => _service.CreateAsync(request.Request, cancellationToken);
 }
-

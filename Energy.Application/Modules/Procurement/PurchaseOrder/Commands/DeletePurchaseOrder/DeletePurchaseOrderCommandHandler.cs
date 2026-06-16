@@ -20,4 +20,3 @@ public sealed class DeletePurchaseOrderCommandHandler
         CancellationToken cancellationToken)
         => _service.DeleteAsync(request.Id, cancellationToken);
 }
-

@@ -16,8 +16,8 @@ import shutil
 
 from generate_domain import ROOT, build_model
 
-CLIENTS_ROOT = os.path.join(ROOT, "Energy.Web", "Clients", "Modules")
-WEBCTRL_ROOT = os.path.join(ROOT, "Energy.Web", "Controllers", "Modules")
+CLIENTS_ROOT = os.path.join(ROOT, "Energy.Web", "Clients")
+WEBCTRL_ROOT = os.path.join(ROOT, "Energy.Web", "Controllers")
 EXCLUDE_MODULES = {"IAM", "Chat"}
 
 
@@ -38,7 +38,7 @@ def gen_client(module, entity, table):
         f"using Energy.Shared.Models.V1.{module}.{entity}.Requests;",
         f"using Energy.Shared.Models.V1.{module}.{entity}.Responses;",
         "using Energy.Web.Clients.Infrastructure;", "",
-        f"namespace Energy.Web.Clients.Modules.{module}.{entity};", "",
+        f"namespace Energy.Web.Clients.{module}.{entity};", "",
         f"/// <summary>{entity} API istemci sözleşmesi.</summary>",
         f"public interface I{entity}ApiClient",
         "{",
@@ -73,13 +73,13 @@ def gen_client(module, entity, table):
 
 def gen_controller(module, entity, table):
     route = f"{kebab(module)}/{kebab(table)}"
-    view = f"~/Views/Modules/{module}/{entity}/Index.cshtml"
+    view = f"~/Views/{module}/{entity}/Index.cshtml"
     L = [
         "using Microsoft.AspNetCore.Authorization;",
         "using Microsoft.AspNetCore.Mvc;",
         f"using Energy.Shared.Models.V1.{module}.{entity}.Requests;",
-        f"using Energy.Web.Clients.Modules.{module}.{entity};", "",
-        f"namespace Energy.Web.Controllers.Modules.{module};", "",
+        f"using Energy.Web.Clients.{module}.{entity};", "",
+        f"namespace Energy.Web.Controllers.{module};", "",
         f"/// <summary>{entity} ekran denetleyicisi (yalnızca API istemcisiyle konuşur).</summary>",
         "[Authorize]",
         f'[Route("{route}")]',
@@ -126,7 +126,7 @@ def gen_registration(items):
         "using Energy.Web.Clients.Infrastructure.ClientIdentity;",
         "using Energy.Web.Configuration;",
         "using Microsoft.Extensions.Options;", "",
-        "namespace Energy.Web.Clients.Modules;", "",
+        "namespace Energy.Web.Clients;", "",
         "/// <summary>Tüm per-entity Modules API istemcilerinin (typed HttpClient) kaydı.</summary>",
         "public static class ModulesApiClientRegistration",
         "{",
@@ -134,8 +134,8 @@ def gen_registration(items):
         "    {",
     ]
     for (m, e) in items:
-        itype = f"global::Energy.Web.Clients.Modules.{m}.{e}.I{e}ApiClient"
-        impl = f"global::Energy.Web.Clients.Modules.{m}.{e}.{e}ApiClient"
+        itype = f"global::Energy.Web.Clients.{m}.{e}.I{e}ApiClient"
+        impl = f"global::Energy.Web.Clients.{m}.{e}.{e}ApiClient"
         L += [
             f"        services.AddHttpClient<{itype}, {impl}>(Configure)",
             "            .AddHttpMessageHandler<ClientIdentityHeaderHandler>()",

@@ -21,4 +21,3 @@ public sealed class GetPurchaseOrderListQueryHandler
         CancellationToken cancellationToken)
         => _service.GetListAsync(request.Request, cancellationToken);
 }
-

@@ -16,7 +16,7 @@ import shutil
 
 from generate_domain import ROOT, build_model
 
-API_ROOT = os.path.join(ROOT, "Energy.Api", "Controllers", "Modules")
+API_ROOT = os.path.join(ROOT, "Energy.Api", "Controllers")
 # IAM/Chat have curated hand controllers and no CRUD permission set in PermissionCatalog.
 EXCLUDE_MODULES = {"IAM", "Chat"}
 MAP_FILE = os.path.join(ROOT, "Energy.Infrastructure", "System", "Services",
@@ -35,53 +35,63 @@ def write(path, content):
 
 
 def gen_controller(module, entity, table):
+    """Thin, MediatR-tabanlı entity controller (Controller -> IMediator -> Command/Query
+    -> Handler -> Application Service akışı). CQRS Command/Query/Handler dosyaları
+    generate_cqrs.py tarafından üretilir; bu şablon onunla birebir aynı olmalıdır."""
     route = f"api/v{{version:apiVersion}}/{kebab(module)}/{kebab(table)}"
+    cmd = f"Energy.Application.Modules.{module}.{entity}.Commands"
+    qry = f"Energy.Application.Modules.{module}.{entity}.Queries"
     L = [
         "using Asp.Versioning;",
+        "using MediatR;",
         "using Microsoft.AspNetCore.Mvc;",
-        f"using Energy.Application.Modules.{module}.{entity}.Services;",
-        f"using Energy.Application.Modules.{module}.{entity}.Lookups;",
+        f"using {cmd}.Create{entity};",
+        f"using {cmd}.Delete{entity};",
+        f"using {cmd}.Update{entity};",
+        f"using {qry}.Get{entity}ById;",
+        f"using {qry}.Get{entity}List;",
+        f"using {qry}.Get{entity}Lookup;",
         "using Energy.Shared.Models.V1.Common.Responses;",
         f"using Energy.Shared.Models.V1.{module}.{entity}.Requests;",
         f"using Energy.Shared.Models.V1.{module}.{entity}.Responses;", "",
-        f"namespace Energy.Api.Controllers.Modules.{module};", "",
-        f"/// <summary>{entity} uç noktaları (liste, detay, lookup, create, update, delete).</summary>",
+        f"namespace Energy.Api.Controllers.{module};", "",
+        "/// <summary>",
+        f"/// {entity} uç noktaları (liste, detay, lookup, create, update, delete).",
+        "/// Controller iş mantığı içermez; her istek ilgili Command/Query'ye map edilip",
+        "/// <see cref=\"IMediator\"/> üzerinden Application use-case'ine yönlendirilir.",
+        "/// </summary>",
         "[ApiController]",
         '[ApiVersion("1.0")]',
         f'[Route("{route}")]',
         f"public sealed class {entity}Controller : ControllerBase",
         "{",
-        f"    private readonly I{entity}Service _service;",
-        f"    private readonly I{entity}LookupService _lookup;", "",
-        f"    public {entity}Controller(I{entity}Service service, I{entity}LookupService lookup)",
-        "    {",
-        "        _service = service;",
-        "        _lookup = lookup;",
-        "    }", "",
+        "    private readonly IMediator _mediator;", "",
+        f"    public {entity}Controller(IMediator mediator)",
+        "        => _mediator = mediator;", "",
         "    /// <summary>Sayfalanmış liste.</summary>",
         "    [HttpGet]",
         f"    public async Task<ActionResult<BaseResponse<PaginatedResponse<{entity}ListResponse>>>> GetList([FromQuery] Get{entity}ListRequest request, CancellationToken ct)",
-        "        => Ok(await _service.GetListAsync(request, ct));", "",
+        f"        => Ok(await _mediator.Send(new Get{entity}ListQuery(request), ct));", "",
         "    /// <summary>Kimliğe göre detay.</summary>",
         '    [HttpGet("{id:guid}")]',
         f"    public async Task<ActionResult<BaseResponse<{entity}DetailResponse>>> GetById(Guid id, CancellationToken ct)",
-        "        => Ok(await _service.GetByIdAsync(id, ct));", "",
+        f"        => Ok(await _mediator.Send(new Get{entity}ByIdQuery(id), ct));", "",
         "    /// <summary>Lookup listesi.</summary>",
         '    [HttpGet("lookup")]',
         f"    public async Task<ActionResult<BaseResponse<IReadOnlyList<{entity}LookupResponse>>>> Lookup([FromQuery] string? search, [FromQuery] bool activeOnly, CancellationToken ct)",
-        "        => Ok(await _lookup.GetLookupAsync(search, activeOnly, ct));", "",
+        f"        => Ok(await _mediator.Send(new Get{entity}LookupQuery(search, activeOnly), ct));", "",
         "    /// <summary>Yeni kayıt oluşturur.</summary>",
         "    [HttpPost]",
         f"    public async Task<ActionResult<BaseResponse<Guid>>> Create(Create{entity}Request request, CancellationToken ct)",
-        "        => Ok(await _service.CreateAsync(request, ct));", "",
+        f"        => Ok(await _mediator.Send(new Create{entity}Command(request), ct));", "",
         "    /// <summary>Var olan kaydı günceller.</summary>",
         '    [HttpPut("{id:guid}")]',
         f"    public async Task<ActionResult<BaseResponse<bool>>> Update(Guid id, Update{entity}Request request, CancellationToken ct)",
-        "        => Ok(await _service.UpdateAsync(id, request, ct));", "",
+        f"        => Ok(await _mediator.Send(new Update{entity}Command(id, request), ct));", "",
         "    /// <summary>Kaydı (soft-delete) siler.</summary>",
         '    [HttpDelete("{id:guid}")]',
         "    public async Task<ActionResult<BaseResponse<bool>>> Delete(Guid id, CancellationToken ct)",
-        "        => Ok(await _service.DeleteAsync(id, ct));",
+        f"        => Ok(await _mediator.Send(new Delete{entity}Command(id), ct));",
         "}", "",
     ]
     return "\n".join(L)
@@ -113,7 +123,9 @@ def gen_endpoint_permission_map(items):
 
 
 def main():
-    shutil.rmtree(API_ROOT, ignore_errors=True)
+    # NOT: Process/Report controller'ları korunmalı; bu nedenle ağaç silinmez,
+    # entity controller dosyaları yerinde yeniden yazılır. CQRS Command/Query/Handler
+    # dosyaları için generate_cqrs.py çalıştırılmalıdır (controller şablonu ortaktır).
     order, table_module, table_purpose, table_columns, table_entity = build_model()
     items = []
     for t in order:

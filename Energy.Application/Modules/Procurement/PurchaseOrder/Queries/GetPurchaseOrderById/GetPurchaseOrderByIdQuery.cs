@@ -8,4 +8,3 @@ namespace Energy.Application.Modules.Procurement.PurchaseOrder.Queries.GetPurcha
 /// <param name="Id">İstenen kaydın kimliği.</param>
 public sealed record GetPurchaseOrderByIdQuery(Guid Id)
     : IRequest<BaseResponse<PurchaseOrderDetailResponse>>;
-
