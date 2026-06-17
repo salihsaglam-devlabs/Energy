@@ -16,7 +16,7 @@
     <script src="~/js/documents/document-folder/document-folder.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"])))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Documents.DocumentFolder.Help.Intro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.DocumentsDocumentFolder.init("/documents/document-folders", "document-folder-grid", "Documents");

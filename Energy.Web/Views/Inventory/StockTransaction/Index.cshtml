@@ -16,7 +16,7 @@
     <script src="~/js/inventory/stock-transaction/stock-transaction.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Inventory.StockTransaction.Help.Intro"].Value)),
             related: [
                 @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Catalog.Material.Title"].Value)),
                 @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Inventory.StockDocument.Title"].Value)),

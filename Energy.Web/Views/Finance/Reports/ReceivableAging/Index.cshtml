@@ -2,6 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
     ViewData["Title"] = T["Finance.Reports.ReceivableAging.Title"].Value;
+    ViewData["ScreenId"] = "Finance.Reports.ReceivableAging";
 }
 
 <link rel="stylesheet" href="~/css/finance/reports/receivable-aging/receivable-aging.css" asp-append-version="true" />
@@ -18,7 +19,7 @@
     <script src="~/js/finance/reports/receivable-aging/receivable-aging.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroReport"].Value, ViewData["Title"])))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Finance.Reports.ReceivableAging.Help.Intro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppReports.FinanceReceivableAging.init("/finance/reports/receivable-aging", "receivable-aging-grid", "receivable-aging-filters", { hasStatus: false });

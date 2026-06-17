@@ -13,8 +13,8 @@
     "use strict";
     // Yerelleştirme sözlüğü kısayolları (menüler / grid / bildirimler).
     var L = function () { return window.AppL10n.menus; };
-    var LG = function () { return window.AppL10n.grid; };
-    var LN = function () { return window.AppL10n.notifications; };
+    var LG = function () { return window.AppL10n.menus.grid; };
+    var LN = function () { return window.AppL10n.menus.notifications; };
     // Grid örneği, üst menü araması ve yetki araması verileri.
     var gridInstance, lookupItems = [], permissionsLookup = [];
 
@@ -108,7 +108,7 @@
                 },
                 { type: "buttons", width: 130, caption: LG().actions, fixed: true, fixedPosition: "right", buttons: [
                     { hint: LG().edit, icon: "edit", onClick: function (e) { openEdit(e.row.data); } },
-                    { hint: window.AppL10n.roles.managePermissions, icon: "key", onClick: function (e) { openPermissions(e.row.data); } },
+                    { hint: window.AppL10n.menus.managePermissions, icon: "key", onClick: function (e) { openPermissions(e.row.data); } },
                     { hint: LG().delete, icon: "trash", onClick: function (e) { confirmDelete(e.row.data); } }
                 ]}
             ],
@@ -210,7 +210,7 @@
                 var formData = { permissionIds: selectedIds.slice() };
 
                 var popup = $("<div>").appendTo("body").dxPopup({
-                    title: window.AppL10n.roles.permissionsTitle + " - " + row.name,
+                    title: window.AppL10n.menus.permissionsTitle + " - " + row.name,
                     width: 560,
                     height: "auto",
                     maxWidth: "min(92vw, 960px)",
@@ -224,7 +224,7 @@
                         $("<div>").appendTo(host).dxForm({
                             formData: formData, labelLocation: "top", colCount: 1,
                             items: [{
-                                dataField: "permissionIds", label: { text: window.AppL10n.permissions.title },
+                                dataField: "permissionIds", label: { text: window.AppL10n.menus.permissionLabel },
                                 editorType: "dxTagBox",
                                 editorOptions: {
                                     items: permissionsLookup,

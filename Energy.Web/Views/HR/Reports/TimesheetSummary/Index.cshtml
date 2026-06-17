@@ -2,6 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
     ViewData["Title"] = T["HR.Reports.TimesheetSummary.Title"].Value;
+    ViewData["ScreenId"] = "HR.Reports.TimesheetSummary";
 }
 
 <link rel="stylesheet" href="~/css/h-r/reports/timesheet-summary/timesheet-summary.css" asp-append-version="true" />
@@ -18,7 +19,7 @@
     <script src="~/js/h-r/reports/timesheet-summary/timesheet-summary.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroReport"].Value, ViewData["Title"])))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["HR.Reports.TimesheetSummary.Help.Intro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppReports.HRTimesheetSummary.init("/h-r/reports/timesheet-summary", "timesheet-summary-grid", "timesheet-summary-filters", { hasStatus: true });

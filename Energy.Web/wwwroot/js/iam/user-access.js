@@ -15,9 +15,9 @@
 
     // Yerelleştirme sözlüğü kısayolları (kullanıcı erişimi / grid / bildirimler / kullanıcılar).
     var UA = function () { return (window.AppL10n && window.AppL10n.userAccess) || {}; };
-    var LG = function () { return window.AppL10n.grid; };
-    var LN = function () { return window.AppL10n.notifications; };
-    var LU = function () { return window.AppL10n.users; };
+    var LG = function () { return window.AppL10n.userAccess.grid; };
+    var LN = function () { return window.AppL10n.userAccess.notifications; };
+    var LU = function () { return window.AppL10n.userAccess; };
 
     var usersGrid;
     var rolesLookup = [];          // [{ id, name, description, isSystem }]

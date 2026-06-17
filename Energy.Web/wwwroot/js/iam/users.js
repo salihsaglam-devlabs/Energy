@@ -14,8 +14,8 @@
 
     // Yerelleştirme sözlüğü kısayolları (kullanıcılar / grid / bildirimler).
     var L = function () { return window.AppL10n.users; };
-    var LG = function () { return window.AppL10n.grid; };
-    var LN = function () { return window.AppL10n.notifications; };
+    var LG = function () { return window.AppL10n.users.grid; };
+    var LN = function () { return window.AppL10n.users.notifications; };
 
     // Grid örneği ve rol atamaları için arama verisi.
     var gridInstance, rolesLookup = [];
@@ -244,7 +244,7 @@
                     items: [{
                         dataField: "newPassword", label: { text: L().password },
                         editorOptions: { mode: "password", stylingMode: "outlined" },
-                        validationRules: [{ type: "required", message: window.AppL10n.auth.fieldRequired }]
+                        validationRules: [{ type: "required", message: window.AppL10n.users.fieldRequired }]
                     }]
                 });
             },
@@ -289,7 +289,7 @@
             items[0].items.push({
                 dataField: "password", label: { text: L().password },
                 editorOptions: { mode: "password" },
-                validationRules: [{ type: "required", message: window.AppL10n.auth.fieldRequired }]
+                validationRules: [{ type: "required", message: window.AppL10n.users.fieldRequired }]
             });
         }
         if (opts.includeRoles) {

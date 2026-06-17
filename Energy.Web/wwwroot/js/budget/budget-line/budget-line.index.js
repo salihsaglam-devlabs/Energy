@@ -1,13 +1,13 @@
 /*
  * Budget / BudgetLine — entity-specific DevExtreme grid screen.
- * Shared helpers used: AppHttp, AppNotify, AppAuth, AppL10n. Screen-specific
+ * Shared helpers used: AppHttp, AppNotify, AppAuth. Per-screen texts: window.AppScreenL10n (this screen only). Screen-specific
  * grid columns / FK lookups / CRUD wiring live ONLY in this file.
  */
 (function (window, $) {
     "use strict";
 
-    var LG = function () { return (window.AppL10n && window.AppL10n.grid) || {}; };
-    var LN = function () { return (window.AppL10n && window.AppL10n.notifications) || {}; };
+    var LG = function () { return (window.AppScreenL10n && window.AppScreenL10n.grid) || {}; };
+    var LN = function () { return (window.AppScreenL10n && window.AppScreenL10n.notifications) || {}; };
 
     var HIDDEN_FIELDS = ["id", "createdAt", "createdBy", "updatedAt", "updatedBy",
         "isDeleted", "deletedAt", "deletedBy"];

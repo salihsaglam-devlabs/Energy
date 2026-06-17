@@ -16,7 +16,7 @@
     <script src="~/js/core/unit-of-measure/unit-of-measure.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"])))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Core.UnitOfMeasure.Help.Intro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.CoreUnitOfMeasure.init("/core/units-of-measure", "unit-of-measure-grid", "Core");

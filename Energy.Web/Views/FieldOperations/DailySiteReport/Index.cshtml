@@ -16,7 +16,7 @@
     <script src="~/js/field-operations/daily-site-report/daily-site-report.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["FieldOperations.DailySiteReport.Help.Intro"].Value)),
             related: [
                 @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.Project.Title"].Value)),
                 @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Operations.WorkOrder.Title"].Value))

@@ -2,6 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
     ViewData["Title"] = T["Projects.Reports.ProjectStatusReport.Title"].Value;
+    ViewData["ScreenId"] = "Projects.Reports.ProjectStatusReport";
 }
 
 <link rel="stylesheet" href="~/css/projects/reports/project-status-report/project-status-report.css" asp-append-version="true" />
@@ -18,7 +19,7 @@
     <script src="~/js/projects/reports/project-status-report/project-status-report.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroReport"].Value, ViewData["Title"])))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.Reports.ProjectStatusReport.Help.Intro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppReports.ProjectsProjectStatusReport.init("/projects/reports/project-status-report", "project-status-report-grid", "project-status-report-filters", { hasStatus: false });

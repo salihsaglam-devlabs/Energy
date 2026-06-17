@@ -16,6 +16,54 @@
         var screenDict = ScreenLocalization.Build(screenId!, SL);
         screenJson = System.Text.Json.JsonSerializer.Serialize(screenDict);
     }
+
+    // Bespoke IAM/Core ekranları (Users, Roles, Menus, ...) generic grid kaydında
+    // olmadığından kendi grid/bildirim/ödünç metinlerini kendi "{Prefix}.*"
+    // bölümlerinden alır. Aşağıdaki harita her ekranın JS namespace'ine bu
+    // ekran-özel metinleri ekler; böylece hiçbir özel ekran paylaşımlı Grid.* /
+    // Notifications.* / başka ekranın anahtarını kullanmaz.
+    Dictionary<string, string> GridBlock(string p) => new()
+    {
+        ["add"] = Tx(p + ".GridAdd"), ["edit"] = Tx(p + ".GridEdit"), ["delete"] = Tx(p + ".GridDelete"),
+        ["save"] = Tx(p + ".GridSave"), ["cancel"] = Tx(p + ".GridCancel"), ["refresh"] = Tx(p + ".GridRefresh"),
+        ["search"] = Tx(p + ".GridSearch"), ["loading"] = Tx(p + ".GridLoading"), ["noData"] = Tx(p + ".GridNoData"),
+        ["actions"] = Tx(p + ".GridActions"), ["confirmDelete"] = Tx(p + ".GridConfirmDelete"),
+    };
+    Dictionary<string, string> NotifBlock(string p) => new()
+    {
+        ["saved"] = Tx(p + ".NotifSaved"), ["deleted"] = Tx(p + ".NotifDeleted"),
+        ["failed"] = Tx(p + ".NotifFailed"), ["networkError"] = Tx(p + ".NotifNetworkError"),
+    };
+    object ScreenExtra(string p, bool grid, bool notif, Dictionary<string, string>? extra = null)
+    {
+        var d = new Dictionary<string, object?>();
+        if (grid) { d["grid"] = GridBlock(p); }
+        if (notif) { d["notifications"] = NotifBlock(p); }
+        if (extra != null) { foreach (var kv in extra) { d[kv.Key] = Tx(p + "." + kv.Value); } }
+        return d;
+    }
+    var screenExtras = new Dictionary<string, object?>
+    {
+        ["users"] = ScreenExtra("UsersScreen", true, true, new() { ["fieldRequired"] = "FieldRequired" }),
+        ["roles"] = ScreenExtra("RolesScreen", true, true, new() { ["permissionLabel"] = "PermissionLabel" }),
+        ["menus"] = ScreenExtra("MenusScreen", true, true, new()
+        {
+            ["managePermissions"] = "ManagePermissions",
+            ["permissionsTitle"] = "PermissionsTitle",
+            ["permissionLabel"] = "PermissionLabel",
+        }),
+        ["permissions"] = ScreenExtra("PermissionsScreen", true, true),
+        ["userAccess"] = ScreenExtra("UserAccessScreen", true, true, new()
+        {
+            ["firstName"] = "FirstName", ["lastName"] = "LastName",
+            ["userName"] = "UserName", ["isActive"] = "IsActive",
+        }),
+        ["apiEndpoints"] = ScreenExtra("ApiEndpointsScreen", true, true),
+        ["logs"] = ScreenExtra("LogsScreen", true, true),
+        ["settings"] = ScreenExtra("SettingsScreen", false, true),
+        ["localization"] = ScreenExtra("LocalizationScreen", true, true),
+    };
+    var screenExtrasJson = System.Text.Json.JsonSerializer.Serialize(screenExtras);
 }
 <script>
     window.AppL10n = {
@@ -312,14 +360,19 @@
     };
 
     // ---- Ekran bazlı yerelleştirme (per-screen) ----
-    // Aktif ekranın tüm metinleri window.AppScreen üzerinde toplanır. Ayrıca
-    // mevcut ekran kodlarının (LG()/LN() ve grid-l10n.js) hiçbir değişiklik
-    // yapmadan ekran-özel metinleri kullanması için paylaşımlı sözlükler bu
-    // ekranın değerleriyle ezilir. Her sayfa tek bir ekran olduğundan bu
-    // güvenlidir ve "her ekran kendi metnini kullanır" kuralını sağlar.
-    window.AppScreen = @Html.Raw(screenJson);
-    if (window.AppScreen) {
-        var s = window.AppScreen;
+    // Aktif ekranın TÜM metinleri window.AppScreenL10n üzerinde toplanır. Ekran
+    // JS dosyaları (LG()/LN()/LR()/LP()) doğrudan bu nesneden okur; ortak
+    // window.AppL10n sözlüklerine bağımlılık yoktur. (Not: window.AppScreen adı
+    // görsel rozet bileşeni screen.js tarafından kullanıldığından çakışmayı
+    // önlemek için ayrı bir ad kullanılır.)
+    //
+    // Ayrıca yalnızca ekrandan-bağımsız ortak yardımcıların (grid-l10n.js kolon
+    // başlıkları, screen.js rozetleri, info-panel.js yardım metni) ekran-özel
+    // metinleri kullanması için ilgili paylaşımlı sözlükler bu ekranın
+    // değerleriyle ezilir. Her sayfa tek bir ekran olduğundan bu güvenlidir.
+    window.AppScreenL10n = @Html.Raw(screenJson);
+    if (window.AppScreenL10n) {
+        var s = window.AppScreenL10n;
         // Kolon başlıkları: ekranın kendi Columns sözlüğü globalin üstüne yazılır.
         if (s.columns) {
             window.AppL10n.captions = window.AppL10n.captions || {};
@@ -357,6 +410,90 @@
         if (s.confirm && s.confirm.delete) {
             window.AppL10n.grid = window.AppL10n.grid || {};
             window.AppL10n.grid.confirmDelete = s.confirm.delete;
+        }
+        // Süreç ekranı metinleri (Çalıştır, hata, sonuç etiketleri) ekran-özel.
+        if (s.process) {
+            window.AppL10n.processes = window.AppL10n.processes || {};
+            if (s.process.genericError) { window.AppL10n.processes.genericError = s.process.genericError; }
+            if (s.process.genericSuccess) { window.AppL10n.processes.genericSuccess = s.process.genericSuccess; }
+            if (s.process.submit) { window.AppL10n.processes.submit = s.process.submit; }
+            if (s.process.reset) { window.AppL10n.processes.reset = s.process.reset; }
+            if (s.process.resultTotal) { window.AppL10n.processes.resultTotal = s.process.resultTotal; }
+            if (s.process.resultTotalCost) { window.AppL10n.processes.resultTotalCost = s.process.resultTotalCost; }
+            if (s.process.resultTransaction) { window.AppL10n.processes.resultTransaction = s.process.resultTransaction; }
+            if (s.process.resultLines) { window.AppL10n.processes.resultLines = s.process.resultLines; }
+            if (s.process.resultAllocations) { window.AppL10n.processes.resultAllocations = s.process.resultAllocations; }
+        }
+        // Rapor ekranı metinleri (tarih filtreleri, durum, dışa aktar) ekran-özel.
+        if (s.report) {
+            window.AppL10n.reports = window.AppL10n.reports || {};
+            if (s.report.startDate) { window.AppL10n.reports.startDate = s.report.startDate; }
+            if (s.report.endDate) { window.AppL10n.reports.endDate = s.report.endDate; }
+            if (s.report.status) { window.AppL10n.reports.status = s.report.status; }
+            if (s.report.allStatuses) { window.AppL10n.reports.allStatuses = s.report.allStatuses; }
+            if (s.report.export) { window.AppL10n.reports.export = s.report.export; }
+            if (s.report.filters) { window.AppL10n.reports.filters = s.report.filters; }
+            if (s.report.refresh) { window.AppL10n.reports.refresh = s.report.refresh; }
+        }
+        // Yardım/açıklama paneli ekran-özel — info panel bu ekranın metinlerini gösterir.
+        if (s.help) {
+            window.AppL10n.help = window.AppL10n.help || {};
+            for (var hk in s.help) {
+                if (Object.prototype.hasOwnProperty.call(s.help, hk) && s.help[hk]) {
+                    window.AppL10n.help[hk] = s.help[hk];
+                }
+            }
+        }
+        // Modül aksiyon butonları ekran-özel.
+        if (s.moduleActions) {
+            window.AppL10n.moduleActions = window.AppL10n.moduleActions || {};
+            for (var mk in s.moduleActions) {
+                if (Object.prototype.hasOwnProperty.call(s.moduleActions, mk) && s.moduleActions[mk]) {
+                    window.AppL10n.moduleActions[mk] = s.moduleActions[mk];
+                }
+            }
+        }
+        // Diyalog/uyarı butonları ekran-özel.
+        if (s.alerts) {
+            window.AppL10n.alerts = window.AppL10n.alerts || {};
+            for (var ak in s.alerts) {
+                if (Object.prototype.hasOwnProperty.call(s.alerts, ak) && s.alerts[ak]) {
+                    window.AppL10n.alerts[ak] = s.alerts[ak];
+                }
+            }
+        }
+        // Genel diyalog metinleri ekran-özel.
+        if (s.common) {
+            window.AppL10n.common = window.AppL10n.common || {};
+            for (var ck in s.common) {
+                if (Object.prototype.hasOwnProperty.call(s.common, ck) && s.common[ck]) {
+                    window.AppL10n.common[ck] = s.common[ck];
+                }
+            }
+        }
+        // Ekran tür rozeti ekran-özel.
+        if (s.screenChrome) {
+            window.AppL10n.screen = window.AppL10n.screen || {};
+            for (var sk in s.screenChrome) {
+                if (Object.prototype.hasOwnProperty.call(s.screenChrome, sk) && s.screenChrome[sk]) {
+                    window.AppL10n.screen[sk] = s.screenChrome[sk];
+                }
+            }
+        }
+    }
+
+    // ---- Bespoke ekran metinleri (Users/Roles/Menus/...) ----
+    // Her özel ekranın grid/bildirim/ödünç metinleri KENDİ namespace'ine eklenir;
+    // bu ekranlar artık paylaşımlı window.AppL10n.grid/notifications kullanmaz.
+    var __screenExtras = @Html.Raw(screenExtrasJson);
+    for (var __ns in __screenExtras) {
+        if (!Object.prototype.hasOwnProperty.call(__screenExtras, __ns)) { continue; }
+        window.AppL10n[__ns] = window.AppL10n[__ns] || {};
+        var __src = __screenExtras[__ns];
+        for (var __k in __src) {
+            if (Object.prototype.hasOwnProperty.call(__src, __k)) {
+                window.AppL10n[__ns][__k] = __src[__k];
+            }
         }
     }
 </script>

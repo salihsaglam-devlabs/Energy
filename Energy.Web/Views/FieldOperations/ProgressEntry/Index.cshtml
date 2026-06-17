@@ -16,7 +16,7 @@
     <script src="~/js/field-operations/progress-entry/progress-entry.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["FieldOperations.ProgressEntry.Help.Intro"].Value)),
             related: [
                 @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.Project.Title"].Value))
             ]

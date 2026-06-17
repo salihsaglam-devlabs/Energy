@@ -16,7 +16,7 @@
     <script src="~/js/workflow/approval-delegation/approval-delegation.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"])))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Workflow.ApprovalDelegation.Help.Intro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.WorkflowApprovalDelegation.init("/workflow/approval-delegations", "approval-delegation-grid", "Workflow");

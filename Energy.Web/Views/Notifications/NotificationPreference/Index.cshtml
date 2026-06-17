@@ -16,7 +16,7 @@
     <script src="~/js/notifications/notification-preference/notification-preference.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"])))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Notifications.NotificationPreference.Help.Intro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.NotificationsNotificationPreference.init("/notifications/notification-preferences", "notification-preference-grid", "Notifications");

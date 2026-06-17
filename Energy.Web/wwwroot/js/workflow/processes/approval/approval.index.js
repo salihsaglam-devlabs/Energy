@@ -8,7 +8,7 @@
     "use strict";
 
     function init(base, gridId, labels) {
-        var LP = function () { return (window.AppL10n && window.AppL10n.processes) || {}; };
+        var LP = function () { return (window.AppScreenL10n && window.AppScreenL10n.process) || {}; };
         var notify = window.AppNotify || { success: function () {}, error: function () {} };
 
         var store = new DevExpress.data.CustomStore({

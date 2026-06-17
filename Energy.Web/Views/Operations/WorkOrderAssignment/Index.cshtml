@@ -16,7 +16,7 @@
     <script src="~/js/operations/work-order-assignment/work-order-assignment.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Operations.WorkOrderAssignment.Help.Intro"].Value)),
             related: [
                 @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Organization.Employee.Title"].Value)),
                 @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Operations.WorkOrder.Title"].Value))

@@ -16,7 +16,7 @@
     <script src="~/js/operations/work-order-checklist-item/work-order-checklist-item.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Operations.WorkOrderChecklistItem.Help.Intro"].Value)),
             related: [
                 @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Operations.WorkOrderChecklist.Title"].Value))
             ]

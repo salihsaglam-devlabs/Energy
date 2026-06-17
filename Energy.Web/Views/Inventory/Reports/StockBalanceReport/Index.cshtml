@@ -2,6 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
     ViewData["Title"] = T["Inventory.Reports.StockBalanceReport.Title"].Value;
+    ViewData["ScreenId"] = "Inventory.Reports.StockBalanceReport";
 }
 
 <link rel="stylesheet" href="~/css/inventory/reports/stock-balance-report/stock-balance-report.css" asp-append-version="true" />
@@ -18,7 +19,7 @@
     <script src="~/js/inventory/reports/stock-balance-report/stock-balance-report.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroReport"].Value, ViewData["Title"])))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Inventory.Reports.StockBalanceReport.Help.Intro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppReports.InventoryStockBalanceReport.init("/inventory/reports/stock-balance-report", "stock-balance-report-grid", "stock-balance-report-filters", { hasStatus: false });

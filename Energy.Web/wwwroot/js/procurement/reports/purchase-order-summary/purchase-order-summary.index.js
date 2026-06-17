@@ -14,7 +14,7 @@
     }
 
     function init(base, gridId, filtersId, opts) {
-        var LR = function () { return (window.AppL10n && window.AppL10n.reports) || {}; };
+        var LR = function () { return (window.AppScreenL10n && window.AppScreenL10n.report) || {}; };
         var state = { startDate: null, endDate: null, status: null };
 
         function buildQuery(loadOptions) {

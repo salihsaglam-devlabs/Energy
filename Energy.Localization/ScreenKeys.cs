@@ -6502,4 +6502,256 @@ public static class ScreenKeys
         }
     }
 
+    /// <summary>Procurement.Processes.GoodsReceipt</summary>
+    public static class Procurement_Processes_GoodsReceipt
+    {
+        public const string ScreenId = "Procurement.Processes.GoodsReceipt";
+        public const string Title = "Procurement.Processes.GoodsReceipt.Title";
+        public static class Process
+        {
+            public const string GenericError = "Procurement.Processes.GoodsReceipt.Process.GenericError";
+            public const string GenericSuccess = "Procurement.Processes.GoodsReceipt.Process.GenericSuccess";
+            public const string Submit = "Procurement.Processes.GoodsReceipt.Process.Submit";
+            public const string Reset = "Procurement.Processes.GoodsReceipt.Process.Reset";
+            public const string ResultTotal = "Procurement.Processes.GoodsReceipt.Process.ResultTotal";
+            public const string ResultTotalCost = "Procurement.Processes.GoodsReceipt.Process.ResultTotalCost";
+            public const string ResultTransaction = "Procurement.Processes.GoodsReceipt.Process.ResultTransaction";
+            public const string ResultLines = "Procurement.Processes.GoodsReceipt.Process.ResultLines";
+            public const string ResultAllocations = "Procurement.Processes.GoodsReceipt.Process.ResultAllocations";
+        }
+    }
+
+    /// <summary>Inventory.Processes.StockIssue</summary>
+    public static class Inventory_Processes_StockIssue
+    {
+        public const string ScreenId = "Inventory.Processes.StockIssue";
+        public const string Title = "Inventory.Processes.StockIssue.Title";
+        public static class Process
+        {
+            public const string GenericError = "Inventory.Processes.StockIssue.Process.GenericError";
+            public const string GenericSuccess = "Inventory.Processes.StockIssue.Process.GenericSuccess";
+            public const string Submit = "Inventory.Processes.StockIssue.Process.Submit";
+            public const string Reset = "Inventory.Processes.StockIssue.Process.Reset";
+            public const string ResultTotal = "Inventory.Processes.StockIssue.Process.ResultTotal";
+            public const string ResultTotalCost = "Inventory.Processes.StockIssue.Process.ResultTotalCost";
+            public const string ResultTransaction = "Inventory.Processes.StockIssue.Process.ResultTransaction";
+            public const string ResultLines = "Inventory.Processes.StockIssue.Process.ResultLines";
+            public const string ResultAllocations = "Inventory.Processes.StockIssue.Process.ResultAllocations";
+        }
+    }
+
+    /// <summary>Inventory.Processes.StockTransfer</summary>
+    public static class Inventory_Processes_StockTransfer
+    {
+        public const string ScreenId = "Inventory.Processes.StockTransfer";
+        public const string Title = "Inventory.Processes.StockTransfer.Title";
+        public static class Process
+        {
+            public const string GenericError = "Inventory.Processes.StockTransfer.Process.GenericError";
+            public const string GenericSuccess = "Inventory.Processes.StockTransfer.Process.GenericSuccess";
+            public const string Submit = "Inventory.Processes.StockTransfer.Process.Submit";
+            public const string Reset = "Inventory.Processes.StockTransfer.Process.Reset";
+            public const string ResultTotal = "Inventory.Processes.StockTransfer.Process.ResultTotal";
+            public const string ResultTotalCost = "Inventory.Processes.StockTransfer.Process.ResultTotalCost";
+            public const string ResultTransaction = "Inventory.Processes.StockTransfer.Process.ResultTransaction";
+            public const string ResultLines = "Inventory.Processes.StockTransfer.Process.ResultLines";
+            public const string ResultAllocations = "Inventory.Processes.StockTransfer.Process.ResultAllocations";
+        }
+    }
+
+    /// <summary>Workflow.Processes.Approval</summary>
+    public static class Workflow_Processes_Approval
+    {
+        public const string ScreenId = "Workflow.Processes.Approval";
+        public const string Title = "Workflow.Processes.Approval.Title";
+        public static class Process
+        {
+            public const string GenericError = "Workflow.Processes.Approval.Process.GenericError";
+            public const string GenericSuccess = "Workflow.Processes.Approval.Process.GenericSuccess";
+            public const string Submit = "Workflow.Processes.Approval.Process.Submit";
+            public const string Reset = "Workflow.Processes.Approval.Process.Reset";
+            public const string ResultTotal = "Workflow.Processes.Approval.Process.ResultTotal";
+            public const string ResultTotalCost = "Workflow.Processes.Approval.Process.ResultTotalCost";
+            public const string ResultTransaction = "Workflow.Processes.Approval.Process.ResultTransaction";
+            public const string ResultLines = "Workflow.Processes.Approval.Process.ResultLines";
+            public const string ResultAllocations = "Workflow.Processes.Approval.Process.ResultAllocations";
+        }
+    }
+
+    /// <summary>Finance.Processes.PaymentAllocation</summary>
+    public static class Finance_Processes_PaymentAllocation
+    {
+        public const string ScreenId = "Finance.Processes.PaymentAllocation";
+        public const string Title = "Finance.Processes.PaymentAllocation.Title";
+        public static class Process
+        {
+            public const string GenericError = "Finance.Processes.PaymentAllocation.Process.GenericError";
+            public const string GenericSuccess = "Finance.Processes.PaymentAllocation.Process.GenericSuccess";
+            public const string Submit = "Finance.Processes.PaymentAllocation.Process.Submit";
+            public const string Reset = "Finance.Processes.PaymentAllocation.Process.Reset";
+            public const string ResultTotal = "Finance.Processes.PaymentAllocation.Process.ResultTotal";
+            public const string ResultTotalCost = "Finance.Processes.PaymentAllocation.Process.ResultTotalCost";
+            public const string ResultTransaction = "Finance.Processes.PaymentAllocation.Process.ResultTransaction";
+            public const string ResultLines = "Finance.Processes.PaymentAllocation.Process.ResultLines";
+            public const string ResultAllocations = "Finance.Processes.PaymentAllocation.Process.ResultAllocations";
+        }
+    }
+
+    /// <summary>Finance.Processes.ProgressPaymentPosting</summary>
+    public static class Finance_Processes_ProgressPaymentPosting
+    {
+        public const string ScreenId = "Finance.Processes.ProgressPaymentPosting";
+        public const string Title = "Finance.Processes.ProgressPaymentPosting.Title";
+        public static class Process
+        {
+            public const string GenericError = "Finance.Processes.ProgressPaymentPosting.Process.GenericError";
+            public const string GenericSuccess = "Finance.Processes.ProgressPaymentPosting.Process.GenericSuccess";
+            public const string Submit = "Finance.Processes.ProgressPaymentPosting.Process.Submit";
+            public const string Reset = "Finance.Processes.ProgressPaymentPosting.Process.Reset";
+            public const string ResultTotal = "Finance.Processes.ProgressPaymentPosting.Process.ResultTotal";
+            public const string ResultTotalCost = "Finance.Processes.ProgressPaymentPosting.Process.ResultTotalCost";
+            public const string ResultTransaction = "Finance.Processes.ProgressPaymentPosting.Process.ResultTransaction";
+            public const string ResultLines = "Finance.Processes.ProgressPaymentPosting.Process.ResultLines";
+            public const string ResultAllocations = "Finance.Processes.ProgressPaymentPosting.Process.ResultAllocations";
+        }
+    }
+
+    /// <summary>Finance.Processes.TimesheetCost</summary>
+    public static class Finance_Processes_TimesheetCost
+    {
+        public const string ScreenId = "Finance.Processes.TimesheetCost";
+        public const string Title = "Finance.Processes.TimesheetCost.Title";
+        public static class Process
+        {
+            public const string GenericError = "Finance.Processes.TimesheetCost.Process.GenericError";
+            public const string GenericSuccess = "Finance.Processes.TimesheetCost.Process.GenericSuccess";
+            public const string Submit = "Finance.Processes.TimesheetCost.Process.Submit";
+            public const string Reset = "Finance.Processes.TimesheetCost.Process.Reset";
+            public const string ResultTotal = "Finance.Processes.TimesheetCost.Process.ResultTotal";
+            public const string ResultTotalCost = "Finance.Processes.TimesheetCost.Process.ResultTotalCost";
+            public const string ResultTransaction = "Finance.Processes.TimesheetCost.Process.ResultTransaction";
+            public const string ResultLines = "Finance.Processes.TimesheetCost.Process.ResultLines";
+            public const string ResultAllocations = "Finance.Processes.TimesheetCost.Process.ResultAllocations";
+        }
+    }
+
+    /// <summary>Projects.Reports.ProjectStatusReport</summary>
+    public static class Projects_Reports_ProjectStatusReport
+    {
+        public const string ScreenId = "Projects.Reports.ProjectStatusReport";
+        public const string Title = "Projects.Reports.ProjectStatusReport.Title";
+        public static class Report
+        {
+            public const string StartDate = "Projects.Reports.ProjectStatusReport.Report.StartDate";
+            public const string EndDate = "Projects.Reports.ProjectStatusReport.Report.EndDate";
+            public const string Status = "Projects.Reports.ProjectStatusReport.Report.Status";
+            public const string AllStatuses = "Projects.Reports.ProjectStatusReport.Report.AllStatuses";
+            public const string Export = "Projects.Reports.ProjectStatusReport.Report.Export";
+            public const string Filters = "Projects.Reports.ProjectStatusReport.Report.Filters";
+            public const string Refresh = "Projects.Reports.ProjectStatusReport.Report.Refresh";
+        }
+    }
+
+    /// <summary>ProgressPayments.Reports.ProgressPaymentSummary</summary>
+    public static class ProgressPayments_Reports_ProgressPaymentSummary
+    {
+        public const string ScreenId = "ProgressPayments.Reports.ProgressPaymentSummary";
+        public const string Title = "ProgressPayments.Reports.ProgressPaymentSummary.Title";
+        public static class Report
+        {
+            public const string StartDate = "ProgressPayments.Reports.ProgressPaymentSummary.Report.StartDate";
+            public const string EndDate = "ProgressPayments.Reports.ProgressPaymentSummary.Report.EndDate";
+            public const string Status = "ProgressPayments.Reports.ProgressPaymentSummary.Report.Status";
+            public const string AllStatuses = "ProgressPayments.Reports.ProgressPaymentSummary.Report.AllStatuses";
+            public const string Export = "ProgressPayments.Reports.ProgressPaymentSummary.Report.Export";
+            public const string Filters = "ProgressPayments.Reports.ProgressPaymentSummary.Report.Filters";
+            public const string Refresh = "ProgressPayments.Reports.ProgressPaymentSummary.Report.Refresh";
+        }
+    }
+
+    /// <summary>Procurement.Reports.PurchaseOrderSummary</summary>
+    public static class Procurement_Reports_PurchaseOrderSummary
+    {
+        public const string ScreenId = "Procurement.Reports.PurchaseOrderSummary";
+        public const string Title = "Procurement.Reports.PurchaseOrderSummary.Title";
+        public static class Report
+        {
+            public const string StartDate = "Procurement.Reports.PurchaseOrderSummary.Report.StartDate";
+            public const string EndDate = "Procurement.Reports.PurchaseOrderSummary.Report.EndDate";
+            public const string Status = "Procurement.Reports.PurchaseOrderSummary.Report.Status";
+            public const string AllStatuses = "Procurement.Reports.PurchaseOrderSummary.Report.AllStatuses";
+            public const string Export = "Procurement.Reports.PurchaseOrderSummary.Report.Export";
+            public const string Filters = "Procurement.Reports.PurchaseOrderSummary.Report.Filters";
+            public const string Refresh = "Procurement.Reports.PurchaseOrderSummary.Report.Refresh";
+        }
+    }
+
+    /// <summary>Inventory.Reports.StockBalanceReport</summary>
+    public static class Inventory_Reports_StockBalanceReport
+    {
+        public const string ScreenId = "Inventory.Reports.StockBalanceReport";
+        public const string Title = "Inventory.Reports.StockBalanceReport.Title";
+        public static class Report
+        {
+            public const string StartDate = "Inventory.Reports.StockBalanceReport.Report.StartDate";
+            public const string EndDate = "Inventory.Reports.StockBalanceReport.Report.EndDate";
+            public const string Status = "Inventory.Reports.StockBalanceReport.Report.Status";
+            public const string AllStatuses = "Inventory.Reports.StockBalanceReport.Report.AllStatuses";
+            public const string Export = "Inventory.Reports.StockBalanceReport.Report.Export";
+            public const string Filters = "Inventory.Reports.StockBalanceReport.Report.Filters";
+            public const string Refresh = "Inventory.Reports.StockBalanceReport.Report.Refresh";
+        }
+    }
+
+    /// <summary>HR.Reports.TimesheetSummary</summary>
+    public static class HR_Reports_TimesheetSummary
+    {
+        public const string ScreenId = "HR.Reports.TimesheetSummary";
+        public const string Title = "HR.Reports.TimesheetSummary.Title";
+        public static class Report
+        {
+            public const string StartDate = "HR.Reports.TimesheetSummary.Report.StartDate";
+            public const string EndDate = "HR.Reports.TimesheetSummary.Report.EndDate";
+            public const string Status = "HR.Reports.TimesheetSummary.Report.Status";
+            public const string AllStatuses = "HR.Reports.TimesheetSummary.Report.AllStatuses";
+            public const string Export = "HR.Reports.TimesheetSummary.Report.Export";
+            public const string Filters = "HR.Reports.TimesheetSummary.Report.Filters";
+            public const string Refresh = "HR.Reports.TimesheetSummary.Report.Refresh";
+        }
+    }
+
+    /// <summary>Finance.Reports.PayableAging</summary>
+    public static class Finance_Reports_PayableAging
+    {
+        public const string ScreenId = "Finance.Reports.PayableAging";
+        public const string Title = "Finance.Reports.PayableAging.Title";
+        public static class Report
+        {
+            public const string StartDate = "Finance.Reports.PayableAging.Report.StartDate";
+            public const string EndDate = "Finance.Reports.PayableAging.Report.EndDate";
+            public const string Status = "Finance.Reports.PayableAging.Report.Status";
+            public const string AllStatuses = "Finance.Reports.PayableAging.Report.AllStatuses";
+            public const string Export = "Finance.Reports.PayableAging.Report.Export";
+            public const string Filters = "Finance.Reports.PayableAging.Report.Filters";
+            public const string Refresh = "Finance.Reports.PayableAging.Report.Refresh";
+        }
+    }
+
+    /// <summary>Finance.Reports.ReceivableAging</summary>
+    public static class Finance_Reports_ReceivableAging
+    {
+        public const string ScreenId = "Finance.Reports.ReceivableAging";
+        public const string Title = "Finance.Reports.ReceivableAging.Title";
+        public static class Report
+        {
+            public const string StartDate = "Finance.Reports.ReceivableAging.Report.StartDate";
+            public const string EndDate = "Finance.Reports.ReceivableAging.Report.EndDate";
+            public const string Status = "Finance.Reports.ReceivableAging.Report.Status";
+            public const string AllStatuses = "Finance.Reports.ReceivableAging.Report.AllStatuses";
+            public const string Export = "Finance.Reports.ReceivableAging.Report.Export";
+            public const string Filters = "Finance.Reports.ReceivableAging.Report.Filters";
+            public const string Refresh = "Finance.Reports.ReceivableAging.Report.Refresh";
+        }
+    }
+
 }

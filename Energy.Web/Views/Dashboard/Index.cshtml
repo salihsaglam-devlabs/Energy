@@ -2,7 +2,7 @@
 @model Energy.Web.Models.Dashboard.DashboardIndexViewModel
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
-    ViewData["Title"] = T[LocalizationKeys.Menus.Dashboard].Value;
+    ViewData["Title"] = T[LocalizationKeys.Dashboard.Title].Value;
 
     string ResolveQuickLinkTitle(string titleOrKey) => T[titleOrKey].Value;
 
@@ -18,7 +18,7 @@
 <section class="energy-dashboard">
     <header class="energy-dashboard__hero">
         <div class="energy-dashboard__hero-copy">
-            <span class="energy-dashboard__eyebrow">@T[LocalizationKeys.Common.AppName]</span>
+            <span class="energy-dashboard__eyebrow">@T[LocalizationKeys.Dashboard.Brand]</span>
             <h2>@T[LocalizationKeys.Dashboard.Title]</h2>
             <p>@T[LocalizationKeys.Dashboard.Subtitle]</p>
         </div>

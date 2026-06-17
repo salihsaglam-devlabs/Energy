@@ -16,7 +16,7 @@
     <script src="~/js/core/localization-resource/localization-resource.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"])))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Core.LocalizationResource.Help.Intro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.CoreLocalizationResource.init("/core/localization-resources", "localization-resource-grid", "Core");

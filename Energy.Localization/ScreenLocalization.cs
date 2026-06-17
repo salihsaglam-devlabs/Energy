@@ -140,8 +140,35 @@ public static class ScreenLocalization
         ["Workflow.ApprovalStepDefinition"] = new[] { "approvalDefinitionVersionId", "stepNo", "approvalMode", "requiredApprovalCount", "isRequired", "name" },
     };
 
+    // Süreç (operasyonel) ekranları — kendi Process.* metin bölümüne sahiptir.
+    public static readonly HashSet<string> ProcessScreens = new(System.StringComparer.OrdinalIgnoreCase)
+    {
+        "Procurement.Processes.GoodsReceipt",
+        "Inventory.Processes.StockIssue",
+        "Inventory.Processes.StockTransfer",
+        "Workflow.Processes.Approval",
+        "Finance.Processes.PaymentAllocation",
+        "Finance.Processes.ProgressPaymentPosting",
+        "Finance.Processes.TimesheetCost",
+    };
+
+    // Rapor ekranları — kendi Report.* metin bölümüne sahiptir.
+    public static readonly HashSet<string> ReportScreens = new(System.StringComparer.OrdinalIgnoreCase)
+    {
+        "Projects.Reports.ProjectStatusReport",
+        "ProgressPayments.Reports.ProgressPaymentSummary",
+        "Procurement.Reports.PurchaseOrderSummary",
+        "Inventory.Reports.StockBalanceReport",
+        "HR.Reports.TimesheetSummary",
+        "Finance.Reports.PayableAging",
+        "Finance.Reports.ReceivableAging",
+    };
+
     public static bool IsKnown(string? screenId)
-        => !string.IsNullOrWhiteSpace(screenId) && Registry.ContainsKey(screenId);
+        => !string.IsNullOrWhiteSpace(screenId)
+           && (Registry.ContainsKey(screenId!)
+               || ProcessScreens.Contains(screenId!)
+               || ReportScreens.Contains(screenId!));
 
     // Verilen ekran için tüm metinleri içeren iç içe sözlük döndürür.
     // JSON'a çevrilip window.AppScreen olarak istemciye verilir.
@@ -161,7 +188,7 @@ public static class ScreenLocalization
                 columns[f] = Tx("Columns." + f);
         }
 
-        return new Dictionary<string, object?>
+        var result = new Dictionary<string, object?>
         {
             ["id"] = screenId,
             ["title"] = Tx("Title"),
@@ -204,6 +231,121 @@ public static class ScreenLocalization
             {
                 ["delete"] = Tx("Confirm.Delete"),
             },
+            // Yardım/açıklama paneli — her ekran kendi Help.* bölümünden.
+            ["help"] = new Dictionary<string, string>
+            {
+                ["title"] = Tx("Help.Title"),
+                ["button"] = Tx("Help.Button"),
+                ["close"] = Tx("Help.Close"),
+                ["purposeTitle"] = Tx("Help.PurposeTitle"),
+                ["introGeneric"] = Tx("Help.IntroGeneric"),
+                ["introEntity"] = Tx("Help.Intro"),
+                ["stepsTitle"] = Tx("Help.StepsTitle"),
+                ["gridTitle"] = Tx("Help.GridTitle"),
+                ["gridSearch"] = Tx("Help.GridSearch"),
+                ["gridFilterRow"] = Tx("Help.GridFilterRow"),
+                ["gridHeaderFilter"] = Tx("Help.GridHeaderFilter"),
+                ["gridColumnChooser"] = Tx("Help.GridColumnChooser"),
+                ["gridSort"] = Tx("Help.GridSort"),
+                ["gridExport"] = Tx("Help.GridExport"),
+                ["gridPaging"] = Tx("Help.GridPaging"),
+                ["actionsTitle"] = Tx("Help.ActionsTitle"),
+                ["actionsExtraTitle"] = Tx("Help.ActionsExtraTitle"),
+                ["actionAdd"] = Tx("Help.ActionAdd"),
+                ["actionEdit"] = Tx("Help.ActionEdit"),
+                ["actionDelete"] = Tx("Help.ActionDelete"),
+                ["columnsTitle"] = Tx("Help.ColumnsTitle"),
+                ["filtersTitle"] = Tx("Help.FiltersTitle"),
+                ["relatedTitle"] = Tx("Help.RelatedTitle"),
+                ["relatedNote"] = Tx("Help.RelatedNote"),
+                ["lookupNote"] = Tx("Help.LookupNote"),
+            },
+            // Modül aksiyon butonları (onayla/reddet/iade vb.) — ekran-özel.
+            ["moduleActions"] = new Dictionary<string, string>
+            {
+                ["column"] = Tx("ModuleActions.column"),
+                ["approve"] = Tx("ModuleActions.approve"),
+                ["reject"] = Tx("ModuleActions.reject"),
+                ["return"] = Tx("ModuleActions.return"),
+                ["cancel"] = Tx("ModuleActions.cancel"),
+                ["reverse"] = Tx("ModuleActions.reverse"),
+                ["receive"] = Tx("ModuleActions.receive"),
+                ["close"] = Tx("ModuleActions.close"),
+                ["reopen"] = Tx("ModuleActions.reopen"),
+                ["activate"] = Tx("ModuleActions.activate"),
+                ["validate"] = Tx("ModuleActions.validate"),
+                ["confirmTitle"] = Tx("ModuleActions.confirmTitle"),
+                ["confirmMessage"] = Tx("ModuleActions.confirmMessage"),
+                ["notePrompt"] = Tx("ModuleActions.notePrompt"),
+                ["succeeded"] = Tx("ModuleActions.succeeded"),
+                ["validationOk"] = Tx("ModuleActions.validationOk"),
+                ["validationIssues"] = Tx("ModuleActions.validationIssues"),
+            },
+            // Diyalog/uyarı butonları — ekran-özel.
+            ["alerts"] = new Dictionary<string, string>
+            {
+                ["success"] = Tx("Alerts.success"),
+                ["info"] = Tx("Alerts.info"),
+                ["warning"] = Tx("Alerts.warning"),
+                ["error"] = Tx("Alerts.error"),
+                ["confirm"] = Tx("Alerts.confirm"),
+                ["ok"] = Tx("Alerts.ok"),
+                ["cancel"] = Tx("Alerts.cancel"),
+            },
+            // Genel diyalog metinleri — ekran-özel.
+            ["common"] = new Dictionary<string, string>
+            {
+                ["error"] = Tx("Common.error"),
+                ["cancel"] = Tx("Common.cancel"),
+                ["save"] = Tx("Common.save"),
+                ["yes"] = Tx("Common.yes"),
+                ["no"] = Tx("Common.no"),
+            },
+            // Ekran tür rozeti (CRUD/süreç/rapor) — ekran-özel.
+            ["screenChrome"] = new Dictionary<string, string>
+            {
+                ["entityBadge"] = Tx("ScreenChrome.entityBadge"),
+                ["entityBadgeTitle"] = Tx("ScreenChrome.entityBadgeTitle"),
+                ["processBadge"] = Tx("ScreenChrome.processBadge"),
+                ["processBadgeTitle"] = Tx("ScreenChrome.processBadgeTitle"),
+                ["reportBadge"] = Tx("ScreenChrome.reportBadge"),
+                ["reportBadgeTitle"] = Tx("ScreenChrome.reportBadgeTitle"),
+                ["lookupMissing"] = Tx("ScreenChrome.lookupMissing"),
+            },
         };
+
+        // Süreç ekranları: kendi Process.* bölümünden operasyonel metinler.
+        if (ProcessScreens.Contains(screenId))
+        {
+            result["process"] = new Dictionary<string, string>
+            {
+                ["genericError"] = Tx("Process.GenericError"),
+                ["genericSuccess"] = Tx("Process.GenericSuccess"),
+                ["submit"] = Tx("Process.Submit"),
+                ["reset"] = Tx("Process.Reset"),
+                ["resultTotal"] = Tx("Process.ResultTotal"),
+                ["resultTotalCost"] = Tx("Process.ResultTotalCost"),
+                ["resultTransaction"] = Tx("Process.ResultTransaction"),
+                ["resultLines"] = Tx("Process.ResultLines"),
+                ["resultAllocations"] = Tx("Process.ResultAllocations"),
+            };
+        }
+
+        // Rapor ekranları: kendi Report.* bölümünden filtre/aksiyon metinleri.
+        if (ReportScreens.Contains(screenId))
+        {
+            result["report"] = new Dictionary<string, string>
+            {
+                ["startDate"] = Tx("Report.StartDate"),
+                ["endDate"] = Tx("Report.EndDate"),
+                ["status"] = Tx("Report.Status"),
+                ["allStatuses"] = Tx("Report.AllStatuses"),
+                ["export"] = Tx("Report.Export"),
+                ["filters"] = Tx("Report.Filters"),
+                ["refresh"] = Tx("Report.Refresh"),
+            };
+        }
+
+        return result;
     }
 }

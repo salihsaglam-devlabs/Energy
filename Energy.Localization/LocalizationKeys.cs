@@ -233,6 +233,7 @@ public static class LocalizationKeys
         public const string TotalMenusDescription = "Dashboard.TotalMenusDescription";
         public const string BusinessOverview = "Dashboard.BusinessOverview";
         public const string BusinessOverviewDescription = "Dashboard.BusinessOverviewDescription";
+        public const string Brand = "Dashboard.Brand";
     }
 
     public static class Auth
@@ -265,6 +266,7 @@ public static class LocalizationKeys
         public const string LoginSuccessful = "Auth.LoginSuccessful";
         public const string DevQuickLogin = "Auth.DevQuickLogin";
         public const string DevSelectUser = "Auth.DevSelectUser";
+        public const string MyProfile = "Auth.MyProfile";
     }
 
     public static class Layout
@@ -296,6 +298,7 @@ public static class LocalizationKeys
         public const string NoPermissions = "ProfileScreen.NoPermissions";
         public const string AccountActive = "ProfileScreen.AccountActive";
         public const string AccountInactive = "ProfileScreen.AccountInactive";
+        public const string ConfirmDelete = "ProfileScreen.ConfirmDelete";
     }
 
     public static class Grid

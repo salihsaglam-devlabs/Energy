@@ -16,7 +16,7 @@
     <script src="~/js/catalog/material-attribute-option/material-attribute-option.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Catalog.MaterialAttributeOption.Help.Intro"].Value)),
             related: [
                 @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Catalog.MaterialAttributeDefinition.Title"].Value))
             ]

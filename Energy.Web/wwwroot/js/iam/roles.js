@@ -12,8 +12,8 @@
     "use strict";
     // Yerelleştirme sözlüğü kısayolları (roller / grid / bildirimler).
     var L = function () { return window.AppL10n.roles; };
-    var LG = function () { return window.AppL10n.grid; };
-    var LN = function () { return window.AppL10n.notifications; };
+    var LG = function () { return window.AppL10n.roles.grid; };
+    var LN = function () { return window.AppL10n.roles.notifications; };
 
     // Grid örneği ve rol-yetki ataması için arama verisi.
     var gridInstance, permissionsLookup = [];
@@ -193,7 +193,7 @@
                         $("<div>").appendTo(host).dxForm({
                             formData: formData, labelLocation: "top", colCount: 1,
                             items: [{
-                                dataField: "permissionIds", label: { text: window.AppL10n.permissions.title },
+                                dataField: "permissionIds", label: { text: window.AppL10n.roles.permissionLabel },
                                 editorType: "dxTagBox",
                                 editorOptions: {
                                     items: permissionsLookup, valueExpr: "id", displayExpr: function (p) { return p ? p.name + " (" + p.code + ")" : ""; },

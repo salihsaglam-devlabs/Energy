@@ -29,7 +29,7 @@
     }
 
     function init(base, opts) {
-        var LP = function () { return (window.AppL10n && window.AppL10n.processes) || {}; };
+        var LP = function () { return (window.AppScreenL10n && window.AppScreenL10n.process) || {}; };
         var notify = window.AppNotify || { success: function () {}, error: function () {} };
         var data = {};
 

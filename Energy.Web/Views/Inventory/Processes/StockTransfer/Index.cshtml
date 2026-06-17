@@ -2,6 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
     ViewData["Title"] = T["Inventory.Processes.StockTransfer.Title"].Value;
+    ViewData["ScreenId"] = "Inventory.Processes.StockTransfer";
 }
 
 <link rel="stylesheet" href="~/css/inventory/processes/stock-transfer/stock-transfer.css" asp-append-version="true" />
@@ -18,7 +19,7 @@
     <script src="~/js/inventory/processes/stock-transfer/stock-transfer.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroProcess"].Value, ViewData["Title"])))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Inventory.Processes.StockTransfer.Help.Intro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppProcesses.InventoryStockTransfer.init("/inventory/processes/stock-transfer", {
