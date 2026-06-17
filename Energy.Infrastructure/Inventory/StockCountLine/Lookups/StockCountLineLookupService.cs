@@ -16,17 +16,17 @@ public class StockCountLineLookupService : IStockCountLineLookupService
     public async Task<BaseResponse<IReadOnlyList<StockCountLineLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.StockCountLines.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new StockCountLineLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<StockCountLineLookupResponse>)rows.Select(e => new StockCountLineLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace(e.SystemQuantity.ToString()) ? "Stock Count Line #" + e.Id.ToString().Substring(0, 8) : (e.SystemQuantity.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<StockCountLineLookupResponse>>.Success(items);
     }
 }

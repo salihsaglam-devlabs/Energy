@@ -16,17 +16,17 @@ public class DailySiteReportWorkerLookupService : IDailySiteReportWorkerLookupSe
     public async Task<BaseResponse<IReadOnlyList<DailySiteReportWorkerLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.DailySiteReportWorkers.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new DailySiteReportWorkerLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<DailySiteReportWorkerLookupResponse>)rows.Select(e => new DailySiteReportWorkerLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace((e.Note ?? "")) ? "Daily Site Report Worker #" + e.Id.ToString().Substring(0, 8) : ((e.Note ?? "")),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<DailySiteReportWorkerLookupResponse>>.Success(items);
     }
 }

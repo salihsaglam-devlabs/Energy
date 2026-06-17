@@ -16,17 +16,17 @@ public class ProjectMemberLookupService : IProjectMemberLookupService
     public async Task<BaseResponse<IReadOnlyList<ProjectMemberLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.ProjectMembers.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new ProjectMemberLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<ProjectMemberLookupResponse>)rows.Select(e => new ProjectMemberLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace((e.ProjectRole ?? "")) ? "Project Member #" + e.Id.ToString().Substring(0, 8) : ((e.ProjectRole ?? "")),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<ProjectMemberLookupResponse>>.Success(items);
     }
 }

@@ -16,17 +16,17 @@ public class LeaveRequestLookupService : ILeaveRequestLookupService
     public async Task<BaseResponse<IReadOnlyList<LeaveRequestLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.LeaveRequests.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new LeaveRequestLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<LeaveRequestLookupResponse>)rows.Select(e => new LeaveRequestLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace((e.LeaveType ?? "") + " - " + e.Status.ToString()) ? "Leave Request #" + e.Id.ToString().Substring(0, 8) : ((e.LeaveType ?? "") + " - " + e.Status.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<LeaveRequestLookupResponse>>.Success(items);
     }
 }

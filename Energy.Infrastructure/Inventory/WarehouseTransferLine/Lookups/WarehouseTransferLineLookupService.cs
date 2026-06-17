@@ -16,17 +16,17 @@ public class WarehouseTransferLineLookupService : IWarehouseTransferLineLookupSe
     public async Task<BaseResponse<IReadOnlyList<WarehouseTransferLineLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.WarehouseTransferLines.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new WarehouseTransferLineLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<WarehouseTransferLineLookupResponse>)rows.Select(e => new WarehouseTransferLineLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace(e.Quantity.ToString()) ? "Warehouse Transfer Line #" + e.Id.ToString().Substring(0, 8) : (e.Quantity.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<WarehouseTransferLineLookupResponse>>.Success(items);
     }
 }

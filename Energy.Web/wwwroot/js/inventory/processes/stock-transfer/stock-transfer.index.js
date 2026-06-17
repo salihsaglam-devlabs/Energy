@@ -29,6 +29,7 @@
     }
 
     function init(base, opts) {
+        var LP = function () { return (window.AppL10n && window.AppL10n.processes) || {}; };
         var notify = window.AppNotify || { success: function () {}, error: function () {} };
         var data = {};
 
@@ -37,12 +38,12 @@
             labelLocation: "top",
             colCount: 2,
             items: [
-                $.extend({ dataField: "sourceWarehouseId", label: { text: "Source Warehouse" } }, selectBox("/inventory/warehouses/lookup", true)),
-                $.extend({ dataField: "targetWarehouseId", label: { text: "Target Warehouse" } }, selectBox("/inventory/warehouses/lookup", true)),
-                $.extend({ dataField: "materialId", label: { text: "Material" } }, selectBox("/catalog/materials/lookup", true)),
-                $.extend({ dataField: "unitOfMeasureId", label: { text: "Unit" } }, selectBox("/core/units-of-measure/lookup", true)),
-                { dataField: "quantity", label: { text: "Quantity" }, editorType: "dxNumberBox", validationRules: [{ type: "required" }, { type: "range", min: 0.000001 }], editorOptions: { showSpinButtons: true, min: 0 } },
-                { dataField: "note", label: { text: "Note" }, editorType: "dxTextArea", colSpan: 2 },
+                $.extend({ dataField: "sourceWarehouseId" }, selectBox("/inventory/warehouses/lookup", true)),
+                $.extend({ dataField: "targetWarehouseId" }, selectBox("/inventory/warehouses/lookup", true)),
+                $.extend({ dataField: "materialId" }, selectBox("/catalog/materials/lookup", true)),
+                $.extend({ dataField: "unitOfMeasureId" }, selectBox("/core/units-of-measure/lookup", true)),
+                { dataField: "quantity", editorType: "dxNumberBox", validationRules: [{ type: "required" }, { type: "range", min: 0.000001 }], editorOptions: { showSpinButtons: true, min: 0 } },
+                { dataField: "note", editorType: "dxTextArea", colSpan: 2 },
                 {
                     itemType: "button",
                     horizontalAlignment: "left",
@@ -55,13 +56,13 @@
                                 .then(function (r) {
                                     if (r && r.isSuccess) {
                                         notify.success(opts.success);
-                                        $("#" + opts.resultId).text("Total cost: " + (r.data ? r.data.totalCost : "") + " | Allocations: " + (r.data ? r.data.allocationCount : ""));
+                                        $("#" + opts.resultId).text((LP().resultTotalCost || "Total cost") + ": " + (r.data ? r.data.totalCost : "") + " | " + (LP().resultAllocations || "Allocations") + ": " + (r.data ? r.data.allocationCount : ""));
                                         form.resetValues();
                                     } else {
-                                        notify.error((r && r.message) || "Error");
+                                        notify.error((r && r.message) || LP().genericError || "Error");
                                     }
                                 })
-                                .catch(function () { notify.error("Error"); });
+                                .catch(function () { notify.error(LP().genericError || "Error"); });
                         }
                     }
                 }

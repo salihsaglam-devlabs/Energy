@@ -1134,4 +1134,78 @@
   <data name="Help.RelatedNote" xml:space="preserve"><value>Bu kayıt aşağıdaki kayıt türleriyle ilişkilidir; seçim alanlarında bunların adı/kodu gösterilir.</value></data>
   <data name="Help.IntroReport" xml:space="preserve"><value>Bu rapor ekranı; “{0}” verilerini filtreleyip görüntülemenizi ve Excel olarak dışa aktarmanızı sağlar.</value></data>
   <data name="Help.IntroProcess" xml:space="preserve"><value>Bu ekran, “{0}” işlemini adım adım gerçekleştirmenizi sağlar.</value></data>
+  <data name="Screen.EntityBadge" xml:space="preserve"><value>Veri Yönetimi</value></data>
+  <data name="Screen.EntityBadgeTitle" xml:space="preserve"><value>Tekil veri yönetim ekranı: Kayıtları listeleyin, ekleyin, düzenleyin veya silin.</value></data>
+  <data name="Screen.ProcessBadge" xml:space="preserve"><value>Süreç</value></data>
+  <data name="Screen.ProcessBadgeTitle" xml:space="preserve"><value>Operasyonel süreç ekranı: Bir iş akışını adım adım yürütün.</value></data>
+  <data name="Screen.ReportBadge" xml:space="preserve"><value>Rapor</value></data>
+  <data name="Screen.ReportBadgeTitle" xml:space="preserve"><value>Rapor ekranı: Veriyi filtreleyin, görüntüleyin ve dışa aktarın.</value></data>
+  <data name="Screen.LookupMissing" xml:space="preserve"><value>(adı yok)</value></data>
+  <data name="Reports.StartDate" xml:space="preserve"><value>Başlangıç Tarihi</value></data>
+  <data name="Reports.EndDate" xml:space="preserve"><value>Bitiş Tarihi</value></data>
+  <data name="Reports.Status" xml:space="preserve"><value>Durum</value></data>
+  <data name="Reports.Export" xml:space="preserve"><value>Dışa Aktar</value></data>
+  <data name="Reports.Refresh" xml:space="preserve"><value>Yenile</value></data>
+  <data name="Reports.Filters" xml:space="preserve"><value>Filtreler</value></data>
+  <data name="Reports.AllStatuses" xml:space="preserve"><value>Tüm durumlar</value></data>
+  <data name="Processes.Submit" xml:space="preserve"><value>Çalıştır</value></data>
+  <data name="Processes.Reset" xml:space="preserve"><value>Sıfırla</value></data>
+  <data name="Processes.GenericError" xml:space="preserve"><value>İşlem gerçekleştirilemedi.</value></data>
+  <data name="Processes.GenericSuccess" xml:space="preserve"><value>İşlem başarıyla tamamlandı.</value></data>
+  <data name="Processes.ResultTotalCost" xml:space="preserve"><value>Toplam maliyet</value></data>
+  <data name="Processes.ResultAllocations" xml:space="preserve"><value>Dağıtım sayısı</value></data>
+  <data name="Processes.ResultTransaction" xml:space="preserve"><value>Finansal hareket</value></data>
+  <data name="Processes.ResultLines" xml:space="preserve"><value>Satır sayısı</value></data>
+  <data name="Processes.ResultTotal" xml:space="preserve"><value>Toplam</value></data>
+  <data name="ChatScreen.GroupName" xml:space="preserve"><value>Grup adı</value></data>
+  <data name="ChatScreen.CreateGroup" xml:space="preserve"><value>Oluştur</value></data>
+  <data name="ChatScreen.InviteToGroup" xml:space="preserve"><value>Davet et</value></data>
+  <data name="ChatScreen.DeleteGroup" xml:space="preserve"><value>Grubu sil</value></data>
+  <data name="ChatScreen.Calling" xml:space="preserve"><value>Aranıyor…</value></data>
+  <data name="ChatScreen.VoiceUnsupported" xml:space="preserve"><value>Sesli kayıt bu tarayıcıda desteklenmiyor.</value></data>
+  <data name="ChatScreen.VoiceDenied" xml:space="preserve"><value>Mikrofon erişimi reddedildi.</value></data>
+  <data name="ChatScreen.GroupInvite" xml:space="preserve"><value>Yeni grup daveti</value></data>
+  <data name="ChatScreen.Group" xml:space="preserve"><value>Grup</value></data>
+  <data name="ChatScreen.NewGroup" xml:space="preserve"><value>Yeni grup</value></data>
+  <data name="ChatScreen.Members" xml:space="preserve"><value>Üyeler</value></data>
+  <data name="ChatScreen.AddMember" xml:space="preserve"><value>Üye ekle</value></data>
+  <data name="ChatScreen.GroupMembers" xml:space="preserve"><value>Grup üyeleri</value></data>
+  <data name="ChatScreen.GroupNameRequired" xml:space="preserve"><value>Grup adı gerekli</value></data>
+  <data name="ChatScreen.GroupCreated" xml:space="preserve"><value>Grup oluşturuldu</value></data>
+  <data name="ChatScreen.GroupDeleted" xml:space="preserve"><value>Grup silindi</value></data>
+  <data name="ChatScreen.InviteSent" xml:space="preserve"><value>Davet gönderildi</value></data>
+  <data name="ChatScreen.MessageForwarded" xml:space="preserve"><value>İletildi</value></data>
+  <data name="ChatScreen.MessageActionReact" xml:space="preserve"><value>Tepki</value></data>
+  <data name="ChatScreen.MessageActionReply" xml:space="preserve"><value>Yanıtla</value></data>
+  <data name="ChatScreen.MessageActionForward" xml:space="preserve"><value>İlet</value></data>
+  <data name="ChatScreen.MessageActionDelete" xml:space="preserve"><value>Sil</value></data>
+  <data name="ChatScreen.ConfirmDeleteMessage" xml:space="preserve"><value>Mesaj silinsin mi?</value></data>
+  <data name="ChatScreen.ConfirmRemoveMember" xml:space="preserve"><value>Üye gruptan çıkarılsın mı?</value></data>
+  <data name="ChatScreen.ConfirmDeleteGroup" xml:space="preserve"><value>Grup kalıcı olarak silinsin mi?</value></data>
+  <data name="ChatScreen.MakeAdmin" xml:space="preserve"><value>Yönetici yap</value></data>
+  <data name="ChatScreen.RemoveAdmin" xml:space="preserve"><value>Yöneticiliği kaldır</value></data>
+  <data name="ChatScreen.RemoveFromGroup" xml:space="preserve"><value>Gruptan çıkar</value></data>
+  <data name="ChatScreen.RoleOwner" xml:space="preserve"><value>Sahip</value></data>
+  <data name="ChatScreen.RoleAdmin" xml:space="preserve"><value>Yönetici</value></data>
+  <data name="ChatScreen.RolePending" xml:space="preserve"><value>Bekliyor</value></data>
+  <data name="ChatScreen.RoleMember" xml:space="preserve"><value>Üye</value></data>
+  <data name="ChatScreen.ForwardTitle" xml:space="preserve"><value>İlet</value></data>
+  <data name="ChatScreen.Contacts" xml:space="preserve"><value>Kişiler</value></data>
+  <data name="ChatScreen.Groups" xml:space="preserve"><value>Gruplar</value></data>
+  <data name="ChatScreen.RecentChats" xml:space="preserve"><value>Son sohbetler</value></data>
+  <data name="ChatScreen.AcceptCall" xml:space="preserve"><value>Kabul et</value></data>
+  <data name="ChatScreen.RejectCall" xml:space="preserve"><value>Reddet</value></data>
+  <data name="ChatScreen.CallConnected" xml:space="preserve"><value>Bağlandı</value></data>
+  <data name="ChatScreen.CallNeedsOnline" xml:space="preserve"><value>Arama yapabilmek için kullanıcının çevrimiçi olması gerekir.</value></data>
+  <data name="ChatScreen.MicNotAccessible" xml:space="preserve"><value>Mikrofona erişilemedi.</value></data>
+  <data name="ChatScreen.GenericError" xml:space="preserve"><value>Bir hata oluştu.</value></data>
+  <data name="ChatScreen.ToggleChats" xml:space="preserve"><value>Sohbetler</value></data>
+  <data name="ChatScreen.ToggleContacts" xml:space="preserve"><value>Kişiler</value></data>
+  <data name="ChatScreen.CloseSidebar" xml:space="preserve"><value>Kapat</value></data>
+  <data name="ChatScreen.WelcomeMessage" xml:space="preserve"><value>Mesajlaşmaya başlamak için soldan bir kişi ya da grup seçin.</value></data>
+  <data name="ChatScreen.VoiceCall" xml:space="preserve"><value>Sesli ara</value></data>
+  <data name="ChatScreen.VoiceMessage" xml:space="preserve"><value>Sesli mesaj</value></data>
+  <data name="ChatScreen.SendVoice" xml:space="preserve"><value>Gönder</value></data>
+  <data name="ChatScreen.CancelLabel" xml:space="preserve"><value>İptal</value></data>
+  <data name="ChatScreen.NoGroups" xml:space="preserve"><value>Grup yok</value></data>
 </root>

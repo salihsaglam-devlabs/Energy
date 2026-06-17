@@ -1133,4 +1133,78 @@
   <data name="Help.RelatedNote" xml:space="preserve"><value>This record links to the following record types; their name/code is shown in selection fields.</value></data>
   <data name="Help.IntroReport" xml:space="preserve"><value>This report screen lets you filter, view and export “{0}” data to Excel.</value></data>
   <data name="Help.IntroProcess" xml:space="preserve"><value>This screen lets you carry out the “{0}” operation step by step.</value></data>
+  <data name="Screen.EntityBadge" xml:space="preserve"><value>Data Management</value></data>
+  <data name="Screen.EntityBadgeTitle" xml:space="preserve"><value>Single-record data management screen: list, add, edit or delete records.</value></data>
+  <data name="Screen.ProcessBadge" xml:space="preserve"><value>Process</value></data>
+  <data name="Screen.ProcessBadgeTitle" xml:space="preserve"><value>Operational process screen: execute a workflow step by step.</value></data>
+  <data name="Screen.ReportBadge" xml:space="preserve"><value>Report</value></data>
+  <data name="Screen.ReportBadgeTitle" xml:space="preserve"><value>Report screen: filter, view and export data.</value></data>
+  <data name="Screen.LookupMissing" xml:space="preserve"><value>(unnamed)</value></data>
+  <data name="Reports.StartDate" xml:space="preserve"><value>Start Date</value></data>
+  <data name="Reports.EndDate" xml:space="preserve"><value>End Date</value></data>
+  <data name="Reports.Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Reports.Export" xml:space="preserve"><value>Export</value></data>
+  <data name="Reports.Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="Reports.Filters" xml:space="preserve"><value>Filters</value></data>
+  <data name="Reports.AllStatuses" xml:space="preserve"><value>All statuses</value></data>
+  <data name="Processes.Submit" xml:space="preserve"><value>Run</value></data>
+  <data name="Processes.Reset" xml:space="preserve"><value>Reset</value></data>
+  <data name="Processes.GenericError" xml:space="preserve"><value>The operation could not be completed.</value></data>
+  <data name="Processes.GenericSuccess" xml:space="preserve"><value>Operation completed successfully.</value></data>
+  <data name="Processes.ResultTotalCost" xml:space="preserve"><value>Total cost</value></data>
+  <data name="Processes.ResultAllocations" xml:space="preserve"><value>Allocations</value></data>
+  <data name="Processes.ResultTransaction" xml:space="preserve"><value>Financial transaction</value></data>
+  <data name="Processes.ResultLines" xml:space="preserve"><value>Lines</value></data>
+  <data name="Processes.ResultTotal" xml:space="preserve"><value>Total</value></data>
+  <data name="ChatScreen.GroupName" xml:space="preserve"><value>Group name</value></data>
+  <data name="ChatScreen.CreateGroup" xml:space="preserve"><value>Create</value></data>
+  <data name="ChatScreen.InviteToGroup" xml:space="preserve"><value>Invite</value></data>
+  <data name="ChatScreen.DeleteGroup" xml:space="preserve"><value>Delete group</value></data>
+  <data name="ChatScreen.Calling" xml:space="preserve"><value>Calling…</value></data>
+  <data name="ChatScreen.VoiceUnsupported" xml:space="preserve"><value>Voice recording is not supported in this browser.</value></data>
+  <data name="ChatScreen.VoiceDenied" xml:space="preserve"><value>Microphone access was denied.</value></data>
+  <data name="ChatScreen.GroupInvite" xml:space="preserve"><value>New group invitation</value></data>
+  <data name="ChatScreen.Group" xml:space="preserve"><value>Group</value></data>
+  <data name="ChatScreen.NewGroup" xml:space="preserve"><value>New group</value></data>
+  <data name="ChatScreen.Members" xml:space="preserve"><value>Members</value></data>
+  <data name="ChatScreen.AddMember" xml:space="preserve"><value>Add member</value></data>
+  <data name="ChatScreen.GroupMembers" xml:space="preserve"><value>Group members</value></data>
+  <data name="ChatScreen.GroupNameRequired" xml:space="preserve"><value>Group name is required</value></data>
+  <data name="ChatScreen.GroupCreated" xml:space="preserve"><value>Group created</value></data>
+  <data name="ChatScreen.GroupDeleted" xml:space="preserve"><value>Group deleted</value></data>
+  <data name="ChatScreen.InviteSent" xml:space="preserve"><value>Invitation sent</value></data>
+  <data name="ChatScreen.MessageForwarded" xml:space="preserve"><value>Forwarded</value></data>
+  <data name="ChatScreen.MessageActionReact" xml:space="preserve"><value>React</value></data>
+  <data name="ChatScreen.MessageActionReply" xml:space="preserve"><value>Reply</value></data>
+  <data name="ChatScreen.MessageActionForward" xml:space="preserve"><value>Forward</value></data>
+  <data name="ChatScreen.MessageActionDelete" xml:space="preserve"><value>Delete</value></data>
+  <data name="ChatScreen.ConfirmDeleteMessage" xml:space="preserve"><value>Delete this message?</value></data>
+  <data name="ChatScreen.ConfirmRemoveMember" xml:space="preserve"><value>Remove this member from the group?</value></data>
+  <data name="ChatScreen.ConfirmDeleteGroup" xml:space="preserve"><value>Permanently delete this group?</value></data>
+  <data name="ChatScreen.MakeAdmin" xml:space="preserve"><value>Make admin</value></data>
+  <data name="ChatScreen.RemoveAdmin" xml:space="preserve"><value>Remove admin</value></data>
+  <data name="ChatScreen.RemoveFromGroup" xml:space="preserve"><value>Remove from group</value></data>
+  <data name="ChatScreen.RoleOwner" xml:space="preserve"><value>Owner</value></data>
+  <data name="ChatScreen.RoleAdmin" xml:space="preserve"><value>Admin</value></data>
+  <data name="ChatScreen.RolePending" xml:space="preserve"><value>Pending</value></data>
+  <data name="ChatScreen.RoleMember" xml:space="preserve"><value>Member</value></data>
+  <data name="ChatScreen.ForwardTitle" xml:space="preserve"><value>Forward</value></data>
+  <data name="ChatScreen.Contacts" xml:space="preserve"><value>Contacts</value></data>
+  <data name="ChatScreen.Groups" xml:space="preserve"><value>Groups</value></data>
+  <data name="ChatScreen.RecentChats" xml:space="preserve"><value>Recent chats</value></data>
+  <data name="ChatScreen.AcceptCall" xml:space="preserve"><value>Accept</value></data>
+  <data name="ChatScreen.RejectCall" xml:space="preserve"><value>Reject</value></data>
+  <data name="ChatScreen.CallConnected" xml:space="preserve"><value>Connected</value></data>
+  <data name="ChatScreen.CallNeedsOnline" xml:space="preserve"><value>The user must be online to call.</value></data>
+  <data name="ChatScreen.MicNotAccessible" xml:space="preserve"><value>Could not access the microphone.</value></data>
+  <data name="ChatScreen.GenericError" xml:space="preserve"><value>An error occurred.</value></data>
+  <data name="ChatScreen.ToggleChats" xml:space="preserve"><value>Chats</value></data>
+  <data name="ChatScreen.ToggleContacts" xml:space="preserve"><value>Contacts</value></data>
+  <data name="ChatScreen.CloseSidebar" xml:space="preserve"><value>Close</value></data>
+  <data name="ChatScreen.WelcomeMessage" xml:space="preserve"><value>Pick a contact or group from the left to start chatting.</value></data>
+  <data name="ChatScreen.VoiceCall" xml:space="preserve"><value>Voice call</value></data>
+  <data name="ChatScreen.VoiceMessage" xml:space="preserve"><value>Voice message</value></data>
+  <data name="ChatScreen.SendVoice" xml:space="preserve"><value>Send</value></data>
+  <data name="ChatScreen.CancelLabel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="ChatScreen.NoGroups" xml:space="preserve"><value>No groups</value></data>
 </root>

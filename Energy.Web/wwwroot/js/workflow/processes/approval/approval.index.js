@@ -8,6 +8,7 @@
     "use strict";
 
     function init(base, gridId, labels) {
+        var LP = function () { return (window.AppL10n && window.AppL10n.processes) || {}; };
         var notify = window.AppNotify || { success: function () {}, error: function () {} };
 
         var store = new DevExpress.data.CustomStore({
@@ -28,13 +29,13 @@
             window.AppHttp.post(base + "/" + id + "/" + verb, { note: note })
                 .then(function (res) {
                     if (res && res.isSuccess) {
-                        notify.success((res.message) || "OK");
+                        notify.success((res.message) || LP().genericSuccess || "OK");
                     } else {
-                        notify.error((res && res.message) || "Error");
+                        notify.error((res && res.message) || LP().genericError || "Error");
                     }
                     grid.refresh();
                 })
-                .catch(function () { notify.error("Error"); });
+                .catch(function () { notify.error(LP().genericError || "Error"); });
         }
 
         grid = $("#" + gridId).dxDataGrid({
@@ -50,12 +51,12 @@
             paging: { pageSize: 25 },
             pager: { visible: true, showInfo: true },
             columns: [
-                { dataField: "relatedModule", caption: "Module" },
-                { dataField: "relatedEntityType", caption: "Entity" },
-                { dataField: "relatedEntityId", caption: "Entity Id" },
-                { dataField: "status", caption: "Status" },
-                { dataField: "currentStepNo", caption: "Step", dataType: "number" },
-                { dataField: "createdAt", caption: "Created", dataType: "datetime" },
+                { dataField: "relatedModule" },
+                { dataField: "relatedEntityType" },
+                { dataField: "relatedEntityId" },
+                { dataField: "status" },
+                { dataField: "currentStepNo", dataType: "number" },
+                { dataField: "createdAt", dataType: "datetime" },
                 {
                     type: "buttons",
                     width: 220,

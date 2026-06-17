@@ -16,17 +16,17 @@ public class ProgressPaymentLookupService : IProgressPaymentLookupService
     public async Task<BaseResponse<IReadOnlyList<ProgressPaymentLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.ProgressPayments.AsNoTracking();
-        var items = await query
-            .OrderBy(e => e.Id)
-            .Select(e => new ProgressPaymentLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
+        var rows = await query
+            .OrderBy(e => e.ProgressPaymentNo)
             .ToListAsync(ct);
+        var items = (IReadOnlyList<ProgressPaymentLookupResponse>)rows.Select(e => new ProgressPaymentLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace((e.ProgressPaymentNo ?? "") + " - " + e.Status.ToString()) ? "Progress Payment #" + e.Id.ToString().Substring(0, 8) : ((e.ProgressPaymentNo ?? "") + " - " + e.Status.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<ProgressPaymentLookupResponse>>.Success(items);
     }
 }

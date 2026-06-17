@@ -16,17 +16,17 @@ public class WorkOrderStatusHistoryLookupService : IWorkOrderStatusHistoryLookup
     public async Task<BaseResponse<IReadOnlyList<WorkOrderStatusHistoryLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.WorkOrderStatusHistories.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new WorkOrderStatusHistoryLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<WorkOrderStatusHistoryLookupResponse>)rows.Select(e => new WorkOrderStatusHistoryLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace((e.Note ?? "") + " - " + e.FromStatus.ToString()) ? "Work Order Status History #" + e.Id.ToString().Substring(0, 8) : ((e.Note ?? "") + " - " + e.FromStatus.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<WorkOrderStatusHistoryLookupResponse>>.Success(items);
     }
 }

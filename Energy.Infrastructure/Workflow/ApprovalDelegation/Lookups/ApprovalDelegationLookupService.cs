@@ -17,17 +17,17 @@ public class ApprovalDelegationLookupService : IApprovalDelegationLookupService
     {
         var query = _db.ApprovalDelegations.AsNoTracking();
         if (activeOnly) query = query.Where(e => e.IsActive);
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new ApprovalDelegationLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = e.IsActive
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<ApprovalDelegationLookupResponse>)rows.Select(e => new ApprovalDelegationLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace(e.StartDate.ToString("yyyy-MM-dd")) ? "Approval Delegation #" + e.Id.ToString().Substring(0, 8) : (e.StartDate.ToString("yyyy-MM-dd")),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<ApprovalDelegationLookupResponse>>.Success(items);
     }
 }

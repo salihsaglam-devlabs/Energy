@@ -2,6 +2,11 @@
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> SL
 @{
     string Tx(string key) => SL.GetText(key);
+    var captions = FieldCaptions.ForCulture(System.Globalization.CultureInfo.CurrentUICulture);
+    var captionsJson = System.Text.Json.JsonSerializer.Serialize(captions);
+    var fieldTypesJson = System.Text.Json.JsonSerializer.Serialize(FieldTypes.Map);
+    var fieldLookupsJson = System.Text.Json.JsonSerializer.Serialize(FieldLookups.Map);
+    var enumCaptionsJson = System.Text.Json.JsonSerializer.Serialize(EnumCaptions.ForCulture(System.Globalization.CultureInfo.CurrentUICulture));
 }
 <script>
     window.AppL10n = {
@@ -89,6 +94,43 @@
             confirm: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Alerts.Confirm))),
             ok: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Alerts.Ok))),
             cancel: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Common.Cancel)))
+        },
+        screen: {
+            entityBadge: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Screen.EntityBadge))),
+            entityBadgeTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Screen.EntityBadgeTitle))),
+            processBadge: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Screen.ProcessBadge))),
+            processBadgeTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Screen.ProcessBadgeTitle))),
+            reportBadge: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Screen.ReportBadge))),
+            reportBadgeTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Screen.ReportBadgeTitle))),
+            lookupMissing: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Screen.LookupMissing)))
+        },
+        reports: {
+            startDate: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Reports.StartDate))),
+            endDate: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Reports.EndDate))),
+            status: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Reports.Status))),
+            export: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Reports.Export))),
+            refresh: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Reports.Refresh))),
+            filters: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Reports.Filters))),
+            allStatuses: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Reports.AllStatuses)))
+        },
+        processes: {
+            submit: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Processes.Submit))),
+            reset: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Processes.Reset))),
+            genericError: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Processes.GenericError))),
+            genericSuccess: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Processes.GenericSuccess))),
+            resultTotalCost: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Processes.ResultTotalCost))),
+            resultAllocations: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Processes.ResultAllocations))),
+            resultTransaction: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Processes.ResultTransaction))),
+            resultLines: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Processes.ResultLines))),
+            resultTotal: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Processes.ResultTotal)))
+        },
+        captions: @Html.Raw(captionsJson),
+        fieldTypes: @Html.Raw(fieldTypesJson),
+        fieldLookups: @Html.Raw(fieldLookupsJson),
+        enumValues: @Html.Raw(enumCaptionsJson),
+        chatScreen: {
+            group: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.ChatScreen.Group))),
+            groupInvite: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.ChatScreen.GroupInvite)))
         },
         layout: {
             loading: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Layout.Loading))),

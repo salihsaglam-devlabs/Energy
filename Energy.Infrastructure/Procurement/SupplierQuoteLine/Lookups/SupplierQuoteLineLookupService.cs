@@ -16,17 +16,17 @@ public class SupplierQuoteLineLookupService : ISupplierQuoteLineLookupService
     public async Task<BaseResponse<IReadOnlyList<SupplierQuoteLineLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.SupplierQuoteLines.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new SupplierQuoteLineLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<SupplierQuoteLineLookupResponse>)rows.Select(e => new SupplierQuoteLineLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace((e.Description ?? "") + " - " + e.Quantity.ToString()) ? "Supplier Quote Line #" + e.Id.ToString().Substring(0, 8) : ((e.Description ?? "") + " - " + e.Quantity.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<SupplierQuoteLineLookupResponse>>.Success(items);
     }
 }

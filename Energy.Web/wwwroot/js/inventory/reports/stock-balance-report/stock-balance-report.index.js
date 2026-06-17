@@ -14,6 +14,7 @@
     }
 
     function init(base, gridId, filtersId, opts) {
+        var LR = function () { return (window.AppL10n && window.AppL10n.reports) || {}; };
         var state = { startDate: null, endDate: null, status: null };
 
         function buildQuery(loadOptions) {
@@ -49,12 +50,12 @@
             paging: { pageSize: 50 },
             pager: { visible: true, showPageSizeSelector: true, allowedPageSizes: [25, 50, 100], showInfo: true },
             columns: [
-            { dataField: "warehouseId", caption: "WarehouseId" },
-            { dataField: "materialId", caption: "MaterialId" },
-            { dataField: "quantity", caption: "Quantity", dataType: "number", format: { type: "fixedPoint", precision: 2 } },
-            { dataField: "reservedQuantity", caption: "ReservedQuantity", dataType: "number", format: { type: "fixedPoint", precision: 2 } },
-            { dataField: "totalCost", caption: "TotalCost", dataType: "number", format: { type: "fixedPoint", precision: 2 } },
-            { dataField: "lastRecalculatedAt", caption: "LastRecalculatedAt", dataType: "date" }
+            { dataField: "warehouseId" },
+            { dataField: "materialId" },
+            { dataField: "quantity", dataType: "number", format: { type: "fixedPoint", precision: 2 } },
+            { dataField: "reservedQuantity", dataType: "number", format: { type: "fixedPoint", precision: 2 } },
+            { dataField: "totalCost", dataType: "number", format: { type: "fixedPoint", precision: 2 } },
+            { dataField: "lastRecalculatedAt", dataType: "date" }
             ]
         }).dxDataGrid("instance");
 
@@ -62,15 +63,15 @@
         var $f = $("#" + filtersId);
         var $start = $("<div class=\"energy-report__filter\"></div>").appendTo($f);
         var $end = $("<div class=\"energy-report__filter\"></div>").appendTo($f);
-        $start.dxDateBox({ type: "date", placeholder: "Start", onValueChanged: function (e) { state.startDate = e.value ? e.value.toISOString() : null; grid.refresh(); } });
-        $end.dxDateBox({ type: "date", placeholder: "End", onValueChanged: function (e) { state.endDate = e.value ? e.value.toISOString() : null; grid.refresh(); } });
+        $start.dxDateBox({ type: "date", placeholder: (LR().startDate || "Start"), onValueChanged: function (e) { state.startDate = e.value ? e.value.toISOString() : null; grid.refresh(); } });
+        $end.dxDateBox({ type: "date", placeholder: (LR().endDate || "End"), onValueChanged: function (e) { state.endDate = e.value ? e.value.toISOString() : null; grid.refresh(); } });
         if (opts && opts.hasStatus) {
             var $status = $("<div class=\"energy-report__filter\"></div>").appendTo($f);
-            $status.dxTextBox({ placeholder: "Status", onValueChanged: function (e) { state.status = e.value || null; grid.refresh(); } });
+            $status.dxTextBox({ placeholder: (LR().status || "Status"), onValueChanged: function (e) { state.status = e.value || null; grid.refresh(); } });
         }
         var $export = $("<div class=\"energy-report__filter\"></div>").appendTo($f);
         $export.dxButton({
-            icon: "export", text: "Export",
+            icon: "export", text: (LR().export || "Export"),
             onClick: function () {
                 var q = buildQuery({ skip: 0, take: 100000 });
                 window.open(base + "/data?" + q, "_blank");

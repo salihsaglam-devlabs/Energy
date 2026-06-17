@@ -16,17 +16,17 @@ public class FinancialTransactionLineLookupService : IFinancialTransactionLineLo
     public async Task<BaseResponse<IReadOnlyList<FinancialTransactionLineLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.FinancialTransactionLines.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new FinancialTransactionLineLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<FinancialTransactionLineLookupResponse>)rows.Select(e => new FinancialTransactionLineLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace((e.Description ?? "") + " - " + e.Amount.ToString()) ? "Financial Transaction Line #" + e.Id.ToString().Substring(0, 8) : ((e.Description ?? "") + " - " + e.Amount.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<FinancialTransactionLineLookupResponse>>.Success(items);
     }
 }

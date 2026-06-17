@@ -379,7 +379,7 @@
             };
             groupInviteSubscribers.forEach(function (cb) { try { cb(norm); } catch (e) { /* ignore */ } });
             // Kullanıcı sohbet sayfasında olmasa bile fark etsin diye bir toast göster.
-            showCenterToast({ senderName: norm.groupName || "Grup", text: "Yeni grup daveti" });
+            showCenterToast({ senderName: norm.groupName || (((window.AppL10n||{}).chatScreen||{}).group || "Grup"), text: (((window.AppL10n||{}).chatScreen||{}).groupInvite || "Yeni grup daveti") });
         });
         connection.on("GroupChanged", function (p) {
             if (!p) { return; }

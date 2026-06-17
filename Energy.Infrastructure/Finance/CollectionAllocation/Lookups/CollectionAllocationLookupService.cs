@@ -16,17 +16,17 @@ public class CollectionAllocationLookupService : ICollectionAllocationLookupServ
     public async Task<BaseResponse<IReadOnlyList<CollectionAllocationLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.CollectionAllocations.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new CollectionAllocationLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<CollectionAllocationLookupResponse>)rows.Select(e => new CollectionAllocationLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace(e.Amount.ToString()) ? "Collection Allocation #" + e.Id.ToString().Substring(0, 8) : (e.Amount.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<CollectionAllocationLookupResponse>>.Success(items);
     }
 }

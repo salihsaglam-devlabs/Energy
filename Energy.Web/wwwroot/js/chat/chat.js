@@ -148,7 +148,7 @@
         // Mesaj bazlı eylem araç çubuğu.
         var $tools = $("<div>").addClass("energy-chat__msg-tools");
         var $react = $("<button>").addClass("energy-chat__msg-action")
-            .attr({ "data-chat-action": "palette", "data-msg-id": meta.id, title: "Tepki" })
+            .attr({ "data-chat-action": "palette", "data-msg-id": meta.id, title: (labels.actionReact || "Tepki") })
             .append($("<i>").addClass("fa-regular fa-face-smile"));
         var $palette = $("<span>").addClass("energy-chat__palette");
         REACTION_EMOJIS.forEach(function (e) {
@@ -158,14 +158,14 @@
         });
         $react.append($palette).appendTo($tools);
         $("<button>").addClass("energy-chat__msg-action")
-            .attr({ "data-chat-action": "reply", "data-msg-id": meta.id, title: "Yanıtla" })
+            .attr({ "data-chat-action": "reply", "data-msg-id": meta.id, title: (labels.actionReply || "Yanıtla") })
             .append($("<i>").addClass("fa-solid fa-reply")).appendTo($tools);
         $("<button>").addClass("energy-chat__msg-action")
-            .attr({ "data-chat-action": "forward", "data-msg-id": meta.id, title: "İlet" })
+            .attr({ "data-chat-action": "forward", "data-msg-id": meta.id, title: (labels.actionForward || "İlet") })
             .append($("<i>").addClass("fa-solid fa-share")).appendTo($tools);
         if (meta.isMine) {
             $("<button>").addClass("energy-chat__msg-action is-danger")
-                .attr({ "data-chat-action": "delete", "data-msg-id": meta.id, title: "Sil" })
+                .attr({ "data-chat-action": "delete", "data-msg-id": meta.id, title: (labels.actionDelete || "Sil") })
                 .append($("<i>").addClass("fa-solid fa-trash")).appendTo($tools);
         }
         $tools.appendTo($wrap);
@@ -389,7 +389,7 @@
                 recents.sort(function (a, b) { return new Date(b.at || 0) - new Date(a.at || 0); });
                 recents = recents.slice(0, 6);
                 if (recents.length === 0) { return; }
-                $("<div>").addClass("energy-chat__welcome-recent-title").text("Son sohbetler").appendTo($welcomeRecent);
+                $("<div>").addClass("energy-chat__welcome-recent-title").text(labels.recentChats || "Son sohbetler").appendTo($welcomeRecent);
                 recents.forEach(function (r) {
                     var $row = $("<button>").attr("type", "button").addClass("energy-chat__welcome-recent-item");
                     var $avatar = $("<span>").addClass("energy-chat__contact-avatar");
@@ -429,7 +429,7 @@
                         appendMessage(msg);
                     }
                 }).fail(function () {
-                    if (window.AppNotify) { window.AppNotify.error("Error"); }
+                    if (window.AppNotify) { window.AppNotify.error(labels.error || "Error"); }
                 });
             }
 
@@ -721,11 +721,11 @@
                     $("<span>").addClass("energy-chat__invite-by").text((inv.invitedByName || "") + " davet etti").appendTo($info);
                     $info.appendTo($card);
                     var $actions = $("<div>").addClass("energy-chat__invite-actions");
-                    $("<button>").addClass("energy-chat__icon-btn is-primary").attr("title", "Kabul et")
+                    $("<button>").addClass("energy-chat__icon-btn is-primary").attr("title", labels.acceptCall || "Kabul et")
                         .append($("<i>").addClass("fa-solid fa-check"))
                         .on("click", function () { respondInvite(inv.groupId, true); })
                         .appendTo($actions);
-                    $("<button>").addClass("energy-chat__icon-btn is-danger").attr("title", "Reddet")
+                    $("<button>").addClass("energy-chat__icon-btn is-danger").attr("title", labels.rejectCall || "Reddet")
                         .append($("<i>").addClass("fa-solid fa-xmark"))
                         .on("click", function () { respondInvite(inv.groupId, false); })
                         .appendTo($actions);
@@ -761,7 +761,7 @@
                 dataSource: [],
                 keyExpr: "id",
                 selectionMode: "single",
-                noDataText: "Grup yok",
+                noDataText: (labels.noGroups || "Grup yok"),
                 onItemClick: function (e) { openGroup(e.itemData); },
                 itemTemplate: function (data) {
                     var $row = $("<div>").addClass("energy-chat__contact");
@@ -805,27 +805,27 @@
             }
 
             var groupPopup = $groupPopup.dxPopup({
-                title: "Yeni grup",
+                title: (labels.newGroup || "Yeni grup"),
                 width: 380, height: 480, hideOnOutsideClick: true, visible: false,
                 contentTemplate: function (content) {
                     var $c = $(content);
-                    $("<label>").addClass("energy-chat__field-label").text("Grup adı").appendTo($c);
-                    var nameBox = $("<div>").appendTo($c).dxTextBox({ placeholder: "Grup adı" }).dxTextBox("instance");
-                    $("<label>").addClass("energy-chat__field-label").text("Üyeler").appendTo($c);
+                    $("<label>").addClass("energy-chat__field-label").text(labels.groupName || "Grup adı").appendTo($c);
+                    var nameBox = $("<div>").appendTo($c).dxTextBox({ placeholder: (labels.groupName || "Grup adı") }).dxTextBox("instance");
+                    $("<label>").addClass("energy-chat__field-label").text(labels.members || "Üyeler").appendTo($c);
                     var picker = buildMemberPicker($c, []);
                     var $btn = $("<div>").css("margin-top", "12px").appendTo($c);
                     $btn.dxButton({
-                        text: "Oluştur", type: "default", width: "100%",
+                        text: (labels.createGroup || "Oluştur"), type: "default", width: "100%",
                         onClick: function () {
                             var name = (nameBox.option("value") || "").trim();
-                            if (!name) { if (window.AppNotify) { window.AppNotify.error("Grup adı gerekli"); } return; }
+                            if (!name) { if (window.AppNotify) { window.AppNotify.error(labels.groupNameRequired || "Grup adı gerekli"); } return; }
                             postJson("/chat/groups", { name: name, memberUserIds: picker.option("selectedItemKeys") || [] })
                                 .done(function () {
                                     groupPopup.hide();
                                     loadGroups();
-                                    if (window.AppNotify) { window.AppNotify.success("Grup oluşturuldu"); }
+                                    if (window.AppNotify) { window.AppNotify.success(labels.groupCreated || "Grup oluşturuldu"); }
                                 })
-                                .fail(function () { if (window.AppNotify) { window.AppNotify.error("Hata"); } });
+                                .fail(function () { if (window.AppNotify) { window.AppNotify.error(labels.error || "Hata"); } });
                         }
                     });
                 }
@@ -868,7 +868,7 @@
             }
 
             var membersPopup = $membersPopup.dxPopup({
-                title: "Grup üyeleri", width: 380, height: 520, hideOnOutsideClick: true, visible: false
+                title: (labels.groupMembers || "Grup üyeleri"), width: 380, height: 520, hideOnOutsideClick: true, visible: false
             }).dxPopup("instance");
 
             $groupManage.on("click", function () {
@@ -877,7 +877,7 @@
                 var manage = canManageGroup();
                 membersPopup.option("contentTemplate", function (content) {
                     var $c = $(content);
-                    $("<div>").addClass("energy-chat__field-label").text("Üyeler").appendTo($c);
+                    $("<div>").addClass("energy-chat__field-label").text(labels.members || "Üyeler").appendTo($c);
                     var $members = $("<div>").addClass("energy-chat__members").appendTo($c);
 
                     function loadMembers() {
@@ -885,28 +885,28 @@
                         $.getJSON("/chat/groups/" + gid + "/members").done(function (list) {
                             (list || []).forEach(function (d) {
                                 var $row = $("<div>").addClass("energy-chat__member-row");
-                                var role = d.isOwner ? "sahip" : (d.isAdmin ? "yönetici" : (d.status === 0 ? "bekliyor" : "üye"));
+                                var role = d.isOwner ? (labels.roleOwner || "Sahip") : (d.isAdmin ? (labels.roleAdmin || "Yönetici") : (d.status === 0 ? (labels.rolePending || "Bekliyor") : (labels.roleMember || "Üye")));
                                 $("<span>").addClass("energy-chat__member-name").text(d.fullName || d.userName).appendTo($row);
                                 $("<span>").addClass("energy-chat__member-role").text(role).appendTo($row);
                                 // Sahip/yöneticiler diğer kabul edilmiş, sahip olmayan üyeleri yönetir.
                                 if (manage && !d.isOwner && d.status === 1) {
                                     var $actions = $("<span>").addClass("energy-chat__member-actions").appendTo($row);
                                     $("<button>").addClass("energy-chat__icon-btn")
-                                        .attr("title", d.isAdmin ? "Yöneticiliği kaldır" : "Yönetici yap")
+                                        .attr("title", d.isAdmin ? (labels.removeAdmin || "Yöneticiliği kaldır") : (labels.makeAdmin || "Yönetici yap"))
                                         .append($("<i>").addClass(d.isAdmin ? "fa-solid fa-user-shield" : "fa-regular fa-user"))
                                         .on("click", function () {
                                             setGroupAdmin(gid, d.userId, !d.isAdmin)
                                                 .done(loadMembers)
-                                                .fail(function () { if (window.AppNotify) { window.AppNotify.error("Hata"); } });
+                                                .fail(function () { if (window.AppNotify) { window.AppNotify.error(labels.error || "Hata"); } });
                                         }).appendTo($actions);
                                     $("<button>").addClass("energy-chat__icon-btn is-danger")
-                                        .attr("title", "Gruptan çıkar")
+                                        .attr("title", labels.removeFromGroup || "Gruptan çıkar")
                                         .append($("<i>").addClass("fa-solid fa-user-minus"))
                                         .on("click", function () {
-                                            if (!window.confirm("Üye gruptan çıkarılsın mı?")) { return; }
+                                            if (!window.confirm(labels.confirmRemoveMember || "Üye gruptan çıkarılsın mı?")) { return; }
                                             removeGroupMember(gid, d.userId)
                                                 .done(function () { loadMembers(); loadGroups(); })
-                                                .fail(function () { if (window.AppNotify) { window.AppNotify.error("Hata"); } });
+                                                .fail(function () { if (window.AppNotify) { window.AppNotify.error(labels.error || "Hata"); } });
                                         }).appendTo($actions);
                                 }
                                 $row.appendTo($members);
@@ -916,28 +916,28 @@
                     loadMembers();
 
                     if (manage) {
-                        $("<div>").addClass("energy-chat__field-label").text("Üye ekle").appendTo($c);
+                        $("<div>").addClass("energy-chat__field-label").text(labels.addMember || "Üye ekle").appendTo($c);
                         var picker = buildMemberPicker($c, []);
                         $("<div>").css("margin-top", "12px").appendTo($c).dxButton({
-                            text: "Davet et", type: "default", width: "100%",
+                            text: (labels.inviteToGroup || "Davet et"), type: "default", width: "100%",
                             onClick: function () {
                                 var ids = picker.option("selectedItemKeys") || [];
                                 if (ids.length === 0) { return; }
                                 postJson("/chat/groups/" + gid + "/invite", { userIds: ids })
-                                    .done(function () { if (window.AppNotify) { window.AppNotify.success("Davet gönderildi"); } loadMembers(); })
-                                    .fail(function () { if (window.AppNotify) { window.AppNotify.error("Hata"); } });
+                                    .done(function () { if (window.AppNotify) { window.AppNotify.success(labels.inviteSent || "Davet gönderildi"); } loadMembers(); })
+                                    .fail(function () { if (window.AppNotify) { window.AppNotify.error(labels.error || "Hata"); } });
                             }
                         });
                         $("<div>").css("margin-top", "16px").appendTo($c).dxButton({
-                            text: "Grubu sil", type: "danger", width: "100%", icon: "trash",
+                            text: (labels.deleteGroup || "Grubu sil"), type: "danger", width: "100%", icon: "trash",
                             onClick: function () {
-                                if (!window.confirm("Grup kalıcı olarak silinsin mi?")) { return; }
+                                if (!window.confirm(labels.confirmDeleteGroup || "Grup kalıcı olarak silinsin mi?")) { return; }
                                 deleteGroup(gid).done(function () {
                                     membersPopup.hide();
-                                    if (window.AppNotify) { window.AppNotify.success("Grup silindi"); }
+                                    if (window.AppNotify) { window.AppNotify.success(labels.groupDeleted || "Grup silindi"); }
                                     closeGroupView(gid);
                                     loadGroups();
-                                }).fail(function () { if (window.AppNotify) { window.AppNotify.error("Hata"); } });
+                                }).fail(function () { if (window.AppNotify) { window.AppNotify.error(labels.error || "Hata"); } });
                             }
                         });
                     }
@@ -965,7 +965,7 @@
             $replyCancel.on("click", cancelReply);
 
             function deleteMessage(id) {
-                if (!window.confirm("Mesaj silinsin mi?")) { return; }
+                if (!window.confirm(labels.confirmDeleteMessage || "Mesaj silinsin mi?")) { return; }
                 var token = $("meta[name='csrf-token']").attr("content");
                 $.ajax({
                     url: "/chat/messages/" + id, method: "DELETE",
@@ -1016,25 +1016,25 @@
 
             // ----- İletme açılır penceresi ----------------------------------------------
             var forwardPopup = $forwardPopup.dxPopup({
-                title: "İlet", width: 340, height: 480, hideOnOutsideClick: true, visible: false
+                title: (labels.actionForward || "İlet"), width: 340, height: 480, hideOnOutsideClick: true, visible: false
             }).dxPopup("instance");
 
             function doForward(id, target) {
                 postJson("/chat/messages/" + id + "/forward", target).done(function () {
                     forwardPopup.hide();
-                    if (window.AppNotify) { window.AppNotify.success("İletildi"); }
+                    if (window.AppNotify) { window.AppNotify.success(labels.messageForwarded || "İletildi"); }
                 });
             }
             function openForward(id) {
                 forwardPopup.option("contentTemplate", function (content) {
                     var $c = $(content);
-                    $("<div>").addClass("energy-chat__field-label").text("Kişiler").appendTo($c);
+                    $("<div>").addClass("energy-chat__field-label").text(labels.contacts || "Kişiler").appendTo($c);
                     $("<div>").appendTo($c).dxList({
                         dataSource: state.contacts, keyExpr: "id", height: 170, searchEnabled: true, searchExpr: ["fullName", "userName"],
                         itemTemplate: function (d) { return $("<span>").text(d.fullName || d.userName); },
                         onItemClick: function (e) { doForward(id, { recipientId: e.itemData.id }); }
                     });
-                    $("<div>").addClass("energy-chat__field-label").text("Gruplar").appendTo($c);
+                    $("<div>").addClass("energy-chat__field-label").text(labels.groups || "Gruplar").appendTo($c);
                     $("<div>").appendTo($c).dxList({
                         dataSource: state.groups, keyExpr: "id", height: 130,
                         itemTemplate: function (d) { return $("<span>").text(d.name); },
@@ -1112,13 +1112,13 @@
                 // kurulduğunda "Bağlandı" yaz; başarısızlıkta aramayı temizle.
                 pc.onconnectionstatechange = function () {
                     var st = pc.connectionState;
-                    if (st === "connected") { $callState.text("Bağlandı"); }
+                    if (st === "connected") { $callState.text(labels.callConnected || "Bağlandı"); }
                     else if (st === "failed" || st === "disconnected") { cleanupCall(); }
                 };
                 // connectionState'i desteklemeyen tarayıcılar için ICE durumu yedeği.
                 pc.oniceconnectionstatechange = function () {
                     var st = pc.iceConnectionState;
-                    if (st === "connected" || st === "completed") { $callState.text("Bağlandı"); }
+                    if (st === "connected" || st === "completed") { $callState.text(labels.callConnected || "Bağlandı"); }
                     else if (st === "failed") { cleanupCall(); }
                 };
                 return pc;
@@ -1136,7 +1136,7 @@
                 var peerId = state.peerId;
                 // Arama yalnızca karşı taraf çevrimiçiyse başlatılabilir.
                 if (!isOnline(peerId)) {
-                    if (window.AppNotify) { window.AppNotify.warning("Arama yapabilmek için kullanıcının çevrimiçi olması gerekir."); }
+                    if (window.AppNotify) { window.AppNotify.warning(labels.callNeedsOnline || "Arama yapabilmek için kullanıcının çevrimiçi olması gerekir."); }
                     return;
                 }
                 var peerName = (state.peer && (state.peer.fullName || state.peer.userName)) || "";
@@ -1154,7 +1154,7 @@
                         });
                     });
                 }).catch(function () {
-                    if (window.AppNotify) { window.AppNotify.error("Mikrofona erişilemedi."); }
+                    if (window.AppNotify) { window.AppNotify.error(labels.micNotAccessible || "Mikrofona erişilemedi."); }
                     cleanupCall();
                 });
             }
@@ -1178,11 +1178,11 @@
                             return call.pc.setLocalDescription(answer).then(function () {
                                 ENERGY.answerCall(call.peerId, answer);
                                 $callAccept.prop("hidden", true);
-                                $callState.text("Bağlanıyor…");
+                                $callState.text(labels.calling || "Bağlanıyor…");
                             });
                         });
                 }).catch(function () {
-                    if (window.AppNotify) { window.AppNotify.error("Mikrofona erişilemedi."); }
+                    if (window.AppNotify) { window.AppNotify.error(labels.micNotAccessible || "Mikrofona erişilemedi."); }
                     ENERGY.endCall(call.peerId);
                     cleanupCall();
                 });
@@ -1212,7 +1212,7 @@
                         }
                     } else if (ev.type === "answer") {
                         if (call.pc) {
-                            $callState.text("Bağlanıyor…");
+                            $callState.text(labels.calling || "Bağlanıyor…");
                             call.pc.setRemoteDescription(new RTCSessionDescription(d.answer))
                                 .then(function () {
                                     // Yanıt (uzak açıklama) ayarlandı: bekleyen ICE adaylarını boşalt.

@@ -16,17 +16,17 @@ public class MaterialAttributeOptionLookupService : IMaterialAttributeOptionLook
     public async Task<BaseResponse<IReadOnlyList<MaterialAttributeOptionLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.MaterialAttributeOptions.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new MaterialAttributeOptionLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<MaterialAttributeOptionLookupResponse>)rows.Select(e => new MaterialAttributeOptionLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = "Material Attribute Option #" + e.Id.ToString().Substring(0, 8),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<MaterialAttributeOptionLookupResponse>>.Success(items);
     }
 }

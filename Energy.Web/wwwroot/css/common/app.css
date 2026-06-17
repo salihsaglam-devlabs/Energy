@@ -407,6 +407,31 @@ body.energy-nav-closed .energy-toolbar__menu {
 .energy-screen__header { display: flex; justify-content: space-between; align-items: end; gap: 16px; }
 .energy-screen__header h2 { margin: 0; font-size: 22px; }
 .energy-screen__header p { margin: 4px 0 0; color: var(--energy-text-muted); }
+
+/* Entity (veri yönetimi) vs Process (süreç) vs Report rozetleri.
+   Dikkat dağıtmayacak, kurumsal sade görünüm: ince çerçeve + nokta + metin. */
+.energy-screen__badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 600; letter-spacing: .02em;
+    border: 1px solid var(--energy-border);
+    background: var(--energy-surface);
+    color: var(--energy-text-muted);
+    white-space: nowrap; user-select: none;
+    align-self: center;
+}
+.energy-screen__badge::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%;
+    background: currentColor; opacity: .8;
+}
+.energy-screen__badge.is-entity  { color: #1565c0; border-color: rgba(21,101,192,.35);  background: rgba(21,101,192,.06); }
+.energy-screen__badge.is-process { color: #6a1b9a; border-color: rgba(106,27,154,.35); background: rgba(106,27,154,.06); }
+.energy-screen__badge.is-report  { color: #2e7d32; border-color: rgba(46,125,50,.35);  background: rgba(46,125,50,.06); }
+
+/* İnce sol şerit ile ekran türünü içerikten de hissettir (dikkat dağıtmaz). */
+.energy-screen--entity  > .energy-screen__header { border-left: 3px solid rgba(21,101,192,.55);  padding-left: 10px; }
+.energy-screen--process > .energy-screen__header { border-left: 3px solid rgba(106,27,154,.55); padding-left: 10px; }
+.energy-screen--report  > .energy-screen__header { border-left: 3px solid rgba(46,125,50,.55);  padding-left: 10px; }
 .energy-error-card {
     background: var(--energy-surface);
     border: 1px solid var(--energy-border);

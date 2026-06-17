@@ -16,17 +16,17 @@ public class UnitConversionLookupService : IUnitConversionLookupService
     public async Task<BaseResponse<IReadOnlyList<UnitConversionLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.UnitConversions.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new UnitConversionLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<UnitConversionLookupResponse>)rows.Select(e => new UnitConversionLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace(e.Factor.ToString()) ? "Unit Conversion #" + e.Id.ToString().Substring(0, 8) : (e.Factor.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<UnitConversionLookupResponse>>.Success(items);
     }
 }

@@ -16,17 +16,17 @@ public class DailySiteReportMaterialLookupService : IDailySiteReportMaterialLook
     public async Task<BaseResponse<IReadOnlyList<DailySiteReportMaterialLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.DailySiteReportMaterials.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new DailySiteReportMaterialLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<DailySiteReportMaterialLookupResponse>)rows.Select(e => new DailySiteReportMaterialLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace(e.Quantity.ToString()) ? "Daily Site Report Material #" + e.Id.ToString().Substring(0, 8) : (e.Quantity.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<DailySiteReportMaterialLookupResponse>>.Success(items);
     }
 }

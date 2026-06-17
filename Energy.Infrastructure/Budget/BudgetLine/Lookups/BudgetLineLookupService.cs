@@ -16,17 +16,17 @@ public class BudgetLineLookupService : IBudgetLineLookupService
     public async Task<BaseResponse<IReadOnlyList<BudgetLineLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.BudgetLines.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new BudgetLineLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<BudgetLineLookupResponse>)rows.Select(e => new BudgetLineLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace((e.Description ?? "") + " - " + e.PlannedAmount.ToString()) ? "Budget Line #" + e.Id.ToString().Substring(0, 8) : ((e.Description ?? "") + " - " + e.PlannedAmount.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<BudgetLineLookupResponse>>.Success(items);
     }
 }

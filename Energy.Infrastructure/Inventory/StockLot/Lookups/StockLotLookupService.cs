@@ -16,17 +16,17 @@ public class StockLotLookupService : IStockLotLookupService
     public async Task<BaseResponse<IReadOnlyList<StockLotLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.StockLots.AsNoTracking();
-        var items = await query
-            .OrderBy(e => e.Id)
-            .Select(e => new StockLotLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
+        var rows = await query
+            .OrderBy(e => e.LotNo)
             .ToListAsync(ct);
+        var items = (IReadOnlyList<StockLotLookupResponse>)rows.Select(e => new StockLotLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace((e.LotNo ?? "") + " - " + e.ReceivedAt.ToString("yyyy-MM-dd")) ? "Stock Lot #" + e.Id.ToString().Substring(0, 8) : ((e.LotNo ?? "") + " - " + e.ReceivedAt.ToString("yyyy-MM-dd")),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<StockLotLookupResponse>>.Success(items);
     }
 }

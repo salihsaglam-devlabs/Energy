@@ -16,17 +16,17 @@ public class RequestLineLookupService : IRequestLineLookupService
     public async Task<BaseResponse<IReadOnlyList<RequestLineLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.RequestLines.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new RequestLineLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<RequestLineLookupResponse>)rows.Select(e => new RequestLineLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace((e.Note ?? "") + " - " + e.Quantity.ToString()) ? "Request Line #" + e.Id.ToString().Substring(0, 8) : ((e.Note ?? "") + " - " + e.Quantity.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<RequestLineLookupResponse>>.Success(items);
     }
 }

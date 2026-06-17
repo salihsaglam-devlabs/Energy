@@ -16,17 +16,17 @@ public class PaymentAllocationLookupService : IPaymentAllocationLookupService
     public async Task<BaseResponse<IReadOnlyList<PaymentAllocationLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.PaymentAllocations.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new PaymentAllocationLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<PaymentAllocationLookupResponse>)rows.Select(e => new PaymentAllocationLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace(e.Amount.ToString()) ? "Payment Allocation #" + e.Id.ToString().Substring(0, 8) : (e.Amount.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<PaymentAllocationLookupResponse>>.Success(items);
     }
 }

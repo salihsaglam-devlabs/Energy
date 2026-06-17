@@ -16,17 +16,17 @@ public class MaterialCategoryAttributeLookupService : IMaterialCategoryAttribute
     public async Task<BaseResponse<IReadOnlyList<MaterialCategoryAttributeLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.MaterialCategoryAttributes.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new MaterialCategoryAttributeLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<MaterialCategoryAttributeLookupResponse>)rows.Select(e => new MaterialCategoryAttributeLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = "Material Category Attribute #" + e.Id.ToString().Substring(0, 8),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<MaterialCategoryAttributeLookupResponse>>.Success(items);
     }
 }

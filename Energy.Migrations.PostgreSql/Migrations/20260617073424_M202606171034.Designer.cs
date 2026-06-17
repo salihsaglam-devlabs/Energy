@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Energy.Migrations.PostgreSql.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260617010740_M202606170407")]
-    partial class M202606170407
+    [Migration("20260617073424_M202606171034")]
+    partial class M202606171034
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

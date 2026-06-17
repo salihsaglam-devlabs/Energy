@@ -15,6 +15,7 @@
     }
 
     function init(base, opts) {
+        var LP = function () { return (window.AppL10n && window.AppL10n.processes) || {}; };
         var notify = window.AppNotify || { success: function () {}, error: function () {} };
         var data = {};
 
@@ -25,7 +26,6 @@
             items: [
                 {
                     dataField: "progressPaymentId",
-                    label: { text: "Progress Payment" },
                     editorType: "dxSelectBox",
                     validationRules: [{ type: "required" }],
                     editorOptions: {
@@ -47,13 +47,13 @@
                                 .then(function (r) {
                                     if (r && r.isSuccess) {
                                         notify.success(opts.success);
-                                        $("#" + opts.resultId).text("Transaction: " + (r.data ? r.data.financialTransactionId : ""));
+                                        $("#" + opts.resultId).text((LP().resultTransaction || "Transaction") + ": " + (r.data ? r.data.financialTransactionId : ""));
                                         form.resetValues();
                                     } else {
-                                        notify.error((r && r.message) || "Error");
+                                        notify.error((r && r.message) || LP().genericError || "Error");
                                     }
                                 })
-                                .catch(function () { notify.error("Error"); });
+                                .catch(function () { notify.error(LP().genericError || "Error"); });
                         }
                     }
                 }
