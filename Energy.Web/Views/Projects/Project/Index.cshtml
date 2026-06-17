@@ -1,0 +1,37 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Projects.Project.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Projects.Project.Title"]</h2></div>
+    </header>
+    <div id="project-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/projects/project/project.index.js" asp-append-version="true"></script>
+    <script>
+        // Bu sayfaya özel, yerelleştirilmiş rehber içeriği (Bilgi düğmesinden açılır).
+        // Diğer ekranlar bu deseni izleyerek kendi açıklamalarını ekleyebilir.
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.Project.Help.Intro"].Value)),
+            columns: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.Project.Help.ColCode"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.Project.Help.ColName"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.Project.Help.ColCustomer"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.Project.Help.ColType"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.Project.Help.ColStatus"].Value))
+            ],
+            filters: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.Project.Help.FilterStatus"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.Project.Help.FilterType"].Value))
+            ]
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.ProjectsProject.init("/projects/projects", "project-grid", "Projects");
+        });
+    </script>
+}

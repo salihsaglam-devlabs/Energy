@@ -1548,6 +1548,88 @@ namespace Energy.Migrations.PostgreSql.Migrations
                     b.ToTable("ContractParties", (string)null);
                 });
 
+            modelBuilder.Entity("Energy.Domain.Core.AuditLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<Guid?>("CorrelationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("DurationMs")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ExceptionMessage")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ExceptionType")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("HasException")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("HttpMethod")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(45)
+                        .HasColumnType("character varying(45)");
+
+                    b.Property<bool>("IsSuccess")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("OccurredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Path")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("QueryString")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("RequestBody")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ResponseBody")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Source")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<int>("StatusCode")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CorrelationId");
+
+                    b.HasIndex("OccurredAt")
+                        .IsDescending();
+
+                    b.HasIndex("Source");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("HttpMethod", "Path");
+
+                    b.ToTable("AuditLogs", (string)null);
+                });
+
             modelBuilder.Entity("Energy.Domain.Core.Branch", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1838,6 +1920,63 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .IsUnique();
 
                     b.ToTable("ExchangeRates", (string)null);
+                });
+
+            modelBuilder.Entity("Energy.Domain.Core.Resource", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Culture")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("DeletedBy");
+
+                    b.HasIndex("Key");
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.HasIndex("Culture", "Key")
+                        .IsUnique();
+
+                    b.ToTable("LocalizationResources", (string)null);
                 });
 
             modelBuilder.Entity("Energy.Domain.Core.SequenceDefinition", b =>
@@ -3551,7 +3690,149 @@ namespace Energy.Migrations.PostgreSql.Migrations
                     b.ToTable("TimesheetLines", (string)null);
                 });
 
-            modelBuilder.Entity("Energy.Domain.Identity.Permission", b =>
+            modelBuilder.Entity("Energy.Domain.IAM.ApiEndpoint", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("HttpMethod")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("RequiredPermissionCode")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("DeletedBy");
+
+                    b.HasIndex("RequiredPermissionCode");
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.HasIndex("HttpMethod", "Path")
+                        .IsUnique();
+
+                    b.ToTable("ApiEndpoints", (string)null);
+                });
+
+            modelBuilder.Entity("Energy.Domain.IAM.Menu", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Icon")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsVisible")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("NameKey")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("RequiredPermissionCode")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Url")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("DeletedBy");
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("RequiredPermissionCode");
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.HasIndex("ParentId", "DisplayOrder");
+
+                    b.ToTable("Menus", (string)null);
+                });
+
+            modelBuilder.Entity("Energy.Domain.IAM.Permission", b =>
                 {
                     b.Property<string>("Code")
                         .HasMaxLength(150)
@@ -3583,7 +3864,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                     b.ToTable("Permissions", (string)null);
                 });
 
-            modelBuilder.Entity("Energy.Domain.Identity.Role", b =>
+            modelBuilder.Entity("Energy.Domain.IAM.Role", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -3636,7 +3917,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                     b.ToTable("Roles", (string)null);
                 });
 
-            modelBuilder.Entity("Energy.Domain.Identity.RolePermission", b =>
+            modelBuilder.Entity("Energy.Domain.IAM.RolePermission", b =>
                 {
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uuid");
@@ -3652,7 +3933,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                     b.ToTable("RolePermissions", (string)null);
                 });
 
-            modelBuilder.Entity("Energy.Domain.Identity.User", b =>
+            modelBuilder.Entity("Energy.Domain.IAM.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -3746,7 +4027,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("Energy.Domain.Identity.UserPermission", b =>
+            modelBuilder.Entity("Energy.Domain.IAM.UserPermission", b =>
                 {
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -3762,7 +4043,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                     b.ToTable("UserPermissions", (string)null);
                 });
 
-            modelBuilder.Entity("Energy.Domain.Identity.UserRole", b =>
+            modelBuilder.Entity("Energy.Domain.IAM.UserRole", b =>
                 {
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -3777,7 +4058,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                     b.ToTable("UserRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Energy.Domain.Identity.UserSetting", b =>
+            modelBuilder.Entity("Energy.Domain.IAM.UserSetting", b =>
                 {
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -4698,145 +4979,6 @@ namespace Energy.Migrations.PostgreSql.Migrations
                     b.HasIndex("WarehouseTransferId");
 
                     b.ToTable("WarehouseTransferLines", (string)null);
-                });
-
-            modelBuilder.Entity("Energy.Domain.Localization.Resource", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Culture")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Key")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("DeletedBy");
-
-                    b.HasIndex("Key");
-
-                    b.HasIndex("UpdatedBy");
-
-                    b.HasIndex("Culture", "Key")
-                        .IsUnique();
-
-                    b.ToTable("LocalizationResources", (string)null);
-                });
-
-            modelBuilder.Entity("Energy.Domain.Logger.AuditLog", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<Guid?>("CorrelationId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("DurationMs")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ExceptionMessage")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ExceptionType")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<bool>("HasException")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("HttpMethod")
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
-
-                    b.Property<string>("IpAddress")
-                        .HasMaxLength(45)
-                        .HasColumnType("character varying(45)");
-
-                    b.Property<bool>("IsSuccess")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("OccurredAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Path")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<string>("QueryString")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<string>("RequestBody")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ResponseBody")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Source")
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
-
-                    b.Property<int>("StatusCode")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CorrelationId");
-
-                    b.HasIndex("OccurredAt")
-                        .IsDescending();
-
-                    b.HasIndex("Source");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("HttpMethod", "Path");
-
-                    b.ToTable("AuditLogs", (string)null);
                 });
 
             modelBuilder.Entity("Energy.Domain.Notifications.Notification", b =>
@@ -7445,148 +7587,6 @@ namespace Energy.Migrations.PostgreSql.Migrations
                     b.ToTable("RequestTypes", (string)null);
                 });
 
-            modelBuilder.Entity("Energy.Domain.System.ApiEndpoint", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<string>("HttpMethod")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
-
-                    b.Property<string>("Path")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("character varying(300)");
-
-                    b.Property<string>("RequiredPermissionCode")
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("DeletedBy");
-
-                    b.HasIndex("RequiredPermissionCode");
-
-                    b.HasIndex("UpdatedBy");
-
-                    b.HasIndex("HttpMethod", "Path")
-                        .IsUnique();
-
-                    b.ToTable("ApiEndpoints", (string)null);
-                });
-
-            modelBuilder.Entity("Energy.Domain.System.Menu", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Icon")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsVisible")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("NameKey")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<Guid?>("ParentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("RequiredPermissionCode")
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Url")
-                        .HasMaxLength(300)
-                        .HasColumnType("character varying(300)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("DeletedBy");
-
-                    b.HasIndex("ParentId");
-
-                    b.HasIndex("RequiredPermissionCode");
-
-                    b.HasIndex("UpdatedBy");
-
-                    b.HasIndex("ParentId", "DisplayOrder");
-
-                    b.ToTable("Menus", (string)null);
-                });
-
             modelBuilder.Entity("Energy.Domain.Workflow.ApprovalAction", b =>
                 {
                     b.Property<Guid>("Id")
@@ -8207,17 +8207,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8225,12 +8225,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Assets.EquipmentAssignment", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8251,7 +8251,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8264,12 +8264,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Assets.EquipmentMaintenance", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8280,7 +8280,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8293,7 +8293,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("CostCenterId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8304,7 +8304,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8314,7 +8314,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8333,12 +8333,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("CostCenterId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8348,7 +8348,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8356,17 +8356,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.BusinessPartners.BusinessPartner", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8380,17 +8380,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8404,7 +8404,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8414,12 +8414,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8433,17 +8433,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8451,17 +8451,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Catalog.Brand", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8480,12 +8480,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("BrandId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8496,7 +8496,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8504,17 +8504,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Catalog.MaterialAttributeDefinition", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8522,12 +8522,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Catalog.MaterialAttributeOption", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8538,7 +8538,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8546,12 +8546,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Catalog.MaterialAttributeValue", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8573,7 +8573,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("OptionId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8581,12 +8581,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Catalog.MaterialCategory", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8596,7 +8596,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ParentCategoryId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8604,12 +8604,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Catalog.MaterialCategoryAttribute", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8626,7 +8626,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8634,12 +8634,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Catalog.MaterialUnitConversion", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8662,7 +8662,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8670,23 +8670,23 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Chat.ChatGroup", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8694,12 +8694,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Chat.ChatGroupMember", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8710,12 +8710,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -8724,12 +8724,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Chat.ChatMessage", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8739,7 +8739,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("RecipientId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8749,13 +8749,13 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ReplyToMessageId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8763,12 +8763,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Chat.ChatMessageReaction", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8779,12 +8779,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -8793,7 +8793,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Contracts.Contract", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8804,7 +8804,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8814,7 +8814,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8828,17 +8828,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8852,17 +8852,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8882,17 +8882,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8906,17 +8906,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8930,17 +8930,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8948,17 +8948,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Core.Currency", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8972,17 +8972,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("ManagerUserId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -8992,7 +8992,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ParentDepartmentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9000,7 +9000,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Core.ExchangeRate", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9011,12 +9011,30 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
+                        .WithMany()
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Energy.Domain.Core.Resource", b =>
+                {
+                    b.HasOne("Energy.Domain.IAM.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Energy.Domain.IAM.User", null)
+                        .WithMany()
+                        .HasForeignKey("DeletedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9024,17 +9042,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Core.SequenceDefinition", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9042,17 +9060,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Core.SystemSetting", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9060,12 +9078,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Core.UnitConversion", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9082,7 +9100,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9090,17 +9108,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Core.UnitOfMeasure", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9108,12 +9126,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Documents.Document", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9123,7 +9141,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("DocumentFolderId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9131,12 +9149,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Documents.DocumentFolder", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9146,7 +9164,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ParentFolderId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9154,12 +9172,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Documents.DocumentPermission", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9170,17 +9188,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.Role", null)
+                    b.HasOne("Energy.Domain.IAM.Role", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9188,12 +9206,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Documents.DocumentRelation", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9204,7 +9222,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9212,12 +9230,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Documents.DocumentVersion", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9228,7 +9246,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9236,12 +9254,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.FieldOperations.DailySiteReport", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9252,7 +9270,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9265,7 +9283,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.FieldOperations.DailySiteReportEquipment", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9276,7 +9294,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9286,7 +9304,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("EquipmentAssetId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9294,7 +9312,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.FieldOperations.DailySiteReportMaterial", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9305,7 +9323,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9316,7 +9334,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9324,7 +9342,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.FieldOperations.DailySiteReportWorker", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9335,7 +9353,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9346,7 +9364,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9359,12 +9377,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ContractId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9375,7 +9393,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9383,12 +9401,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.FieldOperations.MeasurementSheetLine", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9399,7 +9417,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9407,12 +9425,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.FieldOperations.ProgressEntry", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9428,7 +9446,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ProjectPhaseId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9436,7 +9454,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Finance.Collection", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9447,7 +9465,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9463,7 +9481,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9477,12 +9495,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9493,7 +9511,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9501,12 +9519,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Finance.CostCenter", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9516,7 +9534,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ParentCostCenterId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9524,7 +9542,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Finance.FinancialAccount", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9534,12 +9552,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9552,7 +9570,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("CostCenterId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9563,7 +9581,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9583,7 +9601,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9596,12 +9614,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("CostCenterId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9617,7 +9635,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9625,7 +9643,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Finance.Payable", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9636,7 +9654,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9647,7 +9665,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9655,7 +9673,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Finance.Payment", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9666,7 +9684,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9682,7 +9700,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9690,12 +9708,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Finance.PaymentAllocation", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9712,7 +9730,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9720,7 +9738,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Finance.Receivable", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9731,7 +9749,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9742,7 +9760,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9750,17 +9768,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.HR.Timesheet", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9768,12 +9786,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.HR.TimesheetLine", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9795,7 +9813,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9806,90 +9824,141 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("Energy.Domain.Identity.Role", b =>
+            modelBuilder.Entity("Energy.Domain.IAM.ApiEndpoint", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.Permission", null)
+                        .WithMany()
+                        .HasForeignKey("RequiredPermissionCode")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("Energy.Domain.Identity.RolePermission", b =>
+            modelBuilder.Entity("Energy.Domain.IAM.Menu", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.Permission", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Energy.Domain.IAM.User", null)
+                        .WithMany()
+                        .HasForeignKey("DeletedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Energy.Domain.IAM.Menu", null)
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Energy.Domain.IAM.Permission", null)
+                        .WithMany()
+                        .HasForeignKey("RequiredPermissionCode")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Energy.Domain.IAM.User", null)
+                        .WithMany()
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Energy.Domain.IAM.Role", b =>
+                {
+                    b.HasOne("Energy.Domain.IAM.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Energy.Domain.IAM.User", null)
+                        .WithMany()
+                        .HasForeignKey("DeletedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Energy.Domain.IAM.User", null)
+                        .WithMany()
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Energy.Domain.IAM.RolePermission", b =>
+                {
+                    b.HasOne("Energy.Domain.IAM.Permission", null)
                         .WithMany()
                         .HasForeignKey("PermissionCode")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.Role", null)
+                    b.HasOne("Energy.Domain.IAM.Role", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Energy.Domain.Identity.User", b =>
+            modelBuilder.Entity("Energy.Domain.IAM.User", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("Energy.Domain.Identity.UserPermission", b =>
+            modelBuilder.Entity("Energy.Domain.IAM.UserPermission", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.Permission", null)
+                    b.HasOne("Energy.Domain.IAM.Permission", null)
                         .WithMany()
                         .HasForeignKey("PermissionCode")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Energy.Domain.Identity.UserRole", b =>
+            modelBuilder.Entity("Energy.Domain.IAM.UserRole", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.Role", null)
+                    b.HasOne("Energy.Domain.IAM.Role", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Energy.Domain.Identity.UserSetting", b =>
+            modelBuilder.Entity("Energy.Domain.IAM.UserSetting", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -9898,12 +9967,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Inventory.StockBalance", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9914,7 +9983,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9928,17 +9997,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Inventory.StockCount", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9952,12 +10021,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Inventory.StockCountLine", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9974,7 +10043,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -9982,12 +10051,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Inventory.StockDocument", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10013,7 +10082,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("TargetWarehouseId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10021,7 +10090,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Inventory.StockDocumentLine", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10031,7 +10100,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10054,7 +10123,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10062,17 +10131,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Inventory.StockDocumentType", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10080,12 +10149,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Inventory.StockIssueAllocation", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10102,7 +10171,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10110,12 +10179,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Inventory.StockLot", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10132,7 +10201,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10146,12 +10215,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Inventory.StockReservation", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10162,7 +10231,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10176,12 +10245,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Inventory.StockTransaction", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10209,7 +10278,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("StockLotId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10234,12 +10303,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10249,7 +10318,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10257,12 +10326,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Inventory.WarehouseLocation", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10272,7 +10341,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ParentLocationId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10286,12 +10355,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Inventory.WarehouseTransfer", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10308,7 +10377,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10316,12 +10385,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Inventory.WarehouseTransferLine", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10332,7 +10401,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10344,37 +10413,19 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Energy.Domain.Localization.Resource", b =>
-                {
-                    b.HasOne("Energy.Domain.Identity.User", null)
-                        .WithMany()
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Energy.Domain.Identity.User", null)
-                        .WithMany()
-                        .HasForeignKey("DeletedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Energy.Domain.Identity.User", null)
-                        .WithMany()
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-                });
-
             modelBuilder.Entity("Energy.Domain.Notifications.Notification", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10382,22 +10433,22 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Notifications.NotificationPreference", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -10406,12 +10457,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Notifications.NotificationRecipient", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10422,12 +10473,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -10436,12 +10487,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Operations.WorkOrder", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10461,7 +10512,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ProjectPhaseId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10475,12 +10526,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Operations.WorkOrderAssignment", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10490,12 +10541,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10509,17 +10560,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Operations.WorkOrderChecklist", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10533,17 +10584,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Operations.WorkOrderChecklistItem", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10557,12 +10608,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Operations.WorkOrderMaterialPlan", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10573,7 +10624,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10587,12 +10638,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Operations.WorkOrderMaterialUsage", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10608,7 +10659,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("StockDocumentLineId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10622,17 +10673,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Operations.WorkOrderStatusHistory", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10646,17 +10697,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Operations.WorkOrderType", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10675,12 +10726,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10695,12 +10746,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("EmployeePositionId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10708,17 +10759,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Organization.EmployeePosition", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10726,17 +10777,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Organization.EmployeeSkill", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10744,12 +10795,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Organization.EmployeeSkillAssignment", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10766,7 +10817,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10774,7 +10825,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Organization.ExpenseClaim", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10785,7 +10836,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10801,7 +10852,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10809,12 +10860,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Organization.ExpenseClaimLine", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10825,7 +10876,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10833,12 +10884,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Organization.LeaveRequest", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10849,7 +10900,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10857,7 +10908,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Procurement.PurchaseOrder", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10868,7 +10919,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10884,7 +10935,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10892,7 +10943,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Procurement.PurchaseOrderLine", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10903,7 +10954,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10924,7 +10975,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("RequestLineId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10932,12 +10983,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Procurement.PurchaseReceipt", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10958,7 +11009,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10972,12 +11023,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Procurement.PurchaseReceiptLine", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -10999,7 +11050,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11007,7 +11058,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Procurement.SupplierInvoice", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11018,7 +11069,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11039,7 +11090,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11047,12 +11098,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Procurement.SupplierInvoiceLine", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11068,7 +11119,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11076,7 +11127,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Procurement.SupplierQuote", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11087,7 +11138,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11103,7 +11154,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11111,12 +11162,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Procurement.SupplierQuoteLine", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11137,7 +11188,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11151,12 +11202,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11166,7 +11217,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("PartnerId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11174,12 +11225,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.ProgressPayments.ProgressPaymentDeduction", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11190,7 +11241,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11203,12 +11254,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ContractLineId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11224,7 +11275,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11243,7 +11294,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11253,12 +11304,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("ManagerUserId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11275,7 +11326,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11283,12 +11334,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Projects.ProjectLocation", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11304,7 +11355,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11312,12 +11363,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Projects.ProjectMember", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11333,12 +11384,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11346,12 +11397,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Projects.ProjectNote", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11362,7 +11413,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11370,12 +11421,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Projects.ProjectPhase", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11391,7 +11442,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11399,17 +11450,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Projects.ProjectStatus", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11417,17 +11468,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Projects.ProjectType", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11435,22 +11486,22 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Reporting.DashboardWidget", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.Permission", null)
+                    b.HasOne("Energy.Domain.IAM.Permission", null)
                         .WithMany()
                         .HasForeignKey("RequiredPermissionCode")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11458,22 +11509,22 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Reporting.ReportDefinition", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.Permission", null)
+                    b.HasOne("Energy.Domain.IAM.Permission", null)
                         .WithMany()
                         .HasForeignKey("RequiredPermissionCode")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11481,12 +11532,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Requests.Request", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11502,13 +11553,13 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("RequestedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11516,12 +11567,12 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Requests.RequestLine", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11543,7 +11594,7 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11551,68 +11602,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Requests.RequestType", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
-                        .WithMany()
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-                });
-
-            modelBuilder.Entity("Energy.Domain.System.ApiEndpoint", b =>
-                {
-                    b.HasOne("Energy.Domain.Identity.User", null)
-                        .WithMany()
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Energy.Domain.Identity.User", null)
-                        .WithMany()
-                        .HasForeignKey("DeletedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Energy.Domain.Identity.Permission", null)
-                        .WithMany()
-                        .HasForeignKey("RequiredPermissionCode")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("Energy.Domain.Identity.User", null)
-                        .WithMany()
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-                });
-
-            modelBuilder.Entity("Energy.Domain.System.Menu", b =>
-                {
-                    b.HasOne("Energy.Domain.Identity.User", null)
-                        .WithMany()
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Energy.Domain.Identity.User", null)
-                        .WithMany()
-                        .HasForeignKey("DeletedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Energy.Domain.System.Menu", null)
-                        .WithMany()
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Energy.Domain.Identity.Permission", null)
-                        .WithMany()
-                        .HasForeignKey("RequiredPermissionCode")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11631,22 +11631,22 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ApprovalRequestStepId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -11661,17 +11661,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11679,17 +11679,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Workflow.ApprovalDefinition", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11703,17 +11703,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11721,29 +11721,29 @@ namespace Energy.Migrations.PostgreSql.Migrations
 
             modelBuilder.Entity("Energy.Domain.Workflow.ApprovalDelegation", b =>
                 {
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DelegateUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DelegatorUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11757,23 +11757,23 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("RequestedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11787,22 +11787,22 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -11823,17 +11823,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11852,27 +11852,27 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .HasForeignKey("ApproverDepartmentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.Role", null)
+                    b.HasOne("Energy.Domain.IAM.Role", null)
                         .WithMany()
                         .HasForeignKey("ApproverRoleId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("ApproverUserId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -11886,17 +11886,17 @@ namespace Energy.Migrations.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Energy.Domain.Identity.User", null)
+                    b.HasOne("Energy.Domain.IAM.User", null)
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);

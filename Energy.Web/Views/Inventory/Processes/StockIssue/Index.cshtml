@@ -1,0 +1,33 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Inventory.Processes.StockIssue.Title"].Value;
+}
+
+<link rel="stylesheet" href="~/css/inventory/processes/stock-issue/stock-issue.css" asp-append-version="true" />
+
+<section class="energy-screen energy-process">
+    <header class="energy-screen__header">
+        <div><h2>@T["Inventory.Processes.StockIssue.Title"]</h2></div>
+    </header>
+    <div id="stock-issue-form" class="energy-process__form"></div>
+    <div id="stock-issue-result" class="energy-process__result"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/inventory/processes/stock-issue/stock-issue.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroProcess"].Value, ViewData["Title"])))
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppProcesses.InventoryStockIssue.init("/inventory/processes/stock-issue", {
+                formId: "stock-issue-form",
+                resultId: "stock-issue-result",
+                submit: "@T["Inventory.Processes.StockIssue.Actions.Execute"]",
+                success: "@T["Inventory.Processes.StockIssue.Messages.Completed"]"
+            });
+        });
+    </script>
+}
+

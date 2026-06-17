@@ -1,0 +1,24 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Documents.DocumentFolder.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Documents.DocumentFolder.Title"]</h2></div>
+    </header>
+    <div id="document-folder-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/documents/document-folder/document-folder.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"])))
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.DocumentsDocumentFolder.init("/documents/document-folders", "document-folder-grid", "Documents");
+        });
+    </script>
+}

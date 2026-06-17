@@ -1,0 +1,46 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Documents.Files.Title"].Value;
+}
+
+<link rel="stylesheet" href="~/css/documents/files/files.css" asp-append-version="true" />
+
+<section class="energy-screen energy-documents">
+    <header class="energy-screen__header">
+        <div><h2>@T["Documents.Files.Title"]</h2></div>
+    </header>
+    <p class="energy-documents__hint">@T["Documents.Files.Hint"]</p>
+
+    <div class="energy-documents__toolbar">
+        <div id="document-select" class="energy-documents__select"></div>
+        <div id="document-upload" class="energy-documents__upload"></div>
+    </div>
+
+    <h3 class="energy-documents__subtitle">@T["Documents.Files.VersionHistory"]</h3>
+    <div id="document-versions-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/documents/files/files.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Documents.Files.Hint"].Value))
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppDocuments.Files.init("/documents/files", {
+                selectId: "document-select",
+                uploadId: "document-upload",
+                gridId: "document-versions-grid",
+                labels: {
+                    selectDocument: "@T["Documents.Files.SelectDocument"]",
+                    upload: "@T["Documents.Files.Actions.Upload"]",
+                    download: "@T["Documents.Files.Actions.Download"]",
+                    uploaded: "@T["Documents.Files.Messages.Uploaded"]",
+                    pickFirst: "@T["Documents.Files.Messages.PickDocument"]"
+                }
+            });
+        });
+    </script>
+}
+

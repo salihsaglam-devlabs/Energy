@@ -1,0 +1,28 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["FieldOperations.DailySiteReport.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["FieldOperations.DailySiteReport.Title"]</h2></div>
+    </header>
+    <div id="daily-site-report-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/field-operations/daily-site-report/daily-site-report.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.Project.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Operations.WorkOrder.Title"].Value))
+            ]
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.FieldOperationsDailySiteReport.init("/field-operations/daily-site-reports", "daily-site-report-grid", "FieldOperations");
+        });
+    </script>
+}

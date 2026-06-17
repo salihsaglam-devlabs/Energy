@@ -1,6 +1,7 @@
+using Energy.Shared.Common;
 using Energy.Application.Workflow.Services;
 using Energy.Domain.Common;
-using Energy.Domain.Identity;
+using Energy.Domain.IAM;
 using Energy.Domain.Workflow;
 using Energy.Infrastructure.Persistence;
 using Energy.Infrastructure.Workflow.Services;

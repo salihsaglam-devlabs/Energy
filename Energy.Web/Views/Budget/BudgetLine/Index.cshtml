@@ -1,0 +1,29 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Budget.BudgetLine.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Budget.BudgetLine.Title"]</h2></div>
+    </header>
+    <div id="budget-line-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/budget/budget-line/budget-line.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Budget.Budget.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Finance.CostCenter.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.Project.Title"].Value))
+            ]
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.BudgetBudgetLine.init("/budget/budget-lines", "budget-line-grid", "Budget");
+        });
+    </script>
+}

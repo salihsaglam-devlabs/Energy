@@ -1,0 +1,27 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["HR.Timesheet.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["HR.Timesheet.Title"]</h2></div>
+    </header>
+    <div id="timesheet-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/h-r/timesheet/timesheet.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Workflow.ApprovalRequest.Title"].Value))
+            ]
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.HRTimesheet.init("/h-r/timesheets", "timesheet-grid", "HR");
+        });
+    </script>
+}

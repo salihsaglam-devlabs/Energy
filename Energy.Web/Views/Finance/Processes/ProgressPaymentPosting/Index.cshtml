@@ -1,0 +1,34 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Finance.Processes.ProgressPaymentPosting.Title"].Value;
+}
+
+<link rel="stylesheet" href="~/css/finance/processes/progress-payment-posting/progress-payment-posting.css" asp-append-version="true" />
+
+<section class="energy-screen energy-process">
+    <header class="energy-screen__header">
+        <div><h2>@T["Finance.Processes.ProgressPaymentPosting.Title"]</h2></div>
+    </header>
+    <p class="energy-process__hint">@T["Finance.Processes.ProgressPaymentPosting.Hint"]</p>
+    <div id="ppp-form" class="energy-process__form"></div>
+    <div id="ppp-result" class="energy-process__result"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/finance/processes/progress-payment-posting/progress-payment-posting.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Finance.Processes.ProgressPaymentPosting.Hint"].Value))
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppProcesses.FinanceProgressPaymentPosting.init("/finance/processes/progress-payment-posting", {
+                formId: "ppp-form",
+                resultId: "ppp-result",
+                submit: "@T["Finance.Processes.ProgressPaymentPosting.Actions.Execute"]",
+                success: "@T["Finance.Processes.ProgressPaymentPosting.Messages.Completed"]"
+            });
+        });
+    </script>
+}
+

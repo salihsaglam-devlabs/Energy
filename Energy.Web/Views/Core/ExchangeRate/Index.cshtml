@@ -1,0 +1,27 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Core.ExchangeRate.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Core.ExchangeRate.Title"]</h2></div>
+    </header>
+    <div id="exchange-rate-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/core/exchange-rate/exchange-rate.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Core.Currency.Title"].Value))
+            ]
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.CoreExchangeRate.init("/core/exchange-rates", "exchange-rate-grid", "Core");
+        });
+    </script>
+}

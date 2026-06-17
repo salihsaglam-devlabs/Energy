@@ -1,0 +1,27 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Finance.FinancialAccount.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Finance.FinancialAccount.Title"]</h2></div>
+    </header>
+    <div id="financial-account-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/finance/financial-account/financial-account.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Core.Currency.Title"].Value))
+            ]
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.FinanceFinancialAccount.init("/finance/financial-accounts", "financial-account-grid", "Finance");
+        });
+    </script>
+}

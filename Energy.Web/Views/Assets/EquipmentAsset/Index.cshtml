@@ -1,0 +1,27 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Assets.EquipmentAsset.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Assets.EquipmentAsset.Title"]</h2></div>
+    </header>
+    <div id="equipment-asset-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/assets/equipment-asset/equipment-asset.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Core.Company.Title"].Value))
+            ]
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.AssetsEquipmentAsset.init("/assets/equipment-assets", "equipment-asset-grid", "Assets");
+        });
+    </script>
+}

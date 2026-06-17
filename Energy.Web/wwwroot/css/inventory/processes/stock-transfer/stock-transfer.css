@@ -1,0 +1,15 @@
+/* Process form screen shared styles (stock-transfer). */
+.energy-process__form {
+    max-width: 720px;
+    margin-bottom: 16px;
+}
+
+.energy-process__result {
+    font-weight: 600;
+    color: var(--energy-accent, #2e7d32);
+}
+
+@media (max-width: 640px) {
+    .energy-process__form { max-width: 100%; }
+}
+

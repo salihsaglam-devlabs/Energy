@@ -1,5 +1,5 @@
 using Energy.Domain.Chat;
-using Energy.Domain.Identity;
+using Energy.Domain.IAM;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

@@ -1,0 +1,28 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Finance.PaymentAllocation.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Finance.PaymentAllocation.Title"]</h2></div>
+    </header>
+    <div id="payment-allocation-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/finance/payment-allocation/payment-allocation.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Finance.Payable.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Finance.Payment.Title"].Value))
+            ]
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.FinancePaymentAllocation.init("/finance/payment-allocations", "payment-allocation-grid", "Finance");
+        });
+    </script>
+}

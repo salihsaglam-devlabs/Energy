@@ -1,4 +1,6 @@
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Energy.Localization;
 
 namespace Energy.Web.Clients.Infrastructure;
@@ -10,6 +12,23 @@ namespace Energy.Web.Clients.Infrastructure;
 /// </summary>
 public abstract class ApiClientBase
 {
+    /// <summary>
+    /// Web ile API arasındaki JSON sözleşmesi. API, enum'ları metin (ör. "Customer")
+    /// olarak serileştirdiği için (bkz. Energy.Api JsonStringEnumConverter), istemci de
+    /// aynı dönüştürücüyü kullanmalıdır; aksi halde varsayılan (sayısal) enum çözücü
+    /// "The JSON value could not be converted to ... enum" hatası verir.
+    /// Hem okuma (yanıt) hem yazma (istek) için kullanılır ki gönderilen enum'lar da
+    /// API'nin beklediği metin biçiminde olsun.
+    /// </summary>
+    private static readonly JsonSerializerOptions JsonOptions = CreateJsonOptions();
+
+    private static JsonSerializerOptions CreateJsonOptions()
+    {
+        var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+        options.Converters.Add(new JsonStringEnumConverter());
+        return options;
+    }
+
     private readonly HttpClient _httpClient;
 
     /// <summary>Alttaki HttpClient örneğini enjekte eder.</summary>
@@ -33,7 +52,7 @@ public abstract class ApiClientBase
         TRequest request,
         CancellationToken cancellationToken = default)
     {
-        using var response = await _httpClient.PostAsJsonAsync(requestUri, request, cancellationToken);
+        using var response = await _httpClient.PostAsJsonAsync(requestUri, request, JsonOptions, cancellationToken);
         return await ReadAsync<TResponse>(response, requestUri, cancellationToken);
     }
 
@@ -52,7 +71,7 @@ public abstract class ApiClientBase
         TRequest request,
         CancellationToken cancellationToken = default)
     {
-        using var response = await _httpClient.PutAsJsonAsync(requestUri, request, cancellationToken);
+        using var response = await _httpClient.PutAsJsonAsync(requestUri, request, JsonOptions, cancellationToken);
         return await ReadAsync<TResponse>(response, requestUri, cancellationToken);
     }
 
@@ -76,7 +95,7 @@ public abstract class ApiClientBase
         TRequest request,
         CancellationToken cancellationToken = default)
     {
-        using var response = await _httpClient.PostAsJsonAsync(requestUri, request, cancellationToken);
+        using var response = await _httpClient.PostAsJsonAsync(requestUri, request, JsonOptions, cancellationToken);
         return response.IsSuccessStatusCode;
     }
 
@@ -95,6 +114,19 @@ public abstract class ApiClientBase
         return (bytes, contentType, (int)response.StatusCode);
     }
 
+    /// <summary>
+    /// Bir multipart/form-data POST isteği gönderir (dosya yükleme) ve BaseResponse
+    /// zarfını çözer. İçerik çağıran tarafından oluşturulup yönetilir.
+    /// </summary>
+    protected async Task<TResponse> PostMultipartAsync<TResponse>(
+        string requestUri,
+        MultipartFormDataContent content,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await _httpClient.PostAsync(requestUri, content, cancellationToken);
+        return await ReadAsync<TResponse>(response, requestUri, cancellationToken);
+    }
+
     /// <summary>Yanıt gövdesini BaseResponse zarfı olarak okur ve seri durumdan çıkarır.</summary>
     private static async Task<TResponse> ReadAsync<TResponse>(
         HttpResponseMessage response,
@@ -108,7 +140,7 @@ public abstract class ApiClientBase
 
         try
         {
-            payload = await response.Content.ReadFromJsonAsync<TResponse>(cancellationToken);
+            payload = await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions, cancellationToken);
         }
         catch (Exception ex)
         {

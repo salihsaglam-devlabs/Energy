@@ -1,0 +1,27 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Inventory.Reports.StockBalanceReport.Title"].Value;
+}
+
+<link rel="stylesheet" href="~/css/inventory/reports/stock-balance-report/stock-balance-report.css" asp-append-version="true" />
+
+<section class="energy-screen energy-report">
+    <header class="energy-screen__header">
+        <div><h2>@T["Inventory.Reports.StockBalanceReport.Title"]</h2></div>
+    </header>
+    <div id="stock-balance-report-filters" class="energy-report__filters"></div>
+    <div id="stock-balance-report-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/inventory/reports/stock-balance-report/stock-balance-report.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroReport"].Value, ViewData["Title"])))
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppReports.InventoryStockBalanceReport.init("/inventory/reports/stock-balance-report", "stock-balance-report-grid", "stock-balance-report-filters", { hasStatus: false });
+        });
+    </script>
+}

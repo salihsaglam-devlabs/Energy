@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Energy.Shared.Models.V1.Common.Requests;
 
 /// <summary>

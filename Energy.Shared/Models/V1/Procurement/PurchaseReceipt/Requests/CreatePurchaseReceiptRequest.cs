@@ -1,0 +1,27 @@
+using Energy.Shared.Common;
+namespace Energy.Shared.Models.V1.Procurement.PurchaseReceipt.Requests;
+
+/// <summary>PurchaseReceipt oluşturma isteği.</summary>
+public class CreatePurchaseReceiptRequest
+{
+    /// <summary>SupplierId</summary>
+    public Guid SupplierId { get; set; }
+
+    /// <summary>PurchaseOrderId</summary>
+    public Guid? PurchaseOrderId { get; set; }
+
+    /// <summary>WarehouseId</summary>
+    public Guid WarehouseId { get; set; }
+
+    /// <summary>StockDocumentId</summary>
+    public Guid? StockDocumentId { get; set; }
+
+    /// <summary>ReceiptNo</summary>
+    public string ReceiptNo { get; set; } = string.Empty;
+
+    /// <summary>ReceiptDate</summary>
+    public DateTime ReceiptDate { get; set; }
+
+    /// <summary>Status</summary>
+    public DocumentStatus Status { get; set; }
+}

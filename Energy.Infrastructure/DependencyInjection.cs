@@ -9,6 +9,7 @@ using Energy.Infrastructure.Identity;
 using Energy.Infrastructure.Identity.Services;
 using Energy.Infrastructure.Localization;
 using Energy.Infrastructure.Logger.Services;
+using Energy.Infrastructure;
 using Energy.Infrastructure.Persistence;
 using Energy.Infrastructure.Persistence.Interceptors;
 using Energy.Infrastructure.Seeding;
@@ -60,6 +61,7 @@ public static class DependencyInjection
             options.AddInterceptors(sp.GetRequiredService<AuditingSaveChangesInterceptor>());
         });
 
+
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
         services.Configure<LocalizationSettings>(configuration.GetSection(LocalizationSettings.SectionName));
 
@@ -77,14 +79,6 @@ public static class DependencyInjection
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<Application.Settings.Services.IUserSettingsService, Infrastructure.Settings.Services.UserSettingsService>();
 
-        // Kurumsal modüllerin ortak CRUD servisi (açık generic kayıt).
-        services.AddScoped(typeof(Application.Common.Crud.IGenericCrudService<>), typeof(Infrastructure.Common.GenericCrudService<>));
-
-        // Ana-detay ekranları için ortak alt-koleksiyon sorgu servisi.
-        services.AddScoped<Application.Common.Crud.IModuleDetailQueryService, Infrastructure.Common.ModuleDetailQueryService>();
-
-        // Ana-detay ekranları için ortak alt-koleksiyon yazma (CRUD) servisi.
-        services.AddScoped<Application.Common.Crud.IModuleDetailCommandService, Infrastructure.Common.ModuleDetailCommandService>();
 
         // Workflow (onay) motoru + kaynak belge durum güncelleyici.
         services.AddScoped<Application.Workflow.Services.IApprovalSourceUpdater, Infrastructure.Workflow.Services.ApprovalSourceUpdater>();
@@ -104,6 +98,16 @@ public static class DependencyInjection
         services.AddLocalizationOverrides();
         services.AddScoped<SystemSeeder>();
         services.AddScoped<ISystemSeeder>(sp => sp.GetRequiredService<SystemSeeder>());
+
+        // Tüm 134 per-entity CRUD + lookup servisleri (üretildi).
+        services.AddEntityServices();
+
+        // ER Overview iş akışlarından türetilen salt-okunur rapor servisleri (üretildi).
+        services.AddReportServices();
+
+        // Belge dosya/versiyon yönetimi: yerel dosya saklama + dosya servisi.
+        services.AddScoped<Energy.Application.Common.Storage.IFileStorage, Energy.Infrastructure.Common.Storage.LocalFileStorage>();
+        services.AddScoped<Energy.Application.Documents.Files.Services.IDocumentFileService, Energy.Infrastructure.Documents.Files.DocumentFileService>();
 
         return services;
     }

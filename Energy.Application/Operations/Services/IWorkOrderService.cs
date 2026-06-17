@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 using Energy.Domain.Common;
 
 namespace Energy.Application.Operations.Services;

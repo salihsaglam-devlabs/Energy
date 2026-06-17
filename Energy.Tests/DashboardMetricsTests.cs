@@ -1,3 +1,5 @@
+using BudgetEntity = Energy.Domain.Budget.Budget;
+using Energy.Shared.Common;
 using Energy.Application.Identity.Services;
 using Energy.Domain.Budget;
 using Energy.Domain.BusinessPartners;
@@ -5,7 +7,7 @@ using Energy.Domain.Catalog;
 using Energy.Domain.Common;
 using Energy.Domain.Core;
 using Energy.Domain.Finance;
-using Energy.Domain.Identity;
+using Energy.Domain.IAM;
 using Energy.Domain.Inventory;
 using Energy.Domain.Operations;
 using Energy.Domain.Procurement;
@@ -34,7 +36,7 @@ public sealed class DashboardMetricsTests : IDisposable
     [
         ("LowStock", "Inventory", "Inventory.ReadAll"),
         ("PendingApprovals", "Workflow", "Workflow.ReadAll"),
-        ("BudgetOverrun", "Budget", "Budget.ReadAll"),
+        ("BudgetOverrun", "BudgetEntity", "BudgetEntity.ReadAll"),
         ("OrderDelivery", "Procurement", "Procurement.ReadAll"),
         ("WorkOrderProgress", "Operations", "Operations.ReadAll"),
     ];
@@ -154,7 +156,7 @@ public sealed class DashboardMetricsTests : IDisposable
         });
 
         // BudgetOverrun = gerçekleşen > planlanan olan etkin bütçe sayısı → 1.
-        var budget = new Budget
+        var budget = new BudgetEntity
         {
             Id = Guid.NewGuid(), ProjectId = project.Id, CurrencyId = currency.Id,
             Name = "Test Bütçe", Year = DateTime.UtcNow.Year, IsActive = true,
@@ -211,7 +213,7 @@ public sealed class DashboardMetricsTests : IDisposable
     [Fact]
     public async Task All_metrics_compute_expected_values_when_user_has_all_permissions()
     {
-        var service = BuildService("Inventory.ReadAll", "Workflow.ReadAll", "Budget.ReadAll", "Procurement.ReadAll", "Operations.ReadAll");
+        var service = BuildService("Inventory.ReadAll", "Workflow.ReadAll", "BudgetEntity.ReadAll", "Procurement.ReadAll", "Operations.ReadAll");
 
         var metrics = await service.GetEnterpriseMetricsAsync();
         var byCode = metrics.ToDictionary(m => m.Code, m => m.Value);
@@ -248,7 +250,7 @@ public sealed class DashboardMetricsTests : IDisposable
     [Fact]
     public async Task Metrics_are_ordered_by_display_order()
     {
-        var service = BuildService("Inventory.ReadAll", "Workflow.ReadAll", "Budget.ReadAll", "Procurement.ReadAll", "Operations.ReadAll");
+        var service = BuildService("Inventory.ReadAll", "Workflow.ReadAll", "BudgetEntity.ReadAll", "Procurement.ReadAll", "Operations.ReadAll");
 
         var metrics = await service.GetEnterpriseMetricsAsync();
 

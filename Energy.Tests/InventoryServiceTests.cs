@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 using Energy.Application.Inventory.Services;
 using Energy.Domain.BusinessPartners;
 using Energy.Domain.Catalog;

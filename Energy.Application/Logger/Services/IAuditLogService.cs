@@ -1,4 +1,4 @@
-using Energy.Domain.Logger;
+using Energy.Domain.Core;
 using Energy.Shared.Models.V1.Common.Requests;
 using Energy.Shared.Models.V1.Common.Responses;
 using Energy.Shared.Models.V1.Logger.Requests;

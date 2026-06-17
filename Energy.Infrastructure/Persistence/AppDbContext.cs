@@ -1,3 +1,5 @@
+using BudgetEntity = Energy.Domain.Budget.Budget;
+using Energy.Shared.Common;
 using System.Reflection;
 using Energy.Domain.Assets;
 using Energy.Domain.BusinessPartners;
@@ -11,10 +13,8 @@ using Energy.Domain.Documents;
 using Energy.Domain.FieldOperations;
 using Energy.Domain.Finance;
 using Energy.Domain.HR;
-using Energy.Domain.Identity;
+using Energy.Domain.IAM;
 using Energy.Domain.Inventory;
-using Energy.Domain.Localization;
-using Energy.Domain.Logger;
 using Energy.Domain.Notifications;
 using Energy.Domain.Operations;
 using Energy.Domain.Organization;
@@ -23,9 +23,7 @@ using Energy.Domain.ProgressPayments;
 using Energy.Domain.Projects;
 using Energy.Domain.Reporting;
 using Energy.Domain.Requests;
-using Energy.Domain.System;
 using Energy.Domain.Workflow;
-using Energy.Infrastructure.Persistence.Configurations.Enterprise;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energy.Infrastructure.Persistence;
@@ -47,6 +45,8 @@ public class AppDbContext : DbContext
     public DbSet<Menu> Menus => Set<Menu>();
     public DbSet<ApiEndpoint> ApiEndpoints => Set<ApiEndpoint>();
     public DbSet<Resource> Resources => Set<Resource>();
+    // LocalizationResources, Resource varlığının modül-standardı (Core) takma adıdır.
+    public DbSet<Resource> LocalizationResources => Set<Resource>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
     public DbSet<ChatGroup> ChatGroups => Set<ChatGroup>();
@@ -169,8 +169,8 @@ public class AppDbContext : DbContext
     public DbSet<Collection> Collections => Set<Collection>();
     public DbSet<CollectionAllocation> CollectionAllocations => Set<CollectionAllocation>();
 
-    // ---- Budget ----
-    public DbSet<Budget> Budgets => Set<Budget>();
+    // ---- BudgetEntity ----
+    public DbSet<BudgetEntity> Budgets => Set<BudgetEntity>();
     public DbSet<BudgetLine> BudgetLines => Set<BudgetLine>();
 
     // ---- Contracts ----
@@ -235,15 +235,10 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        // Her tablo için ayrı IEntityTypeConfiguration uygulanır (per-entity standardı).
+        // Birleşik (combine) yapılandırma dosyaları kullanılmaz; tüm modül
+        // yapılandırmaları assembly taraması ile otomatik uygulanır.
         builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-
-        CoreModuleConfiguration.Configure(builder);
-        OrgPartnersProjectsConfiguration.Configure(builder);
-        CatalogInventoryConfiguration.Configure(builder);
-        RequestsProcurementConfiguration.Configure(builder);
-        OperationsFieldHrAssetsConfiguration.Configure(builder);
-        FinanceBudgetContractsProgressConfiguration.Configure(builder);
-        DocumentsWorkflowNotificationsReportingConfiguration.Configure(builder);
 
         ApplyAuditUserForeignKeys(builder);
         ApplySoftDeleteConvention(builder);

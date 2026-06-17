@@ -1,0 +1,28 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Operations.WorkOrderAssignment.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Operations.WorkOrderAssignment.Title"]</h2></div>
+    </header>
+    <div id="work-order-assignment-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/operations/work-order-assignment/work-order-assignment.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Organization.Employee.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Operations.WorkOrder.Title"].Value))
+            ]
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.OperationsWorkOrderAssignment.init("/operations/work-order-assignments", "work-order-assignment-grid", "Operations");
+        });
+    </script>
+}

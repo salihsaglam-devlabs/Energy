@@ -1,0 +1,29 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Catalog.Material.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Catalog.Material.Title"]</h2></div>
+    </header>
+    <div id="material-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/catalog/material/material.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Core.UnitOfMeasure.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Catalog.Brand.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Catalog.MaterialCategory.Title"].Value))
+            ]
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.CatalogMaterial.init("/catalog/materials", "material-grid", "Catalog");
+        });
+    </script>
+}

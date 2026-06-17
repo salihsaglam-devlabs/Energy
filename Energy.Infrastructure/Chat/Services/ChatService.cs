@@ -1,6 +1,11 @@
+using ChatGroupEntity = Energy.Domain.Chat.ChatGroup;
+using ChatGroupMemberEntity = Energy.Domain.Chat.ChatGroupMember;
+using ChatGroupMemberStatusEntity = Energy.Domain.Chat.ChatGroupMemberStatus;
+using ChatMessageEntity = Energy.Domain.Chat.ChatMessage;
+using ChatMessageReactionEntity = Energy.Domain.Chat.ChatMessageReaction;
 using Energy.Application.Chat.Services;
 using Energy.Domain.Chat;
-using Energy.Domain.Identity;
+using Energy.Domain.IAM;
 using Energy.Infrastructure.Persistence;
 using Energy.Shared.Models.V1.Chat.Requests;
 using Energy.Shared.Models.V1.Chat.Responses;
@@ -104,7 +109,7 @@ public sealed class ChatService : IChatService
                 : request.AttachmentContentType.Trim();
         }
 
-        var message = new ChatMessage
+        var message = new ChatMessageEntity
         {
             Id = Guid.NewGuid(),
             SenderId = senderId,
@@ -122,7 +127,7 @@ public sealed class ChatService : IChatService
         if (request.GroupId is { } groupId)
         {
             var isMember = await _db.ChatGroupMembers.AsNoTracking().AnyAsync(
-                gm => gm.GroupId == groupId && gm.UserId == senderId && gm.Status == ChatGroupMemberStatus.Accepted, ct);
+                gm => gm.GroupId == groupId && gm.UserId == senderId && gm.Status == ChatGroupMemberStatusEntity.Accepted, ct);
             if (!isMember)
             {
                 throw new InvalidOperationException("Not a member of the group.");
@@ -209,7 +214,7 @@ public sealed class ChatService : IChatService
     public async Task<IReadOnlyList<ChatGroupResponse>> GetGroupsAsync(Guid currentUserId, CancellationToken ct = default)
     {
         var myMemberships = await _db.ChatGroupMembers.AsNoTracking()
-            .Where(gm => gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatus.Accepted)
+            .Where(gm => gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatusEntity.Accepted)
             .Select(gm => new { gm.GroupId, gm.IsOwner, gm.IsAdmin })
             .ToListAsync(ct);
         if (myMemberships.Count == 0) return [];
@@ -222,7 +227,7 @@ public sealed class ChatService : IChatService
             .ToListAsync(ct);
 
         var memberCounts = await _db.ChatGroupMembers.AsNoTracking()
-            .Where(gm => myGroupIds.Contains(gm.GroupId) && gm.Status == ChatGroupMemberStatus.Accepted)
+            .Where(gm => myGroupIds.Contains(gm.GroupId) && gm.Status == ChatGroupMemberStatusEntity.Accepted)
             .GroupBy(gm => gm.GroupId)
             .Select(g => new { GroupId = g.Key, Count = g.Count() })
             .ToDictionaryAsync(x => x.GroupId, x => x.Count, ct);
@@ -253,7 +258,7 @@ public sealed class ChatService : IChatService
     public async Task<IReadOnlyList<ChatGroupInviteResponse>> GetGroupInvitesAsync(Guid currentUserId, CancellationToken ct = default)
     {
         var invites = await _db.ChatGroupMembers.AsNoTracking()
-            .Where(gm => gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatus.Pending)
+            .Where(gm => gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatusEntity.Pending)
             .Join(_db.ChatGroups.AsNoTracking(), gm => gm.GroupId, g => g.Id, (gm, g) => new { gm, g })
             .ToListAsync(ct);
 
@@ -286,28 +291,28 @@ public sealed class ChatService : IChatService
             throw new InvalidOperationException("Group name is required.");
         }
 
-        var group = new ChatGroup { Id = Guid.NewGuid(), Name = name, OwnerId = ownerId };
+        var group = new ChatGroupEntity { Id = Guid.NewGuid(), Name = name, OwnerId = ownerId };
         _db.ChatGroups.Add(group);
 
         // Owner is an immediate accepted member.
-        _db.ChatGroupMembers.Add(new ChatGroupMember
+        _db.ChatGroupMembers.Add(new ChatGroupMemberEntity
         {
             Id = Guid.NewGuid(),
             GroupId = group.Id,
             UserId = ownerId,
-            Status = ChatGroupMemberStatus.Accepted,
+            Status = ChatGroupMemberStatusEntity.Accepted,
             IsOwner = true
         });
 
         // Davet edilen kullanıcılar beklemede üyelik alır (yalnızca kabul ettikten sonra etkin olur).
         foreach (var userId in (request.MemberUserIds ?? []).Distinct().Where(id => id != ownerId && id != Guid.Empty))
         {
-            _db.ChatGroupMembers.Add(new ChatGroupMember
+            _db.ChatGroupMembers.Add(new ChatGroupMemberEntity
             {
                 Id = Guid.NewGuid(),
                 GroupId = group.Id,
                 UserId = userId,
-                Status = ChatGroupMemberStatus.Pending,
+                Status = ChatGroupMemberStatusEntity.Pending,
                 InvitedById = ownerId
             });
         }
@@ -330,7 +335,7 @@ public sealed class ChatService : IChatService
     {
         // Davet eden kişi, grubun kabul edilmiş bir üyesi olmalıdır.
         var isMember = await _db.ChatGroupMembers.AsNoTracking().AnyAsync(
-            gm => gm.GroupId == groupId && gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatus.Accepted, ct);
+            gm => gm.GroupId == groupId && gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatusEntity.Accepted, ct);
         if (!isMember)
         {
             throw new InvalidOperationException("Not a member of the group.");
@@ -347,9 +352,9 @@ public sealed class ChatService : IChatService
             if (existingByUser.TryGetValue(userId, out var row))
             {
                 // Daha önce reddetmiş/çıkarılmış bir kullanıcıyı yeniden davet et.
-                if (row.Status == ChatGroupMemberStatus.Declined)
+                if (row.Status == ChatGroupMemberStatusEntity.Declined)
                 {
-                    row.Status = ChatGroupMemberStatus.Pending;
+                    row.Status = ChatGroupMemberStatusEntity.Pending;
                     row.InvitedById = currentUserId;
                     row.UpdatedAt = DateTime.UtcNow;
                     invited.Add(userId);
@@ -357,12 +362,12 @@ public sealed class ChatService : IChatService
                 continue;
             }
 
-            _db.ChatGroupMembers.Add(new ChatGroupMember
+            _db.ChatGroupMembers.Add(new ChatGroupMemberEntity
             {
                 Id = Guid.NewGuid(),
                 GroupId = groupId,
                 UserId = userId,
-                Status = ChatGroupMemberStatus.Pending,
+                Status = ChatGroupMemberStatusEntity.Pending,
                 InvitedById = currentUserId
             });
             invited.Add(userId);
@@ -375,13 +380,13 @@ public sealed class ChatService : IChatService
     public async Task<bool> RespondInviteAsync(Guid currentUserId, Guid groupId, bool accept, CancellationToken ct = default)
     {
         var row = await _db.ChatGroupMembers
-            .FirstOrDefaultAsync(gm => gm.GroupId == groupId && gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatus.Pending, ct);
+            .FirstOrDefaultAsync(gm => gm.GroupId == groupId && gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatusEntity.Pending, ct);
         if (row is null)
         {
             return false;
         }
 
-        row.Status = accept ? ChatGroupMemberStatus.Accepted : ChatGroupMemberStatus.Declined;
+        row.Status = accept ? ChatGroupMemberStatusEntity.Accepted : ChatGroupMemberStatusEntity.Declined;
         row.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync(ct);
         return true;
@@ -390,14 +395,14 @@ public sealed class ChatService : IChatService
     public async Task<IReadOnlyList<ChatGroupMemberResponse>> GetGroupMembersAsync(Guid currentUserId, Guid groupId, CancellationToken ct = default)
     {
         var isMember = await _db.ChatGroupMembers.AsNoTracking().AnyAsync(
-            gm => gm.GroupId == groupId && gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatus.Accepted, ct);
+            gm => gm.GroupId == groupId && gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatusEntity.Accepted, ct);
         if (!isMember)
         {
             return [];
         }
 
         return await _db.ChatGroupMembers.AsNoTracking()
-            .Where(gm => gm.GroupId == groupId && gm.Status != ChatGroupMemberStatus.Declined)
+            .Where(gm => gm.GroupId == groupId && gm.Status != ChatGroupMemberStatusEntity.Declined)
             .Join(_db.Users.AsNoTracking(), gm => gm.UserId, u => u.Id, (gm, u) => new ChatGroupMemberResponse
             {
                 UserId = u.Id,
@@ -413,14 +418,14 @@ public sealed class ChatService : IChatService
 
     public async Task<IReadOnlyList<Guid>> GetGroupMemberIdsAsync(Guid groupId, CancellationToken ct = default)
         => await _db.ChatGroupMembers.AsNoTracking()
-            .Where(gm => gm.GroupId == groupId && gm.Status == ChatGroupMemberStatus.Accepted)
+            .Where(gm => gm.GroupId == groupId && gm.Status == ChatGroupMemberStatusEntity.Accepted)
             .Select(gm => gm.UserId)
             .ToListAsync(ct);
 
     public async Task<IReadOnlyList<ChatMessageResponse>> GetGroupConversationAsync(Guid currentUserId, Guid groupId, CancellationToken ct = default)
     {
         var isMember = await _db.ChatGroupMembers.AsNoTracking().AnyAsync(
-            gm => gm.GroupId == groupId && gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatus.Accepted, ct);
+            gm => gm.GroupId == groupId && gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatusEntity.Accepted, ct);
         if (!isMember)
         {
             return [];
@@ -458,7 +463,7 @@ public sealed class ChatService : IChatService
         => _db.ChatGroupMembers.AsNoTracking().AnyAsync(
             gm => gm.GroupId == groupId
                && gm.UserId == userId
-               && gm.Status == ChatGroupMemberStatus.Accepted
+               && gm.Status == ChatGroupMemberStatusEntity.Accepted
                && (gm.IsOwner || gm.IsAdmin), ct);
 
     public async Task<bool> DeleteGroupAsync(Guid currentUserId, Guid groupId, CancellationToken ct = default)
@@ -517,7 +522,7 @@ public sealed class ChatService : IChatService
         var row = await _db.ChatGroupMembers
             .FirstOrDefaultAsync(gm => gm.GroupId == groupId
                                     && gm.UserId == memberUserId
-                                    && gm.Status == ChatGroupMemberStatus.Accepted, ct);
+                                    && gm.Status == ChatGroupMemberStatusEntity.Accepted, ct);
         if (row is null || row.IsOwner)
         {
             // Grup sahibi her zaman yöneticidir; durumu değiştirilemez.
@@ -571,7 +576,7 @@ public sealed class ChatService : IChatService
         if (request.GroupId is { } targetGroup)
         {
             var isMember = await _db.ChatGroupMembers.AsNoTracking().AnyAsync(
-                gm => gm.GroupId == targetGroup && gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatus.Accepted, ct);
+                gm => gm.GroupId == targetGroup && gm.UserId == currentUserId && gm.Status == ChatGroupMemberStatusEntity.Accepted, ct);
             if (!isMember)
             {
                 return null;
@@ -582,7 +587,7 @@ public sealed class ChatService : IChatService
             return null;
         }
 
-        var fwd = new ChatMessage
+        var fwd = new ChatMessageEntity
         {
             Id = Guid.NewGuid(),
             SenderId = currentUserId,
@@ -622,7 +627,7 @@ public sealed class ChatService : IChatService
             .FirstOrDefaultAsync(r => r.MessageId == messageId && r.UserId == currentUserId, ct);
         if (existing is null)
         {
-            _db.ChatMessageReactions.Add(new ChatMessageReaction
+            _db.ChatMessageReactions.Add(new ChatMessageReactionEntity
             {
                 Id = Guid.NewGuid(),
                 MessageId = messageId,
@@ -651,14 +656,14 @@ public sealed class ChatService : IChatService
     }
 
     // Kullanıcı, mesajın bir katılımcısıysa (doğrudan muhatap ya da kabul edilmiş grup üyesi) true döner.
-    private async Task<bool> CanAccessMessageAsync(Guid userId, ChatMessage m, CancellationToken ct)
+    private async Task<bool> CanAccessMessageAsync(Guid userId, ChatMessageEntity m, CancellationToken ct)
     {
         if (m.SenderId == userId || m.RecipientId == userId)
         {
             return true;
         }
         return m.GroupId.HasValue && await _db.ChatGroupMembers.AsNoTracking().AnyAsync(
-            gm => gm.GroupId == m.GroupId && gm.UserId == userId && gm.Status == ChatGroupMemberStatus.Accepted, ct);
+            gm => gm.GroupId == m.GroupId && gm.UserId == userId && gm.Status == ChatGroupMemberStatusEntity.Accepted, ct);
     }
 
     // Verilen projeksiyonlara yanıt parçacıklarını + tepki özetlerini doldurur.
@@ -715,7 +720,7 @@ public sealed class ChatService : IChatService
         }
     }
 
-    private static ChatMessageResponse Map(ChatMessage m, string senderName, bool senderHasImage) => new()
+    private static ChatMessageResponse Map(ChatMessageEntity m, string senderName, bool senderHasImage) => new()
     {
         Id = m.Id,
         SenderId = m.SenderId,

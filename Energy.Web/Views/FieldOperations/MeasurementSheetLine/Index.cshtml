@@ -1,0 +1,27 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["FieldOperations.MeasurementSheetLine.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["FieldOperations.MeasurementSheetLine.Title"]</h2></div>
+    </header>
+    <div id="measurement-sheet-line-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/field-operations/measurement-sheet-line/measurement-sheet-line.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["FieldOperations.MeasurementSheet.Title"].Value))
+            ]
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.FieldOperationsMeasurementSheetLine.init("/field-operations/measurement-sheet-lines", "measurement-sheet-line-grid", "FieldOperations");
+        });
+    </script>
+}

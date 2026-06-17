@@ -1,0 +1,28 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Inventory.StockIssueAllocation.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Inventory.StockIssueAllocation.Title"]</h2></div>
+    </header>
+    <div id="stock-issue-allocation-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/inventory/stock-issue-allocation/stock-issue-allocation.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Inventory.StockDocumentLine.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Inventory.StockLot.Title"].Value))
+            ]
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.InventoryStockIssueAllocation.init("/inventory/stock-issue-allocations", "stock-issue-allocation-grid", "Inventory");
+        });
+    </script>
+}

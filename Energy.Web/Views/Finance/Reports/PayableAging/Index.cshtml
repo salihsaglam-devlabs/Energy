@@ -1,0 +1,27 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Finance.Reports.PayableAging.Title"].Value;
+}
+
+<link rel="stylesheet" href="~/css/finance/reports/payable-aging/payable-aging.css" asp-append-version="true" />
+
+<section class="energy-screen energy-report">
+    <header class="energy-screen__header">
+        <div><h2>@T["Finance.Reports.PayableAging.Title"]</h2></div>
+    </header>
+    <div id="payable-aging-filters" class="energy-report__filters"></div>
+    <div id="payable-aging-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/finance/reports/payable-aging/payable-aging.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroReport"].Value, ViewData["Title"])))
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppReports.FinancePayableAging.init("/finance/reports/payable-aging", "payable-aging-grid", "payable-aging-filters", { hasStatus: false });
+        });
+    </script>
+}

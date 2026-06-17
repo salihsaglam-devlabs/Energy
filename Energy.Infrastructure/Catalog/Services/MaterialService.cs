@@ -1,3 +1,4 @@
+using MaterialEntity = Energy.Domain.Catalog.Material;
 using Energy.Application.Catalog.Services;
 using Energy.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,7 @@ public sealed class MaterialService : IMaterialService
     public async Task<IReadOnlyList<string>> ValidateAttributesAsync(Guid materialId, CancellationToken ct = default)
     {
         var material = await _db.Materials.FirstOrDefaultAsync(m => m.Id == materialId, ct)
-            ?? throw new InvalidOperationException($"Material {materialId} not found.");
+            ?? throw new InvalidOperationException($"MaterialEntity {materialId} not found.");
 
         // Kategorinin öznitelik bağlantıları + tanımları.
         var categoryAttributes = await (
@@ -89,7 +90,7 @@ public sealed class MaterialService : IMaterialService
     public async Task ChangeBaseUnitOfMeasureAsync(Guid materialId, Guid newUnitOfMeasureId, CancellationToken ct = default)
     {
         var material = await _db.Materials.FirstOrDefaultAsync(m => m.Id == materialId, ct)
-            ?? throw new InvalidOperationException($"Material {materialId} not found.");
+            ?? throw new InvalidOperationException($"MaterialEntity {materialId} not found.");
 
         var hasMovements = await _db.StockTransactions.AnyAsync(t => t.MaterialId == materialId, ct);
         if (hasMovements)

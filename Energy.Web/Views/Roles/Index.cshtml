@@ -16,8 +16,11 @@
 </section>
 
 @section Scripts {
-    <script src="~/js/app/pages/roles.js" asp-append-version="true"></script>
+    <script src="~/js/iam/roles.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Help.IntroGeneric"].Value))
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.Roles.init();
         });

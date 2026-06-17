@@ -28,9 +28,9 @@
     <meta name="csrf-token" content="@requestToken" />
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/devextreme-dist@25.2.7/css/dx.common.css" />
-    <link rel="stylesheet" href="~/css/dx.fluent.energy-custom-scheme.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/common/dx.fluent.energy-custom-scheme.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" />
-    <link rel="stylesheet" href="~/css/app.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/common/app.css" asp-append-version="true" />
 
     @* Tema yanıp sönmesini (FOUC) önle: gövde boyanmadan önce son bilinen tercihi
        uygula. "system" tercihinde işletim sistemi koyu modunu dikkate al. *@
@@ -73,17 +73,18 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/devextreme-dist@25.2.7/js/dx.all.js"></script>
-    <script src="~/js/app/dx-license.js" asp-append-version="true"></script>
+    <script src="~/js/common/dx-license.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/devextreme-dist@25.2.7/js/localization/dx.messages.@(dxLocale).js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
-    <script src="~/js/app/http.js" asp-append-version="true"></script>
-    <script src="~/js/app/alerts.js" asp-append-version="true"></script>
-    <script src="~/js/app/notifications.js" asp-append-version="true"></script>
-    <script src="~/js/app/loading.js" asp-append-version="true"></script>
-    <script src="~/js/app/icons.js" asp-append-version="true"></script>
-    <script src="~/js/app/shell.js" asp-append-version="true"></script>
+    <script src="~/js/common/http.js" asp-append-version="true"></script>
+    <script src="~/js/common/alerts.js" asp-append-version="true"></script>
+    <script src="~/js/common/notifications.js" asp-append-version="true"></script>
+    <script src="~/js/common/loading.js" asp-append-version="true"></script>
+    <script src="~/js/common/icons.js" asp-append-version="true"></script>
+    <script src="~/js/common/shell.js" asp-append-version="true"></script>
+    <script src="~/js/common/info-panel.js" asp-append-version="true"></script>
 
     <script>
         DevExpress.localization.locale("@currentCulture");
@@ -121,13 +122,14 @@
         })();
         document.addEventListener("DOMContentLoaded", function () {
             window.AppShell.init();
+            if (window.AppInfo) { window.AppInfo.init(); }
         });
     </script>
 
     <!-- Loaded AFTER AppContext is defined so the chat realtime client can read
          AppContext.chat.hubUrl; otherwise it falls back to the disabled no-op. -->
-    <script src="~/js/app/user-settings.js" asp-append-version="true"></script>
-    <script src="~/js/app/chat-realtime.js" asp-append-version="true"></script>
+    <script src="~/js/common/user-settings.js" asp-append-version="true"></script>
+    <script src="~/js/common/chat-realtime.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

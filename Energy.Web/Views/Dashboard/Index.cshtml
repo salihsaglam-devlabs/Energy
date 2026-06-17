@@ -118,3 +118,11 @@
     }
 </section>
 
+@section Scripts {
+    <script>
+        // Pano (Dashboard) ekranı için Bilgi rehberi içeriği.
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T[LocalizationKeys.Dashboard.Subtitle].Value))
+        };
+    </script>
+}

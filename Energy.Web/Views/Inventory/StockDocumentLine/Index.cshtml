@@ -1,0 +1,30 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Inventory.StockDocumentLine.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Inventory.StockDocumentLine.Title"]</h2></div>
+    </header>
+    <div id="stock-document-line-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/inventory/stock-document-line/stock-document-line.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Core.Currency.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Catalog.Material.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Inventory.StockDocument.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Core.UnitOfMeasure.Title"].Value))
+            ]
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.InventoryStockDocumentLine.init("/inventory/stock-document-lines", "stock-document-line-grid", "Inventory");
+        });
+    </script>
+}

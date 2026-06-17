@@ -1,0 +1,8 @@
+using Energy.Shared.Models.V1.Common.Responses;
+using MediatR;
+
+namespace Energy.Application.Inventory.Warehouse.Commands.DeleteWarehouse;
+
+/// <summary>Warehouse kaydını (gerekiyorsa soft-delete) silme use-case'i.</summary>
+/// <param name="Id">Silinecek kaydın kimliği.</param>
+public sealed record DeleteWarehouseCommand(Guid Id) : IRequest<BaseResponse<bool>>;

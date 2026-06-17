@@ -1,0 +1,33 @@
+using Energy.Shared.Common;
+namespace Energy.Shared.Models.V1.Requests.Request.Requests;
+
+/// <summary>Request güncelleme isteği.</summary>
+public class UpdateRequestRequest
+{
+    /// <summary>Güncellenecek kaydın kimliği.</summary>
+    public Guid Id { get; set; }
+
+    /// <summary>Talep türü</summary>
+    public Guid RequestTypeId { get; set; }
+
+    /// <summary>Opsiyonel proje</summary>
+    public Guid? ProjectId { get; set; }
+
+    /// <summary>Talep sahibi</summary>
+    public Guid RequestedByUserId { get; set; }
+
+    /// <summary>Durum</summary>
+    public RequestStatus Status { get; set; }
+
+    /// <summary>Talep no</summary>
+    public string RequestNo { get; set; } = string.Empty;
+
+    /// <summary>RequestDate</summary>
+    public DateTime RequestDate { get; set; }
+
+    /// <summary>Description</summary>
+    public string? Description { get; set; }
+
+    /// <summary>ApprovalRequestId</summary>
+    public Guid? ApprovalRequestId { get; set; }
+}

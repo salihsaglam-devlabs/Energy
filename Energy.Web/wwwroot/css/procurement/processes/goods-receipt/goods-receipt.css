@@ -1,0 +1,21 @@
+/* Process form screen shared styles (goods-receipt). */
+.energy-process__hint {
+    margin: 0 0 16px;
+    color: var(--energy-muted, #6c757d);
+    font-size: 0.95rem;
+}
+
+.energy-process__form {
+    max-width: 640px;
+    margin-bottom: 16px;
+}
+
+.energy-process__result {
+    font-weight: 600;
+    color: var(--energy-accent, #2e7d32);
+}
+
+@media (max-width: 640px) {
+    .energy-process__form { max-width: 100%; }
+}
+

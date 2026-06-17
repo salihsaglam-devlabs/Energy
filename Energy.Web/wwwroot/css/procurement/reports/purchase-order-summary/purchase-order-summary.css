@@ -1,0 +1,17 @@
+/* PurchaseOrderSummary report screen styles. */
+.energy-report__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+    margin-bottom: 16px;
+}
+
+.energy-report__filter {
+    min-width: 160px;
+}
+
+@media (max-width: 640px) {
+    .energy-report__filters { flex-direction: column; align-items: stretch; }
+    .energy-report__filter { width: 100%; }
+}

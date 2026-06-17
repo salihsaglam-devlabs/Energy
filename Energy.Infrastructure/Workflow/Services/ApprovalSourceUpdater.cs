@@ -1,3 +1,4 @@
+using Energy.Shared.Common;
 using Energy.Application.Workflow.Services;
 using Energy.Domain.Common;
 using Energy.Infrastructure.Persistence;

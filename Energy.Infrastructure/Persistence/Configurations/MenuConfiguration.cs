@@ -1,5 +1,4 @@
-using Energy.Domain.Identity;
-using Energy.Domain.System;
+using Energy.Domain.IAM;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

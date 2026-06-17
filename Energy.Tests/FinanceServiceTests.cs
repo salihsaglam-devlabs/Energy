@@ -1,3 +1,5 @@
+using BudgetEntity = Energy.Domain.Budget.Budget;
+using Energy.Shared.Common;
 using Energy.Application.Finance.Services;
 using Energy.Domain.Budget;
 using Energy.Domain.BusinessPartners;
@@ -155,7 +157,7 @@ public sealed class FinanceServiceTests : IDisposable
     {
         var costCenter = new CostCenter { Id = Guid.NewGuid(), Code = "CC1", Name = "CC", IsActive = true };
         _db.CostCenters.Add(costCenter);
-        var budget = new Budget { Id = Guid.NewGuid(), CostCenterId = costCenter.Id, CurrencyId = _currencyId, Name = "B", Year = 2026, IsActive = true };
+        var budget = new BudgetEntity { Id = Guid.NewGuid(), CostCenterId = costCenter.Id, CurrencyId = _currencyId, Name = "B", Year = 2026, IsActive = true };
         _db.Budgets.Add(budget);
         _db.BudgetLines.Add(new BudgetLine { Id = Guid.NewGuid(), BudgetId = budget.Id, CostCenterId = costCenter.Id, Description = "L", PlannedAmount = 1000m });
 

@@ -1,0 +1,157 @@
+13. LOCALIZATION VE MAGIC STRING STANDARDI
+
+Sistemde kullanıcıya görünen veya dışarı dönen tüm metinler localization üzerinden yönetilecek.
+
+Bu projede hardcoded/sabit mesaj kullanımı kabul edilmez. UI, API, validation, exception, notification, menu, permission açıklaması, grid başlığı, buton metni, placeholder, tooltip, toast mesajı, modal başlığı, confirm mesajı, hata mesajı, başarı mesajı ve uyarı mesajı dahil olmak üzere kullanıcıya temas eden her metin localization catalog/resource dosyalarında tanımlanmalıdır.
+
+Kesin kurallar:
+
+* Kullanıcıya görünen hiçbir metin C#, Razor, JavaScript, HTML veya JSON içinde hardcoded yazılmayacak.
+* Magic string mesaj kullanılmayacak.
+* `"Kayıt başarıyla oluşturuldu"`, `"Silmek istediğinize emin misiniz?"`, `"Yetkiniz yok"`, `"Validation failed"`, `"Save"`, `"Delete"`, `"Edit"` gibi metinler doğrudan kod içinde bulunmayacak.
+* Backend response mesajları localization key üzerinden dönecek.
+* Validation mesajları localization key üzerinden üretilecek.
+* Exception mesajları localization key üzerinden üretilecek.
+* API error response mesajları localization destekli olacak.
+* DevExtreme grid kolon başlıkları localization üzerinden gelecek.
+* DevExtreme button textleri localization üzerinden gelecek.
+* DevExtreme lookup placeholder/search/noDataText/loadingText gibi tüm UI metinleri localization üzerinden gelecek.
+* Menü adları localization üzerinden gelecek.
+* Sayfa başlıkları localization üzerinden gelecek.
+* Modal/popup başlıkları localization üzerinden gelecek.
+* Toast/notification mesajları localization üzerinden gelecek.
+* Confirm dialog metinleri localization üzerinden gelecek.
+* JavaScript içinde kullanıcıya görünen metin varsa localization helper üzerinden alınacak.
+* Razor içinde kullanıcıya görünen metin varsa IHtmlLocalizer/IStringLocalizer veya merkezi localization helper üzerinden alınacak.
+* API içinde kullanıcıya dönen metin varsa ILocalizationService veya merkezi localization service üzerinden alınacak.
+* Permission Name/Description alanları localization key ile ilişkilendirilecek.
+* Menu DisplayName alanları localization key ile ilişkilendirilecek.
+* Lookup/reference display metinleri veriden geliyorsa veri gösterilir; sistemsel label, status açıklaması veya enum display name gerekiyorsa localization üzerinden üretilecek.
+* Enum display değerleri hardcoded olmayacak; localization key üzerinden gösterilecek.
+* Frontend ve backend aynı localization key standardını kullanacak.
+* Türkçe ve İngilizce resource dosyaları birlikte güncellenecek.
+* Eksik localization key varsa sessiz geçilmeyecek; coverage raporunda listelenecek.
+* Kodda kullanıcıya görünen hardcoded metin kalırsa bu kabul kriteri başarısız sayılır.
+
+Localization key formatı:
+
+Modules.{ModuleName}.{EntityName}.Title
+Modules.{ModuleName}.{EntityName}.Fields.{FieldName}
+Modules.{ModuleName}.{EntityName}.Placeholders.{FieldName}
+Modules.{ModuleName}.{EntityName}.Tooltips.{FieldName}
+Modules.{ModuleName}.{EntityName}.Actions.Create
+Modules.{ModuleName}.{EntityName}.Actions.Update
+Modules.{ModuleName}.{EntityName}.Actions.Delete
+Modules.{ModuleName}.{EntityName}.Actions.Export
+Modules.{ModuleName}.{EntityName}.Messages.Created
+Modules.{ModuleName}.{EntityName}.Messages.Updated
+Modules.{ModuleName}.{EntityName}.Messages.Deleted
+Modules.{ModuleName}.{EntityName}.Messages.NotFound
+Modules.{ModuleName}.{EntityName}.Messages.Conflict
+Modules.{ModuleName}.{EntityName}.Messages.ValidationFailed
+Modules.{ModuleName}.{EntityName}.Confirmations.Delete
+
+Modules.{ModuleName}.Processes.{ProcessName}.Title
+Modules.{ModuleName}.Processes.{ProcessName}.Actions.Execute
+Modules.{ModuleName}.Processes.{ProcessName}.Actions.Approve
+Modules.{ModuleName}.Processes.{ProcessName}.Actions.Reject
+Modules.{ModuleName}.Processes.{ProcessName}.Actions.Cancel
+Modules.{ModuleName}.Processes.{ProcessName}.Messages.Completed
+Modules.{ModuleName}.Processes.{ProcessName}.Messages.Approved
+Modules.{ModuleName}.Processes.{ProcessName}.Messages.Rejected
+Modules.{ModuleName}.Processes.{ProcessName}.Messages.Cancelled
+Modules.{ModuleName}.Processes.{ProcessName}.Confirmations.Execute
+Modules.{ModuleName}.Processes.{ProcessName}.Confirmations.Cancel
+
+Modules.{ModuleName}.Reports.{ReportName}.Title
+Modules.{ModuleName}.Reports.{ReportName}.Filters.StartDate
+Modules.{ModuleName}.Reports.{ReportName}.Filters.EndDate
+Modules.{ModuleName}.Reports.{ReportName}.Actions.Export
+Modules.{ModuleName}.Reports.{ReportName}.Messages.ExportCompleted
+
+Common.Actions.Save
+Common.Actions.Cancel
+Common.Actions.Edit
+Common.Actions.Delete
+Common.Actions.Search
+Common.Actions.Clear
+Common.Actions.Refresh
+Common.Actions.Export
+Common.Actions.Close
+Common.Actions.Back
+
+Common.Messages.Created
+Common.Messages.Updated
+Common.Messages.Deleted
+Common.Messages.Saved
+Common.Messages.NotFound
+Common.Messages.Unauthorized
+Common.Messages.Forbidden
+Common.Messages.ValidationFailed
+Common.Messages.UnexpectedError
+Common.Messages.Conflict
+Common.Messages.NoData
+Common.Messages.Loading
+
+Common.Confirmations.Delete
+Common.Confirmations.Cancel
+Common.Confirmations.Approve
+Common.Confirmations.Reject
+
+Common.Grid.SearchPanelPlaceholder
+Common.Grid.NoDataText
+Common.Grid.LoadingText
+Common.Grid.ColumnChooserTitle
+Common.Grid.ExportAll
+Common.Grid.ExportSelected
+Common.Grid.FilterRowOperationEquals
+Common.Grid.FilterRowOperationContains
+
+Common.Validation.Required
+Common.Validation.MaxLength
+Common.Validation.MinLength
+Common.Validation.Email
+Common.Validation.Range
+Common.Validation.InvalidFormat
+Common.Validation.GreaterThanZero
+
+Teknik uygulama standardı:
+
+* Energy.Localization merkezi localization kaynağı olarak kullanılacak.
+* SharedResource.tr-TR.resx ve SharedResource.en-US.resx eksiksiz güncellenecek.
+* C# tarafında localization key sabitleri merkezi bir sınıfta tutulacak.
+* JavaScript tarafında localization metinleri merkezi endpoint veya bootstrap localization object üzerinden yüklenecek.
+* JS içinde doğrudan Türkçe/İngilizce metin yazılmayacak.
+* Razor view içinde doğrudan Türkçe/İngilizce metin yazılmayacak.
+* Controller, Service, Handler ve Validator içinde doğrudan kullanıcı mesajı yazılmayacak.
+* Tüm response mesajları localization key ile üretilecek.
+* Tüm validator mesajları localization key ile üretilecek.
+* Tüm exception mesajları localization key ile üretilecek.
+
+Örnek yanlış kullanım:
+
+throw new Exception("Kayıt bulunamadı");
+return BadRequest("Yetkiniz yok");
+button.Text = "Kaydet";
+toast.success("Kayıt başarıyla oluşturuldu");
+
+Örnek doğru kullanım:
+
+throw new NotFoundException(LocalizationKeys.Common.Messages.NotFound);
+return BaseResponse.Fail(LocalizationKeys.Common.Messages.Forbidden);
+button.Text = L("Common.Actions.Save");
+notification.success(L("Modules.Procurement.PurchaseOrder.Messages.Created"));
+
+Son kontrol:
+
+Build işleminden önce kod tabanı taranacak ve kullanıcıya görünen hardcoded metinler tespit edilip localization’a taşınacak.
+
+Coverage raporuna şu bilgiler ayrıca eklenecek:
+
+* Toplam localization key sayısı
+* Türkçe resource key sayısı
+* İngilizce resource key sayısı
+* Eksik Türkçe key listesi
+* Eksik İngilizce key listesi
+* Koddan localization’a taşınan hardcoded mesaj sayısı
+* Hâlâ kalan hardcoded kullanıcı metni varsa dosya yolu ve satır bilgisi

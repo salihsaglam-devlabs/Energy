@@ -1,0 +1,31 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Finance.FinancialTransaction.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Finance.FinancialTransaction.Title"]</h2></div>
+    </header>
+    <div id="financial-transaction-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/finance/financial-transaction/financial-transaction.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Finance.CostCenter.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Core.Currency.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Finance.FinancialAccount.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["BusinessPartners.BusinessPartner.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.Project.Title"].Value))
+            ]
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.FinanceFinancialTransaction.init("/finance/financial-transactions", "financial-transaction-grid", "Finance");
+        });
+    </script>
+}

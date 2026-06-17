@@ -1,0 +1,27 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["Documents.DocumentVersion.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["Documents.DocumentVersion.Title"]</h2></div>
+    </header>
+    <div id="document-version-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/documents/document-version/document-version.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Documents.Document.Title"].Value))
+            ]
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.DocumentsDocumentVersion.init("/documents/document-versions", "document-version-grid", "Documents");
+        });
+    </script>
+}

@@ -1,0 +1,28 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["ProgressPayments.ProgressPayment.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["ProgressPayments.ProgressPayment.Title"]</h2></div>
+    </header>
+    <div id="progress-payment-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/progress-payments/progress-payment/progress-payment.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Workflow.ApprovalRequest.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Contracts.Contract.Title"].Value))
+            ]
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.ProgressPaymentsProgressPayment.init("/progress-payments/progress-payments", "progress-payment-grid", "ProgressPayments");
+        });
+    </script>
+}

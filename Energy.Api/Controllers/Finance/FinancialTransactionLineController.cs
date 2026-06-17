@@ -1,0 +1,60 @@
+using Asp.Versioning;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Energy.Application.Finance.FinancialTransactionLine.Commands.CreateFinancialTransactionLine;
+using Energy.Application.Finance.FinancialTransactionLine.Commands.DeleteFinancialTransactionLine;
+using Energy.Application.Finance.FinancialTransactionLine.Commands.UpdateFinancialTransactionLine;
+using Energy.Application.Finance.FinancialTransactionLine.Queries.GetFinancialTransactionLineById;
+using Energy.Application.Finance.FinancialTransactionLine.Queries.GetFinancialTransactionLineList;
+using Energy.Application.Finance.FinancialTransactionLine.Queries.GetFinancialTransactionLineLookup;
+using Energy.Shared.Models.V1.Common.Responses;
+using Energy.Shared.Models.V1.Finance.FinancialTransactionLine.Requests;
+using Energy.Shared.Models.V1.Finance.FinancialTransactionLine.Responses;
+
+namespace Energy.Api.Controllers.Finance;
+
+/// <summary>
+/// FinancialTransactionLine uç noktaları (liste, detay, lookup, create, update, delete).
+/// Controller iş mantığı içermez; her istek ilgili Command/Query'ye map edilip
+/// <see cref="IMediator"/> üzerinden Application use-case'ine yönlendirilir.
+/// </summary>
+[ApiController]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/finance/financial-transaction-lines")]
+public sealed class FinancialTransactionLineController : ControllerBase
+{
+    private readonly IMediator _mediator;
+
+    public FinancialTransactionLineController(IMediator mediator)
+        => _mediator = mediator;
+
+    /// <summary>Sayfalanmış liste.</summary>
+    [HttpGet]
+    public async Task<ActionResult<BaseResponse<PaginatedResponse<FinancialTransactionLineListResponse>>>> GetList([FromQuery] GetFinancialTransactionLineListRequest request, CancellationToken ct)
+        => Ok(await _mediator.Send(new GetFinancialTransactionLineListQuery(request), ct));
+
+    /// <summary>Kimliğe göre detay.</summary>
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<BaseResponse<FinancialTransactionLineDetailResponse>>> GetById(Guid id, CancellationToken ct)
+        => Ok(await _mediator.Send(new GetFinancialTransactionLineByIdQuery(id), ct));
+
+    /// <summary>Lookup listesi.</summary>
+    [HttpGet("lookup")]
+    public async Task<ActionResult<BaseResponse<IReadOnlyList<FinancialTransactionLineLookupResponse>>>> Lookup([FromQuery] string? search, [FromQuery] bool activeOnly, CancellationToken ct)
+        => Ok(await _mediator.Send(new GetFinancialTransactionLineLookupQuery(search, activeOnly), ct));
+
+    /// <summary>Yeni kayıt oluşturur.</summary>
+    [HttpPost]
+    public async Task<ActionResult<BaseResponse<Guid>>> Create(CreateFinancialTransactionLineRequest request, CancellationToken ct)
+        => Ok(await _mediator.Send(new CreateFinancialTransactionLineCommand(request), ct));
+
+    /// <summary>Var olan kaydı günceller.</summary>
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<BaseResponse<bool>>> Update(Guid id, UpdateFinancialTransactionLineRequest request, CancellationToken ct)
+        => Ok(await _mediator.Send(new UpdateFinancialTransactionLineCommand(id, request), ct));
+
+    /// <summary>Kaydı (soft-delete) siler.</summary>
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<BaseResponse<bool>>> Delete(Guid id, CancellationToken ct)
+        => Ok(await _mediator.Send(new DeleteFinancialTransactionLineCommand(id), ct));
+}

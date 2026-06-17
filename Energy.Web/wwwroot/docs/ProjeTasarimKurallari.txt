@@ -1,4 +1,5 @@
 Sen kıdemli .NET Solution Architect, Senior Full-Stack Developer ve Enterprise Application Designer olarak davran.
+ilk olarak kodu varsayım yapmadan full oku ve eksiksiz anla.Mevcut haliyle eksik yada düzeltilmesi gerekn yerler vardır.
 
 Elimde Energy adlı mevcut bir .NET solution var. Mevcut proje yapısını ve Excel tabanlı teknik tasarım dokümanını verdim.
 
@@ -10,8 +11,8 @@ Energy projesini; geliştiricinin her modül, entity, endpoint, ekran, JS, CSS, 
 
 REFERANS DOKÜMAN
 
-Excel tasarım dokümanını esas al:
-
+Excel tasarım dokümanını esas al:(/Users/base/Codes/Energy/Energy.Web/wwwroot/docs/Energy_Teknik_Tasarim_Dokumani-v1.xlsx)
+- Mediatr yapısı da kullan.
 - Module Catalogue
 - Table Catalogue
 - Column Catalogue

@@ -1,0 +1,27 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["FieldOperations.ProgressEntry.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["FieldOperations.ProgressEntry.Title"]</h2></div>
+    </header>
+    <div id="progress-entry-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/field-operations/progress-entry/progress-entry.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.Project.Title"].Value))
+            ]
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.FieldOperationsProgressEntry.init("/field-operations/progress-entries", "progress-entry-grid", "FieldOperations");
+        });
+    </script>
+}

@@ -4,6 +4,7 @@ using System.Text.Json;
 using Asp.Versioning;
 using Energy.Api.Common.Authorization;
 using Energy.Api.Common.Middleware;
+using Energy.Application;
 using Energy.Application.Identity.Services;
 using Energy.Infrastructure;
 using Energy.Infrastructure.Identity;
@@ -48,10 +49,51 @@ if (environmentSection.Exists())
     builder.Configuration.AddInMemoryCollection(environmentValues);
 }
 
-builder.Services.AddControllers().AddEnergyDataAnnotationsLocalization();
+// Veritabanı sağlayıcısını ortam değişkeniyle zorla (ENERGY_DB_PROVIDER). Energy.Migrator
+// ve ef.sh, ef komutlarını ve "tam veri seed" çalıştırmasını belirli bir sağlayıcıya
+// yönlendirmek için bu değişkeni kullanır; böylece seçilen migrations derlemesiyle
+// AppDbContext sağlayıcısı her zaman eşleşir. En son eklenir => "Database:Provider"ı geçersiz kılar.
+var forcedDbProvider = Environment.GetEnvironmentVariable("ENERGY_DB_PROVIDER");
+if (!string.IsNullOrWhiteSpace(forcedDbProvider))
+{
+    builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+    {
+        ["Database:Provider"] = forcedDbProvider,
+    });
+}
+
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<Energy.Api.Common.Filters.FluentValidationActionFilter>();
+}).AddJsonOptions(options =>
+{
+    // Enum değerleri tel üzerinde string olarak serileştirilir (UI/JS uyumluluğu).
+    options.JsonSerializerOptions.Converters.Add(
+        new System.Text.Json.Serialization.JsonStringEnumConverter());
+}).AddEnergyDataAnnotationsLocalization();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 
+// Model bağlama / DataAnnotations doğrulama hatalarını da standart BaseResponse
+// zarfında döndür (spec §21: tüm API'de tek tip hata standardı). [ApiController]
+// varsayılan ProblemDetails yanıtını bununla değiştiririz.
+builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(kvp => kvp.Value is not null && kvp.Value.Errors.Count > 0)
+            .SelectMany(kvp => kvp.Value!.Errors.Select(e =>
+                string.IsNullOrWhiteSpace(e.ErrorMessage) ? "Invalid value." : e.ErrorMessage))
+            .ToArray();
+
+        var body = Energy.Shared.Models.V1.Common.Responses.BaseResponse<object>
+            .Failure("Validation failed.", errors);
+        return new Microsoft.AspNetCore.Mvc.BadRequestObjectResult(body);
+    };
+});
+
+builder.Services.AddEnergyApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddEnergyLocalization();
 
@@ -223,6 +265,20 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 await app.RunSystemSeedingAsync();
+
+// "Tam veri seed" modu: Energy.Migrator (veya CI) `--seed-only` argümanıyla ya da
+// ENERGY_SEED_ONLY=1 ortam değişkeniyle çağırdığında, sistem tohumlaması çalıştıktan
+// sonra web sunucusunu BAŞLATMADAN çıkarız. Böylece tüm referans/örnek veriyi tek
+// komutla, kalıcı bir süreç açmadan yükleyebiliriz.
+var seedOnly =
+    args.Any(a => string.Equals(a, "--seed-only", StringComparison.OrdinalIgnoreCase)) ||
+    string.Equals(Environment.GetEnvironmentVariable("ENERGY_SEED_ONLY"), "1", StringComparison.OrdinalIgnoreCase) ||
+    string.Equals(Environment.GetEnvironmentVariable("ENERGY_SEED_ONLY"), "true", StringComparison.OrdinalIgnoreCase);
+if (seedOnly)
+{
+    app.Logger.LogInformation("Seed-only mode: system seeding completed; exiting without starting the web host.");
+    return;
+}
 
 // İstek şemasını / uzak IP'yi inceleyen herhangi bir ara katmandan ÖNCE çalışmalıdır;
 // böylece ters proxy tarafından iletilen orijinal değerleri görürler.

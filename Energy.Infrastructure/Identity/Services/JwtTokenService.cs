@@ -2,7 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Energy.Application.Identity.Services;
-using Energy.Domain.Identity;
+using Energy.Domain.IAM;
 using Energy.Shared.Models.V1.Identity.Responses;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

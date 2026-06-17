@@ -143,6 +143,23 @@ public static class PermissionCatalog
         "Chat.GroupManage", "Chat.GroupDelete", "Chat.MemberAdd", "Chat.MemberRemove", "Chat.AdminAssign",
     ];
 
+    /// <summary>
+    /// ER Overview iş akışlarından türetilen rapor yetkileri (her rapor için
+    /// <c>{Module}.{Report}.Read</c> ve ayrı <c>{Module}.{Report}.Export</c>).
+    /// Bu liste rapor generator'ı (tools/scaffold/generate_reports.py) ile birebir
+    /// hizalıdır; yeni rapor eklemek sürüm zamanına ait bir değişikliktir.
+    /// </summary>
+    public static IReadOnlyList<string> ReportPermissions { get; } =
+    [
+        "Procurement.PurchaseOrderSummary.Read", "Procurement.PurchaseOrderSummary.Export",
+        "Inventory.StockBalanceReport.Read", "Inventory.StockBalanceReport.Export",
+        "Projects.ProjectStatusReport.Read", "Projects.ProjectStatusReport.Export",
+        "HR.TimesheetSummary.Read", "HR.TimesheetSummary.Export",
+        "Finance.PayableAging.Read", "Finance.PayableAging.Export",
+        "Finance.ReceivableAging.Read", "Finance.ReceivableAging.Export",
+        "ProgressPayments.ProgressPaymentSummary.Read", "ProgressPayments.ProgressPaymentSummary.Export",
+    ];
+
     /// <summary>Tanımlanmış her yetki kodunun düz listesi.</summary>
     public static IReadOnlyList<PermissionDescriptor> All { get; } = BuildAll();
 
@@ -187,6 +204,11 @@ public static class PermissionCatalog
         }
 
         foreach (var code in SpecialPermissions)
+        {
+            list.Add(Describe(code));
+        }
+
+        foreach (var code in ReportPermissions)
         {
             list.Add(Describe(code));
         }

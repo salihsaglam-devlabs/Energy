@@ -1,4 +1,4 @@
-using Energy.Domain.System;
+using Energy.Domain.IAM;
 using Energy.Infrastructure.Persistence;
 using Energy.Shared.Identity.Permissions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -211,6 +211,29 @@ public sealed class ApiEndpointSyncService
         map["WorkflowActions.Cancel"] = "Workflow.Update";
         map["WorkflowActions.MyPending"] = "Workflow.Read";
 
+        // Standart süreç rotası: onay süreci ekranı uç noktaları.
+        map["ApprovalProcess.MyPending"] = "Workflow.Read";
+        map["ApprovalProcess.Approve"] = "Workflow.Approve";
+        map["ApprovalProcess.Reject"] = "Workflow.Reject";
+        map["ApprovalProcess.Cancel"] = "Workflow.Update";
+
+        // Standart süreç rotası: stok ve mal kabul süreç ekranı uç noktaları.
+        map["StockIssueProcess.Execute"] = "Inventory.Approve";
+        map["StockTransferProcess.Execute"] = "Inventory.Transfer";
+        map["GoodsReceiptProcess.Execute"] = "Procurement.Approve";
+
+        // Standart süreç rotası: Finance süreç ekranı uç noktaları.
+        map["TimesheetCostProcess.Execute"] = "Finance.Create";
+        map["ProgressPaymentPostingProcess.Execute"] = "Finance.Create";
+
+        // Ödeme tahsis süreci.
+        map["PaymentAllocationProcess.Execute"] = "Finance.Update";
+
+        // Belge dosya/versiyon yönetimi uç noktaları.
+        map["DocumentFiles.Upload"] = "Documents.Upload";
+        map["DocumentFiles.Versions"] = "Documents.Read";
+        map["DocumentFiles.Download"] = "Documents.Download";
+
         // Inventory iş kuralı eylemleri.
         map["InventoryActions.StockIn"] = "Inventory.Approve";
         map["InventoryActions.StockOut"] = "Inventory.Approve";
@@ -238,6 +261,14 @@ public sealed class ApiEndpointSyncService
         map["FinanceActions.TimesheetCost"] = "Finance.Create";
         map["FinanceActions.ProgressPayment"] = "Finance.Create";
         map["FinanceActions.BudgetOverrun"] = "Budget.Read";
+
+        // Üretilen per-entity API controller uç noktaları (134 tablo, IAM/Chat hariç):
+        // Controller.Action → modül CRUD yetkisi. Başlangıçta otomatik etkinleştirilir.
+        EntityEndpointPermissionMap.Apply(map);
+
+        // ER Overview iş akışlarından türetilen rapor uç noktaları:
+        // Controller.Action → {Module}.{Report}.Read / .Export.
+        ReportEndpointPermissionMap.Apply(map);
 
         return map;
     }

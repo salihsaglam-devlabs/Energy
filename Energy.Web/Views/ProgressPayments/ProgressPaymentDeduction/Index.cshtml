@@ -1,0 +1,27 @@
+@using Energy.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
+@{
+    ViewData["Title"] = T["ProgressPayments.ProgressPaymentDeduction.Title"].Value;
+}
+
+<section class="energy-screen">
+    <header class="energy-screen__header">
+        <div><h2>@T["ProgressPayments.ProgressPaymentDeduction.Title"]</h2></div>
+    </header>
+    <div id="progress-payment-deduction-grid"></div>
+</section>
+
+@section Scripts {
+    <script src="~/js/progress-payments/progress-payment-deduction/progress-payment-deduction.index.js" asp-append-version="true"></script>
+    <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["ProgressPayments.ProgressPayment.Title"].Value))
+            ]
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            window.AppPages.ProgressPaymentsProgressPaymentDeduction.init("/progress-payments/progress-payment-deductions", "progress-payment-deduction-grid", "ProgressPayments");
+        });
+    </script>
+}
