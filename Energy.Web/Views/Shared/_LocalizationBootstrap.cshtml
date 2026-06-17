@@ -7,6 +7,15 @@
     var fieldTypesJson = System.Text.Json.JsonSerializer.Serialize(FieldTypes.Map);
     var fieldLookupsJson = System.Text.Json.JsonSerializer.Serialize(FieldLookups.Map);
     var enumCaptionsJson = System.Text.Json.JsonSerializer.Serialize(EnumCaptions.ForCulture(System.Globalization.CultureInfo.CurrentUICulture));
+
+    // Ekran bazlı (per-screen) yerelleştirme: aktif ekranın tüm metinleri.
+    var screenId = ViewData["ScreenId"] as string;
+    string screenJson = "null";
+    if (ScreenLocalization.IsKnown(screenId))
+    {
+        var screenDict = ScreenLocalization.Build(screenId!, SL);
+        screenJson = System.Text.Json.JsonSerializer.Serialize(screenDict);
+    }
 }
 <script>
     window.AppL10n = {
@@ -301,4 +310,53 @@
             lookupNote: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.LookupNote")))
         }
     };
+
+    // ---- Ekran bazlı yerelleştirme (per-screen) ----
+    // Aktif ekranın tüm metinleri window.AppScreen üzerinde toplanır. Ayrıca
+    // mevcut ekran kodlarının (LG()/LN() ve grid-l10n.js) hiçbir değişiklik
+    // yapmadan ekran-özel metinleri kullanması için paylaşımlı sözlükler bu
+    // ekranın değerleriyle ezilir. Her sayfa tek bir ekran olduğundan bu
+    // güvenlidir ve "her ekran kendi metnini kullanır" kuralını sağlar.
+    window.AppScreen = @Html.Raw(screenJson);
+    if (window.AppScreen) {
+        var s = window.AppScreen;
+        // Kolon başlıkları: ekranın kendi Columns sözlüğü globalin üstüne yazılır.
+        if (s.columns) {
+            window.AppL10n.captions = window.AppL10n.captions || {};
+            for (var cf in s.columns) {
+                if (Object.prototype.hasOwnProperty.call(s.columns, cf) && s.columns[cf]) {
+                    window.AppL10n.captions[cf] = s.columns[cf];
+                }
+            }
+        }
+        // Grid metinleri (Ara..., Kayıt yok, Yükleniyor...) ekran-özel.
+        if (s.grid) {
+            window.AppL10n.grid = window.AppL10n.grid || {};
+            if (s.grid.search) { window.AppL10n.grid.search = s.grid.search; }
+            if (s.grid.noData) { window.AppL10n.grid.noData = s.grid.noData; }
+            if (s.grid.loading) { window.AppL10n.grid.loading = s.grid.loading; }
+        }
+        // Aksiyon butonları (Yeni, Düzenle, Sil, Kaydet, İptal, Yenile) ekran-özel.
+        if (s.actions) {
+            window.AppL10n.grid = window.AppL10n.grid || {};
+            if (s.actions.new) { window.AppL10n.grid.add = s.actions.new; }
+            if (s.actions.edit) { window.AppL10n.grid.edit = s.actions.edit; }
+            if (s.actions.delete) { window.AppL10n.grid.delete = s.actions.delete; }
+            if (s.actions.save) { window.AppL10n.grid.save = s.actions.save; }
+            if (s.actions.cancel) { window.AppL10n.grid.cancel = s.actions.cancel; }
+            if (s.actions.refresh) { window.AppL10n.grid.refresh = s.actions.refresh; }
+        }
+        // Bildirim metinleri (Kaydedildi, Güncellendi, Silindi) ekran-özel.
+        if (s.notifications) {
+            window.AppL10n.notifications = window.AppL10n.notifications || {};
+            if (s.notifications.saved) { window.AppL10n.notifications.saved = s.notifications.saved; }
+            if (s.notifications.updated) { window.AppL10n.notifications.saved = window.AppL10n.notifications.saved || s.notifications.updated; }
+            if (s.notifications.deleted) { window.AppL10n.notifications.deleted = s.notifications.deleted; }
+        }
+        // Onay metni (silme onayı) ekran-özel.
+        if (s.confirm && s.confirm.delete) {
+            window.AppL10n.grid = window.AppL10n.grid || {};
+            window.AppL10n.grid.confirmDelete = s.confirm.delete;
+        }
+    }
 </script>
