@@ -16,6 +16,7 @@ public sealed class AccountController : Controller
     private readonly IAuthApiClient _auth;
     private readonly IAuthCookieFactory _cookies;
     private readonly IWebHostEnvironment _env;
+    private readonly IConfiguration _config;
     private readonly IStringLocalizer<SharedResource> _localizer;
     private readonly ILogger<AccountController> _logger;
 
@@ -23,32 +24,67 @@ public sealed class AccountController : Controller
         IAuthApiClient auth,
         IAuthCookieFactory cookies,
         IWebHostEnvironment env,
+        IConfiguration config,
         IStringLocalizer<SharedResource> localizer,
         ILogger<AccountController> logger)
     {
         _auth = auth;
         _cookies = cookies;
         _env = env;
+        _config = config;
         _localizer = localizer;
         _logger = logger;
     }
 
-    private LoginViewModel BuildLoginModel(string? returnUrl) => new()
+    /// <summary>
+    /// Geliştirici hızlı girişinin gösterilip gösterilmeyeceğini belirler.
+    /// Geliştirme ortamında her zaman açıktır. Geliştirme dışı (örn. Production)
+    /// ortamda yalnızca URL parametresi (<c>?devLogin=...</c>) ile açılabilir:
+    ///  - <c>DevLogin:Key</c> yapılandırılmışsa parametre bu gizli anahtara eşit olmalıdır.
+    ///  - yapılandırılmamışsa "1" / "true" gibi doğru bir değer yeterlidir.
+    /// </summary>
+    private bool ShowDevAccounts(string? devLogin)
+    {
+        if (_env.IsDevelopment())
+        {
+            return true;
+        }
+
+        if (string.IsNullOrWhiteSpace(devLogin))
+        {
+            return false;
+        }
+
+        var key = _config["DevLogin:Key"];
+        if (!string.IsNullOrWhiteSpace(key))
+        {
+            // Sabit zamanlı olmayan basit karşılaştırma yeterli: anahtar yalnızca
+            // hızlı giriş listesini açar, kimlik doğrulamayı atlamaz.
+            return string.Equals(devLogin, key, StringComparison.Ordinal);
+        }
+
+        return devLogin is "1" or "true" or "yes"
+            || string.Equals(devLogin, "true", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private LoginViewModel BuildLoginModel(string? returnUrl, string? devLogin) => new()
     {
         ReturnUrl = returnUrl,
-        // Tohumlanan hızlı giriş hazır ayarlarını yalnızca geliştirme sırasında göster.
-        DevAccounts = _env.IsDevelopment() ? DevLoginAccounts.All : Array.Empty<DevAccount>()
+        // Geliştirmede her zaman; geliştirme dışında yalnızca URL parametresiyle göster.
+        DevAccounts = ShowDevAccounts(devLogin) ? DevLoginAccounts.All : Array.Empty<DevAccount>(),
+        // Doğrulama hatası sonrası hızlı girişin görünür kalması için parametreyi taşı.
+        DevLoginToken = devLogin
     };
 
     [HttpGet("/account/login")]
-    public IActionResult Login(string? returnUrl = null)
-        => View(BuildLoginModel(returnUrl));
+    public IActionResult Login(string? returnUrl = null, [FromQuery] string? devLogin = null)
+        => View(BuildLoginModel(returnUrl, devLogin));
 
     [HttpPost("/account/login")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginInputModel input, CancellationToken ct)
     {
-        if (!ModelState.IsValid) return View(BuildLoginModel(input.ReturnUrl));
+        if (!ModelState.IsValid) return View(BuildLoginModel(input.ReturnUrl, input.DevLogin));
 
         Shared.Models.V1.Common.Responses.BaseResponse<Shared.Models.V1.Identity.Responses.AuthTokenResponse> response;
         try
@@ -68,7 +104,7 @@ public sealed class AccountController : Controller
             // Sayfada kal ve anlaşılır bir mesaj göster.
             _logger.LogWarning(ex, "Login API call failed for {User}.", input.UserNameOrEmail);
             ModelState.AddModelError(string.Empty, _localizer[LocalizationKeys.Auth.InvalidCredentials].Value);
-            return View(BuildLoginModel(input.ReturnUrl));
+            return View(BuildLoginModel(input.ReturnUrl, input.DevLogin));
         }
 
         if (!response.IsSuccess || response.Data is null)
@@ -80,7 +116,7 @@ public sealed class AccountController : Controller
                 ? _localizer[LocalizationKeys.Auth.InvalidCredentials].Value
                 : response.Message;
             ModelState.AddModelError(string.Empty, message);
-            return View(BuildLoginModel(input.ReturnUrl));
+            return View(BuildLoginModel(input.ReturnUrl, input.DevLogin));
         }
 
         await _cookies.SignInAsync(HttpContext, response.Data);
