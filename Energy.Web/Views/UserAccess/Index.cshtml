@@ -26,7 +26,7 @@
     <script src="~/js/iam/user-access.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Help.IntroGeneric"].Value))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["UserAccessScreen.HelpIntro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.UserAccess.init();

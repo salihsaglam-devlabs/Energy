@@ -278,6 +278,7 @@ public static class LocalizationKeys
         public const string Loading = "Layout.Loading";
         public const string Profile = "Layout.Profile";
         public const string MyProfile = "Layout.MyProfile";
+        public const string MenuSearch = "Layout.MenuSearch";
     }
 
     public static class ProfileScreen

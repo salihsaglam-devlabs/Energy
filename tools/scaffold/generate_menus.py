@@ -17,6 +17,43 @@ from generate_domain import ROOT, build_model
 OUT = os.path.join(ROOT, "Energy.Infrastructure", "Seeding", "SystemSeeder.ModulesMenus.cs")
 EXCLUDE_MODULES = {"IAM", "Chat"}
 
+# KÜRATÖRLÜ NAVİGASYON: Menüye yalnızca gezilebilir iş ekranları (aggregate root /
+# ana veri + ana işlem belgeleri) eklenir. Aşağıdaki alt tablolar (satır/detay,
+# junction, versiyon, geçmiş, dağıtım, adım/onaylayan) menüye AYRI öğe olarak
+# EKLENMEZ; bunlar daima ait oldukları üst ekran içinde yönetilir. NameKey biçimi:
+# "Menus.<Module>.<Entity>".
+EXCLUDE_ENTITY_KEYS = {
+    "Menus.Organization.EmployeeSkillAssignment", "Menus.Organization.ExpenseClaimLine",
+    "Menus.BusinessPartners.BusinessPartnerContact", "Menus.BusinessPartners.BusinessPartnerAddress",
+    "Menus.BusinessPartners.BusinessPartnerBankAccount",
+    "Menus.Projects.ProjectPhase", "Menus.Projects.ProjectMember", "Menus.Projects.ProjectNote",
+    "Menus.Catalog.MaterialAttributeOption", "Menus.Catalog.MaterialCategoryAttribute",
+    "Menus.Catalog.MaterialAttributeValue", "Menus.Catalog.MaterialUnitConversion",
+    "Menus.Inventory.StockDocumentLine", "Menus.Inventory.StockIssueAllocation",
+    "Menus.Inventory.StockCountLine", "Menus.Inventory.WarehouseTransferLine",
+    "Menus.Requests.RequestLine",
+    "Menus.Procurement.SupplierQuoteLine", "Menus.Procurement.PurchaseOrderLine",
+    "Menus.Procurement.PurchaseReceiptLine", "Menus.Procurement.SupplierInvoiceLine",
+    "Menus.Operations.WorkOrderAssignment", "Menus.Operations.WorkOrderMaterialPlan",
+    "Menus.Operations.WorkOrderMaterialUsage", "Menus.Operations.WorkOrderChecklist",
+    "Menus.Operations.WorkOrderChecklistItem", "Menus.Operations.WorkOrderStatusHistory",
+    "Menus.FieldOperations.DailySiteReportWorker", "Menus.FieldOperations.DailySiteReportEquipment",
+    "Menus.FieldOperations.DailySiteReportMaterial", "Menus.FieldOperations.MeasurementSheetLine",
+    "Menus.HR.TimesheetLine",
+    "Menus.Finance.FinancialTransactionLine", "Menus.Finance.PaymentAllocation",
+    "Menus.Finance.CollectionAllocation",
+    "Menus.Budget.BudgetLine",
+    "Menus.Contracts.ContractParty", "Menus.Contracts.ContractLine", "Menus.Contracts.ContractAmendment",
+    "Menus.ProgressPayments.ProgressPaymentLine", "Menus.ProgressPayments.ProgressPaymentDeduction",
+    "Menus.Documents.DocumentVersion", "Menus.Documents.DocumentRelation",
+    "Menus.Documents.DocumentPermission",
+    "Menus.Workflow.ApprovalDefinitionVersion", "Menus.Workflow.ApprovalStepDefinition",
+    "Menus.Workflow.ApprovalStepApprover", "Menus.Workflow.ApprovalCondition",
+    "Menus.Workflow.ApprovalRequestStep", "Menus.Workflow.ApprovalRequestApprover",
+    "Menus.Workflow.ApprovalAction",
+    "Menus.Notifications.NotificationRecipient",
+}
+
 
 def kebab(name: str) -> str:
     return re.sub(r"(?<!^)(?=[A-Z])", "-", name).lower()
@@ -30,10 +67,12 @@ def main():
         m, e = table_module[t], table_entity[t]
         if m in EXCLUDE_MODULES:
             continue
+        name_key = f"Menus.{m}.{e}"
+        if name_key in EXCLUDE_ENTITY_KEYS:
+            continue  # küratörlü: alt tablolar menüye eklenmez
         idx = per_module_index.get(m, 0) + 1
         per_module_index[m] = idx
         route = f"/{kebab(m)}/{kebab(t)}"
-        name_key = f"Menus.{m}.{e}"
         parent_key = "Menus.CoreData" if m == "Core" else f"Menus.{m}"
         rows.append((m, parent_key, e, route, name_key, idx))
 

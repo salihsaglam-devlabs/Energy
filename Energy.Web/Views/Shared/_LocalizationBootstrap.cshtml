@@ -195,7 +195,8 @@
             userMenu: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Layout.UserMenu))),
             profile: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Layout.Profile))),
             myProfile: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Layout.MyProfile))),
-            signOut: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Auth.SignOut)))
+            signOut: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Auth.SignOut))),
+            menuSearch: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Layout.MenuSearch)))
         },
         auth: {
             signInTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.Auth.SignInTitle))),
@@ -355,7 +356,8 @@
             filtersTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.FiltersTitle"))),
             relatedTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.RelatedTitle"))),
             relatedNote: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.RelatedNote"))),
-            lookupNote: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.LookupNote")))
+            lookupNote: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.LookupNote"))),
+            screenKindTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.ScreenKindTitle")))
         }
     };
 

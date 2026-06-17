@@ -28,6 +28,19 @@
 
     function H() { return (window.AppL10n && window.AppL10n.help) || {}; }
 
+    // Aktif ekranın türünü (entity / process / report) sayfadaki ekran bölümünden
+    // tespit eder; screen.js ile aynı sınıflandırmayı kullanır.
+    function detectScreenKind() {
+        var section = document.querySelector("section.energy-screen");
+        if (section) {
+            var explicit = section.getAttribute("data-screen");
+            if (explicit === "process" || explicit === "entity" || explicit === "report") { return explicit; }
+            if (section.classList.contains("energy-process")) { return "process"; }
+            if (section.classList.contains("energy-report")) { return "report"; }
+        }
+        return "entity";
+    }
+
     // "{0}" yer tutucusunu doldurur.
     function fmt(template, arg) {
         return String(template || "").replace("{0}", arg == null ? "" : arg);
@@ -94,6 +107,19 @@
         // 1) Amaç
         var intro = page.intro || (title ? fmt(h.introEntity, title) : h.introGeneric);
         paragraphSection($root, h.purposeTitle, intro);
+
+        // 1b) Ekran türü — sayfanın ortasındaki rozet bileşeninin (Veri Yönetimi /
+        //     Süreç / Rapor) ne anlama geldiğini açıklar.
+        var sc = (window.AppL10n && window.AppL10n.screen) || {};
+        var kind = detectScreenKind();
+        var badge, badgeDesc;
+        if (kind === "process") { badge = sc.processBadge; badgeDesc = sc.processBadgeTitle; }
+        else if (kind === "report") { badge = sc.reportBadge; badgeDesc = sc.reportBadgeTitle; }
+        else { badge = sc.entityBadge; badgeDesc = sc.entityBadgeTitle; }
+        if (badge || badgeDesc) {
+            var kindText = (badge ? "“" + badge + "” — " : "") + (badgeDesc || "");
+            paragraphSection($root, h.screenKindTitle || h.purposeTitle, kindText);
+        }
 
         // 2) Temel kullanım adımları — sayfaya özel adımlar her zaman; varsayılan
         //    (Ekle/Düzenle/Sil) adımları yalnızca sayfada bir tablo varsa gösterilir.

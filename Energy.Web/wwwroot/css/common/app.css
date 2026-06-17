@@ -219,6 +219,22 @@ a:hover { text-decoration: underline; }
 }
 .energy-navigation__tree { padding: 0; }
 
+/* Menü arama kutusu (dxTreeView searchEnabled) — çekmecenin en üstüne sabitlenir;
+   kullanıcı kaydırırken bile her zaman erişilebilir kalır (kurumsal yönetim paneli
+   deneyimi). Arama hem üst başlıkları hem de alt menüleri canlı filtreler. */
+.energy-navigation .dx-treeview-search {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    margin: 0 0 8px;
+    padding-bottom: 8px;
+    background: var(--energy-surface);
+    border-bottom: 1px solid var(--energy-border);
+}
+.energy-navigation .dx-treeview-search.dx-texteditor {
+    width: 100%;
+}
+
 /* Navigation drawer — layout only (colors/spacing come from the theme).
    The theme renders .dx-treeview-item as a flex row: [toggle order:0]
    [content order:2]. We move the native expand toggle to the RIGHT (keeping it

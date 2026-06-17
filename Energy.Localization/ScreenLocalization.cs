@@ -259,6 +259,8 @@ public static class ScreenLocalization
                 ["relatedTitle"] = Tx("Help.RelatedTitle"),
                 ["relatedNote"] = Tx("Help.RelatedNote"),
                 ["lookupNote"] = Tx("Help.LookupNote"),
+                // Ekran türü (Veri Yönetimi / Süreç / Rapor) bölümünün başlığı.
+                ["screenKindTitle"] = Tx("Help.ScreenKindTitle"),
             },
             // Modül aksiyon butonları (onayla/reddet/iade vb.) — ekran-özel.
             ["moduleActions"] = new Dictionary<string, string>

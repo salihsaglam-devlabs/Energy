@@ -148,7 +148,20 @@ public sealed class MenuService : IMenuService
     private string ResolveLocalized(string key)
     {
         var value = _localizer[key];
-        return value.ResourceNotFound ? key : value.Value;
+        if (!value.ResourceNotFound) return value.Value;
+
+        // "Veri Yönetimi" kırılımındaki yapraklar iş menüsündeki aynı entity etiketini
+        // paylaşır: "Menus.DataAdmin.<Module>.<Entity>" → "Menus.<Module>.<Entity>".
+        // Böylece her tablo için ayrı çeviri anahtarı gerekmez.
+        const string dataAdminPrefix = "Menus.DataAdmin.";
+        if (key.StartsWith(dataAdminPrefix, StringComparison.Ordinal))
+        {
+            var fallbackKey = "Menus." + key[dataAdminPrefix.Length..];
+            var fallback = _localizer[fallbackKey];
+            if (!fallback.ResourceNotFound) return fallback.Value;
+        }
+
+        return key;
     }
 
     private async Task<bool> CreatesCycle(Guid menuId, Guid? newParentId, CancellationToken ct)

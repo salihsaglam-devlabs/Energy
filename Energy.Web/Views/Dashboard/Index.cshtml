@@ -122,7 +122,7 @@
     <script>
         // Pano (Dashboard) ekranı için Bilgi rehberi içeriği.
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T[LocalizationKeys.Dashboard.Subtitle].Value))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Dashboard.HelpIntro"].Value))
         };
     </script>
 }

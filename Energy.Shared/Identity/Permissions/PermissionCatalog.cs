@@ -87,6 +87,14 @@ public static class PermissionCatalog
     /// </summary>
     public const string SystemSeed = "System.Seed";
 
+    /// <summary>
+    /// "Veri Yönetimi" kırılımı: veritabanındaki TÜM tabloların düz CRUD ekranlarına
+    /// (ham veriye müdahale) erişim. Çok yüksek ayrıcalıklı; yalnızca SystemAdmin'e
+    /// verilir (SuperAdmin atlar). Varsayılan dağıtıma (DefaultGrants) GİRMEZ ve hiçbir
+    /// iş rolüne otomatik atanmaz; böylece bu ekranlara herkes erişemez.
+    /// </summary>
+    public const string DataAdminAccess = "System.DataAdmin";
+
     /// <summary>Self servis: her kimlik doğrulanmış kullanıcı kendi profilini okuyabilir (varsayılan verilir).</summary>
     public const string ProfileRead = "Profile.Read";
     /// <summary>Self servis: her kimlik doğrulanmış kullanıcı kendi profilini güncelleyebilir (varsayılan verilir).</summary>
@@ -186,6 +194,8 @@ public static class PermissionCatalog
             Describe(SettingRead), Describe(SettingUpdate),
 
             Describe(SystemSeed),
+
+            Describe(DataAdminAccess),
 
             Describe(ProfileRead), Describe(ProfileUpdate),
 
