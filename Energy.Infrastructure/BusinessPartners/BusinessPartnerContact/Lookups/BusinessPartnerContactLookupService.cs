@@ -16,7 +16,7 @@ public class BusinessPartnerContactLookupService : IBusinessPartnerContactLookup
     public async Task<BaseResponse<IReadOnlyList<BusinessPartnerContactLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.BusinessPartnerContacts.AsNoTracking();
-        if (!string.IsNullOrWhiteSpace(search)) query = query.Where(e => e.Title.Contains(search));
+        if (!string.IsNullOrWhiteSpace(search)) query = query.Where(e => e.Title != null && e.Title.Contains(search));
         var items = await query
             .OrderBy(e => e.Title)
             .Select(e => new BusinessPartnerContactLookupResponse
@@ -24,7 +24,7 @@ public class BusinessPartnerContactLookupService : IBusinessPartnerContactLookup
                 Id = e.Id,
                 Code = null,
                 Name = e.Title,
-                DisplayName = e.Title,
+                DisplayName = e.Title ?? string.Empty,
                 IsActive = true
             })
             .ToListAsync(ct);

@@ -17,7 +17,7 @@ public class EmployeeLookupService : IEmployeeLookupService
     {
         var query = _db.Employees.AsNoTracking();
         if (activeOnly) query = query.Where(e => e.IsActive);
-        if (!string.IsNullOrWhiteSpace(search)) query = query.Where(e => e.Email.Contains(search) || e.Code.Contains(search));
+        if (!string.IsNullOrWhiteSpace(search)) query = query.Where(e => (e.Email != null && e.Email.Contains(search)) || (e.Code != null && e.Code.Contains(search)));
         var items = await query
             .OrderBy(e => e.Email)
             .Select(e => new EmployeeLookupResponse

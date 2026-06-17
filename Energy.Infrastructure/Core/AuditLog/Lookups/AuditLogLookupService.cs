@@ -16,7 +16,7 @@ public class AuditLogLookupService : IAuditLogLookupService
     public async Task<BaseResponse<IReadOnlyList<AuditLogLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.AuditLogs.AsNoTracking();
-        if (!string.IsNullOrWhiteSpace(search)) query = query.Where(e => e.UserName.Contains(search));
+        if (!string.IsNullOrWhiteSpace(search)) query = query.Where(e => e.UserName != null && e.UserName.Contains(search));
         var items = await query
             .OrderBy(e => e.UserName)
             .Select(e => new AuditLogLookupResponse
@@ -24,7 +24,7 @@ public class AuditLogLookupService : IAuditLogLookupService
                 Id = Guid.Empty,
                 Code = null,
                 Name = e.UserName,
-                DisplayName = e.UserName,
+                DisplayName = e.UserName ?? string.Empty,
                 IsActive = true
             })
             .ToListAsync(ct);

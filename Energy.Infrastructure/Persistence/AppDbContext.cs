@@ -15,8 +15,6 @@ using Energy.Domain.Finance;
 using Energy.Domain.HR;
 using Energy.Domain.IAM;
 using Energy.Domain.Inventory;
-using Energy.Domain.Core;
-using Energy.Domain.Core;
 using Energy.Domain.Notifications;
 using Energy.Domain.Operations;
 using Energy.Domain.Organization;
@@ -25,7 +23,6 @@ using Energy.Domain.ProgressPayments;
 using Energy.Domain.Projects;
 using Energy.Domain.Reporting;
 using Energy.Domain.Requests;
-using Energy.Domain.IAM;
 using Energy.Domain.Workflow;
 using Microsoft.EntityFrameworkCore;
 
