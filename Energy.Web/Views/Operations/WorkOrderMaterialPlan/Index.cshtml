@@ -14,6 +14,13 @@
 @section Scripts {
     <script src="~/js/operations/work-order-material-plan/work-order-material-plan.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Catalog.Material.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Operations.WorkOrder.Title"].Value))
+            ]
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.OperationsWorkOrderMaterialPlan.init("/operations/work-order-material-plans", "work-order-material-plan-grid", "Operations");
         });

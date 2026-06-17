@@ -668,8 +668,8 @@
   <data name="Menus.Projects.ProjectStatus" xml:space="preserve"><value>Project Status</value></data>
   <data name="Projects.ProjectLocation.Title" xml:space="preserve"><value>Project Location</value></data>
   <data name="Menus.Projects.ProjectLocation" xml:space="preserve"><value>Project Location</value></data>
-  <data name="Projects.ProjectPhas.Title" xml:space="preserve"><value>Project Phas</value></data>
-  <data name="Menus.Projects.ProjectPhas" xml:space="preserve"><value>Project Phas</value></data>
+  <data name="Projects.ProjectPhas.Title" xml:space="preserve"><value>Project Phase</value></data>
+  <data name="Menus.Projects.ProjectPhas" xml:space="preserve"><value>Project Phase</value></data>
   <data name="Projects.ProjectMember.Title" xml:space="preserve"><value>Project Member</value></data>
   <data name="Menus.Projects.ProjectMember" xml:space="preserve"><value>Project Member</value></data>
   <data name="Projects.ProjectNote.Title" xml:space="preserve"><value>Project Note</value></data>
@@ -690,8 +690,8 @@
   <data name="Menus.Catalog.MaterialAttributeValue" xml:space="preserve"><value>Material Attribute Value</value></data>
   <data name="Catalog.MaterialUnitConversion.Title" xml:space="preserve"><value>Material Unit Conversion</value></data>
   <data name="Menus.Catalog.MaterialUnitConversion" xml:space="preserve"><value>Material Unit Conversion</value></data>
-  <data name="Inventory.Warehous.Title" xml:space="preserve"><value>Warehous</value></data>
-  <data name="Menus.Inventory.Warehous" xml:space="preserve"><value>Warehous</value></data>
+  <data name="Inventory.Warehous.Title" xml:space="preserve"><value>Warehouse</value></data>
+  <data name="Menus.Inventory.Warehous" xml:space="preserve"><value>Warehouse</value></data>
   <data name="Inventory.WarehouseLocation.Title" xml:space="preserve"><value>Warehouse Location</value></data>
   <data name="Menus.Inventory.WarehouseLocation" xml:space="preserve"><value>Warehouse Location</value></data>
   <data name="Inventory.StockDocumentType.Title" xml:space="preserve"><value>Stock Document Type</value></data>
@@ -1086,4 +1086,42 @@
   <data name="LocalizationScreen.ImportConfirmTitle" xml:space="preserve"><value>Import confirmation</value></data>
   <data name="LocalizationScreen.ImportConfirmMessage" xml:space="preserve"><value>Are you sure you want to import from resx resources?</value></data>
   <data name="LocalizationScreen.Imported" xml:space="preserve"><value>{0} entries imported.</value></data>
+  <data name="Help.Button" xml:space="preserve"><value>About this page</value></data>
+  <data name="Help.Title" xml:space="preserve"><value>Page Guide</value></data>
+  <data name="Help.Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Help.PurposeTitle" xml:space="preserve"><value>Purpose</value></data>
+  <data name="Help.IntroGeneric" xml:space="preserve"><value>Use this screen to view and manage the related records.</value></data>
+  <data name="Help.IntroEntity" xml:space="preserve"><value>On this screen you can list, create, edit and delete “{0}” records.</value></data>
+  <data name="Help.StepsTitle" xml:space="preserve"><value>Basic Usage Steps</value></data>
+  <data name="Help.Step1" xml:space="preserve"><value>Review existing records; narrow the list with the search box and filters.</value></data>
+  <data name="Help.Step2" xml:space="preserve"><value>Use the “Add” button in the toolbar to create a new record.</value></data>
+  <data name="Help.Step3" xml:space="preserve"><value>Use the edit/delete icons at the end of a row to update or remove a record.</value></data>
+  <data name="Help.GridTitle" xml:space="preserve"><value>List &amp; Table Features</value></data>
+  <data name="Help.GridSearch" xml:space="preserve"><value>Search box: quickly searches across all columns.</value></data>
+  <data name="Help.GridFilterRow" xml:space="preserve"><value>Filter row: applies a separate filter for each column under the headers.</value></data>
+  <data name="Help.GridHeaderFilter" xml:space="preserve"><value>Header filter: filter by selecting values from the funnel icon in a column header.</value></data>
+  <data name="Help.GridColumnChooser" xml:space="preserve"><value>Column chooser: lets you show or hide columns.</value></data>
+  <data name="Help.GridSort" xml:space="preserve"><value>Sorting: click a column header to sort ascending or descending.</value></data>
+  <data name="Help.GridExport" xml:space="preserve"><value>Export: downloads the current list as an Excel (.xlsx) file.</value></data>
+  <data name="Help.GridPaging" xml:space="preserve"><value>Paging: change the page number and page size from the bottom bar.</value></data>
+  <data name="Help.ActionsTitle" xml:space="preserve"><value>Record Actions</value></data>
+  <data name="Help.ActionsExtraTitle" xml:space="preserve"><value>Page-Specific Actions</value></data>
+  <data name="Help.ActionAdd" xml:space="preserve"><value>Add: creates a new record.</value></data>
+  <data name="Help.ActionEdit" xml:space="preserve"><value>Edit: updates the selected record.</value></data>
+  <data name="Help.ActionDelete" xml:space="preserve"><value>Delete: permanently removes the selected record.</value></data>
+  <data name="Help.ColumnsTitle" xml:space="preserve"><value>Key Columns</value></data>
+  <data name="Help.FiltersTitle" xml:space="preserve"><value>Filters</value></data>
+  <data name="Help.LookupNote" xml:space="preserve"><value>Selection (lookup) fields show the related record's name/code, not a technical ID.</value></data>
+  <data name="Projects.Project.Help.Intro" xml:space="preserve"><value>This screen is the master record for the projects your company runs; here you define them and track them by status and type.</value></data>
+  <data name="Projects.Project.Help.ColCode" xml:space="preserve"><value>Code: the project's unique short code.</value></data>
+  <data name="Projects.Project.Help.ColName" xml:space="preserve"><value>Name: the full project name.</value></data>
+  <data name="Projects.Project.Help.ColCustomer" xml:space="preserve"><value>Customer: the business partner the project belongs to (name shown, not an ID).</value></data>
+  <data name="Projects.Project.Help.ColType" xml:space="preserve"><value>Project Type: the project's classification.</value></data>
+  <data name="Projects.Project.Help.ColStatus" xml:space="preserve"><value>Status: the project's current stage (Planning, In Progress, Completed, etc.).</value></data>
+  <data name="Projects.Project.Help.FilterStatus" xml:space="preserve"><value>Status: filter projects by a specific status.</value></data>
+  <data name="Projects.Project.Help.FilterType" xml:space="preserve"><value>Project Type: filter projects by a specific type.</value></data>
+  <data name="Help.RelatedTitle" xml:space="preserve"><value>Related Records</value></data>
+  <data name="Help.RelatedNote" xml:space="preserve"><value>This record links to the following record types; their name/code is shown in selection fields.</value></data>
+  <data name="Help.IntroReport" xml:space="preserve"><value>This report screen lets you filter, view and export “{0}” data to Excel.</value></data>
+  <data name="Help.IntroProcess" xml:space="preserve"><value>This screen lets you carry out the “{0}” operation step by step.</value></data>
 </root>

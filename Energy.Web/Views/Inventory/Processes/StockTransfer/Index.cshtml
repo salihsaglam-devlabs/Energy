@@ -17,6 +17,9 @@
 @section Scripts {
     <script src="~/js/inventory/processes/stock-transfer/stock-transfer.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroProcess"].Value, ViewData["Title"])))
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppProcesses.InventoryStockTransfer.init("/inventory/processes/stock-transfer", {
                 formId: "stock-transfer-form",

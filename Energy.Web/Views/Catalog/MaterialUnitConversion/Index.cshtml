@@ -14,6 +14,12 @@
 @section Scripts {
     <script src="~/js/catalog/material-unit-conversion/material-unit-conversion.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Catalog.Material.Title"].Value))
+            ]
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.CatalogMaterialUnitConversion.init("/catalog/material-unit-conversions", "material-unit-conversion-grid", "Catalog");
         });

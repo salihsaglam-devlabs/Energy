@@ -14,6 +14,14 @@
 @section Scripts {
     <script src="~/js/progress-payments/progress-payment-line/progress-payment-line.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Contracts.ContractLine.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["FieldOperations.MeasurementSheetLine.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["ProgressPayments.ProgressPayment.Title"].Value))
+            ]
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.ProgressPaymentsProgressPaymentLine.init("/progress-payments/progress-payment-lines", "progress-payment-line-grid", "ProgressPayments");
         });

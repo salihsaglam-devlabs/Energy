@@ -17,6 +17,9 @@
 @section Scripts {
     <script src="~/js/procurement/reports/purchase-order-summary/purchase-order-summary.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroReport"].Value, ViewData["Title"])))
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppReports.ProcurementPurchaseOrderSummary.init("/procurement/reports/purchase-order-summary", "purchase-order-summary-grid", "purchase-order-summary-filters", { hasStatus: true });
         });

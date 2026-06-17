@@ -49,6 +49,19 @@ if (environmentSection.Exists())
     builder.Configuration.AddInMemoryCollection(environmentValues);
 }
 
+// Veritabanı sağlayıcısını ortam değişkeniyle zorla (ENERGY_DB_PROVIDER). Energy.Migrator
+// ve ef.sh, ef komutlarını ve "tam veri seed" çalıştırmasını belirli bir sağlayıcıya
+// yönlendirmek için bu değişkeni kullanır; böylece seçilen migrations derlemesiyle
+// AppDbContext sağlayıcısı her zaman eşleşir. En son eklenir => "Database:Provider"ı geçersiz kılar.
+var forcedDbProvider = Environment.GetEnvironmentVariable("ENERGY_DB_PROVIDER");
+if (!string.IsNullOrWhiteSpace(forcedDbProvider))
+{
+    builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+    {
+        ["Database:Provider"] = forcedDbProvider,
+    });
+}
+
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<Energy.Api.Common.Filters.FluentValidationActionFilter>();
@@ -252,6 +265,20 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 await app.RunSystemSeedingAsync();
+
+// "Tam veri seed" modu: Energy.Migrator (veya CI) `--seed-only` argümanıyla ya da
+// ENERGY_SEED_ONLY=1 ortam değişkeniyle çağırdığında, sistem tohumlaması çalıştıktan
+// sonra web sunucusunu BAŞLATMADAN çıkarız. Böylece tüm referans/örnek veriyi tek
+// komutla, kalıcı bir süreç açmadan yükleyebiliriz.
+var seedOnly =
+    args.Any(a => string.Equals(a, "--seed-only", StringComparison.OrdinalIgnoreCase)) ||
+    string.Equals(Environment.GetEnvironmentVariable("ENERGY_SEED_ONLY"), "1", StringComparison.OrdinalIgnoreCase) ||
+    string.Equals(Environment.GetEnvironmentVariable("ENERGY_SEED_ONLY"), "true", StringComparison.OrdinalIgnoreCase);
+if (seedOnly)
+{
+    app.Logger.LogInformation("Seed-only mode: system seeding completed; exiting without starting the web host.");
+    return;
+}
 
 // İstek şemasını / uzak IP'yi inceleyen herhangi bir ara katmandan ÖNCE çalışmalıdır;
 // böylece ters proxy tarafından iletilen orijinal değerleri görürler.

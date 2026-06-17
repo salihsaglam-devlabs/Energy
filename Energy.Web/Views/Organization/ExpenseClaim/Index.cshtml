@@ -14,6 +14,15 @@
 @section Scripts {
     <script src="~/js/organization/expense-claim/expense-claim.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Workflow.ApprovalRequest.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Core.Currency.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Organization.Employee.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.Project.Title"].Value))
+            ]
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.OrganizationExpenseClaim.init("/organization/expense-claims", "expense-claim-grid", "Organization");
         });

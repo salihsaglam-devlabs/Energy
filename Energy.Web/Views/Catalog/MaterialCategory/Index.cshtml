@@ -14,6 +14,9 @@
 @section Scripts {
     <script src="~/js/catalog/material-category/material-category.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"])))
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.CatalogMaterialCategory.init("/catalog/material-categories", "material-category-grid", "Catalog");
         });

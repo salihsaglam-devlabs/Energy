@@ -14,6 +14,12 @@
 @section Scripts {
     <script src="~/js/inventory/stock-count/stock-count.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Inventory.Warehouse.Title"].Value))
+            ]
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.InventoryStockCount.init("/inventory/stock-counts", "stock-count-grid", "Inventory");
         });

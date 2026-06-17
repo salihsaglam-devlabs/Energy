@@ -26,6 +26,40 @@
         return payload && typeof payload.redirect === "string" && payload.redirect.length > 0;
     }
 
+    // Sunucu doğrulama (validation) hatalarını okunabilir tek bir metne dönüştürür.
+    // "errors" alanı; alan adı -> mesaj listesi sözlüğü, düz dizi veya metin olabilir.
+    // Amaç: kullanıcıya asla "[object Object]" göstermemek.
+    function flattenErrors(errors) {
+        if (!errors) { return ""; }
+        if (typeof errors === "string") { return errors; }
+        var parts = [];
+        if (Array.isArray(errors)) {
+            errors.forEach(function (e) {
+                var t = (e && typeof e === "object") ? (e.message || e.Message || "") : String(e);
+                if (t) { parts.push(t); }
+            });
+        } else if (typeof errors === "object") {
+            Object.keys(errors).forEach(function (key) {
+                var v = errors[key];
+                if (Array.isArray(v)) { parts.push(v.join(" ")); }
+                else if (v && typeof v === "object") { parts.push(v.message || v.Message || ""); }
+                else if (v != null) { parts.push(String(v)); }
+            });
+        }
+        return parts.filter(Boolean).join(" \u2022 ");
+    }
+
+    // Bir hata yükünden kullanıcı dostu bir mesaj üretir; hiçbir zaman boş/nesne döndürmez.
+    function buildErrorMessage(payload, fallback) {
+        if (payload) {
+            if (typeof payload.message === "string" && payload.message.trim()) { return payload.message; }
+            if (typeof payload.Message === "string" && payload.Message.trim()) { return payload.Message; }
+            var flat = flattenErrors(payload.errors || payload.Errors);
+            if (flat) { return flat; }
+        }
+        return fallback;
+    }
+
     // İstek başlıklarını oluşturur; değiştiren metotlar için CSRF jetonunu ekler.
     function buildHeaders(method, custom) {
         var headers = Object.assign({
@@ -80,7 +114,7 @@
                 }
 
                 if (!response.ok) {
-                    var message = (payload && payload.message) ? payload.message : window.AppL10n.notifications.failed;
+                    var message = buildErrorMessage(payload, window.AppL10n.notifications.failed);
                     return Promise.reject({ status: response.status, message: message, payload: payload });
                 }
 
@@ -111,6 +145,14 @@
         postForm: function (url, formElement) {
             var form = new FormData(formElement);
             return send("POST", url, form);
+        },
+        // Bir hata nesnesini/yükünü kullanıcıya gösterilecek okunabilir bir metne çevirir.
+        // Çağrı yerlerinin "[object Object]" üretmesini engellemek için ortak yardımcı.
+        errorText: function (err, fallback) {
+            if (err && err.handled) { return ""; }
+            var fb = fallback || (window.AppL10n && window.AppL10n.notifications && window.AppL10n.notifications.genericError) || "";
+            if (err && typeof err.message === "string" && err.message.trim()) { return err.message; }
+            return buildErrorMessage(err && err.payload ? err.payload : err, fb);
         }
     };
 })(window);

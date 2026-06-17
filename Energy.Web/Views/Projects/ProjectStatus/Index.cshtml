@@ -14,6 +14,9 @@
 @section Scripts {
     <script src="~/js/projects/project-status/project-status.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"])))
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.ProjectsProjectStatus.init("/projects/project-statuses", "project-status-grid", "Projects");
         });

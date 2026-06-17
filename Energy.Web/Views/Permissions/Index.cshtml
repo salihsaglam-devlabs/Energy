@@ -18,6 +18,9 @@
 @section Scripts {
     <script src="~/js/iam/permissions.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Help.IntroGeneric"].Value))
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.Permissions.init();
         });

@@ -34,7 +34,9 @@
         // AppHttp hata nesnesini hata bildirimine çevirir; ele alınmış yönlendirmeleri atlar.
         fromHttpError: function (err) {
             if (err && err.handled) { return; }
-            var msg = (err && err.message) ? err.message : window.AppL10n.notifications.genericError;
+            var msg = (window.AppHttp && typeof window.AppHttp.errorText === "function")
+                ? window.AppHttp.errorText(err, window.AppL10n.notifications.genericError)
+                : ((err && err.message) ? err.message : window.AppL10n.notifications.genericError);
             toast(msg, "error");
         }
     };

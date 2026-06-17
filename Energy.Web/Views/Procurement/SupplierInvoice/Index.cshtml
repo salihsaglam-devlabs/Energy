@@ -14,6 +14,14 @@
 @section Scripts {
     <script src="~/js/procurement/supplier-invoice/supplier-invoice.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Core.Currency.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Procurement.PurchaseOrder.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Procurement.PurchaseReceipt.Title"].Value))
+            ]
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.ProcurementSupplierInvoice.init("/procurement/supplier-invoices", "supplier-invoice-grid", "Procurement");
         });

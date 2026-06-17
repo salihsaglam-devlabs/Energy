@@ -30,6 +30,28 @@
         return (window.AppL10n && window.AppL10n.alerts) || {};
     }
 
+    // Herhangi bir değeri (metin, hata nesnesi, dizi, düz nesne) kullanıcıya
+    // gösterilebilir bir metne çevirir. Hiçbir zaman "[object Object]" döndürmez.
+    function toText(value) {
+        if (value == null) { return ""; }
+        if (typeof value === "string") { return value; }
+        if (typeof value === "number" || typeof value === "boolean") { return String(value); }
+        // Hata/HTTP nesnesi: ortak çözümleyiciyi kullan.
+        if (window.AppHttp && typeof window.AppHttp.errorText === "function") {
+            var t = window.AppHttp.errorText(value, "");
+            if (t) { return t; }
+        }
+        if (value.message && typeof value.message === "string") { return value.message; }
+        if (value.Message && typeof value.Message === "string") { return value.Message; }
+        if (Array.isArray(value)) { return value.map(toText).filter(Boolean).join(" \u2022 "); }
+        try {
+            var keys = Object.keys(value);
+            var parts = keys.map(function (k) { return toText(value[k]); }).filter(Boolean);
+            if (parts.length) { return parts.join(" \u2022 "); }
+        } catch (e) { /* yok say */ }
+        return (window.AppL10n && window.AppL10n.notifications && window.AppL10n.notifications.genericError) || "";
+    }
+
     function resolveType(type) {
         return TYPES[type] || TYPES.info;
     }
@@ -57,7 +79,7 @@
         var stack = options.stack || bottomStack;
 
         dx.ui.notify({
-            message: message || "",
+            message: toText(message),
             type: meta.dx,
             displayTime: options.displayTime || (type === "error" ? 5000 : 3000),
             width: options.width || "auto",
@@ -118,7 +140,7 @@
                 var $text = $("<div class='energy-alert-popup__text'></div>").appendTo($wrap);
                 $("<div class='energy-alert-popup__title'></div>").text(title).appendTo($text);
                 var $msg = $("<div class='energy-alert-popup__message'></div>").appendTo($text);
-                if (options.html) { $msg.html(options.html); } else { $msg.text(options.message || ""); }
+                if (options.html) { $msg.html(options.html); } else { $msg.text(toText(options.message)); }
 
                 var $footer = $("<div class='energy-alert-popup__footer'></div>");
                 buttons.forEach(function (b) {
@@ -163,7 +185,7 @@
             $("<div class='energy-alert__title'></div>").text(options.title).appendTo($content);
         }
         var $msg = $("<div class='energy-alert__message'></div>").appendTo($content);
-        if (options.html) { $msg.html(options.html); } else { $msg.text(message || ""); }
+        if (options.html) { $msg.html(options.html); } else { $msg.text(toText(message)); }
 
         function close() {
             $alert.addClass("is-leaving");

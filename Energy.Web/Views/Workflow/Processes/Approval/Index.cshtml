@@ -17,6 +17,9 @@
 @section Scripts {
     <script src="~/js/workflow/processes/approval/approval.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Workflow.Processes.Approval.Hint"].Value))
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppProcesses.WorkflowApproval.init("/workflow/processes/approval", "approval-inbox-grid", {
                 approve: "@T["Workflow.Processes.Approval.Actions.Approve"]",

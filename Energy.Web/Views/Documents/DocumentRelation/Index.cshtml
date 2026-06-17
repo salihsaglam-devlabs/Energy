@@ -14,6 +14,12 @@
 @section Scripts {
     <script src="~/js/documents/document-relation/document-relation.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Documents.Document.Title"].Value))
+            ]
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.DocumentsDocumentRelation.init("/documents/document-relations", "document-relation-grid", "Documents");
         });

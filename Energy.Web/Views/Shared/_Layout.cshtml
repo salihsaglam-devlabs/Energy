@@ -84,6 +84,7 @@
     <script src="~/js/common/loading.js" asp-append-version="true"></script>
     <script src="~/js/common/icons.js" asp-append-version="true"></script>
     <script src="~/js/common/shell.js" asp-append-version="true"></script>
+    <script src="~/js/common/info-panel.js" asp-append-version="true"></script>
 
     <script>
         DevExpress.localization.locale("@currentCulture");
@@ -121,6 +122,7 @@
         })();
         document.addEventListener("DOMContentLoaded", function () {
             window.AppShell.init();
+            if (window.AppInfo) { window.AppInfo.init(); }
         });
     </script>
 

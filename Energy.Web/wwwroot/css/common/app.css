@@ -1448,3 +1448,53 @@ img, video, canvas, svg { max-width: 100%; }
    .energy-main içinde yapılır. */
 body, #energy-app { max-width: 100%; overflow-x: hidden; }
 
+/* ---------- Sayfa rehberi (Bilgi / Info) ---------- */
+.energy-info-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid var(--energy-border);
+    border-radius: 50%;
+    background: var(--energy-surface);
+    color: var(--energy-text-muted);
+    cursor: pointer;
+    transition: color .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+}
+.energy-info-btn:hover {
+    color: var(--energy-primary, #2b6cb0);
+    border-color: var(--energy-primary, #2b6cb0);
+    background: var(--energy-surface);
+}
+.energy-info-btn .dx-icon { font-size: 16px; }
+.energy-info-btn--inline { flex: 0 0 auto; align-self: center; }
+.energy-info-btn--floating {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: 44px;
+    height: 44px;
+    z-index: 1400;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .18);
+}
+.energy-info-btn--floating .dx-icon { font-size: 20px; }
+
+/* Yardım penceresi içeriği */
+.energy-help { display: grid; gap: 18px; }
+.energy-help__section { display: grid; gap: 6px; }
+.energy-help__heading {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--energy-text, inherit);
+    text-transform: none;
+}
+.energy-help__text { margin: 0; color: var(--energy-text-muted); line-height: 1.55; }
+.energy-help__list { margin: 0; padding-left: 18px; display: grid; gap: 5px; }
+.energy-help__list li { color: var(--energy-text-muted); line-height: 1.5; }
+.energy-help__list--def li strong { color: var(--energy-text, inherit); font-weight: 600; }
+.energy-help-popup .dx-popup-content { padding-top: 8px; }
+
+

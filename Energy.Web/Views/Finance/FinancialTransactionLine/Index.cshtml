@@ -14,6 +14,14 @@
 @section Scripts {
     <script src="~/js/finance/financial-transaction-line/financial-transaction-line.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Finance.CostCenter.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Finance.FinancialTransaction.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.Project.Title"].Value))
+            ]
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.FinanceFinancialTransactionLine.init("/finance/financial-transaction-lines", "financial-transaction-line-grid", "Finance");
         });

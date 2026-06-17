@@ -18,6 +18,9 @@
 @section Scripts {
     <script src="~/js/finance/processes/timesheet-cost/timesheet-cost.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Finance.Processes.TimesheetCost.Hint"].Value))
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppProcesses.FinanceTimesheetCost.init("/finance/processes/timesheet-cost", {
                 formId: "timesheet-cost-form",

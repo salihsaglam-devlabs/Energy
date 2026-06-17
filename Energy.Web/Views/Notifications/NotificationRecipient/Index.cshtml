@@ -14,6 +14,12 @@
 @section Scripts {
     <script src="~/js/notifications/notification-recipient/notification-recipient.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Notifications.Notification.Title"].Value))
+            ]
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.NotificationsNotificationRecipient.init("/notifications/notification-recipients", "notification-recipient-grid", "Notifications");
         });

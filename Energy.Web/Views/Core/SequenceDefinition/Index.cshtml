@@ -14,6 +14,9 @@
 @section Scripts {
     <script src="~/js/core/sequence-definition/sequence-definition.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"])))
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.CoreSequenceDefinition.init("/core/sequence-definitions", "sequence-definition-grid", "Core");
         });

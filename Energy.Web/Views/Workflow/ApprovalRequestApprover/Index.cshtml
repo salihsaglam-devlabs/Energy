@@ -14,6 +14,12 @@
 @section Scripts {
     <script src="~/js/workflow/approval-request-approver/approval-request-approver.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Workflow.ApprovalRequestStep.Title"].Value))
+            ]
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.WorkflowApprovalRequestApprover.init("/workflow/approval-request-approvers", "approval-request-approver-grid", "Workflow");
         });

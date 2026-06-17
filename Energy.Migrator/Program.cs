@@ -19,6 +19,7 @@ using System.Text.Json;
 //   4) Son migration'ı kaldır
 //   5) SQL script üret
 //   6) Sağlayıcı değiştir (yalnızca bu oturum için geçersiz kıl)
+//   7) Tam veri seed et (Energy.Api'yi --seed-only ile çalıştırır; tüm referans + örnek veri)
 //   0) Çıkış
 //
 // Geçersiz kılmalar (ortam değişkenleri):
@@ -67,6 +68,7 @@ while (true)
     Console.WriteLine("  4) Son migration'ı kaldır");
     Console.WriteLine("  5) SQL script üret");
     Console.WriteLine("  6) Sağlayıcı değiştir (bu oturum için)");
+    Console.WriteLine("  7) Tam veri seed et (referans + örnek/demo verisi)");
     Console.WriteLine("  0) Çıkış");
     Console.Write("Seçim: ");
 
@@ -92,6 +94,9 @@ while (true)
             break;
         case "6":
             provider = SwitchProvider();
+            break;
+        case "7":
+            await FullDataSeedAsync(provider);
             break;
         case "0":
         case "q":
@@ -221,6 +226,55 @@ ProviderInfo SwitchProvider()
     PrintProvider(next);
     Console.WriteLine();
     return next;
+}
+
+// Tam veri tohumlaması: Energy.Api'yi `--seed-only` argümanıyla çalıştırır. API,
+// SystemSeeder.SeedAllAsync'i (şema tamamlama + yetkiler + roller/kullanıcılar +
+// menüler + referans/master data + örnek ve demo verisi) çalıştırır ve web sunucusunu
+// BAŞLATMADAN çıkar. Aktif sağlayıcı ENERGY_DB_PROVIDER ile zorlanır; böylece tohumlama
+// bu oturumda seçili veritabanına uygulanır. Tüm adımlar idempotenttir (tekrar
+// çalıştırma duplicate üretmez).
+async Task FullDataSeedAsync(ProviderInfo p)
+{
+    Console.WriteLine("Bu işlem TÜM referans verisini ve örnek/demo verisini veritabanına");
+    Console.WriteLine("tohumlar (idempotent: tekrar çalıştırma güvenlidir).");
+    Console.Write($"[{p.Label}] veritabanına tam veri seed edilecek. Onaylıyor musunuz? (e/h): ");
+    if (!Confirm()) { Console.WriteLine("İptal edildi.\n"); return; }
+
+    Console.WriteLine($"\n==> [{p.Label}] Energy.Api --seed-only ile çalıştırılıyor...\n");
+
+    var psi = new ProcessStartInfo
+    {
+        FileName = dotnet,
+        UseShellExecute = false,
+        WorkingDirectory = repoRoot,
+    };
+    psi.ArgumentList.Add("run");
+    psi.ArgumentList.Add("--project");
+    psi.ArgumentList.Add(startupProject);
+    // Argümanı uygulamaya ilet (dotnet run'ın kendi argümanlarından ayır).
+    psi.ArgumentList.Add("--");
+    psi.ArgumentList.Add("--seed-only");
+
+    // Tohumlamayı seçilen sağlayıcıya zorla; böylece bağlantı dizesi ve DbContext
+    // seçenekleri bu oturumda etkin migrations projesiyle eşleşir.
+    psi.Environment["ENERGY_DB_PROVIDER"] = p.ConfigValue;
+    psi.Environment["ENERGY_SEED_ONLY"] = "1";
+
+    try
+    {
+        using var process = Process.Start(psi)
+            ?? throw new InvalidOperationException("İşlem başlatılamadı.");
+        await process.WaitForExitAsync();
+
+        Console.WriteLine(process.ExitCode == 0
+            ? "\n✔ Tam veri seed tamamlandı.\n"
+            : $"\n✖ Tam veri seed başarısız (çıkış kodu {process.ExitCode}).\n");
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine($"  ! Komut çalıştırılamadı: {ex.Message}\n");
+    }
 }
 
 // ---------------------------------------------------------------------------

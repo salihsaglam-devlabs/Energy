@@ -14,6 +14,12 @@
 @section Scripts {
     <script src="~/js/field-operations/progress-entry/progress-entry.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.Project.Title"].Value))
+            ]
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.FieldOperationsProgressEntry.init("/field-operations/progress-entries", "progress-entry-grid", "FieldOperations");
         });

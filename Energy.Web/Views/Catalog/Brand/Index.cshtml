@@ -14,6 +14,9 @@
 @section Scripts {
     <script src="~/js/catalog/brand/brand.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"])))
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.CatalogBrand.init("/catalog/brands", "brand-grid", "Catalog");
         });

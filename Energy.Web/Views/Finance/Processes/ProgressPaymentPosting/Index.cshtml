@@ -18,6 +18,9 @@
 @section Scripts {
     <script src="~/js/finance/processes/progress-payment-posting/progress-payment-posting.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Finance.Processes.ProgressPaymentPosting.Hint"].Value))
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppProcesses.FinanceProgressPaymentPosting.init("/finance/processes/progress-payment-posting", {
                 formId: "ppp-form",

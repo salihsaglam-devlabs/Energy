@@ -227,6 +227,36 @@
             correlationId: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.LogsScreen.CorrelationId))),
             requestBody: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.LogsScreen.RequestBody))),
             responseBody: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx(LocalizationKeys.LogsScreen.ResponseBody)))
+        },
+        help: {
+            button: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.Button"))),
+            title: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.Title"))),
+            close: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.Close"))),
+            purposeTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.PurposeTitle"))),
+            introGeneric: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.IntroGeneric"))),
+            introEntity: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.IntroEntity"))),
+            stepsTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.StepsTitle"))),
+            step1: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.Step1"))),
+            step2: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.Step2"))),
+            step3: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.Step3"))),
+            gridTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.GridTitle"))),
+            gridSearch: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.GridSearch"))),
+            gridFilterRow: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.GridFilterRow"))),
+            gridHeaderFilter: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.GridHeaderFilter"))),
+            gridColumnChooser: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.GridColumnChooser"))),
+            gridSort: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.GridSort"))),
+            gridExport: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.GridExport"))),
+            gridPaging: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.GridPaging"))),
+            actionsTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.ActionsTitle"))),
+            actionsExtraTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.ActionsExtraTitle"))),
+            actionAdd: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.ActionAdd"))),
+            actionEdit: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.ActionEdit"))),
+            actionDelete: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.ActionDelete"))),
+            columnsTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.ColumnsTitle"))),
+            filtersTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.FiltersTitle"))),
+            relatedTitle: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.RelatedTitle"))),
+            relatedNote: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.RelatedNote"))),
+            lookupNote: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Tx("Help.LookupNote")))
         }
     };
 </script>

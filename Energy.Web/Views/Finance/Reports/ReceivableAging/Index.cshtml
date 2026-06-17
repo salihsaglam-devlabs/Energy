@@ -17,6 +17,9 @@
 @section Scripts {
     <script src="~/js/finance/reports/receivable-aging/receivable-aging.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroReport"].Value, ViewData["Title"])))
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppReports.FinanceReceivableAging.init("/finance/reports/receivable-aging", "receivable-aging-grid", "receivable-aging-filters", { hasStatus: false });
         });

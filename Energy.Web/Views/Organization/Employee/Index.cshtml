@@ -14,6 +14,15 @@
 @section Scripts {
     <script src="~/js/organization/employee/employee.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Core.Branch.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Core.Company.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Core.Department.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Organization.EmployeePosition.Title"].Value))
+            ]
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.OrganizationEmployee.init("/organization/employees", "employee-grid", "Organization");
         });

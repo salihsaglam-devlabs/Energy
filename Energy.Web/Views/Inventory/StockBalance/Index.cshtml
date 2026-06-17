@@ -14,6 +14,13 @@
 @section Scripts {
     <script src="~/js/inventory/stock-balance/stock-balance.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Catalog.Material.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Inventory.Warehouse.Title"].Value))
+            ]
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.InventoryStockBalance.init("/inventory/stock-balances", "stock-balance-grid", "Inventory");
         });

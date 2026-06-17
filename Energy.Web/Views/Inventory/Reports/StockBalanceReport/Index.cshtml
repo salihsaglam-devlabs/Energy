@@ -17,6 +17,9 @@
 @section Scripts {
     <script src="~/js/inventory/reports/stock-balance-report/stock-balance-report.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroReport"].Value, ViewData["Title"])))
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppReports.InventoryStockBalanceReport.init("/inventory/reports/stock-balance-report", "stock-balance-report-grid", "stock-balance-report-filters", { hasStatus: false });
         });

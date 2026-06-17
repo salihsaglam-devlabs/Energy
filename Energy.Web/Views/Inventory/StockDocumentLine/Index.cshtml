@@ -14,6 +14,15 @@
 @section Scripts {
     <script src="~/js/inventory/stock-document-line/stock-document-line.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Core.Currency.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Catalog.Material.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Inventory.StockDocument.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Core.UnitOfMeasure.Title"].Value))
+            ]
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.InventoryStockDocumentLine.init("/inventory/stock-document-lines", "stock-document-line-grid", "Inventory");
         });

@@ -14,6 +14,13 @@
 @section Scripts {
     <script src="~/js/finance/collection-allocation/collection-allocation.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Finance.Collection.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Finance.Receivable.Title"].Value))
+            ]
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.FinanceCollectionAllocation.init("/finance/collection-allocations", "collection-allocation-grid", "Finance");
         });

@@ -14,6 +14,13 @@
 @section Scripts {
     <script src="~/js/catalog/material-category-attribute/material-category-attribute.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Catalog.MaterialAttributeDefinition.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Catalog.MaterialCategory.Title"].Value))
+            ]
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.CatalogMaterialCategoryAttribute.init("/catalog/material-category-attributes", "material-category-attribute-grid", "Catalog");
         });

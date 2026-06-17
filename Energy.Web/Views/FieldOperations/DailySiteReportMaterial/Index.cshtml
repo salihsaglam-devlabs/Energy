@@ -14,6 +14,13 @@
 @section Scripts {
     <script src="~/js/field-operations/daily-site-report-material/daily-site-report-material.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["FieldOperations.DailySiteReport.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Catalog.Material.Title"].Value))
+            ]
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.FieldOperationsDailySiteReportMaterial.init("/field-operations/daily-site-report-materials", "daily-site-report-material-grid", "FieldOperations");
         });

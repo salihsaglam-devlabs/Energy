@@ -14,6 +14,15 @@
 @section Scripts {
     <script src="~/js/procurement/purchase-order/purchase-order.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            related: [
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Workflow.ApprovalRequest.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Core.Currency.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.Project.Title"].Value)),
+                @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["BusinessPartners.BusinessPartner.Title"].Value))
+            ]
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.ProcurementPurchaseOrder.init("/procurement/purchase-orders", "purchase-order-grid", "Procurement");
         });

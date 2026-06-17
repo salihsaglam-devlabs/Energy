@@ -18,6 +18,9 @@
 @section Scripts {
     <script src="~/js/procurement/processes/goods-receipt/goods-receipt.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Procurement.Processes.GoodsReceipt.Hint"].Value))
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppProcesses.ProcurementGoodsReceipt.init("/procurement/processes/goods-receipt", {
                 formId: "goods-receipt-form",

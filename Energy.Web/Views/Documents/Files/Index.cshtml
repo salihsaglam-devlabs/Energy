@@ -24,6 +24,9 @@
 @section Scripts {
     <script src="~/js/documents/files/files.index.js" asp-append-version="true"></script>
     <script>
+        window.AppPageHelp = {
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Documents.Files.Hint"].Value))
+        };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppDocuments.Files.init("/documents/files", {
                 selectId: "document-select",
