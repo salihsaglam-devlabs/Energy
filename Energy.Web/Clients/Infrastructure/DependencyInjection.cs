@@ -17,6 +17,13 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddEnergyApiClients(this IServiceCollection services)
     {
+        // TÜM typed HttpClient'lara (curated + 134 per-entity + rapor istemcileri) ortak
+        // primary handler'ı uygula. Böylece API TLS sertifikası geçersiz/eksik olsa bile
+        // (ad uyuşmazlığı / güvenilmeyen zincir / kendinden imzalı) her istemci çalışır;
+        // per-entity istemciler bunu tek tek bildirmediğinden burada merkezî olarak yapılır.
+        services.ConfigureHttpClientDefaults(builder =>
+            builder.ConfigurePrimaryHttpMessageHandler(CreatePrimaryHandler));
+
         services.AddHttpContextAccessor();
         services.AddScoped<IUserApiTokenProvider, UserApiTokenProvider>();
         // Singleton: sistem/servis hesabı jetonunu istekler arasında önbelleğe alır.

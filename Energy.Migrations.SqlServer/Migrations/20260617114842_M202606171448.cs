@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Energy.Migrations.SqlServer.Migrations
 {
     /// <inheritdoc />
-    public partial class M202606171337 : Migration
+    public partial class M202606171448 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
