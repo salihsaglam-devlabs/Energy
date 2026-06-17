@@ -12,6 +12,7 @@ using Energy.Application.IAM.User.Commands.RemoveUserProfileImage;
 using Energy.Application.IAM.User.Commands.SetUserAccess;
 using Energy.Application.IAM.User.Commands.SetUserProfileImage;
 using Energy.Application.IAM.User.Commands.UpdateUser;
+using Energy.Application.IAM.User.Queries.GetMyProfile;
 using Energy.Application.IAM.User.Queries.GetUserAccess;
 using Energy.Application.IAM.User.Queries.GetUserById;
 using Energy.Application.IAM.User.Queries.GetUserList;
@@ -33,6 +34,10 @@ public sealed class UsersController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<BaseResponse<PaginatedResponse<UserSummaryResponse>>>> GetAll([FromQuery] PaginatedRequest request, CancellationToken ct)
         => Ok(await _mediator.Send(new GetUserListQuery(request), ct));
+
+    [HttpGet("me")]
+    public async Task<ActionResult<BaseResponse<UserDetailResponse>>> GetMine(CancellationToken ct)
+        => Ok(await _mediator.Send(new GetMyProfileQuery(), ct));
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<BaseResponse<UserDetailResponse>>> GetById(Guid id, CancellationToken ct)

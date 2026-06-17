@@ -16,17 +16,17 @@ public class ApprovalConditionLookupService : IApprovalConditionLookupService
     public async Task<BaseResponse<IReadOnlyList<ApprovalConditionLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.ApprovalConditions.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new ApprovalConditionLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<ApprovalConditionLookupResponse>)rows.Select(e => new ApprovalConditionLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace(e.Operator.ToString() + " - " + (e.ValueNumber.HasValue ? e.ValueNumber.Value.ToString() : "")) ? "Approval Condition #" + e.Id.ToString().Substring(0, 8) : (e.Operator.ToString() + " - " + (e.ValueNumber.HasValue ? e.ValueNumber.Value.ToString() : "")),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<ApprovalConditionLookupResponse>>.Success(items);
     }
 }

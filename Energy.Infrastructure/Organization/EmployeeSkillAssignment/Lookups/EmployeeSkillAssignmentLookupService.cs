@@ -16,17 +16,17 @@ public class EmployeeSkillAssignmentLookupService : IEmployeeSkillAssignmentLook
     public async Task<BaseResponse<IReadOnlyList<EmployeeSkillAssignmentLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.EmployeeSkillAssignments.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new EmployeeSkillAssignmentLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<EmployeeSkillAssignmentLookupResponse>)rows.Select(e => new EmployeeSkillAssignmentLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace((e.Note ?? "")) ? "Employee Skill Assignment #" + e.Id.ToString().Substring(0, 8) : ((e.Note ?? "")),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<EmployeeSkillAssignmentLookupResponse>>.Success(items);
     }
 }

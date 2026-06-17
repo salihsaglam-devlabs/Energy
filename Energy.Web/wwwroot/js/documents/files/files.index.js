@@ -102,11 +102,11 @@
             width: "100%",
             height: "55vh",
             columns: [
-                { dataField: "versionNo", caption: "Version", dataType: "number", width: 90 },
-                { dataField: "fileName", caption: "File Name" },
-                { dataField: "fileSize", caption: "Size (bytes)", dataType: "number" },
-                { dataField: "contentType", caption: "Type" },
-                { dataField: "uploadedAt", caption: "Uploaded", dataType: "datetime" },
+                { dataField: "versionNo", dataType: "number", width: 90 },
+                { dataField: "fileName" },
+                { dataField: "fileSize", dataType: "number" },
+                { dataField: "contentType" },
+                { dataField: "uploadedAt", dataType: "datetime" },
                 {
                     type: "buttons",
                     width: 130,

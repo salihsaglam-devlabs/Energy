@@ -16,6 +16,7 @@
     }
 
     function init(base, opts) {
+        var LP = function () { return (window.AppScreenL10n && window.AppScreenL10n.process) || {}; };
         var notify = window.AppNotify || { success: function () {}, error: function () {} };
         var data = {};
 
@@ -26,7 +27,6 @@
             items: [
                 {
                     dataField: "purchaseReceiptId",
-                    label: { text: "Purchase Receipt" },
                     editorType: "dxSelectBox",
                     validationRules: [{ type: "required" }],
                     editorOptions: {
@@ -51,10 +51,10 @@
                                         $("#" + opts.resultId).text(opts.success);
                                         form.resetValues();
                                     } else {
-                                        notify.error((r && r.message) || "Error");
+                                        notify.error((r && r.message) || LP().genericError || "Error");
                                     }
                                 })
-                                .catch(function () { notify.error("Error"); });
+                                .catch(function () { notify.error(LP().genericError || "Error"); });
                         }
                     }
                 }

@@ -16,17 +16,17 @@ public class BusinessPartnerBankAccountLookupService : IBusinessPartnerBankAccou
     public async Task<BaseResponse<IReadOnlyList<BusinessPartnerBankAccountLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.BusinessPartnerBankAccounts.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new BusinessPartnerBankAccountLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<BusinessPartnerBankAccountLookupResponse>)rows.Select(e => new BusinessPartnerBankAccountLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = "Business Partner Bank Account #" + e.Id.ToString().Substring(0, 8),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<BusinessPartnerBankAccountLookupResponse>>.Success(items);
     }
 }

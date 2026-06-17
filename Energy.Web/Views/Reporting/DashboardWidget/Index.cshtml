@@ -2,6 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
     ViewData["Title"] = T["Reporting.DashboardWidget.Title"].Value;
+    ViewData["ScreenId"] = "Reporting.DashboardWidget";
 }
 
 <section class="energy-screen">
@@ -15,7 +16,7 @@
     <script src="~/js/reporting/dashboard-widget/dashboard-widget.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"])))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Reporting.DashboardWidget.Help.Intro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.ReportingDashboardWidget.init("/reporting/dashboard-widgets", "dashboard-widget-grid", "Reporting");

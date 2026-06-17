@@ -16,17 +16,17 @@ public class WorkOrderMaterialPlanLookupService : IWorkOrderMaterialPlanLookupSe
     public async Task<BaseResponse<IReadOnlyList<WorkOrderMaterialPlanLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.WorkOrderMaterialPlans.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new WorkOrderMaterialPlanLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<WorkOrderMaterialPlanLookupResponse>)rows.Select(e => new WorkOrderMaterialPlanLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace(e.PlannedQuantity.ToString()) ? "Work Order Material Plan #" + e.Id.ToString().Substring(0, 8) : (e.PlannedQuantity.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<WorkOrderMaterialPlanLookupResponse>>.Success(items);
     }
 }

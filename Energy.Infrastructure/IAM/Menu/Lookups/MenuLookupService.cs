@@ -17,17 +17,17 @@ public class MenuLookupService : IMenuLookupService
     {
         var query = _db.Menus.AsNoTracking();
         if (activeOnly) query = query.Where(e => e.IsActive);
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new MenuLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = e.IsActive
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<MenuLookupResponse>)rows.Select(e => new MenuLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = "Menu #" + e.Id.ToString().Substring(0, 8),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<MenuLookupResponse>>.Success(items);
     }
 }

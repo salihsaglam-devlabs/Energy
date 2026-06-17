@@ -2,6 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
     ViewData["Title"] = T["Notifications.Notification.Title"].Value;
+    ViewData["ScreenId"] = "Notifications.Notification";
 }
 
 <section class="energy-screen">
@@ -15,7 +16,7 @@
     <script src="~/js/notifications/notification/notification.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"])))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Notifications.Notification.Help.Intro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.NotificationsNotification.init("/notifications/notifications", "notification-grid", "Notifications");

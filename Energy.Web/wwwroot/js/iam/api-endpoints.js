@@ -12,8 +12,8 @@
     "use strict";
     // Yerelleştirme sözlüğü kısayolları (API uç noktaları / grid / bildirimler).
     var LA = function () { return window.AppL10n.apiEndpoints; };
-    var LG = function () { return window.AppL10n.grid; };
-    var LN = function () { return window.AppL10n.notifications; };
+    var LG = function () { return window.AppL10n.apiEndpoints.grid; };
+    var LN = function () { return window.AppL10n.apiEndpoints.notifications; };
 
     // Grid örneği ve uç nokta-yetki eşlemesi için arama verisi.
     var gridInstance, permissions = [];

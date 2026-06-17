@@ -16,17 +16,17 @@ public class SequenceDefinitionLookupService : ISequenceDefinitionLookupService
     public async Task<BaseResponse<IReadOnlyList<SequenceDefinitionLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.SequenceDefinitions.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new SequenceDefinitionLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<SequenceDefinitionLookupResponse>)rows.Select(e => new SequenceDefinitionLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace((e.Module ?? "") + " - " + e.NextNumber.ToString()) ? "Sequence Definition #" + e.Id.ToString().Substring(0, 8) : ((e.Module ?? "") + " - " + e.NextNumber.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<SequenceDefinitionLookupResponse>>.Success(items);
     }
 }

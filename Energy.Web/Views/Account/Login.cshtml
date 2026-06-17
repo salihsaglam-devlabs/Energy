@@ -26,6 +26,7 @@
     <form id="energy-login-form" method="post" action="/account/login">
         @Html.AntiForgeryToken()
         <input type="hidden" name="ReturnUrl" value="@(Model.ReturnUrl ?? string.Empty)" />
+        <input type="hidden" name="DevLogin" value="@(Model.DevLoginToken ?? string.Empty)" />
         <div id="energy-login-form-host"></div>
         <div style="margin-top:16px">
             <button type="submit" class="dx-button dx-button-mode-contained dx-button-default" style="display:block;height: 30px;width:100%">

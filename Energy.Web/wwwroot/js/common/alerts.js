@@ -234,6 +234,7 @@
         popup: popup,
         confirm: confirm,
         embed: embed,
+        toText: toText,
         success: severity("success"),
         info: severity("info"),
         warning: severity("warning"),

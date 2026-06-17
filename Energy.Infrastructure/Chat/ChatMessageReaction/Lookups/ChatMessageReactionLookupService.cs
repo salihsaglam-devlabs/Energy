@@ -16,17 +16,17 @@ public class ChatMessageReactionLookupService : IChatMessageReactionLookupServic
     public async Task<BaseResponse<IReadOnlyList<ChatMessageReactionLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.ChatMessageReactions.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new ChatMessageReactionLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<ChatMessageReactionLookupResponse>)rows.Select(e => new ChatMessageReactionLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = "Chat Message Reaction #" + e.Id.ToString().Substring(0, 8),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<ChatMessageReactionLookupResponse>>.Success(items);
     }
 }

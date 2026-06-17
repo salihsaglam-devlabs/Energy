@@ -2,6 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
     ViewData["Title"] = T["Procurement.Reports.PurchaseOrderSummary.Title"].Value;
+    ViewData["ScreenId"] = "Procurement.Reports.PurchaseOrderSummary";
 }
 
 <link rel="stylesheet" href="~/css/procurement/reports/purchase-order-summary/purchase-order-summary.css" asp-append-version="true" />
@@ -18,7 +19,7 @@
     <script src="~/js/procurement/reports/purchase-order-summary/purchase-order-summary.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroReport"].Value, ViewData["Title"])))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Procurement.Reports.PurchaseOrderSummary.Help.Intro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppReports.ProcurementPurchaseOrderSummary.init("/procurement/reports/purchase-order-summary", "purchase-order-summary-grid", "purchase-order-summary-filters", { hasStatus: true });

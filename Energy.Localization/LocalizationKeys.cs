@@ -124,6 +124,7 @@ public static class LocalizationKeys
         public const string Profile = "Menus.Profile";
         public const string Chat = "Menus.Chat";
         public const string Settings = "Menus.Settings";
+        public const string Notifications = "Menus.Notifications";
         public const string Users = "Menus.Users";
         public const string UserAccess = "Menus.UserAccess";
         public const string Roles = "Menus.Roles";
@@ -233,6 +234,7 @@ public static class LocalizationKeys
         public const string TotalMenusDescription = "Dashboard.TotalMenusDescription";
         public const string BusinessOverview = "Dashboard.BusinessOverview";
         public const string BusinessOverviewDescription = "Dashboard.BusinessOverviewDescription";
+        public const string Brand = "Dashboard.Brand";
     }
 
     public static class Auth
@@ -265,6 +267,7 @@ public static class LocalizationKeys
         public const string LoginSuccessful = "Auth.LoginSuccessful";
         public const string DevQuickLogin = "Auth.DevQuickLogin";
         public const string DevSelectUser = "Auth.DevSelectUser";
+        public const string MyProfile = "Auth.MyProfile";
     }
 
     public static class Layout
@@ -276,6 +279,7 @@ public static class LocalizationKeys
         public const string Loading = "Layout.Loading";
         public const string Profile = "Layout.Profile";
         public const string MyProfile = "Layout.MyProfile";
+        public const string MenuSearch = "Layout.MenuSearch";
     }
 
     public static class ProfileScreen
@@ -296,6 +300,7 @@ public static class LocalizationKeys
         public const string NoPermissions = "ProfileScreen.NoPermissions";
         public const string AccountActive = "ProfileScreen.AccountActive";
         public const string AccountInactive = "ProfileScreen.AccountInactive";
+        public const string ConfirmDelete = "ProfileScreen.ConfirmDelete";
     }
 
     public static class Grid
@@ -383,6 +388,41 @@ public static class LocalizationKeys
         public const string Error = "Alerts.Error";
         public const string Confirm = "Alerts.Confirm";
         public const string Ok = "Alerts.Ok";
+    }
+
+    public static class Screen
+    {
+        public const string EntityBadge = "Screen.EntityBadge";
+        public const string EntityBadgeTitle = "Screen.EntityBadgeTitle";
+        public const string ProcessBadge = "Screen.ProcessBadge";
+        public const string ProcessBadgeTitle = "Screen.ProcessBadgeTitle";
+        public const string ReportBadge = "Screen.ReportBadge";
+        public const string ReportBadgeTitle = "Screen.ReportBadgeTitle";
+        public const string LookupMissing = "Screen.LookupMissing";
+    }
+
+    public static class Reports
+    {
+        public const string StartDate = "Reports.StartDate";
+        public const string EndDate = "Reports.EndDate";
+        public const string Status = "Reports.Status";
+        public const string Export = "Reports.Export";
+        public const string Refresh = "Reports.Refresh";
+        public const string Filters = "Reports.Filters";
+        public const string AllStatuses = "Reports.AllStatuses";
+    }
+
+    public static class Processes
+    {
+        public const string Submit = "Processes.Submit";
+        public const string Reset = "Processes.Reset";
+        public const string GenericError = "Processes.GenericError";
+        public const string GenericSuccess = "Processes.GenericSuccess";
+        public const string ResultTotalCost = "Processes.ResultTotalCost";
+        public const string ResultAllocations = "Processes.ResultAllocations";
+        public const string ResultTransaction = "Processes.ResultTransaction";
+        public const string ResultLines = "Processes.ResultLines";
+        public const string ResultTotal = "Processes.ResultTotal";
     }
 
     public static class UsersScreen
@@ -540,6 +580,59 @@ public static class LocalizationKeys
         public const string Reconnecting = "ChatScreen.Reconnecting";
         public const string Disconnected = "ChatScreen.Disconnected";
         public const string OnlineUsers = "ChatScreen.OnlineUsers";
+        public const string GroupName = "ChatScreen.GroupName";
+        public const string CreateGroup = "ChatScreen.CreateGroup";
+        public const string InviteToGroup = "ChatScreen.InviteToGroup";
+        public const string DeleteGroup = "ChatScreen.DeleteGroup";
+        public const string Calling = "ChatScreen.Calling";
+        public const string VoiceUnsupported = "ChatScreen.VoiceUnsupported";
+        public const string VoiceDenied = "ChatScreen.VoiceDenied";
+        public const string GroupInvite = "ChatScreen.GroupInvite";
+        public const string Group = "ChatScreen.Group";
+        // Yeni grup / üyeler / iletim popup'ları
+        public const string NewGroup = "ChatScreen.NewGroup";
+        public const string Members = "ChatScreen.Members";
+        public const string AddMember = "ChatScreen.AddMember";
+        public const string GroupMembers = "ChatScreen.GroupMembers";
+        public const string GroupNameRequired = "ChatScreen.GroupNameRequired";
+        public const string GroupCreated = "ChatScreen.GroupCreated";
+        public const string GroupDeleted = "ChatScreen.GroupDeleted";
+        public const string InviteSent = "ChatScreen.InviteSent";
+        public const string MessageForwarded = "ChatScreen.MessageForwarded";
+        public const string MessageActionReact = "ChatScreen.MessageActionReact";
+        public const string MessageActionReply = "ChatScreen.MessageActionReply";
+        public const string MessageActionForward = "ChatScreen.MessageActionForward";
+        public const string MessageActionDelete = "ChatScreen.MessageActionDelete";
+        public const string ConfirmDeleteMessage = "ChatScreen.ConfirmDeleteMessage";
+        public const string ConfirmRemoveMember = "ChatScreen.ConfirmRemoveMember";
+        public const string ConfirmDeleteGroup = "ChatScreen.ConfirmDeleteGroup";
+        public const string MakeAdmin = "ChatScreen.MakeAdmin";
+        public const string RemoveAdmin = "ChatScreen.RemoveAdmin";
+        public const string RemoveFromGroup = "ChatScreen.RemoveFromGroup";
+        public const string RoleOwner = "ChatScreen.RoleOwner";
+        public const string RoleAdmin = "ChatScreen.RoleAdmin";
+        public const string RolePending = "ChatScreen.RolePending";
+        public const string RoleMember = "ChatScreen.RoleMember";
+        public const string ForwardTitle = "ChatScreen.ForwardTitle";
+        public const string Contacts = "ChatScreen.Contacts";
+        public const string Groups = "ChatScreen.Groups";
+        public const string RecentChats = "ChatScreen.RecentChats";
+        public const string AcceptCall = "ChatScreen.AcceptCall";
+        public const string RejectCall = "ChatScreen.RejectCall";
+        public const string CallConnected = "ChatScreen.CallConnected";
+        public const string CallNeedsOnline = "ChatScreen.CallNeedsOnline";
+        public const string MicNotAccessible = "ChatScreen.MicNotAccessible";
+        public const string GenericError = "ChatScreen.GenericError";
+        // Görünüm rozetleri / aria-label / boş veri metinleri
+        public const string ToggleChats = "ChatScreen.ToggleChats";
+        public const string ToggleContacts = "ChatScreen.ToggleContacts";
+        public const string CloseSidebar = "ChatScreen.CloseSidebar";
+        public const string WelcomeMessage = "ChatScreen.WelcomeMessage";
+        public const string VoiceCall = "ChatScreen.VoiceCall";
+        public const string VoiceMessage = "ChatScreen.VoiceMessage";
+        public const string SendVoice = "ChatScreen.SendVoice";
+        public const string CancelLabel = "ChatScreen.CancelLabel";
+        public const string NoGroups = "ChatScreen.NoGroups";
     }
 
     public static class LogsScreen

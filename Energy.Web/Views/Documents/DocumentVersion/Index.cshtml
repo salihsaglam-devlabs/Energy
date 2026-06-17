@@ -2,6 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
     ViewData["Title"] = T["Documents.DocumentVersion.Title"].Value;
+    ViewData["ScreenId"] = "Documents.DocumentVersion";
 }
 
 <section class="energy-screen">
@@ -15,7 +16,7 @@
     <script src="~/js/documents/document-version/document-version.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Documents.DocumentVersion.Help.Intro"].Value)),
             related: [
                 @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Documents.Document.Title"].Value))
             ]

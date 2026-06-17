@@ -12,8 +12,8 @@ public sealed class ApiSettings
     /// <summary>
     /// True olduğunda, HTTP istemcisi API sunucusunun TLS sertifikasını geçersiz olsa
     /// bile (ad uyuşmazlığı / güvenilmeyen zincir / kendinden imzalı) kabul eder.
-    /// YALNIZCA sunucu sertifikasının güvenilemediği yerel/geliştirme veya geçici
-    /// kurulumlar içindir. Gerçek üretimde false bırakın.
+    /// Şu aşamada sertifika zorunlu olmadığından varsayılan <c>true</c>'dur; geçerli bir
+    /// sertifika kurulduğunda yapılandırmadan <c>false</c> yapılabilir.
     /// </summary>
-    public bool AllowInvalidCertificate { get; set; }
+    public bool AllowInvalidCertificate { get; set; } = true;
 }

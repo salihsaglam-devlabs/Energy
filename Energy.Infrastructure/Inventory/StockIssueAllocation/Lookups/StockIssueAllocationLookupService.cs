@@ -16,17 +16,17 @@ public class StockIssueAllocationLookupService : IStockIssueAllocationLookupServ
     public async Task<BaseResponse<IReadOnlyList<StockIssueAllocationLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.StockIssueAllocations.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new StockIssueAllocationLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<StockIssueAllocationLookupResponse>)rows.Select(e => new StockIssueAllocationLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace(e.Quantity.ToString()) ? "Stock Issue Allocation #" + e.Id.ToString().Substring(0, 8) : (e.Quantity.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<StockIssueAllocationLookupResponse>>.Success(items);
     }
 }

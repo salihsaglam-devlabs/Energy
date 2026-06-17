@@ -69,7 +69,7 @@ public sealed class RequestLoggingMiddleware
                 "Handled {ExceptionType} for {Method} {Path} -> 404. CorrelationId: {CorrelationId}.",
                 nameof(NotFoundException), context.Request.Method, context.Request.Path.Value, correlationId);
             var message = localizer[ex.MessageKey, ex.Arguments].Value;
-            await WriteFailureAsync(context, StatusCodes.Status404NotFound, message, new[] { message });
+            await WriteFailureAsync(context, buffer, StatusCodes.Status404NotFound, message, new[] { message });
         }
         catch (ConflictException ex)
         {
@@ -78,7 +78,7 @@ public sealed class RequestLoggingMiddleware
                 "Handled {ExceptionType} for {Method} {Path} -> 409. CorrelationId: {CorrelationId}.",
                 nameof(ConflictException), context.Request.Method, context.Request.Path.Value, correlationId);
             var message = localizer[ex.MessageKey, ex.Arguments].Value;
-            await WriteFailureAsync(context, StatusCodes.Status409Conflict, message, new[] { message });
+            await WriteFailureAsync(context, buffer, StatusCodes.Status409Conflict, message, new[] { message });
         }
         catch (Exception ex)
         {
@@ -88,7 +88,7 @@ public sealed class RequestLoggingMiddleware
             _logger.LogError(ex,
                 "Unhandled exception for {Method} {Path} -> 500. CorrelationId: {CorrelationId}.",
                 context.Request.Method, context.Request.Path.Value, correlationId);
-            await WriteFailureAsync(context, StatusCodes.Status500InternalServerError,
+            await WriteFailureAsync(context, buffer, StatusCodes.Status500InternalServerError,
                 localizer[LocalizationKeys.Messages.UnexpectedError].Value,
                 new[] { localizer[LocalizationKeys.Messages.UnexpectedError].Value });
         }
@@ -118,10 +118,27 @@ public sealed class RequestLoggingMiddleware
                 context.Response.Body = originalBody;
             }
 
-            await SafeWriteLogAsync(auditLogs, context, currentUser, correlationId, startedAt,
-                stopwatch.ElapsedMilliseconds, exception, requestBody, responseBody);
+            // Denetim kaydı YAZMA (ingest) isteğinin kendisini tekrar kaydetme: aksi
+            // halde her istemci log'u, onu yazmak için yapılan API çağrısı yüzünden
+            // ikinci, anlamsız bir denetim satırı üretir (öz-referanslı gürültü).
+            if (!IsAuditIngestRequest(context))
+            {
+                await SafeWriteLogAsync(auditLogs, context, currentUser, correlationId, startedAt,
+                    stopwatch.ElapsedMilliseconds, exception, requestBody, responseBody);
+            }
         }
     }
+
+    /// <summary>
+    /// İsteğin, denetim kaydı yazma (ingest) uç noktasına yapılan çağrı olup
+    /// olmadığını belirler (<c>POST /api/v{n}/audit-logs</c>). Bu çağrılar denetim
+    /// kaydının KENDİSİNİ oluşturur; bu yüzden onları yeniden loglamak gereksiz bir
+    /// öz-referans üretir.
+    /// </summary>
+    private static bool IsAuditIngestRequest(HttpContext context)
+        => HttpMethods.IsPost(context.Request.Method)
+           && (context.Request.Path.Value ?? string.Empty)
+               .EndsWith("/audit-logs", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>İstek gövdesini güvenli ve maskelenmiş şekilde yakalar (tamponlamayla yeniden okunabilir).</summary>
     private static async Task<string?> CaptureRequestBodyAsync(HttpContext context)
@@ -182,9 +199,18 @@ public sealed class RequestLoggingMiddleware
     }
 
     /// <summary>Standartlaştırılmış bir başarısızlık yanıtı (BaseResponse) yazar.</summary>
-    private static async Task WriteFailureAsync(HttpContext context, int status, string message, IEnumerable<string> errors)
+    private static async Task WriteFailureAsync(HttpContext context, MemoryStream buffer, int status, string message, IEnumerable<string> errors)
     {
         if (context.Response.HasStarted) return;
+
+        // Alt katman (controller / JSON serileştirici) hata fırlatmadan önce tampona
+        // KISMİ içerik yazmış olabilir. Standart hata zarfını bunun ÜZERİNE eklersek
+        // bozuk/iç içe JSON oluşur ve üst katman (Web) yanıtı çözemeyip kendisi 500
+        // verir. Bu yüzden zarfı yazmadan önce tamponu ve uzunluk başlığını sıfırla.
+        buffer.SetLength(0);
+        buffer.Position = 0;
+        context.Response.Headers.ContentLength = null;
+
         context.Response.StatusCode = status;
         context.Response.ContentType = "application/json";
         await context.Response.WriteAsync(JsonSerializer.Serialize(BaseResponse<object>.Failure(message, errors)));

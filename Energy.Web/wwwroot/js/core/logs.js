@@ -13,7 +13,7 @@
     "use strict";
     // Yerelleştirme sözlüğü kısayolları (günlükler / grid).
     var LL = function () { return window.AppL10n.logs; };
-    var LG = function () { return window.AppL10n.grid; };
+    var LG = function () { return window.AppL10n.logs.grid; };
 
     // Grid örneği.
     var gridInstance;

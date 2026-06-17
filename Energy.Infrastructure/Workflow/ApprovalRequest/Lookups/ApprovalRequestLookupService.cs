@@ -16,17 +16,19 @@ public class ApprovalRequestLookupService : IApprovalRequestLookupService
     public async Task<BaseResponse<IReadOnlyList<ApprovalRequestLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.ApprovalRequests.AsNoTracking();
-        var items = await query
-            .OrderBy(e => e.Id)
-            .Select(e => new ApprovalRequestLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
+        var rows = await query
+            .OrderByDescending(e => e.CurrentStepNo)
             .ToListAsync(ct);
+        var items = (IReadOnlyList<ApprovalRequestLookupResponse>)rows.Select(e => new ApprovalRequestLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            // İlgili varlık türü + durum, kullanıcıya GUID yerine anlamlı bağlam verir.
+            DisplayName = (string.IsNullOrWhiteSpace(e.RelatedEntityType) ? "Onay Talebi" : e.RelatedEntityType)
+                + " (" + e.Status.ToString() + ")",
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<ApprovalRequestLookupResponse>>.Success(items);
     }
 }

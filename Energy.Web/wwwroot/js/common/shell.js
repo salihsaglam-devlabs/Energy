@@ -138,6 +138,18 @@
             displayExpr: "text",
             selectionMode: "single",
             expandNodesRecursive: false,
+            // Sol menünün en üstüne hızlı erişim arama alanı: kullanıcı yazdıkça menü
+            // öğeleri canlı filtrelenir; arama hem üst başlıklarda hem de alt menülerde
+            // çalışır (eşleşen düğüm + üst dalları gösterilir).
+            searchEnabled: true,
+            searchMode: "contains",
+            searchTimeout: 150,
+            searchEditorOptions: {
+                placeholder: (window.AppL10n && window.AppL10n.layout && window.AppL10n.layout.menuSearch) || "Search menu...",
+                mode: "search",
+                stylingMode: "outlined",
+                elementAttr: { class: "energy-nav-search" }
+            },
             itemTemplate: function (itemData, index, itemElement) {
                 var $row = $("<div>").addClass("energy-nav-row");
                 if (itemData.icon) {

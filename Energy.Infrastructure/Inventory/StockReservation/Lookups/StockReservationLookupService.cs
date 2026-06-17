@@ -16,17 +16,17 @@ public class StockReservationLookupService : IStockReservationLookupService
     public async Task<BaseResponse<IReadOnlyList<StockReservationLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.StockReservations.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new StockReservationLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<StockReservationLookupResponse>)rows.Select(e => new StockReservationLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace((e.RelatedModule ?? "") + " - " + e.Quantity.ToString()) ? "Stock Reservation #" + e.Id.ToString().Substring(0, 8) : ((e.RelatedModule ?? "") + " - " + e.Quantity.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<StockReservationLookupResponse>>.Success(items);
     }
 }

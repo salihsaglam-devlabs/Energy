@@ -87,6 +87,14 @@ public static class PermissionCatalog
     /// </summary>
     public const string SystemSeed = "System.Seed";
 
+    /// <summary>
+    /// "Veri Yönetimi" kırılımı: veritabanındaki TÜM tabloların düz CRUD ekranlarına
+    /// (ham veriye müdahale) erişim. Çok yüksek ayrıcalıklı; yalnızca SystemAdmin'e
+    /// verilir (SuperAdmin atlar). Varsayılan dağıtıma (DefaultGrants) GİRMEZ ve hiçbir
+    /// iş rolüne otomatik atanmaz; böylece bu ekranlara herkes erişemez.
+    /// </summary>
+    public const string DataAdminAccess = "System.DataAdmin";
+
     /// <summary>Self servis: her kimlik doğrulanmış kullanıcı kendi profilini okuyabilir (varsayılan verilir).</summary>
     public const string ProfileRead = "Profile.Read";
     /// <summary>Self servis: her kimlik doğrulanmış kullanıcı kendi profilini güncelleyebilir (varsayılan verilir).</summary>
@@ -187,6 +195,8 @@ public static class PermissionCatalog
 
             Describe(SystemSeed),
 
+            Describe(DataAdminAccess),
+
             Describe(ProfileRead), Describe(ProfileUpdate),
 
             Describe(ChatUse),
@@ -225,16 +235,25 @@ public static class PermissionCatalog
         new HashSet<string>(All.Select(item => item.Code), StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Her kimlik doğrulanmış kullanıcının roründen bağımsız olarak sahip olması
-    /// gereken yetkiler — açık atama gerektirmeyen "taban". Gösterge panosu ve
-    /// self servis profilin her zaman erişilebilir olması için her role tohumlanır.
+    /// Her kimlik doğrulanmış kullanıcının rolünden bağımsız olarak sahip olması
+    /// gereken yetkiler — açık atama gerektirmeyen "taban". Bu yetkiler, her
+    /// kullanıcının minimum görmesi gereken dört menünün (Dashboard, Chat,
+    /// Profile, Settings) her zaman görünür olmasını garanti eder ve SuperAdmin
+    /// dışındaki her role tohumlanır.
     /// </summary>
     public static IReadOnlyList<string> DefaultGrants { get; } =
     [
+        // Dashboard menüsü — her kullanıcının açılış ekranı.
         DashboardRead,
+
+        // Chat menüsü — kurum içi mesajlaşma.
+        ChatUse,
+
+        // Profile menüsü — self servis profil görüntüleme/güncelleme.
         ProfileRead,
         ProfileUpdate,
-        ChatUse,
+
+        // Settings menüsü — kullanıcı bazlı ayarlar.
         UserSettingsRead,
         UserSettingsUpdate,
     ];

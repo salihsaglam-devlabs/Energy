@@ -2,6 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
     ViewData["Title"] = T["Requests.RequestType.Title"].Value;
+    ViewData["ScreenId"] = "Requests.RequestType";
 }
 
 <section class="energy-screen">
@@ -15,7 +16,7 @@
     <script src="~/js/requests/request-type/request-type.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"])))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Requests.RequestType.Help.Intro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.RequestsRequestType.init("/requests/request-types", "request-type-grid", "Requests");

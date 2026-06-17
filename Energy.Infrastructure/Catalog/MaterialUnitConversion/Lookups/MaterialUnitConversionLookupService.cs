@@ -16,17 +16,17 @@ public class MaterialUnitConversionLookupService : IMaterialUnitConversionLookup
     public async Task<BaseResponse<IReadOnlyList<MaterialUnitConversionLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.MaterialUnitConversions.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new MaterialUnitConversionLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<MaterialUnitConversionLookupResponse>)rows.Select(e => new MaterialUnitConversionLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace(e.Factor.ToString()) ? "Material Unit Conversion #" + e.Id.ToString().Substring(0, 8) : (e.Factor.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<MaterialUnitConversionLookupResponse>>.Success(items);
     }
 }

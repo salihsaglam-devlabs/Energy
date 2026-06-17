@@ -77,12 +77,12 @@
                     var data = envelope && (envelope.data || envelope.Data);
                     if (ok) {
                         window.EnergyUserSettings.set(data || payload);
-                        if (window.AppNotify) { window.AppNotify.success(opts.savedMessage || window.AppL10n.notifications.saved); }
+                        if (window.AppNotify) { window.AppNotify.success(opts.savedMessage || window.AppL10n.settings.notifications.saved); }
                     } else if (window.AppNotify) {
-                        window.AppNotify.error((envelope && (envelope.message || envelope.Message)) || window.AppL10n.notifications.failed);
+                        window.AppNotify.error((envelope && (envelope.message || envelope.Message)) || window.AppL10n.settings.notifications.failed);
                     }
                 }).fail(function () {
-                    if (window.AppNotify) { window.AppNotify.error(window.AppL10n.notifications.networkError); }
+                    if (window.AppNotify) { window.AppNotify.error(window.AppL10n.settings.notifications.networkError); }
                 });
             });
         }

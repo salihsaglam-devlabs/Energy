@@ -2,6 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
     ViewData["Title"] = T["Organization.EmployeeSkill.Title"].Value;
+    ViewData["ScreenId"] = "Organization.EmployeeSkill";
 }
 
 <section class="energy-screen">
@@ -15,7 +16,7 @@
     <script src="~/js/organization/employee-skill/employee-skill.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"])))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Organization.EmployeeSkill.Help.Intro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.OrganizationEmployeeSkill.init("/organization/employee-skills", "employee-skill-grid", "Organization");

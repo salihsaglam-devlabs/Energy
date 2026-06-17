@@ -2,6 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
     ViewData["Title"] = T["Catalog.MaterialCategoryAttribute.Title"].Value;
+    ViewData["ScreenId"] = "Catalog.MaterialCategoryAttribute";
 }
 
 <section class="energy-screen">
@@ -15,7 +16,7 @@
     <script src="~/js/catalog/material-category-attribute/material-category-attribute.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Catalog.MaterialCategoryAttribute.Help.Intro"].Value)),
             related: [
                 @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Catalog.MaterialAttributeDefinition.Title"].Value)),
                 @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Catalog.MaterialCategory.Title"].Value))

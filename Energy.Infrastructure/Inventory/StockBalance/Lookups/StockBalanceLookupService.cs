@@ -16,17 +16,17 @@ public class StockBalanceLookupService : IStockBalanceLookupService
     public async Task<BaseResponse<IReadOnlyList<StockBalanceLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.StockBalances.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new StockBalanceLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<StockBalanceLookupResponse>)rows.Select(e => new StockBalanceLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace(e.LastRecalculatedAt.ToString("yyyy-MM-dd") + " - " + e.Quantity.ToString()) ? "Stock Balance #" + e.Id.ToString().Substring(0, 8) : (e.LastRecalculatedAt.ToString("yyyy-MM-dd") + " - " + e.Quantity.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<StockBalanceLookupResponse>>.Success(items);
     }
 }

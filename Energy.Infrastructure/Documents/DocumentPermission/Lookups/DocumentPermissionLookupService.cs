@@ -16,17 +16,17 @@ public class DocumentPermissionLookupService : IDocumentPermissionLookupService
     public async Task<BaseResponse<IReadOnlyList<DocumentPermissionLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.DocumentPermissions.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new DocumentPermissionLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<DocumentPermissionLookupResponse>)rows.Select(e => new DocumentPermissionLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace((e.AccessType ?? "")) ? "Document Permission #" + e.Id.ToString().Substring(0, 8) : ((e.AccessType ?? "")),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<DocumentPermissionLookupResponse>>.Success(items);
     }
 }

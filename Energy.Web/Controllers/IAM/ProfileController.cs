@@ -48,7 +48,9 @@ public sealed class ProfileController : Controller
         {
             try
             {
-                var envelope = await _users.GetByIdAsync(id, ct);
+                // Self-servis uç: yalnızca KENDİ kaydımızı çeker ve Profile.Read ile
+                // korunur; böylece minimum yetkili kullanıcı da 403 almadan zenginleşir.
+                var envelope = await _users.GetMineAsync(ct);
                 if (envelope.IsSuccess && envelope.Data is not null)
                 {
                     var u = envelope.Data;

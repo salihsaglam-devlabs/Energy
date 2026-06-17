@@ -9,9 +9,16 @@ public sealed class LoginViewModel
     /// <summary>
     /// Yalnızca Geliştirme ortamında gösterilen hızlı giriş hazır ayarları; böylece
     /// bilinen tohum hesapları kimlik bilgileri tekrar yazılmadan seçilebilir.
-    /// Geliştirme dışı her ortamda boştur.
+    /// Geliştirme dışı her ortamda boştur (URL parametresiyle açılması hariç).
     /// </summary>
     public IReadOnlyList<DevAccount> DevAccounts { get; init; } = Array.Empty<DevAccount>();
+
+    /// <summary>
+    /// Geliştirme dışı ortamda hızlı girişi açan URL parametresinin değeri. POST
+    /// sonrası (örn. doğrulama hatası) hızlı girişin görünür kalması için forma
+    /// gizli alan olarak geri yazılır.
+    /// </summary>
+    public string? DevLoginToken { get; init; }
 }
 
 /// <summary>Tek tıkla geliştirme girişi için sunulan, tohumlanmış bir demo hesap.</summary>

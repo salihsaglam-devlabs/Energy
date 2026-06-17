@@ -16,17 +16,17 @@ public class ExchangeRateLookupService : IExchangeRateLookupService
     public async Task<BaseResponse<IReadOnlyList<ExchangeRateLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.ExchangeRates.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new ExchangeRateLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<ExchangeRateLookupResponse>)rows.Select(e => new ExchangeRateLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace(e.RateDate.ToString("yyyy-MM-dd")) ? "Exchange Rate #" + e.Id.ToString().Substring(0, 8) : (e.RateDate.ToString("yyyy-MM-dd")),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<ExchangeRateLookupResponse>>.Success(items);
     }
 }

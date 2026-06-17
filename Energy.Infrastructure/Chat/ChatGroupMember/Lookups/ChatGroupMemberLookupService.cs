@@ -16,17 +16,17 @@ public class ChatGroupMemberLookupService : IChatGroupMemberLookupService
     public async Task<BaseResponse<IReadOnlyList<ChatGroupMemberLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.ChatGroupMembers.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new ChatGroupMemberLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<ChatGroupMemberLookupResponse>)rows.Select(e => new ChatGroupMemberLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace(e.Status.ToString()) ? "Chat Group Member #" + e.Id.ToString().Substring(0, 8) : (e.Status.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<ChatGroupMemberLookupResponse>>.Success(items);
     }
 }

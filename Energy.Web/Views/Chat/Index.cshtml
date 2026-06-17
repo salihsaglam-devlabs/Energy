@@ -12,7 +12,50 @@
         attachmentLabel = T[LocalizationKeys.ChatScreen.AttachmentLabel].Value,
         online = T[LocalizationKeys.ChatScreen.Online].Value,
         offline = T[LocalizationKeys.ChatScreen.Offline].Value,
-        typing = T[LocalizationKeys.ChatScreen.Typing].Value
+        typing = T[LocalizationKeys.ChatScreen.Typing].Value,
+        groupName = T[LocalizationKeys.ChatScreen.GroupName].Value,
+        createGroup = T[LocalizationKeys.ChatScreen.CreateGroup].Value,
+        inviteToGroup = T[LocalizationKeys.ChatScreen.InviteToGroup].Value,
+        deleteGroup = T[LocalizationKeys.ChatScreen.DeleteGroup].Value,
+        calling = T[LocalizationKeys.ChatScreen.Calling].Value,
+        voiceUnsupported = T[LocalizationKeys.ChatScreen.VoiceUnsupported].Value,
+        voiceDenied = T[LocalizationKeys.ChatScreen.VoiceDenied].Value,
+        group = T[LocalizationKeys.ChatScreen.Group].Value,
+        groupInvite = T[LocalizationKeys.ChatScreen.GroupInvite].Value,
+        newGroup = T[LocalizationKeys.ChatScreen.NewGroup].Value,
+        members = T[LocalizationKeys.ChatScreen.Members].Value,
+        addMember = T[LocalizationKeys.ChatScreen.AddMember].Value,
+        groupMembers = T[LocalizationKeys.ChatScreen.GroupMembers].Value,
+        groupNameRequired = T[LocalizationKeys.ChatScreen.GroupNameRequired].Value,
+        groupCreated = T[LocalizationKeys.ChatScreen.GroupCreated].Value,
+        groupDeleted = T[LocalizationKeys.ChatScreen.GroupDeleted].Value,
+        inviteSent = T[LocalizationKeys.ChatScreen.InviteSent].Value,
+        messageForwarded = T[LocalizationKeys.ChatScreen.MessageForwarded].Value,
+        actionReact = T[LocalizationKeys.ChatScreen.MessageActionReact].Value,
+        actionReply = T[LocalizationKeys.ChatScreen.MessageActionReply].Value,
+        actionForward = T[LocalizationKeys.ChatScreen.MessageActionForward].Value,
+        actionDelete = T[LocalizationKeys.ChatScreen.MessageActionDelete].Value,
+        confirmDeleteMessage = T[LocalizationKeys.ChatScreen.ConfirmDeleteMessage].Value,
+        confirmRemoveMember = T[LocalizationKeys.ChatScreen.ConfirmRemoveMember].Value,
+        confirmDeleteGroup = T[LocalizationKeys.ChatScreen.ConfirmDeleteGroup].Value,
+        makeAdmin = T[LocalizationKeys.ChatScreen.MakeAdmin].Value,
+        removeAdmin = T[LocalizationKeys.ChatScreen.RemoveAdmin].Value,
+        removeFromGroup = T[LocalizationKeys.ChatScreen.RemoveFromGroup].Value,
+        roleOwner = T[LocalizationKeys.ChatScreen.RoleOwner].Value,
+        roleAdmin = T[LocalizationKeys.ChatScreen.RoleAdmin].Value,
+        rolePending = T[LocalizationKeys.ChatScreen.RolePending].Value,
+        roleMember = T[LocalizationKeys.ChatScreen.RoleMember].Value,
+        forwardTitle = T[LocalizationKeys.ChatScreen.ForwardTitle].Value,
+        contacts = T[LocalizationKeys.ChatScreen.Contacts].Value,
+        groups = T[LocalizationKeys.ChatScreen.Groups].Value,
+        recentChats = T[LocalizationKeys.ChatScreen.RecentChats].Value,
+        acceptCall = T[LocalizationKeys.ChatScreen.AcceptCall].Value,
+        rejectCall = T[LocalizationKeys.ChatScreen.RejectCall].Value,
+        callConnected = T[LocalizationKeys.ChatScreen.CallConnected].Value,
+        callNeedsOnline = T[LocalizationKeys.ChatScreen.CallNeedsOnline].Value,
+        micNotAccessible = T[LocalizationKeys.ChatScreen.MicNotAccessible].Value,
+        noGroups = T[LocalizationKeys.ChatScreen.NoGroups].Value,
+        error = T[LocalizationKeys.ChatScreen.GenericError].Value
     });
 
     var fullName = User.GetFullName() ?? string.Empty;
@@ -29,7 +72,7 @@
     <div class="energy-chat__sidebar" id="chat-sidebar">
         <div class="energy-chat__sidebar-head">
             <span class="energy-chat__sidebar-title">@T[LocalizationKeys.ChatScreen.Title]</span>
-            <button type="button" class="energy-chat__icon-btn energy-chat__drawer-close" id="chat-drawer-close" aria-label="Close">
+            <button type="button" class="energy-chat__icon-btn energy-chat__drawer-close" id="chat-drawer-close" aria-label="@T[LocalizationKeys.ChatScreen.CloseSidebar]">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -38,7 +81,7 @@
                 <i class="fa-solid fa-user"></i> <span>@T[LocalizationKeys.ChatScreen.SearchContacts]</span>
             </button>
             <button type="button" class="energy-chat__tab" data-tab="groups" id="chat-tab-groups">
-                <i class="fa-solid fa-users"></i> <span>Gruplar</span>
+                <i class="fa-solid fa-users"></i> <span>@T[LocalizationKeys.ChatScreen.Groups]</span>
                 <span class="energy-chat__tab-badge" id="chat-invite-badge" hidden></span>
             </button>
         </div>
@@ -49,7 +92,7 @@
         <div class="energy-chat__pane" id="chat-pane-groups" hidden>
             <div class="energy-chat__pane-actions">
                 <button type="button" class="energy-chat__new-group" id="chat-new-group">
-                    <i class="fa-solid fa-plus"></i> <span>Yeni grup</span>
+                    <i class="fa-solid fa-plus"></i> <span>@T[LocalizationKeys.ChatScreen.NewGroup]</span>
                 </button>
             </div>
             <div id="chat-invites" class="energy-chat__invites"></div>
@@ -58,19 +101,19 @@
     </div>
     <div class="energy-chat__main">
         <div class="energy-chat__welcome" id="chat-welcome">
-            <button type="button" class="energy-chat__icon-btn energy-chat__drawer-toggle energy-chat__welcome-menu" id="chat-welcome-toggle" aria-label="Sohbetler">
+            <button type="button" class="energy-chat__icon-btn energy-chat__drawer-toggle energy-chat__welcome-menu" id="chat-welcome-toggle" aria-label="@T[LocalizationKeys.ChatScreen.ToggleChats]">
                 <i class="fa-solid fa-bars"></i>
             </button>
             <div class="energy-chat__welcome-card">
                 <div class="energy-chat__welcome-icon"><i class="fa-solid fa-comments"></i></div>
                 <h2 class="energy-chat__welcome-title">@T[LocalizationKeys.ChatScreen.Title]</h2>
-                <p class="energy-chat__welcome-text">Mesajlaşmaya başlamak için soldan bir kişi ya da grup seçin.</p>
+                <p class="energy-chat__welcome-text">@T[LocalizationKeys.ChatScreen.WelcomeMessage]</p>
                 <div class="energy-chat__welcome-recent" id="chat-welcome-recent"></div>
             </div>
         </div>
         <div class="energy-chat__window-wrap" hidden>
             <header id="chat-peer" class="energy-chat__peer">
-                <button type="button" class="energy-chat__icon-btn energy-chat__drawer-toggle" id="chat-drawer-toggle" aria-label="Contacts">
+                <button type="button" class="energy-chat__icon-btn energy-chat__drawer-toggle" id="chat-drawer-toggle" aria-label="@T[LocalizationKeys.ChatScreen.ToggleContacts]">
                     <i class="fa-solid fa-bars"></i>
                 </button>
                 <span class="energy-chat__peer-avatar"></span>
@@ -78,10 +121,10 @@
                     <span class="energy-chat__peer-name"></span>
                     <span class="energy-chat__peer-status"></span>
                 </span>
-                <button type="button" class="energy-chat__icon-btn energy-chat__call-btn" id="chat-call-btn" title="Sesli ara" aria-label="Sesli ara" hidden>
+                <button type="button" class="energy-chat__icon-btn energy-chat__call-btn" id="chat-call-btn" title="@T[LocalizationKeys.ChatScreen.VoiceCall]" aria-label="@T[LocalizationKeys.ChatScreen.VoiceCall]" hidden>
                     <i class="fa-solid fa-phone"></i>
                 </button>
-                <button type="button" class="energy-chat__icon-btn energy-chat__group-manage" id="chat-group-manage" title="Üyeler" aria-label="Üyeler" hidden>
+                <button type="button" class="energy-chat__icon-btn energy-chat__group-manage" id="chat-group-manage" title="@T[LocalizationKeys.ChatScreen.Members]" aria-label="@T[LocalizationKeys.ChatScreen.Members]" hidden>
                     <i class="fa-solid fa-user-plus"></i>
                 </button>
             </header>
@@ -91,7 +134,7 @@
                     <span class="energy-chat__reply-bar-sender" id="chat-reply-sender"></span>
                     <span class="energy-chat__reply-bar-text" id="chat-reply-text"></span>
                 </div>
-                <button type="button" class="energy-chat__icon-btn" id="chat-reply-cancel" title="İptal" aria-label="İptal">
+                <button type="button" class="energy-chat__icon-btn" id="chat-reply-cancel" title="@T[LocalizationKeys.ChatScreen.CancelLabel]" aria-label="@T[LocalizationKeys.ChatScreen.CancelLabel]">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -100,7 +143,7 @@
                     <button type="button" id="chat-attach-btn" class="energy-chat__icon-btn" title="@T[LocalizationKeys.ChatScreen.AttachFile]" aria-label="@T[LocalizationKeys.ChatScreen.AttachFile]">
                         <i class="fa-solid fa-paperclip"></i>
                     </button>
-                    <button type="button" id="chat-voice-btn" class="energy-chat__icon-btn" title="Sesli mesaj" aria-label="Sesli mesaj">
+                    <button type="button" id="chat-voice-btn" class="energy-chat__icon-btn" title="@T[LocalizationKeys.ChatScreen.VoiceMessage]" aria-label="@T[LocalizationKeys.ChatScreen.VoiceMessage]">
                         <i class="fa-solid fa-microphone"></i>
                     </button>
                 </div>
@@ -109,10 +152,10 @@
                     <span class="energy-chat__recorder-dot"></span>
                     <span class="energy-chat__recorder-time" id="chat-recorder-time">0:00</span>
                     <span class="energy-chat__recorder-spacer"></span>
-                    <button type="button" id="chat-rec-cancel" class="energy-chat__icon-btn is-danger" title="İptal" aria-label="İptal">
+                    <button type="button" id="chat-rec-cancel" class="energy-chat__icon-btn is-danger" title="@T[LocalizationKeys.ChatScreen.CancelLabel]" aria-label="@T[LocalizationKeys.ChatScreen.CancelLabel]">
                         <i class="fa-solid fa-trash"></i>
                     </button>
-                    <button type="button" id="chat-rec-send" class="energy-chat__icon-btn is-primary" title="Gönder" aria-label="Gönder">
+                    <button type="button" id="chat-rec-send" class="energy-chat__icon-btn is-primary" title="@T[LocalizationKeys.ChatScreen.SendVoice]" aria-label="@T[LocalizationKeys.ChatScreen.SendVoice]">
                         <i class="fa-solid fa-paper-plane"></i>
                     </button>
                 </div>
@@ -128,7 +171,7 @@
         <div class="energy-chat__call-card">
             <div class="energy-chat__call-avatar" id="chat-call-avatar"></div>
             <div class="energy-chat__call-name" id="chat-call-name"></div>
-            <div class="energy-chat__call-state" id="chat-call-state">Aranıyor…</div>
+            <div class="energy-chat__call-state" id="chat-call-state">@T[LocalizationKeys.ChatScreen.Calling]</div>
             <div class="energy-chat__call-actions">
                 <button type="button" class="energy-chat__call-btn-accept" id="chat-call-accept" hidden>
                     <i class="fa-solid fa-phone"></i>
@@ -146,7 +189,7 @@
     <script src="~/js/chat/chat.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Help.IntroGeneric"].Value))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["ChatScreen.HelpIntro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.Chat.init();

@@ -2,6 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
     ViewData["Title"] = T["Workflow.Processes.Approval.Title"].Value;
+    ViewData["ScreenId"] = "Workflow.Processes.Approval";
 }
 
 <link rel="stylesheet" href="~/css/workflow/processes/approval/approval.css" asp-append-version="true" />

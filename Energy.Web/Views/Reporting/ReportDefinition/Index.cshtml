@@ -2,6 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
     ViewData["Title"] = T["Reporting.ReportDefinition.Title"].Value;
+    ViewData["ScreenId"] = "Reporting.ReportDefinition";
 }
 
 <section class="energy-screen">
@@ -15,7 +16,7 @@
     <script src="~/js/reporting/report-definition/report-definition.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"])))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Reporting.ReportDefinition.Help.Intro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.ReportingReportDefinition.init("/reporting/report-definitions", "report-definition-grid", "Reporting");

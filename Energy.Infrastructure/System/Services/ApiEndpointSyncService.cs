@@ -39,6 +39,9 @@ public sealed class ApiEndpointSyncService
             // Kullanıcılar
             ["Users.GetAll"]         = PermissionCatalog.UserReadAll,
             ["Users.GetById"]        = PermissionCatalog.UserRead,
+            // Self-servis: kullanıcı yalnızca KENDİ profilini okur (kimlik bağlamdan gelir),
+            // bu yüzden Profil ekranının varsayılan yetkisi (ProfileRead) yeterlidir.
+            ["Users.GetMine"]        = PermissionCatalog.ProfileRead,
             ["Users.Create"]         = PermissionCatalog.UserCreate,
             ["Users.Update"]         = PermissionCatalog.UserUpdate,
             ["Users.Delete"]         = PermissionCatalog.UserDelete,

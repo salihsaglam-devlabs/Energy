@@ -2,6 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
     ViewData["Title"] = T["FieldOperations.DailySiteReportMaterial.Title"].Value;
+    ViewData["ScreenId"] = "FieldOperations.DailySiteReportMaterial";
 }
 
 <section class="energy-screen">
@@ -15,7 +16,7 @@
     <script src="~/js/field-operations/daily-site-report-material/daily-site-report-material.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["FieldOperations.DailySiteReportMaterial.Help.Intro"].Value)),
             related: [
                 @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["FieldOperations.DailySiteReport.Title"].Value)),
                 @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Catalog.Material.Title"].Value))

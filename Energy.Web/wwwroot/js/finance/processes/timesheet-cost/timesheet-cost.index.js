@@ -28,6 +28,7 @@
     }
 
     function init(base, opts) {
+        var LP = function () { return (window.AppScreenL10n && window.AppScreenL10n.process) || {}; };
         var notify = window.AppNotify || { success: function () {}, error: function () {} };
         var data = {};
 
@@ -36,8 +37,8 @@
             labelLocation: "top",
             colCount: 2,
             items: [
-                $.extend({ dataField: "timesheetId", label: { text: "Timesheet" } }, selectBox("/hr/timesheets/lookup")),
-                $.extend({ dataField: "currencyId", label: { text: "Currency" } }, selectBox("/core/currencies/lookup")),
+                $.extend({ dataField: "timesheetId" }, selectBox("/hr/timesheets/lookup")),
+                $.extend({ dataField: "currencyId" }, selectBox("/core/currencies/lookup")),
                 {
                     itemType: "button",
                     horizontalAlignment: "left",
@@ -50,13 +51,13 @@
                                 .then(function (r) {
                                     if (r && r.isSuccess) {
                                         notify.success(opts.success);
-                                        $("#" + opts.resultId).text("Transaction: " + (r.data ? r.data.financialTransactionId : ""));
+                                        $("#" + opts.resultId).text((LP().resultTransaction || "Transaction") + ": " + (r.data ? r.data.financialTransactionId : ""));
                                         form.resetValues();
                                     } else {
-                                        notify.error((r && r.message) || "Error");
+                                        notify.error((r && r.message) || LP().genericError || "Error");
                                     }
                                 })
-                                .catch(function () { notify.error("Error"); });
+                                .catch(function () { notify.error(LP().genericError || "Error"); });
                         }
                     }
                 }

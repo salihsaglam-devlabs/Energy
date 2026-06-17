@@ -2,6 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
     ViewData["Title"] = T["Catalog.MaterialAttributeDefinition.Title"].Value;
+    ViewData["ScreenId"] = "Catalog.MaterialAttributeDefinition";
 }
 
 <section class="energy-screen">
@@ -15,7 +16,7 @@
     <script src="~/js/catalog/material-attribute-definition/material-attribute-definition.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"])))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Catalog.MaterialAttributeDefinition.Help.Intro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.CatalogMaterialAttributeDefinition.init("/catalog/material-attribute-definitions", "material-attribute-definition-grid", "Catalog");

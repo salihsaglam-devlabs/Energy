@@ -2,6 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
     ViewData["Title"] = T["Projects.ProjectType.Title"].Value;
+    ViewData["ScreenId"] = "Projects.ProjectType";
 }
 
 <section class="energy-screen">
@@ -15,7 +16,7 @@
     <script src="~/js/projects/project-type/project-type.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"])))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["Projects.ProjectType.Help.Intro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppPages.ProjectsProjectType.init("/projects/project-types", "project-type-grid", "Projects");

@@ -2,6 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
     ViewData["Title"] = T["ProgressPayments.Reports.ProgressPaymentSummary.Title"].Value;
+    ViewData["ScreenId"] = "ProgressPayments.Reports.ProgressPaymentSummary";
 }
 
 <link rel="stylesheet" href="~/css/progress-payments/reports/progress-payment-summary/progress-payment-summary.css" asp-append-version="true" />
@@ -18,7 +19,7 @@
     <script src="~/js/progress-payments/reports/progress-payment-summary/progress-payment-summary.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroReport"].Value, ViewData["Title"])))
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["ProgressPayments.Reports.ProgressPaymentSummary.Help.Intro"].Value))
         };
         document.addEventListener("DOMContentLoaded", function () {
             window.AppReports.ProgressPaymentsProgressPaymentSummary.init("/progress-payments/reports/progress-payment-summary", "progress-payment-summary-grid", "progress-payment-summary-filters", { hasStatus: true });

@@ -395,14 +395,15 @@ public sealed partial class SystemSeeder : ISystemSeeder
         // NameKey anahtarıyla düğüm bazlı idempotent upsert. Yeni eklenen ekranlar
         // (ör. Profil), yönetici düzenlemelerini silmeden veya mevcut ağacı yeniden
         // sıralamadan sonraki bir çalıştırmada eklenir.
-        var system = await EnsureMenuAsync(LocalizationKeys.Menus.System, null, null, "preferences", 10, null, ct);
+        var system = await EnsureMenuAsync(LocalizationKeys.Menus.System, null, null, "preferences", 90, null, ct);
 
         // Kimliği doğrulanmış her kullanıcının eriştiği kullanıcı bazlı sayfalar
         // (yetkiler DefaultGrants kümesinin parçasıdır; böylece menü her zaman görünür).
+        // Pano en üstte; kişisel öğeler (Profil, Ayarlar) menünün en altında konumlanır.
         await EnsureMenuAsync(LocalizationKeys.Menus.Dashboard, null, "/dashboard", "home", 1, PermissionCatalog.DashboardRead, ct);
-        await EnsureMenuAsync(LocalizationKeys.Menus.Profile, null, "/profile", "user", 2, PermissionCatalog.ProfileRead, ct);
-        await EnsureMenuAsync(LocalizationKeys.Menus.Chat, null, "/chat", "chat", 3, PermissionCatalog.ChatUse, ct);
-        await EnsureMenuAsync(LocalizationKeys.Menus.Settings, null, "/settings", "preferences", 4, PermissionCatalog.UserSettingsRead, ct);
+        await EnsureMenuAsync(LocalizationKeys.Menus.Chat, null, "/chat", "chat", 2, PermissionCatalog.ChatUse, ct);
+        await EnsureMenuAsync(LocalizationKeys.Menus.Profile, null, "/profile", "user", 9998, PermissionCatalog.ProfileRead, ct);
+        await EnsureMenuAsync(LocalizationKeys.Menus.Settings, null, "/settings", "preferences", 9999, PermissionCatalog.UserSettingsRead, ct);
 
         // Sistem yönetimi alt menüsü — referans projenin hiyerarşisini yansıtır
         // (her yönetici ekranı için bir girdi); her biri ilgili sayfanın/uç noktanın
@@ -1025,6 +1026,9 @@ public sealed partial class SystemSeeder : ISystemSeeder
         _logger.LogInformation("Seeding: per-process module menus");
         await EnsureProcessMenusAsync(ct);
 
+        _logger.LogInformation("Seeding: pruning obsolete menu nodes");
+        await EnsureObsoleteMenusRemovedAsync(ct);
+
         _logger.LogInformation("Seeding: dashboard widgets");
         await EnsureDashboardWidgetsAsync(ct);
 
@@ -1383,7 +1387,11 @@ public sealed partial class SystemSeeder : ISystemSeeder
 
     private async Task EnsureModuleMenusAsync(CancellationToken ct)
     {
-        // Alan bazlı üst menüler + modül girdileri. Her modül kendi <Module>.ReadAll yetkisiyle korunur.
+        // Kurumsal bilgi mimarisi: işlevsel alanlar (L1) -> modüller (L2) -> ekranlar (L3).
+        // Her alan benzersiz ve açık bir ada sahiptir (alan ile modül adları çakışmaz);
+        // ana/referans veriler kendi alanında öne çıkar, "Genel" çöp menüsü kaldırılmıştır.
+
+        // 1) Proje ve Saha Yönetimi
         var projects = await EnsureMenuAsync("Menus.ProjectsArea", null, null, "hierarchy", 20, null, ct);
         await EnsureMenuAsync("Menus.Projects", projects.Id, null, "box", 21, "Projects.ReadAll", ct);
         await EnsureMenuAsync("Menus.Operations", projects.Id, null, "preferences", 22, "Operations.ReadAll", ct);
@@ -1391,28 +1399,135 @@ public sealed partial class SystemSeeder : ISystemSeeder
         await EnsureMenuAsync("Menus.Contracts", projects.Id, null, "doc", 24, "Contracts.ReadAll", ct);
         await EnsureMenuAsync("Menus.ProgressPayments", projects.Id, null, "money", 25, "ProgressPayments.ReadAll", ct);
 
+        // 2) Tedarik ve Stok Yönetimi
         var supply = await EnsureMenuAsync("Menus.SupplyArea", null, null, "cart", 30, null, ct);
         await EnsureMenuAsync("Menus.Catalog", supply.Id, null, "detailslayout", 31, "Catalog.ReadAll", ct);
         await EnsureMenuAsync("Menus.Inventory", supply.Id, null, "box", 32, "Inventory.ReadAll", ct);
         await EnsureMenuAsync("Menus.Requests", supply.Id, null, "newfolder", 33, "Requests.ReadAll", ct);
         await EnsureMenuAsync("Menus.Procurement", supply.Id, null, "cart", 34, "Procurement.ReadAll", ct);
 
+        // 3) Finans ve Bütçe
         var finance = await EnsureMenuAsync("Menus.FinanceArea", null, null, "money", 40, null, ct);
         await EnsureMenuAsync("Menus.Finance", finance.Id, null, "money", 41, "Finance.ReadAll", ct);
         await EnsureMenuAsync("Menus.Budget", finance.Id, null, "chart", 42, "Budget.ReadAll", ct);
 
+        // 4) İnsan Kaynakları
         var hr = await EnsureMenuAsync("Menus.HRArea", null, null, "group", 50, null, ct);
         await EnsureMenuAsync("Menus.Organization", hr.Id, null, "group", 51, "Organization.ReadAll", ct);
         await EnsureMenuAsync("Menus.HR", hr.Id, null, "clock", 52, "HR.ReadAll", ct);
-        await EnsureMenuAsync("Menus.Assets", hr.Id, null, "car", 53, "Assets.ReadAll", ct);
 
-        var common = await EnsureMenuAsync("Menus.CommonArea", null, null, "more", 60, null, ct);
-        await EnsureMenuAsync("Menus.BusinessPartners", common.Id, null, "card", 61, "BusinessPartners.ReadAll", ct);
-        await EnsureMenuAsync("Menus.Documents", common.Id, null, "doc", 62, "Documents.ReadAll", ct);
-        await EnsureMenuAsync("Menus.Workflow", common.Id, null, "check", 63, "Workflow.ReadAll", ct);
-        await EnsureMenuAsync("Menus.Notifications", common.Id, null, "bell", 64, "Notifications.ReadAll", ct);
-        await EnsureMenuAsync("Menus.Reporting", common.Id, null, "chart", 65, "Reporting.ReadAll", ct);
-        await EnsureMenuAsync("Menus.CoreData", common.Id, null, "preferences", 66, "Core.ReadAll", ct);
+        // 5) İş Ortakları ve Dokümanlar (eski "Genel" alanından ayrıştırıldı)
+        var partners = await EnsureMenuAsync("Menus.PartnersArea", null, null, "card", 60, null, ct);
+        await EnsureMenuAsync("Menus.BusinessPartners", partners.Id, null, "card", 61, "BusinessPartners.ReadAll", ct);
+        await EnsureMenuAsync("Menus.Documents", partners.Id, null, "doc", 62, "Documents.ReadAll", ct);
+
+        // 6) İş Akışı ve Bildirimler
+        var flow = await EnsureMenuAsync("Menus.WorkflowArea", null, null, "check", 70, null, ct);
+        await EnsureMenuAsync("Menus.Workflow", flow.Id, null, "check", 71, "Workflow.ReadAll", ct);
+        await EnsureMenuAsync("Menus.Notifications", flow.Id, null, "bell", 72, "Notifications.ReadAll", ct);
+
+        // 7) Tanımlar ve Ana Veri (referans veriler artık kendi alanında öne çıkar)
+        var masterData = await EnsureMenuAsync("Menus.MasterDataArea", null, null, "preferences", 80, null, ct);
+        await EnsureMenuAsync("Menus.CoreData", masterData.Id, null, "preferences", 81, "Core.ReadAll", ct);
+        await EnsureMenuAsync("Menus.Reporting", masterData.Id, null, "chart", 82, "Reporting.ReadAll", ct);
+    }
+
+    /// <summary>
+    /// Menü mimarisi yeniden tasarımıyla artık kullanılmayan düğümleri kaldırır.
+    /// Modül menüleri yeni alanlara yeniden bağlandıktan SONRA çalıştırılır; böylece
+    /// eski "Genel" (CommonArea) alanı çocuksuz kalır ve güvenle silinebilir. Aynı
+    /// işlevi başka bir grup altında zaten karşılanan çift ekran menüleri de kaldırılır.
+    /// </summary>
+    private async Task EnsureObsoleteMenusRemovedAsync(CancellationToken ct)
+    {
+        // Eski toplayıcı alan (modülleri artık İş Ortakları / İş Akışı / Ana Veri
+        // alanlarına dağıtıldı) ve Sistem Yönetimi'ndeki özel ekranlarla birleştirilen
+        // çift kayıtlar (çeviri + denetim günlüğü generic CRUD menüleri).
+        var obsolete = new[]
+        {
+            "Menus.CommonArea",
+            "Menus.Core.LocalizationResource",
+            "Menus.Core.AuditLog",
+        };
+
+        var nodes = await _db.Menus
+            .Where(m => obsolete.Contains(m.NameKey))
+            .ToListAsync(ct);
+
+        if (nodes.Count == 0)
+        {
+            return;
+        }
+
+        // Güvenlik: yanlışlıkla hâlâ çocuğu olan bir düğümü silme — önce çocukları
+        // bilinen yeni ebeveyne taşınmış olmalıdır. Çocuğu kalanları atla.
+        var removable = new List<Menu>();
+        foreach (var node in nodes)
+        {
+            var hasChildren = await _db.Menus.AnyAsync(m => m.ParentId == node.Id, ct);
+            if (!hasChildren)
+            {
+                removable.Add(node);
+            }
+        }
+
+        if (removable.Count > 0)
+        {
+            _db.Menus.RemoveRange(removable);
+            await _db.SaveChangesAsync(ct);
+        }
+
+        _logger.LogInformation("Seeding: {Count} obsolete menu node(s) removed.", removable.Count);
+
+        // MUTABAKAT — küratörlü navigasyona geçişte artık menüde yer almayan eski
+        // per-entity (satır/detay/junction/versiyon/geçmiş) ekranlarını mevcut
+        // veritabanlarından temizler. Yalnızca tam üç parçalı "Menus.<Modül>.<Entity>"
+        // anahtarına sahip yaprak düğümler hedeflenir; süreç/rapor menüleri ("...Processes/Reports...")
+        // dört parçalı olduğundan ve alan/modül kapsayıcıları iki parçalı olduğundan etkilenmez.
+        // Küratörlü listede bulunmayan ve çocuğu olmayan düğümler güvenle kaldırılır.
+        var desiredLeafKeys = ModuleEntityMenus.Select(m => m.NameKey)
+            .Concat(ModuleProcessMenus.Select(m => m.NameKey))
+            .Concat(ModuleReportMenus.Select(m => m.NameKey))
+            .ToHashSet(StringComparer.Ordinal);
+
+        var candidateLeaves = await _db.Menus
+            .Where(m => m.NameKey.StartsWith("Menus."))
+            .ToListAsync(ct);
+
+        var staleEntityMenus = new List<Menu>();
+        foreach (var node in candidateLeaves)
+        {
+            // "Veri Yönetimi" kırılımı (Menus.DataAdmin.*) ayrı kurallarla yönetilir;
+            // 3 parçalı modül kapsayıcıları (Menus.DataAdmin.<Module>) yanlışlıkla
+            // silinmesin diye mutabakatın tamamen dışında tutulur.
+            if (node.NameKey.StartsWith("Menus.DataAdmin", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            // Tam üç parça (Menus.Modül.Entity) ⇒ per-entity yaprağı.
+            if (node.NameKey.Count(c => c == '.') != 2)
+            {
+                continue;
+            }
+            if (desiredLeafKeys.Contains(node.NameKey))
+            {
+                continue;
+            }
+            if (await _db.Menus.AnyAsync(m => m.ParentId == node.Id, ct))
+            {
+                continue;
+            }
+            staleEntityMenus.Add(node);
+        }
+
+        if (staleEntityMenus.Count > 0)
+        {
+            _db.Menus.RemoveRange(staleEntityMenus);
+            await _db.SaveChangesAsync(ct);
+        }
+
+        _logger.LogInformation("Seeding: {Count} stale per-entity menu(s) reconciled (removed).", staleEntityMenus.Count);
     }
 
     private async Task EnsureDashboardWidgetsAsync(CancellationToken ct)
@@ -1539,9 +1654,21 @@ public sealed partial class SystemSeeder : ISystemSeeder
 
     #region 03 | MENULER | Entity (modul basina ekran menuleri)
 
-    /// <summary>(Module, ParentMenuNameKey, Entity, Route, NameKey, Order)</summary>
+    /// <summary>
+    /// (Module, ParentMenuNameKey, Entity, Route, NameKey, Order)
+    ///
+    /// KÜRATÖRLÜ NAVİGASYON İLKESİ: Menüde YALNIZCA gezilebilir iş ekranları yer alır
+    /// (aggregate root / ana veri + ana işlem belgeleri). Satır/detay, bağlantı (junction),
+    /// versiyon, geçmiş (history), dağıtım (allocation), adım/onaylayan (step/approver) gibi
+    /// alt tablolar menüye AYRI öğe olarak eklenmez; bunlar daima ait oldukları üst ekran
+    /// içinde yönetilir. Böylece menü, "her link yaptığı işe göre" doğru gruplanmış,
+    /// derli toplu ve profesyonel kalır. Listede olmayan eski per-entity menüleri,
+    /// mevcut veritabanlarından <see cref="EnsureObsoleteMenusRemovedAsync"/> içindeki
+    /// mutabakat adımıyla otomatik temizlenir.
+    /// </summary>
     private static readonly (string Module, string ParentKey, string Entity, string Route, string NameKey, int Order)[] ModuleEntityMenus =
     [
+        // — Temel Tanımlar / Ana Veri —
         ("Core", "Menus.CoreData", "Company", "/core/companies", "Menus.Core.Company", 1),
         ("Core", "Menus.CoreData", "Branch", "/core/branches", "Menus.Core.Branch", 2),
         ("Core", "Menus.CoreData", "Department", "/core/departments", "Menus.Core.Department", 3),
@@ -1551,116 +1678,104 @@ public sealed partial class SystemSeeder : ISystemSeeder
         ("Core", "Menus.CoreData", "UnitConversion", "/core/unit-conversions", "Menus.Core.UnitConversion", 7),
         ("Core", "Menus.CoreData", "SequenceDefinition", "/core/sequence-definitions", "Menus.Core.SequenceDefinition", 8),
         ("Core", "Menus.CoreData", "SystemSetting", "/core/system-settings", "Menus.Core.SystemSetting", 9),
-        ("Core", "Menus.CoreData", "LocalizationResource", "/core/localization-resources", "Menus.Core.LocalizationResource", 10),
-        ("Core", "Menus.CoreData", "AuditLog", "/core/audit-logs", "Menus.Core.AuditLog", 11),
+        // NOT: Çeviri (LocalizationResource) ve Denetim Günlüğü (AuditLog) ekranları
+        // burada YER ALMAZ; aynı işlevsel alan Sistem Yönetimi altındaki özel
+        // "Çeviri Yönetimi" (/localization) ve "Sistem Günlükleri" (/logs)
+        // ekranlarıyla tek bir mantıksal grupta toplanmıştır (çift kayıt giderildi).
+
+        // — Organizasyon ve Personel — (beceri ataması ve masraf satırı üst ekranda yönetilir)
         ("Organization", "Menus.Organization", "Employee", "/organization/employees", "Menus.Organization.Employee", 1),
         ("Organization", "Menus.Organization", "EmployeePosition", "/organization/employee-positions", "Menus.Organization.EmployeePosition", 2),
         ("Organization", "Menus.Organization", "EmployeeSkill", "/organization/employee-skills", "Menus.Organization.EmployeeSkill", 3),
-        ("Organization", "Menus.Organization", "EmployeeSkillAssignment", "/organization/employee-skill-assignments", "Menus.Organization.EmployeeSkillAssignment", 4),
-        ("Organization", "Menus.Organization", "LeaveRequest", "/organization/leave-requests", "Menus.Organization.LeaveRequest", 5),
-        ("Organization", "Menus.Organization", "ExpenseClaim", "/organization/expense-claims", "Menus.Organization.ExpenseClaim", 6),
-        ("Organization", "Menus.Organization", "ExpenseClaimLine", "/organization/expense-claim-lines", "Menus.Organization.ExpenseClaimLine", 7),
+        ("Organization", "Menus.Organization", "LeaveRequest", "/organization/leave-requests", "Menus.Organization.LeaveRequest", 4),
+        ("Organization", "Menus.Organization", "ExpenseClaim", "/organization/expense-claims", "Menus.Organization.ExpenseClaim", 5),
+
+        // — İş Ortakları — (kişi/adres/banka hesabı cari kartı içinde yönetilir)
         ("BusinessPartners", "Menus.BusinessPartners", "BusinessPartner", "/business-partners/business-partners", "Menus.BusinessPartners.BusinessPartner", 1),
-        ("BusinessPartners", "Menus.BusinessPartners", "BusinessPartnerContact", "/business-partners/business-partner-contacts", "Menus.BusinessPartners.BusinessPartnerContact", 2),
-        ("BusinessPartners", "Menus.BusinessPartners", "BusinessPartnerAddress", "/business-partners/business-partner-addresses", "Menus.BusinessPartners.BusinessPartnerAddress", 3),
-        ("BusinessPartners", "Menus.BusinessPartners", "BusinessPartnerBankAccount", "/business-partners/business-partner-bank-accounts", "Menus.BusinessPartners.BusinessPartnerBankAccount", 4),
+
+        // — Projeler — (faz/üye/not proje ekranı içinde yönetilir)
         ("Projects", "Menus.Projects", "Project", "/projects/projects", "Menus.Projects.Project", 1),
         ("Projects", "Menus.Projects", "ProjectType", "/projects/project-types", "Menus.Projects.ProjectType", 2),
         ("Projects", "Menus.Projects", "ProjectStatus", "/projects/project-statuses", "Menus.Projects.ProjectStatus", 3),
         ("Projects", "Menus.Projects", "ProjectLocation", "/projects/project-locations", "Menus.Projects.ProjectLocation", 4),
-        ("Projects", "Menus.Projects", "ProjectPhas", "/projects/project-phases", "Menus.Projects.ProjectPhas", 5),
-        ("Projects", "Menus.Projects", "ProjectMember", "/projects/project-members", "Menus.Projects.ProjectMember", 6),
-        ("Projects", "Menus.Projects", "ProjectNote", "/projects/project-notes", "Menus.Projects.ProjectNote", 7),
+
+        // — Malzeme Kataloğu — (öznitelik seçenek/değer/eşleme tanım ekranı içinde yönetilir)
         ("Catalog", "Menus.Catalog", "Brand", "/catalog/brands", "Menus.Catalog.Brand", 1),
         ("Catalog", "Menus.Catalog", "MaterialCategory", "/catalog/material-categories", "Menus.Catalog.MaterialCategory", 2),
         ("Catalog", "Menus.Catalog", "MaterialAttributeDefinition", "/catalog/material-attribute-definitions", "Menus.Catalog.MaterialAttributeDefinition", 3),
-        ("Catalog", "Menus.Catalog", "MaterialAttributeOption", "/catalog/material-attribute-options", "Menus.Catalog.MaterialAttributeOption", 4),
-        ("Catalog", "Menus.Catalog", "MaterialCategoryAttribute", "/catalog/material-category-attributes", "Menus.Catalog.MaterialCategoryAttribute", 5),
-        ("Catalog", "Menus.Catalog", "Material", "/catalog/materials", "Menus.Catalog.Material", 6),
-        ("Catalog", "Menus.Catalog", "MaterialAttributeValue", "/catalog/material-attribute-values", "Menus.Catalog.MaterialAttributeValue", 7),
-        ("Catalog", "Menus.Catalog", "MaterialUnitConversion", "/catalog/material-unit-conversions", "Menus.Catalog.MaterialUnitConversion", 8),
+        ("Catalog", "Menus.Catalog", "Material", "/catalog/materials", "Menus.Catalog.Material", 4),
+
+        // — Stok ve Depo — (belge/sayım/transfer satırları ve dağıtımlar belge ekranında yönetilir)
         ("Inventory", "Menus.Inventory", "Warehouse", "/inventory/warehouses", "Menus.Inventory.Warehouse", 1),
         ("Inventory", "Menus.Inventory", "WarehouseLocation", "/inventory/warehouse-locations", "Menus.Inventory.WarehouseLocation", 2),
         ("Inventory", "Menus.Inventory", "StockDocumentType", "/inventory/stock-document-types", "Menus.Inventory.StockDocumentType", 3),
         ("Inventory", "Menus.Inventory", "StockDocument", "/inventory/stock-documents", "Menus.Inventory.StockDocument", 4),
-        ("Inventory", "Menus.Inventory", "StockDocumentLine", "/inventory/stock-document-lines", "Menus.Inventory.StockDocumentLine", 5),
-        ("Inventory", "Menus.Inventory", "StockLot", "/inventory/stock-lots", "Menus.Inventory.StockLot", 6),
-        ("Inventory", "Menus.Inventory", "StockIssueAllocation", "/inventory/stock-issue-allocations", "Menus.Inventory.StockIssueAllocation", 7),
-        ("Inventory", "Menus.Inventory", "StockTransaction", "/inventory/stock-transactions", "Menus.Inventory.StockTransaction", 8),
-        ("Inventory", "Menus.Inventory", "StockBalance", "/inventory/stock-balances", "Menus.Inventory.StockBalance", 9),
-        ("Inventory", "Menus.Inventory", "StockReservation", "/inventory/stock-reservations", "Menus.Inventory.StockReservation", 10),
-        ("Inventory", "Menus.Inventory", "StockCount", "/inventory/stock-counts", "Menus.Inventory.StockCount", 11),
-        ("Inventory", "Menus.Inventory", "StockCountLine", "/inventory/stock-count-lines", "Menus.Inventory.StockCountLine", 12),
-        ("Inventory", "Menus.Inventory", "WarehouseTransfer", "/inventory/warehouse-transfers", "Menus.Inventory.WarehouseTransfer", 13),
-        ("Inventory", "Menus.Inventory", "WarehouseTransferLine", "/inventory/warehouse-transfer-lines", "Menus.Inventory.WarehouseTransferLine", 14),
+        ("Inventory", "Menus.Inventory", "StockLot", "/inventory/stock-lots", "Menus.Inventory.StockLot", 5),
+        ("Inventory", "Menus.Inventory", "StockTransaction", "/inventory/stock-transactions", "Menus.Inventory.StockTransaction", 6),
+        ("Inventory", "Menus.Inventory", "StockBalance", "/inventory/stock-balances", "Menus.Inventory.StockBalance", 7),
+        ("Inventory", "Menus.Inventory", "StockReservation", "/inventory/stock-reservations", "Menus.Inventory.StockReservation", 8),
+        ("Inventory", "Menus.Inventory", "StockCount", "/inventory/stock-counts", "Menus.Inventory.StockCount", 9),
+        ("Inventory", "Menus.Inventory", "WarehouseTransfer", "/inventory/warehouse-transfers", "Menus.Inventory.WarehouseTransfer", 10),
+
+        // — Talepler — (talep satırı talep ekranında yönetilir)
         ("Requests", "Menus.Requests", "RequestType", "/requests/request-types", "Menus.Requests.RequestType", 1),
         ("Requests", "Menus.Requests", "Request", "/requests/requests", "Menus.Requests.Request", 2),
-        ("Requests", "Menus.Requests", "RequestLine", "/requests/request-lines", "Menus.Requests.RequestLine", 3),
+
+        // — Satınalma — (belge satırları üst belge ekranında yönetilir)
         ("Procurement", "Menus.Procurement", "SupplierQuote", "/procurement/supplier-quotes", "Menus.Procurement.SupplierQuote", 1),
-        ("Procurement", "Menus.Procurement", "SupplierQuoteLine", "/procurement/supplier-quote-lines", "Menus.Procurement.SupplierQuoteLine", 2),
-        ("Procurement", "Menus.Procurement", "PurchaseOrder", "/procurement/purchase-orders", "Menus.Procurement.PurchaseOrder", 3),
-        ("Procurement", "Menus.Procurement", "PurchaseOrderLine", "/procurement/purchase-order-lines", "Menus.Procurement.PurchaseOrderLine", 4),
-        ("Procurement", "Menus.Procurement", "PurchaseReceipt", "/procurement/purchase-receipts", "Menus.Procurement.PurchaseReceipt", 5),
-        ("Procurement", "Menus.Procurement", "PurchaseReceiptLine", "/procurement/purchase-receipt-lines", "Menus.Procurement.PurchaseReceiptLine", 6),
-        ("Procurement", "Menus.Procurement", "SupplierInvoice", "/procurement/supplier-invoices", "Menus.Procurement.SupplierInvoice", 7),
-        ("Procurement", "Menus.Procurement", "SupplierInvoiceLine", "/procurement/supplier-invoice-lines", "Menus.Procurement.SupplierInvoiceLine", 8),
+        ("Procurement", "Menus.Procurement", "PurchaseOrder", "/procurement/purchase-orders", "Menus.Procurement.PurchaseOrder", 2),
+        ("Procurement", "Menus.Procurement", "PurchaseReceipt", "/procurement/purchase-receipts", "Menus.Procurement.PurchaseReceipt", 3),
+        ("Procurement", "Menus.Procurement", "SupplierInvoice", "/procurement/supplier-invoices", "Menus.Procurement.SupplierInvoice", 4),
+
+        // — İş Emirleri — (atama/malzeme/çeklist/geçmiş iş emri ekranında yönetilir)
         ("Operations", "Menus.Operations", "WorkOrderType", "/operations/work-order-types", "Menus.Operations.WorkOrderType", 1),
         ("Operations", "Menus.Operations", "WorkOrder", "/operations/work-orders", "Menus.Operations.WorkOrder", 2),
-        ("Operations", "Menus.Operations", "WorkOrderAssignment", "/operations/work-order-assignments", "Menus.Operations.WorkOrderAssignment", 3),
-        ("Operations", "Menus.Operations", "WorkOrderMaterialPlan", "/operations/work-order-material-plans", "Menus.Operations.WorkOrderMaterialPlan", 4),
-        ("Operations", "Menus.Operations", "WorkOrderMaterialUsage", "/operations/work-order-material-usages", "Menus.Operations.WorkOrderMaterialUsage", 5),
-        ("Operations", "Menus.Operations", "WorkOrderChecklist", "/operations/work-order-checklists", "Menus.Operations.WorkOrderChecklist", 6),
-        ("Operations", "Menus.Operations", "WorkOrderChecklistItem", "/operations/work-order-checklist-items", "Menus.Operations.WorkOrderChecklistItem", 7),
-        ("Operations", "Menus.Operations", "WorkOrderStatusHistory", "/operations/work-order-status-histories", "Menus.Operations.WorkOrderStatusHistory", 8),
+
+        // — Saha Operasyonları — (işçi/ekipman/malzeme/ölçüm satırı üst rapora bağlı)
         ("FieldOperations", "Menus.FieldOperations", "DailySiteReport", "/field-operations/daily-site-reports", "Menus.FieldOperations.DailySiteReport", 1),
-        ("FieldOperations", "Menus.FieldOperations", "DailySiteReportWorker", "/field-operations/daily-site-report-workers", "Menus.FieldOperations.DailySiteReportWorker", 2),
-        ("FieldOperations", "Menus.FieldOperations", "DailySiteReportEquipment", "/field-operations/daily-site-report-equipments", "Menus.FieldOperations.DailySiteReportEquipment", 3),
-        ("FieldOperations", "Menus.FieldOperations", "DailySiteReportMaterial", "/field-operations/daily-site-report-materials", "Menus.FieldOperations.DailySiteReportMaterial", 4),
-        ("FieldOperations", "Menus.FieldOperations", "ProgressEntry", "/field-operations/progress-entries", "Menus.FieldOperations.ProgressEntry", 5),
-        ("FieldOperations", "Menus.FieldOperations", "MeasurementSheet", "/field-operations/measurement-sheets", "Menus.FieldOperations.MeasurementSheet", 6),
-        ("FieldOperations", "Menus.FieldOperations", "MeasurementSheetLine", "/field-operations/measurement-sheet-lines", "Menus.FieldOperations.MeasurementSheetLine", 7),
+        ("FieldOperations", "Menus.FieldOperations", "ProgressEntry", "/field-operations/progress-entries", "Menus.FieldOperations.ProgressEntry", 2),
+        ("FieldOperations", "Menus.FieldOperations", "MeasurementSheet", "/field-operations/measurement-sheets", "Menus.FieldOperations.MeasurementSheet", 3),
+
+        // — Puantaj — (puantaj satırı puantaj ekranında yönetilir)
         ("HR", "Menus.HR", "Timesheet", "/h-r/timesheets", "Menus.HR.Timesheet", 1),
-        ("HR", "Menus.HR", "TimesheetLine", "/h-r/timesheet-lines", "Menus.HR.TimesheetLine", 2),
+
+        // — Ekipman ve Demirbaş —
         ("Assets", "Menus.Assets", "EquipmentAsset", "/assets/equipment-assets", "Menus.Assets.EquipmentAsset", 1),
         ("Assets", "Menus.Assets", "EquipmentAssignment", "/assets/equipment-assignments", "Menus.Assets.EquipmentAssignment", 2),
         ("Assets", "Menus.Assets", "EquipmentMaintenance", "/assets/equipment-maintenances", "Menus.Assets.EquipmentMaintenance", 3),
+
+        // — Finans — (işlem/ödeme/tahsilat satır ve dağıtımları üst belgede yönetilir)
         ("Finance", "Menus.Finance", "FinancialAccount", "/finance/financial-accounts", "Menus.Finance.FinancialAccount", 1),
         ("Finance", "Menus.Finance", "CostCenter", "/finance/cost-centers", "Menus.Finance.CostCenter", 2),
         ("Finance", "Menus.Finance", "FinancialTransaction", "/finance/financial-transactions", "Menus.Finance.FinancialTransaction", 3),
-        ("Finance", "Menus.Finance", "FinancialTransactionLine", "/finance/financial-transaction-lines", "Menus.Finance.FinancialTransactionLine", 4),
-        ("Finance", "Menus.Finance", "Payable", "/finance/payables", "Menus.Finance.Payable", 5),
-        ("Finance", "Menus.Finance", "Receivable", "/finance/receivables", "Menus.Finance.Receivable", 6),
-        ("Finance", "Menus.Finance", "Payment", "/finance/payments", "Menus.Finance.Payment", 7),
-        ("Finance", "Menus.Finance", "PaymentAllocation", "/finance/payment-allocations", "Menus.Finance.PaymentAllocation", 8),
-        ("Finance", "Menus.Finance", "Collection", "/finance/collections", "Menus.Finance.Collection", 9),
-        ("Finance", "Menus.Finance", "CollectionAllocation", "/finance/collection-allocations", "Menus.Finance.CollectionAllocation", 10),
+        ("Finance", "Menus.Finance", "Payable", "/finance/payables", "Menus.Finance.Payable", 4),
+        ("Finance", "Menus.Finance", "Receivable", "/finance/receivables", "Menus.Finance.Receivable", 5),
+        ("Finance", "Menus.Finance", "Payment", "/finance/payments", "Menus.Finance.Payment", 6),
+        ("Finance", "Menus.Finance", "Collection", "/finance/collections", "Menus.Finance.Collection", 7),
+
+        // — Bütçe — (bütçe satırı bütçe ekranında yönetilir)
         ("Budget", "Menus.Budget", "Budget", "/budget/budgets", "Menus.Budget.Budget", 1),
-        ("Budget", "Menus.Budget", "BudgetLine", "/budget/budget-lines", "Menus.Budget.BudgetLine", 2),
+
+        // — Sözleşmeler — (taraf/satır/ek sözleşme ekranında yönetilir)
         ("Contracts", "Menus.Contracts", "Contract", "/contracts/contracts", "Menus.Contracts.Contract", 1),
-        ("Contracts", "Menus.Contracts", "ContractParty", "/contracts/contract-parties", "Menus.Contracts.ContractParty", 2),
-        ("Contracts", "Menus.Contracts", "ContractLine", "/contracts/contract-lines", "Menus.Contracts.ContractLine", 3),
-        ("Contracts", "Menus.Contracts", "ContractAmendment", "/contracts/contract-amendments", "Menus.Contracts.ContractAmendment", 4),
+
+        // — Hakedişler — (satır/kesinti hakediş ekranında yönetilir)
         ("ProgressPayments", "Menus.ProgressPayments", "ProgressPayment", "/progress-payments/progress-payments", "Menus.ProgressPayments.ProgressPayment", 1),
-        ("ProgressPayments", "Menus.ProgressPayments", "ProgressPaymentLine", "/progress-payments/progress-payment-lines", "Menus.ProgressPayments.ProgressPaymentLine", 2),
-        ("ProgressPayments", "Menus.ProgressPayments", "ProgressPaymentDeduction", "/progress-payments/progress-payment-deductions", "Menus.ProgressPayments.ProgressPaymentDeduction", 3),
+
+        // — Dokümanlar — (versiyon/ilişki/yetki doküman ekranında yönetilir)
         ("Documents", "Menus.Documents", "DocumentFolder", "/documents/document-folders", "Menus.Documents.DocumentFolder", 1),
         ("Documents", "Menus.Documents", "Document", "/documents/documents", "Menus.Documents.Document", 2),
-        ("Documents", "Menus.Documents", "DocumentVersion", "/documents/document-versions", "Menus.Documents.DocumentVersion", 3),
-        ("Documents", "Menus.Documents", "DocumentRelation", "/documents/document-relations", "Menus.Documents.DocumentRelation", 4),
-        ("Documents", "Menus.Documents", "DocumentPermission", "/documents/document-permissions", "Menus.Documents.DocumentPermission", 5),
+
+        // — Onay Akışları — (versiyon/adım/koşul/onaylayan/aksiyon tanım ve istek ekranında yönetilir)
         ("Workflow", "Menus.Workflow", "ApprovalDefinition", "/workflow/approval-definitions", "Menus.Workflow.ApprovalDefinition", 1),
-        ("Workflow", "Menus.Workflow", "ApprovalDefinitionVersion", "/workflow/approval-definition-versions", "Menus.Workflow.ApprovalDefinitionVersion", 2),
-        ("Workflow", "Menus.Workflow", "ApprovalStepDefinition", "/workflow/approval-step-definitions", "Menus.Workflow.ApprovalStepDefinition", 3),
-        ("Workflow", "Menus.Workflow", "ApprovalStepApprover", "/workflow/approval-step-approvers", "Menus.Workflow.ApprovalStepApprover", 4),
-        ("Workflow", "Menus.Workflow", "ApprovalCondition", "/workflow/approval-conditions", "Menus.Workflow.ApprovalCondition", 5),
-        ("Workflow", "Menus.Workflow", "ApprovalRequest", "/workflow/approval-requests", "Menus.Workflow.ApprovalRequest", 6),
-        ("Workflow", "Menus.Workflow", "ApprovalRequestStep", "/workflow/approval-request-steps", "Menus.Workflow.ApprovalRequestStep", 7),
-        ("Workflow", "Menus.Workflow", "ApprovalRequestApprover", "/workflow/approval-request-approvers", "Menus.Workflow.ApprovalRequestApprover", 8),
-        ("Workflow", "Menus.Workflow", "ApprovalAction", "/workflow/approval-actions", "Menus.Workflow.ApprovalAction", 9),
-        ("Workflow", "Menus.Workflow", "ApprovalDelegation", "/workflow/approval-delegations", "Menus.Workflow.ApprovalDelegation", 10),
+        ("Workflow", "Menus.Workflow", "ApprovalRequest", "/workflow/approval-requests", "Menus.Workflow.ApprovalRequest", 2),
+        ("Workflow", "Menus.Workflow", "ApprovalDelegation", "/workflow/approval-delegations", "Menus.Workflow.ApprovalDelegation", 3),
+
+        // — Bildirimler — (alıcı listesi bildirim ekranında yönetilir)
         ("Notifications", "Menus.Notifications", "Notification", "/notifications/notifications", "Menus.Notifications.Notification", 1),
-        ("Notifications", "Menus.Notifications", "NotificationRecipient", "/notifications/notification-recipients", "Menus.Notifications.NotificationRecipient", 2),
-        ("Notifications", "Menus.Notifications", "NotificationPreference", "/notifications/notification-preferences", "Menus.Notifications.NotificationPreference", 3),
+        ("Notifications", "Menus.Notifications", "NotificationPreference", "/notifications/notification-preferences", "Menus.Notifications.NotificationPreference", 2),
+
+        // — Raporlama Tanımları —
         ("Reporting", "Menus.Reporting", "ReportDefinition", "/reporting/report-definitions", "Menus.Reporting.ReportDefinition", 1),
         ("Reporting", "Menus.Reporting", "DashboardWidget", "/reporting/dashboard-widgets", "Menus.Reporting.DashboardWidget", 2),
     ];
@@ -1710,6 +1825,123 @@ public sealed partial class SystemSeeder : ISystemSeeder
             await EnsureMenuAsync(nameKey, parent.Id, route, "todo", 200 + order, permission, ct);
         }
         _logger.LogInformation("Seeding: {Count} per-process menu(s) ensured.", ModuleProcessMenus.Length);
+    }
+
+    #endregion
+
+    #region 04b | MENULER | Veri Yonetimi (tum tablolar, kisitli)
+
+    /// <summary>
+    /// İş menüsünde YER ALMAYAN alt/detay tablolar (satır, junction, versiyon, geçmiş,
+    /// dağıtım, adım/onaylayan). "Veri Yönetimi" kırılımı, bu listeyi küratörlü iş
+    /// ekranlarıyla (<see cref="ModuleEntityMenus"/>) BİRLEŞTİREREK veritabanındaki TÜM
+    /// tabloları kapsar. NameKey iş biçimindedir ("Menus.&lt;Module&gt;.&lt;Entity&gt;");
+    /// MenuService bu anahtardan etiketi çözer. (Module, Route, NameKey)
+    /// </summary>
+    private static readonly (string Module, string Route, string NameKey)[] DataAdminExtraEntityMenus =
+    [
+        ("Organization", "/organization/employee-skill-assignments", "Menus.Organization.EmployeeSkillAssignment"),
+        ("Organization", "/organization/expense-claim-lines", "Menus.Organization.ExpenseClaimLine"),
+        ("BusinessPartners", "/business-partners/business-partner-contacts", "Menus.BusinessPartners.BusinessPartnerContact"),
+        ("BusinessPartners", "/business-partners/business-partner-addresses", "Menus.BusinessPartners.BusinessPartnerAddress"),
+        ("BusinessPartners", "/business-partners/business-partner-bank-accounts", "Menus.BusinessPartners.BusinessPartnerBankAccount"),
+        ("Projects", "/projects/project-phases", "Menus.Projects.ProjectPhas"),
+        ("Projects", "/projects/project-members", "Menus.Projects.ProjectMember"),
+        ("Projects", "/projects/project-notes", "Menus.Projects.ProjectNote"),
+        ("Catalog", "/catalog/material-attribute-options", "Menus.Catalog.MaterialAttributeOption"),
+        ("Catalog", "/catalog/material-category-attributes", "Menus.Catalog.MaterialCategoryAttribute"),
+        ("Catalog", "/catalog/material-attribute-values", "Menus.Catalog.MaterialAttributeValue"),
+        ("Catalog", "/catalog/material-unit-conversions", "Menus.Catalog.MaterialUnitConversion"),
+        ("Inventory", "/inventory/stock-document-lines", "Menus.Inventory.StockDocumentLine"),
+        ("Inventory", "/inventory/stock-issue-allocations", "Menus.Inventory.StockIssueAllocation"),
+        ("Inventory", "/inventory/stock-count-lines", "Menus.Inventory.StockCountLine"),
+        ("Inventory", "/inventory/warehouse-transfer-lines", "Menus.Inventory.WarehouseTransferLine"),
+        ("Requests", "/requests/request-lines", "Menus.Requests.RequestLine"),
+        ("Procurement", "/procurement/supplier-quote-lines", "Menus.Procurement.SupplierQuoteLine"),
+        ("Procurement", "/procurement/purchase-order-lines", "Menus.Procurement.PurchaseOrderLine"),
+        ("Procurement", "/procurement/purchase-receipt-lines", "Menus.Procurement.PurchaseReceiptLine"),
+        ("Procurement", "/procurement/supplier-invoice-lines", "Menus.Procurement.SupplierInvoiceLine"),
+        ("Operations", "/operations/work-order-assignments", "Menus.Operations.WorkOrderAssignment"),
+        ("Operations", "/operations/work-order-material-plans", "Menus.Operations.WorkOrderMaterialPlan"),
+        ("Operations", "/operations/work-order-material-usages", "Menus.Operations.WorkOrderMaterialUsage"),
+        ("Operations", "/operations/work-order-checklists", "Menus.Operations.WorkOrderChecklist"),
+        ("Operations", "/operations/work-order-checklist-items", "Menus.Operations.WorkOrderChecklistItem"),
+        ("Operations", "/operations/work-order-status-histories", "Menus.Operations.WorkOrderStatusHistory"),
+        ("FieldOperations", "/field-operations/daily-site-report-workers", "Menus.FieldOperations.DailySiteReportWorker"),
+        ("FieldOperations", "/field-operations/daily-site-report-equipments", "Menus.FieldOperations.DailySiteReportEquipment"),
+        ("FieldOperations", "/field-operations/daily-site-report-materials", "Menus.FieldOperations.DailySiteReportMaterial"),
+        ("FieldOperations", "/field-operations/measurement-sheet-lines", "Menus.FieldOperations.MeasurementSheetLine"),
+        ("HR", "/h-r/timesheet-lines", "Menus.HR.TimesheetLine"),
+        ("Finance", "/finance/financial-transaction-lines", "Menus.Finance.FinancialTransactionLine"),
+        ("Finance", "/finance/payment-allocations", "Menus.Finance.PaymentAllocation"),
+        ("Finance", "/finance/collection-allocations", "Menus.Finance.CollectionAllocation"),
+        ("Budget", "/budget/budget-lines", "Menus.Budget.BudgetLine"),
+        ("Contracts", "/contracts/contract-parties", "Menus.Contracts.ContractParty"),
+        ("Contracts", "/contracts/contract-lines", "Menus.Contracts.ContractLine"),
+        ("Contracts", "/contracts/contract-amendments", "Menus.Contracts.ContractAmendment"),
+        ("ProgressPayments", "/progress-payments/progress-payment-lines", "Menus.ProgressPayments.ProgressPaymentLine"),
+        ("ProgressPayments", "/progress-payments/progress-payment-deductions", "Menus.ProgressPayments.ProgressPaymentDeduction"),
+        ("Documents", "/documents/document-versions", "Menus.Documents.DocumentVersion"),
+        ("Documents", "/documents/document-relations", "Menus.Documents.DocumentRelation"),
+        ("Documents", "/documents/document-permissions", "Menus.Documents.DocumentPermission"),
+        ("Workflow", "/workflow/approval-definition-versions", "Menus.Workflow.ApprovalDefinitionVersion"),
+        ("Workflow", "/workflow/approval-step-definitions", "Menus.Workflow.ApprovalStepDefinition"),
+        ("Workflow", "/workflow/approval-step-approvers", "Menus.Workflow.ApprovalStepApprover"),
+        ("Workflow", "/workflow/approval-conditions", "Menus.Workflow.ApprovalCondition"),
+        ("Workflow", "/workflow/approval-request-steps", "Menus.Workflow.ApprovalRequestStep"),
+        ("Workflow", "/workflow/approval-request-approvers", "Menus.Workflow.ApprovalRequestApprover"),
+        ("Workflow", "/workflow/approval-actions", "Menus.Workflow.ApprovalAction"),
+        ("Notifications", "/notifications/notification-recipients", "Menus.Notifications.NotificationRecipient"),
+    ];
+
+    /// <summary>
+    /// "Veri Yönetimi" kırılımını idempotent kurar: veritabanındaki TÜM tabloların düz
+    /// CRUD ekranlarını, iş menüsünden AYRI ve <see cref="PermissionCatalog.DataAdminAccess"/>
+    /// yetkisiyle KISITLI tek bir alan altında modül modül gruplar. Amaç: ayrıcalıklı
+    /// kullanıcıların ham veriye müdahale edebilmesi. Yapraklar iş menüsündeki aynı
+    /// entity etiketini paylaşır (MenuService "Menus.DataAdmin..." → "Menus..." geri düşüşü).
+    /// </summary>
+    private async Task EnsureDataAdminMenusAsync(CancellationToken ct)
+    {
+        const string perm = PermissionCatalog.DataAdminAccess;
+
+        // Alanın kendisi (kök), Sistem Yönetimi'nden hemen önce (80 alanları ↔ 90 sistem).
+        var area = await EnsureMenuAsync("Menus.DataAdminArea", null, null, "detailslayout", 85, perm, ct);
+
+        // Küratörlü iş ekranları + iş menüsünde olmayan alt/detay tablolar = TÜM tablolar.
+        var rows = ModuleEntityMenus
+            .Select(m => (m.Module, m.Route, m.NameKey))
+            .Concat(DataAdminExtraEntityMenus)
+            .ToList();
+
+        var moduleOrder = 0;
+        foreach (var module in PermissionCatalog.CrudModules)
+        {
+            var moduleRows = rows
+                .Where(r => r.Module == module)
+                .OrderBy(r => r.NameKey, StringComparer.Ordinal)
+                .ToList();
+            if (moduleRows.Count == 0)
+            {
+                continue;
+            }
+
+            moduleOrder += 1;
+            var container = await EnsureMenuAsync($"Menus.DataAdmin.{module}", area.Id, null, "box", moduleOrder, perm, ct);
+
+            var leafOrder = 0;
+            foreach (var (_, route, nameKey) in moduleRows)
+            {
+                leafOrder += 1;
+                // "Menus.<Module>.<Entity>" → "Menus.DataAdmin.<Module>.<Entity>" (benzersiz anahtar).
+                var leafKey = "Menus.DataAdmin." + nameKey["Menus.".Length..];
+                await EnsureMenuAsync(leafKey, container.Id, route, "doc", leafOrder, perm, ct);
+            }
+        }
+
+        _logger.LogInformation(
+            "Seeding: data-administration menus ensured ({Count} flat CRUD screens across {Modules} module group(s)).",
+            rows.Count, moduleOrder);
     }
 
     #endregion

@@ -17,17 +17,17 @@ public class ApprovalDefinitionVersionLookupService : IApprovalDefinitionVersion
     {
         var query = _db.ApprovalDefinitionVersions.AsNoTracking();
         if (activeOnly) query = query.Where(e => e.IsActive);
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new ApprovalDefinitionVersionLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = e.IsActive
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<ApprovalDefinitionVersionLookupResponse>)rows.Select(e => new ApprovalDefinitionVersionLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace(e.EffectiveFrom.ToString("yyyy-MM-dd")) ? "Approval Definition Version #" + e.Id.ToString().Substring(0, 8) : (e.EffectiveFrom.ToString("yyyy-MM-dd")),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<ApprovalDefinitionVersionLookupResponse>>.Success(items);
     }
 }

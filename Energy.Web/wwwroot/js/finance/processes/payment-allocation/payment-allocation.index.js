@@ -16,6 +16,7 @@
     }
 
     function init(base, opts) {
+        var LP = function () { return (window.AppScreenL10n && window.AppScreenL10n.process) || {}; };
         var notify = window.AppNotify || { success: function () {}, error: function () {} };
         var state = { paymentId: null };
         var lines = [];
@@ -28,7 +29,6 @@
             items: [
                 {
                     dataField: "paymentId",
-                    label: { text: "Payment" },
                     editorType: "dxSelectBox",
                     validationRules: [{ type: "required" }],
                     editorOptions: {
@@ -60,7 +60,6 @@
             columns: [
                 {
                     dataField: "targetId",
-                    caption: "Payable",
                     validationRules: [{ type: "required" }],
                     lookup: {
                         dataSource: lookupStore("/finance/payables/lookup"),
@@ -70,7 +69,6 @@
                 },
                 {
                     dataField: "amount",
-                    caption: "Amount",
                     dataType: "number",
                     format: { type: "fixedPoint", precision: 2 },
                     validationRules: [{ type: "required" }, { type: "range", min: 0.000001 }]
@@ -98,15 +96,14 @@
                             if (r && r.isSuccess) {
                                 notify.success(opts.success);
                                 $("#" + opts.resultId).text(
-                                    "Lines: " + (r.data ? r.data.allocatedLineCount : "") +
-                                    " | Total: " + (r.data ? r.data.totalAllocated : ""));
+                                    (LP().resultLines || "Lines") + ": " + (r.data ? r.data.allocatedLineCount : "") + " | " + (LP().resultTotal || "Total") + ": " + (r.data ? r.data.totalAllocated : ""));
                                 lines.splice(0, lines.length);
                                 grid.refresh();
                             } else {
-                                notify.error((r && r.message) || "Error");
+                                notify.error((r && r.message) || LP().genericError || "Error");
                             }
                         })
-                        .catch(function () { notify.error("Error"); });
+                        .catch(function () { notify.error(LP().genericError || "Error"); });
                 });
             }
         });

@@ -16,17 +16,17 @@ public class WorkOrderMaterialUsageLookupService : IWorkOrderMaterialUsageLookup
     public async Task<BaseResponse<IReadOnlyList<WorkOrderMaterialUsageLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.WorkOrderMaterialUsages.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new WorkOrderMaterialUsageLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<WorkOrderMaterialUsageLookupResponse>)rows.Select(e => new WorkOrderMaterialUsageLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace(e.UsedQuantity.ToString()) ? "Work Order Material Usage #" + e.Id.ToString().Substring(0, 8) : (e.UsedQuantity.ToString()),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<WorkOrderMaterialUsageLookupResponse>>.Success(items);
     }
 }

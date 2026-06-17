@@ -16,17 +16,17 @@ public class DocumentRelationLookupService : IDocumentRelationLookupService
     public async Task<BaseResponse<IReadOnlyList<DocumentRelationLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.DocumentRelations.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new DocumentRelationLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<DocumentRelationLookupResponse>)rows.Select(e => new DocumentRelationLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace((e.RelatedModule ?? "")) ? "Document Relation #" + e.Id.ToString().Substring(0, 8) : ((e.RelatedModule ?? "")),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<DocumentRelationLookupResponse>>.Success(items);
     }
 }

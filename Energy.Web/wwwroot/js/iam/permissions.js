@@ -12,8 +12,8 @@
     "use strict";
     // Yerelleştirme sözlüğü kısayolları (yetkiler / grid / bildirimler).
     var L = function () { return window.AppL10n.permissions; };
-    var LG = function () { return window.AppL10n.grid; };
-    var LN = function () { return window.AppL10n.notifications; };
+    var LG = function () { return window.AppL10n.permissions.grid; };
+    var LN = function () { return window.AppL10n.permissions.notifications; };
     // Grid örneği.
     var gridInstance;
 

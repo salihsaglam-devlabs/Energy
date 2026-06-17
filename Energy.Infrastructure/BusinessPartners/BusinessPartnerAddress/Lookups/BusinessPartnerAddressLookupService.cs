@@ -16,17 +16,17 @@ public class BusinessPartnerAddressLookupService : IBusinessPartnerAddressLookup
     public async Task<BaseResponse<IReadOnlyList<BusinessPartnerAddressLookupResponse>>> GetLookupAsync(string? search = null, bool activeOnly = true, CancellationToken ct = default)
     {
         var query = _db.BusinessPartnerAddresses.AsNoTracking();
-        var items = await query
+        var rows = await query
             .OrderBy(e => e.Id)
-            .Select(e => new BusinessPartnerAddressLookupResponse
-            {
-                Id = e.Id,
-                Code = null,
-                Name = null,
-                DisplayName = e.Id.ToString(),
-                IsActive = true
-            })
             .ToListAsync(ct);
+        var items = (IReadOnlyList<BusinessPartnerAddressLookupResponse>)rows.Select(e => new BusinessPartnerAddressLookupResponse
+        {
+            Id = e.Id,
+            Code = null,
+            Name = null,
+            DisplayName = string.IsNullOrWhiteSpace((e.AddressType ?? "")) ? "Business Partner Address #" + e.Id.ToString().Substring(0, 8) : ((e.AddressType ?? "")),
+            IsActive = true
+        }).ToList();
         return BaseResponse<IReadOnlyList<BusinessPartnerAddressLookupResponse>>.Success(items);
     }
 }

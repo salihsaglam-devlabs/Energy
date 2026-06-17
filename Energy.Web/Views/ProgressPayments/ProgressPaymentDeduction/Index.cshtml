@@ -2,6 +2,7 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<SharedResource> T
 @{
     ViewData["Title"] = T["ProgressPayments.ProgressPaymentDeduction.Title"].Value;
+    ViewData["ScreenId"] = "ProgressPayments.ProgressPaymentDeduction";
 }
 
 <section class="energy-screen">
@@ -15,7 +16,7 @@
     <script src="~/js/progress-payments/progress-payment-deduction/progress-payment-deduction.index.js" asp-append-version="true"></script>
     <script>
         window.AppPageHelp = {
-            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(string.Format(T["Help.IntroEntity"].Value, ViewData["Title"]))),
+            intro: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["ProgressPayments.ProgressPaymentDeduction.Help.Intro"].Value)),
             related: [
                 @Html.Raw(System.Text.Json.JsonSerializer.Serialize(T["ProgressPayments.ProgressPayment.Title"].Value))
             ]
