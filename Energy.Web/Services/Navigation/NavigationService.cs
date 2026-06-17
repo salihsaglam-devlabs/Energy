@@ -18,21 +18,24 @@ public interface INavigationService
 
 /// <summary>
 /// Kullanıcı bazlı menü ağacını API'den yükler (sunucu tarafında zaten yetkiye göre
-/// filtrelenmiştir) ve kullanıcı bazlı varsayılanları (Gösterge Panosu + Profil) her zaman
-/// en üste sabitler; böylece rollerine hiç menü atanmamış olsa bile kimliği doğrulanmış her
-/// kullanıcının gidebileceği bir yer olur.
+/// filtrelenmiştir) ve kullanıcı bazlı varsayılanları (Gösterge Paneli, Sohbet,
+/// Bildirimler, Ayarlar ve Profilim) her zaman sabitler; böylece rollerine hiç menü
+/// atanmamış olsa bile kimliği doğrulanmış her kullanıcının gidebileceği bir yer olur.
 /// </summary>
 public sealed class NavigationService : INavigationService
 {
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(2);
 
-    private static readonly HashSet<string> AlwaysVisibleMenuUrls =
-        new(StringComparer.OrdinalIgnoreCase) { "/dashboard", "/profile" };
 
+    // Kimliği doğrulanmış her kullanıcının (rolüne hiç menü atanmamış olsa bile)
+    // her zaman erişebileceği varsayılan menü öğeleri. Her biri doğru ikonuyla eşlenir.
     private static readonly (string Key, string Url, string Icon, int Order)[] PinnedDefaults =
     {
-        (LocalizationKeys.Menus.Dashboard, "/dashboard", "home", 1),
-        (LocalizationKeys.Menus.Profile,   "/profile",   "user", 9999)
+        (LocalizationKeys.Menus.Dashboard,     "/dashboard",                   "home",        1),
+        (LocalizationKeys.Menus.Chat,          "/chat",                        "chat",        9996),
+        (LocalizationKeys.Menus.Notifications, "/notifications/notifications", "bell",        9997),
+        (LocalizationKeys.Menus.Settings,      "/settings",                    "preferences", 9998),
+        (LocalizationKeys.Menus.Profile,       "/profile",                     "user",        9999)
     };
 
     private readonly IMenuApiClient _menus;

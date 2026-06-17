@@ -9,6 +9,7 @@ public interface IUserApiClient
 {
     Task<BaseResponse<PaginatedResponse<UserSummaryResponse>>> GetAllAsync(PaginatedRequest request, CancellationToken ct = default);
     Task<BaseResponse<UserDetailResponse>> GetByIdAsync(Guid id, CancellationToken ct = default);
+    Task<BaseResponse<UserDetailResponse>> GetMineAsync(CancellationToken ct = default);
     Task<BaseResponse<UserDetailResponse>> CreateAsync(CreateUserRequest request, CancellationToken ct = default);
     Task<BaseResponse<UserDetailResponse>> UpdateAsync(Guid id, UpdateUserRequest request, CancellationToken ct = default);
     Task<BaseResponse<bool>> DeleteAsync(Guid id, CancellationToken ct = default);

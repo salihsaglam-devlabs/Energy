@@ -17,6 +17,9 @@ public sealed class UserApiClient : ApiClientBase, IUserApiClient
     public Task<BaseResponse<UserDetailResponse>> GetByIdAsync(Guid id, CancellationToken ct = default)
         => GetAsync<BaseResponse<UserDetailResponse>>(ApiRoutes.Users.ById(id), ct);
 
+    public Task<BaseResponse<UserDetailResponse>> GetMineAsync(CancellationToken ct = default)
+        => GetAsync<BaseResponse<UserDetailResponse>>(ApiRoutes.Users.Me, ct);
+
     public Task<BaseResponse<UserDetailResponse>> CreateAsync(CreateUserRequest request, CancellationToken ct = default)
         => PostAsync<CreateUserRequest, BaseResponse<UserDetailResponse>>(ApiRoutes.Users.Base, request, ct);
 

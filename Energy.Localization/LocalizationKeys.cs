@@ -124,6 +124,7 @@ public static class LocalizationKeys
         public const string Profile = "Menus.Profile";
         public const string Chat = "Menus.Chat";
         public const string Settings = "Menus.Settings";
+        public const string Notifications = "Menus.Notifications";
         public const string Users = "Menus.Users";
         public const string UserAccess = "Menus.UserAccess";
         public const string Roles = "Menus.Roles";

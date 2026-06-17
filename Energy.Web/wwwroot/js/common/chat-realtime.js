@@ -38,6 +38,7 @@
             onStatus: function () { },
             onGroupInvite: function () { },
             onGroupChanged: function () { },
+            onGroupDeleted: function () { },
             onMessageDeleted: function () { },
             onMessageReacted: function () { },
             onMessagesRead: function () { },
@@ -68,6 +69,7 @@
     var statusSubscribers = [];    // bağlantı durumu değişimlerinde bilgilendirilir
     var groupInviteSubscribers = [];  // bir gruba davet edildiğinde bilgilendirilir
     var groupChangedSubscribers = []; // bir grubun üye listesi değiştiğinde bilgilendirilir
+    var groupDeletedSubscribers = []; // bir grup silindiğinde bilgilendirilir
     var msgDeletedSubscribers = [];
     var msgReactedSubscribers = [];
     var msgReadSubscribers = [];
@@ -302,6 +304,7 @@
         onTyping: function (cb) { if (typeof cb === "function") { typingSubscribers.push(cb); } },
         onGroupInvite: function (cb) { if (typeof cb === "function") { groupInviteSubscribers.push(cb); } },
         onGroupChanged: function (cb) { if (typeof cb === "function") { groupChangedSubscribers.push(cb); } },
+        onGroupDeleted: function (cb) { if (typeof cb === "function") { groupDeletedSubscribers.push(cb); } },
         onMessageDeleted: function (cb) { if (typeof cb === "function") { msgDeletedSubscribers.push(cb); } },
         onMessageReacted: function (cb) { if (typeof cb === "function") { msgReactedSubscribers.push(cb); } },
         onMessagesRead: function (cb) { if (typeof cb === "function") { msgReadSubscribers.push(cb); } },

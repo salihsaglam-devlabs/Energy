@@ -22,6 +22,11 @@
     // Base64 gidiş-dönüşünü makul tutmak için ek boyutunu sınırla (10 MB).
     var MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
 
+    // Yerelleştirme etiketleri modül kapsamındadır: hem init() içindeki arayüz kodu hem de
+    // modül kapsamındaki buildMessageContent() (mesaj baloncuğu eylem ipuçları) erişir.
+    // init(), data-labels'tan okuyup buradaki referansı doldurur (yeniden bildirmeden).
+    var labels = {};
+
     function readJson($el, attr, fallback) {
         try {
             var raw = $el.attr(attr);
@@ -178,7 +183,9 @@
             var $root = $(".energy-chat");
             if ($root.length === 0) { return; }
 
-            var labels = readJson($root, "data-labels", {});
+            // Modül kapsamındaki "labels"ı doldur (yeniden bildirme YOK); böylece
+            // buildMessageContent() gibi modül seviyesindeki yardımcılar da erişir.
+            labels = readJson($root, "data-labels", {});
             var me = {
                 id: $root.attr("data-user-id"),
                 name: $root.attr("data-user-name") || "",

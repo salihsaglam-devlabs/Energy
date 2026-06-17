@@ -17,17 +17,6 @@
 (function (window, document) {
     "use strict";
 
-    function L() {
-        return (window.AppL10n && window.AppL10n.screen) || {
-            entityBadge: "Data Management",
-            entityBadgeTitle: "",
-            processBadge: "Process",
-            processBadgeTitle: "",
-            reportBadge: "Report",
-            reportBadgeTitle: ""
-        };
-    }
-
     function detect(section) {
         var explicit = section.getAttribute("data-screen");
         if (explicit === "process" || explicit === "entity" || explicit === "report") {
@@ -38,22 +27,6 @@
         return "entity";
     }
 
-    function ensureBadge(section, kind) {
-        if (section.querySelector(":scope > .energy-screen__header .energy-screen__badge")) { return; }
-        var header = section.querySelector(":scope > .energy-screen__header");
-        if (!header) { return; }
-        var l = L();
-        var badge = document.createElement("span");
-        badge.className = "energy-screen__badge is-" + kind;
-        var text, title;
-        if (kind === "process") { text = l.processBadge; title = l.processBadgeTitle; }
-        else if (kind === "report") { text = l.reportBadge; title = l.reportBadgeTitle; }
-        else { text = l.entityBadge; title = l.entityBadgeTitle; }
-        badge.textContent = text || "";
-        if (title) { badge.setAttribute("title", title); }
-        // Header'ın en sağına yerleştir; mevcut iç düzeni bozma.
-        header.appendChild(badge);
-    }
 
     function markScreens(root) {
         var scope = root || document;
@@ -63,7 +36,11 @@
             var kind = detect(s);
             var modifier = "energy-screen--" + kind;
             if (!s.classList.contains(modifier)) { s.classList.add(modifier); }
-            ensureBadge(s, kind);
+            // Sayfanın üst-ortasındaki "Veri Yönetimi / Süreç / Rapor" rozeti artık
+            // gösterilmez; bu bilgi sayfa "Bilgi" (Info) penceresinde zaten açıklanıyor.
+            // Olası eski/önbellekten gelen rozetleri de temizle.
+            var existing = s.querySelector(":scope > .energy-screen__header .energy-screen__badge");
+            if (existing) { existing.remove(); }
         }
     }
 

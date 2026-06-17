@@ -14,6 +14,7 @@ internal static class ApiRoutes
     public static class Users
     {
         public static readonly string Base = $"{V1}/users";
+        public static readonly string Me = $"{Base}/me";
         public static string ById(Guid id) => $"{Base}/{id}";
         public static string Password(Guid id) => $"{Base}/{id}/password";
         public static string ProfileImage(Guid id) => $"{Base}/{id}/profile-image";
